@@ -129,6 +129,7 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 			if (billDetail.getTransactionType().equalsIgnoreCase("SERVICE_CHARGES")) {
 				if (billDetail.getAmount() != null)
 					chargeAmount = chargeAmount.add(billDetail.getAmount());
+				
 			} else if (billDetail.getTransactionType().equalsIgnoreCase("TAXES")) {
 				if (billDetail.getAmount() != null)
 					taxAmount = taxAmount.add(billDetail.getAmount());
@@ -136,6 +137,7 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 			} else if (billDetail.getTransactionType().equalsIgnoreCase("ADJUSTMENT")) {
 				if (billDetail.getAmount() != null)
 					adjustmentAmount = adjustmentAmount.add(billDetail.getAmount());
+				
 			} else if (billDetail.getTransactionType().contains("PAYMENT")) {
 				if (billDetail.getAmount() != null)
 					paymentAmount = paymentAmount.add(billDetail.getAmount());
