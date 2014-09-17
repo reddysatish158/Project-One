@@ -6,6 +6,7 @@ package org.mifosplatform.cms.eventmaster.service;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.joda.time.LocalDate;
@@ -120,8 +121,10 @@ public class EventMasterReadPlatformServiceImpl implements
 			Long id = rs.getLong("id");
 			String eventName = rs.getString("eventName");
 			String eventDescription = rs.getString("eventDescription");
-			LocalDate eventStartDate = JdbcSupport.getLocalDate(rs, "eventStartDate");
-			LocalDate eventEndDate = JdbcSupport.getLocalDate(rs, "eventEndDate");
+			//LocalDate eventStartDate = JdbcSupport.getLocalDate(rs, "eventStartDate");
+			Date eventStartDate = rs.getTimestamp("eventStartDate");
+			//LocalDate eventEndDate = JdbcSupport.getLocalDate(rs, "eventEndDate");
+			Date eventEndDate = rs.getTimestamp("eventEndDate");
 			LocalDate eventValidity = JdbcSupport.getLocalDate(rs, "eventValidity");
 			Long status = rs.getLong("status");
 			/*int allowCancellation = JdbcSupport.getInteger(rs, "allowCancellation");*/

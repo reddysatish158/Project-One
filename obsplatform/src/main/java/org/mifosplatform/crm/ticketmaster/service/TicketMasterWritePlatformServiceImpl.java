@@ -182,38 +182,34 @@ catch (DataIntegrityViolationException dve) {
 		 try {
 			 Long created=null;
 			 SecurityContext context = SecurityContextHolder.getContext();
-	        	if (context.getAuthentication() != null) {
-	        		AppUser appUser=this.context.authenticatedUser();
-	        		 created=appUser.getId();
-	        	}else{
+			 if (context.getAuthentication() != null) {
+				 AppUser appUser=this.context.authenticatedUser();
+				 created=appUser.getId();
+	        }else{
 	        		created=new Long(0);
-	        	}	 
-		this.fromApiJsonDeserializer.validateForCreate(command.json());
-		final TicketMaster ticketMaster = TicketMaster.fromJson(command);
-		//Long created = context.authenticatedUser().getId();
-		ticketMaster.setCreatedbyId(created);
-		this.repository.saveAndFlush(ticketMaster);
-		final TicketDetail details = TicketDetail.fromJson(command);
-		details.setTicketId(ticketMaster.getId());
-		details.setCreatedbyId(created);
-		this.detailsRepository.saveAndFlush(details);
-		transactionHistoryWritePlatformService.saveTransactionHistory(ticketMaster.getClientId(), "Ticket", ticketMaster.getTicketDate(),"Description:"+ticketMaster.getDescription(),
+	        }	 
+			 this.fromApiJsonDeserializer.validateForCreate(command.json());
+			 final TicketMaster ticketMaster = TicketMaster.fromJson(command);
+			 ticketMaster.setCreatedbyId(created);
+			 this.repository.saveAndFlush(ticketMaster);
+			 final TicketDetail details = TicketDetail.fromJson(command);
+			 details.setTicketId(ticketMaster.getId());
+			 details.setCreatedbyId(created);
+			 this.detailsRepository.saveAndFlush(details);
+			 transactionHistoryWritePlatformService.saveTransactionHistory(ticketMaster.getClientId(), "Ticket", ticketMaster.getTicketDate(),"Description:"+ticketMaster.getDescription(),
 			"Priority:"+ticketMaster.getPriority(),"AssignedTo:"+ticketMaster.getAssignedTo(),"Source:"+ticketMaster.getSource(),"TicketMasterID:"+ticketMaster.getId());
+			 List<ActionDetaislData> actionDetaislDatas=this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_CREATE_TICKET);
 		
-		
-		List<ActionDetaislData> actionDetaislDatas=this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_CREATE_TICKET);
-		if(!actionDetaislDatas.isEmpty()){
-			this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,command.getClientId(), ticketMaster.getId().toString());
-		}
-		
+			 	if(!actionDetaislDatas.isEmpty()){
+			 		this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,command.getClientId(), ticketMaster.getId().toString());
+			 	}
 		return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(ticketMaster.getId()).build();
-	} catch (DataIntegrityViolationException dve) {
+		 } catch (DataIntegrityViolationException dve) {
 		/*handleDataIntegrityIssues(command, dve);*/
 		return new CommandProcessingResult(Long.valueOf(-1));
-	} catch (ParseException e) {
-		throw new PlatformDataIntegrityException("invalid.date.format", "invalid.date.format", "ticketDate","invalid.date.format");
-		
+		 } catch (ParseException e) {
+			 throw new PlatformDataIntegrityException("invalid.date.format", "invalid.date.format", "ticketDate","invalid.date.format");
+		 }
+		}
 	}
-	}
-}
 

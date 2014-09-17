@@ -60,8 +60,8 @@ public class EventMasterFromApiJsonDeserializer {
 	     baseDataValidator.reset().parameter("eventName").value(eventName).notBlank().notExceedingLengthOf(100);
 	     final String chargeCode = fromApiJsonHelper.extractStringNamed("chargeCode", element);
 	     baseDataValidator.reset().parameter("chargeCode").value(chargeCode).notBlank().notExceedingLengthOf(100);
-	     final LocalDate eventStartDate = fromApiJsonHelper.extractLocalDateNamed("eventStartDate", element);
-        baseDataValidator.reset().parameter("eventStartDate").value(eventStartDate).notBlank();
+	     final String eventStartDate = fromApiJsonHelper.extractStringNamed("eventStartDate", element);
+         baseDataValidator.reset().parameter("eventStartDate").value(eventStartDate).notBlank();
         
         final LocalDate eventValidity = fromApiJsonHelper.extractLocalDateNamed("eventValidity", element);
         baseDataValidator.reset().parameter("eventValidity").value(eventValidity).notBlank();
@@ -74,6 +74,16 @@ public class EventMasterFromApiJsonDeserializer {
 	    
 	    final String eventCategory = fromApiJsonHelper.extractStringNamed("eventCategory", element);
 		baseDataValidator.reset().parameter("eventCategory").value(eventCategory).notBlank().notExceedingLengthOf(50);  
+		
+		if("Live Event".equalsIgnoreCase(eventCategory)){
+			final String eventEndDate = fromApiJsonHelper.extractStringNamed("eventEndDate", element);
+	        baseDataValidator.reset().parameter("eventEndDate").value(eventEndDate).notNull();
+	        if(eventStartDate != null && !eventStartDate.contains(":")){
+	        	dataValidationErrors.add(ApiParameterError.parameterError("Event StartTime is mandatory for live event","event.start.time.is.mandatory.for.live.event", "starttime","event.start.time.is.mandatory.for.live.event"));
+	        }if(eventEndDate != null && !eventEndDate.contains(":")){
+	        	dataValidationErrors.add(ApiParameterError.parameterError("Event EndTime is mandatory for live event","event.end.time.is.mandatory.for.live.event", "EndTime","event.end.time.is.mandatory.for.live.event"));
+	        }
+		}
 	     
 	     throwExceptionIfValidationWarningsExist(dataValidationErrors);
 	     

@@ -535,11 +535,17 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 				if(orderDetails == null){
 					throw new NoOrdersFoundException(orderId);
 				}
+				//Check for Custome_Validation
+				CustomValidationData customValidationData   = this.orderDetailsReadPlatformServices.checkForCustomValidations(orderDetails.getClientId(),"Order Renewal", command.json());
+				if(customValidationData.getErrorCode() != 0 && customValidationData.getErrorMessage() != null){
+					throw new ActivePlansFoundException(customValidationData.getErrorMessage()); 
+				}
 				List<OrderPrice>  orderPrices=orderDetails.getPrice();
 				final Long contractPeriod = command.longValueOfParameterNamed("renewalPeriod");
 				final String description=command.stringValueOfParameterNamed("description");
 				Contract contractDetails=this.subscriptionRepository.findOne(contractPeriod);
 				Plan plan=this.planRepository.findOne(orderDetails.getPlanId());
+				
 				
 					if(orderDetails.getStatus().equals(StatusTypeEnum.ACTIVE.getValue().longValue())){
 						newStartdate=new LocalDate(orderDetails.getEndDate()).plusDays(1);

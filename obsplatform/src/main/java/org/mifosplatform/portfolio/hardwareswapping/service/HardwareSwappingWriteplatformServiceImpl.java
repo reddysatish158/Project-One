@@ -95,7 +95,6 @@ public class HardwareSwappingWriteplatformServiceImpl implements HardwareSwappin
 	
 
 @Override
-@Transactional
 public CommandProcessingResult dohardWareSwapping(Long entityId,JsonCommand command) {
 		
 	try{
