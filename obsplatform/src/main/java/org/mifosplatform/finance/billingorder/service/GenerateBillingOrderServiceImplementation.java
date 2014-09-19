@@ -222,17 +222,9 @@ public class GenerateBillingOrderServiceImplementation implements	GenerateBillin
 			netTaxAmount = netTaxAmount.add(netChargeTaxAmount);
 			totalChargeAmount = totalChargeAmount.add(netChargeAmount);
 			
-			invoice.addCharges(charge);		
-			
-			//List<InvoiceTax> listOfTaxes = billingOrderCommand.getListOfTax();
-			//BigDecimal netTaxForService = BigDecimal.ZERO;
-			//for (InvoiceTax invoiceTax : listOfTaxes) {
-			//	netTaxForService = invoiceTax.getTaxAmount().add(netTaxForService);
-			//}
+			invoice.addCharges(charge);	
 			
 		 }
-		 // invoiceAmount = totalChargeAmountForServices;
-        //				.add(totalTaxAmountForServices);
 		
 		if(billingOrderCommands.get(0).getTaxInclusive()!=null){
 		if(isTaxInclusive(billingOrderCommands.get(0).getTaxInclusive())){

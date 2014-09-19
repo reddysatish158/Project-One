@@ -17,13 +17,14 @@ public class PromotionCodeData {
 	 String durationType;
 	 Long duration;
 	 String discountType;
-	 private LocalDate discountStartDate;
+	 private LocalDate startDate;
 	 private BigDecimal discountRate;
 	 private Collection<MCodeData> discounTypeData;
 
 	 private List<PeriodData> contractTypedata;
 
-	public PromotionCodeData(Long id,String promotionCode,String promotionDescription,String durationType,Long duration,String discountType,BigDecimal discountRate) {
+	public PromotionCodeData(Long id,String promotionCode,String promotionDescription,String durationType,Long duration,String discountType,
+			             BigDecimal discountRate,LocalDate startDate) {
 
 		this.id=id;
 		this.promotionCode=promotionCode;
@@ -32,6 +33,7 @@ public class PromotionCodeData {
 		this.duration=duration;
 		this.discountType=discountType;
 		this.discountRate=discountRate;
+		this.startDate = startDate;
 	}
 
 	public PromotionCodeData() {
@@ -90,12 +92,12 @@ public class PromotionCodeData {
 		this.discountType = discountType;
 	}
 
-	public LocalDate getDiscountStartDate() {
-		return discountStartDate;
+	public LocalDate getStartDate() {
+		return startDate;
 	}
 
-	public void setDiscountStartDate(LocalDate discountStartDate) {
-		this.discountStartDate = discountStartDate;
+	public void setStartDate(LocalDate startDate) {
+		this.startDate = startDate;
 	}
 
 	public BigDecimal getDiscountRate() {
