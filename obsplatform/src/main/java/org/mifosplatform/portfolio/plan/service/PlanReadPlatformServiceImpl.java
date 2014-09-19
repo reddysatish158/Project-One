@@ -181,7 +181,7 @@ public class PlanReadPlatformServiceImpl implements PlanReadPlatformService {
 		String sql =null;
 		if(planType != null && orderId != null && "prepaid".equalsIgnoreCase(planType)){
 			
-			 sql = "select " + mapper.schemaForPrepaidPlans()+" and o.id="+orderId+" order by sb.contract_period";
+			 sql = "select " + mapper.schemaForPrepaidPlans()+" and o.id="+orderId+" GROUP BY sb.contract_period order by sb.contract_period";
 		}else{
 		    sql = "select " + mapper.schema()+" order by contract_period";
 		}
