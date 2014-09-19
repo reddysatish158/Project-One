@@ -39,7 +39,7 @@ public final class InventoryItemCommandFromApiJsonDeserializer {
 
 
 	private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("grnId","itemMasterId","quality","serialNumber","provisioningSerialNumber", 
-			"remarks","status","warranty","locale","officeId","clientId","inventorylisttable_length","flag"));
+			"remarks","status","warranty","locale","officeId","clientId","inventorylisttable_length","flag","itemModel"));
 
     
     private final FromJsonHelper fromApiJsonHelper;
