@@ -159,11 +159,12 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 							}else if(detailsData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.DISCONNECTION.toString())){
 					 
 								order.setStatus(OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.DISCONNECTED).getId());
+								this.orderRepository.saveAndFlush(order);
 								Long activeOrders=this.orderReadPlatformService.retrieveClientActiveOrderDetails(order.getClientId(), null);
 								if(activeOrders == 0){
 									client.setStatus(ClientStatus.DEACTIVE.getValue());
 								}
-								this.orderRepository.saveAndFlush(order);
+								
 							
 							}else if(detailsData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.TERMINATION.toString())){
 								order.setStatus(OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.TERMINATED).getId());
@@ -181,6 +182,7 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 											}
 									}*/
 							}else if(detailsData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.SUSPENTATION.toString())){
+								
 								EnumDomainService enumDomainService=this.enumDomainServiceRepository.findOneByEnumMessageProperty(StatusTypeEnum.SUSPENDED.toString());
 								order.setStatus(enumDomainService.getEnumId());
 								this.orderRepository.saveAndFlush(order);
