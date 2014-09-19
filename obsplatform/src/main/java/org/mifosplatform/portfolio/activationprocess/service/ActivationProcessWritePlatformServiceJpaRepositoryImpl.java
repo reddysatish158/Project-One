@@ -230,6 +230,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 			}
 			
 			if (temporary.getStatus().equalsIgnoreCase("PENDING")){
+				
 				String zipCode = command.stringValueOfParameterNamed("zipCode");
 				// client creation
 				AddressData addressData = this.addressReadPlatformService.retrieveName(city);
@@ -326,8 +327,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 				}
 
 				// book order
-				GlobalConfigurationProperty selfregistrationconfiguration = configurationRepository
-						.findOneByName(ConfigurationConstants.CONFIR_PROPERTY_SELF_REGISTRATION);
+				GlobalConfigurationProperty selfregistrationconfiguration = configurationRepository.findOneByName(ConfigurationConstants.CONFIR_PROPERTY_SELF_REGISTRATION);
 				
 				if (selfregistrationconfiguration != null) {
 					

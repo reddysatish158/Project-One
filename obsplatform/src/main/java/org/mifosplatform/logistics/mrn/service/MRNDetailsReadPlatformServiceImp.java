@@ -333,7 +333,7 @@ public class MRNDetailsReadPlatformServiceImp implements MRNDetailsReadPlatformS
 	}
 	@Override
 	public MRNDetailsData retriveSingleMrnDetail(Long mrnId) {
-		final String sql = "select mrn.id as id, mrn.requested_date as requestedDate, (select item_description from b_item_master where id=mrn.item_master_id) as item," +
+		final String sql = "select mrn.id as mrnId, mrn.requested_date as requestedDate, (select item_description from b_item_master where id=mrn.item_master_id) as item," +
 				          "  (select name from m_office where id=mrn.from_office) as fromOffice, (select name from m_office where id = mrn.to_office) as toOffice," +
 				          "   mrn.orderd_quantity as orderdQuantity, mrn.received_quantity as receivedQuantity, mrn.status as status from b_mrn mrn where mrn.id=?";
 		final MRNDetailsMapper rowMapper = new MRNDetailsMapper();

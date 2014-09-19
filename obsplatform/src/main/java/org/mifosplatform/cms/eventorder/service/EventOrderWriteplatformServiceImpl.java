@@ -189,8 +189,8 @@ public class EventOrderWriteplatformServiceImpl implements EventOrderWriteplatfo
 						   "CancelFlag:"+eventOrder.getCancelFlag(),"bookedPrice:"+eventOrder.getBookedPrice(),"EventValidTillDate:"+eventOrder.getEventValidtill(),
 						   "EventId:"+eventOrder.getEventId(),"EventOrderID:"+eventOrder.getId());
 			
-		//	return new CommandProcessingResult(eventOrder.getEventOrderdetials().get(0).getMovieLink());
-			    return new CommandProcessingResultBuilder().withEntityId(eventMaster.getId()).withResourceIdAsString(response).build();
+		        return new CommandProcessingResult(eventOrder.getEventOrderdetials().get(0).getMovieLink());
+			    //return new CommandProcessingResultBuilder().withEntityId(eventMaster.getId()).withResourceIdAsString(response).build();
 			
 			} catch (DataIntegrityViolationException dve) {
 				handleCodeDataIntegrityIssues(command, dve);
