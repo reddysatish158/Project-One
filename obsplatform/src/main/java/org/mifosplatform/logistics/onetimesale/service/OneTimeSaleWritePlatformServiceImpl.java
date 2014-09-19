@@ -84,6 +84,7 @@ public class OneTimeSaleWritePlatformServiceImpl implements OneTimeSaleWritePlat
 				final JsonElement element = fromJsonHelper.parse(command.json());
 				final Long itemId=command.longValueOfParameterNamed("itemId");
 				ItemMaster item=this.itemMasterRepository.findOne(itemId);
+				
 				//Check for Custome_Validation
 				CustomValidationData customValidationData   = this.orderDetailsReadPlatformServices.checkForCustomValidations(clientId,"Rental", command.json());
 				if(customValidationData.getErrorCode() != 0 && customValidationData.getErrorMessage() != null){

@@ -3,6 +3,7 @@
  */
 package org.mifosplatform.cms.eventmaster.service;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +19,6 @@ import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
-import org.mifosplatform.updatecomparing.UpdateCompareUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -38,21 +38,20 @@ public class EventMasterWritePlatformServiceImpl implements
 		EventMasterWritePlatformService {
 	
 	private PlatformSecurityContext context;
-	private EventMasterRepository eventMasterRepository;
 	private MediaAssetRepository assetRepository;
+	private EventMasterRepository eventMasterRepository;
 	private EventMasterFromApiJsonDeserializer apiJsonDeserializer;
 	private MediaAssetReadPlatformService assetReadPlatformService;
 	
 	@Autowired
-	public EventMasterWritePlatformServiceImpl (final PlatformSecurityContext context,
-											    final EventMasterRepository eventMasterRepository,
-											    final EventMasterFromApiJsonDeserializer apiJsonDeserializer,
-											    final MediaAssetRepository assetRepository,
-											    final MediaAssetReadPlatformService assetReadPlatformService) {
+	public EventMasterWritePlatformServiceImpl (final PlatformSecurityContext context,final EventMasterRepository eventMasterRepository,
+	              							final EventMasterFromApiJsonDeserializer apiJsonDeserializer,final MediaAssetRepository assetRepository,
+	              							final MediaAssetReadPlatformService assetReadPlatformService) {
+		
 		this.context = context;
-		this.eventMasterRepository = eventMasterRepository;
-		this.apiJsonDeserializer = apiJsonDeserializer;
 		this.assetRepository = assetRepository;
+		this.apiJsonDeserializer = apiJsonDeserializer;
+		this.eventMasterRepository = eventMasterRepository;
 		this.assetReadPlatformService = assetReadPlatformService;
 	}
 
@@ -63,7 +62,10 @@ public class EventMasterWritePlatformServiceImpl implements
 			this.context.authenticatedUser();
 			Long createdbyId = context.authenticatedUser().getId();
 			this.apiJsonDeserializer.validateForCreate(command.json());
-			EventMaster eventMaster = EventMaster.fromJsom(command);		
+			EventMaster eventMaster;
+			
+				eventMaster = EventMaster.fromJsom(command);
+					
 			final JsonArray array = command.arrayOfParameterNamed("mediaData").getAsJsonArray();
 			String[] media  = null;
 			media = new String[array.size()];
@@ -81,6 +83,10 @@ public class EventMasterWritePlatformServiceImpl implements
 			
 			return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(eventMaster.getId()).build();
 		} catch(DataIntegrityViolationException dve) {
+			
+			return new CommandProcessingResult(Long.valueOf(-1));
+		} catch (ParseException e) {
+			e.printStackTrace();
 			return new CommandProcessingResult(Long.valueOf(-1));
 		}
 	}
@@ -95,7 +101,10 @@ public class EventMasterWritePlatformServiceImpl implements
 			
 			EventMaster oldEvent = this.eventMasterRepository.findOne(command.entityId());
 			
-			final Map<String, Object> changes = oldEvent.updateEventDetails(command);
+			Map<String, Object> changes;
+			
+				changes = oldEvent.updateEventDetails(command);
+			
 			List<MediaAssetData> mediaData = this.assetReadPlatformService.retrieveAllmediaAssetdata();
 			
 			for(MediaAssetData data : mediaData) {
@@ -121,6 +130,8 @@ public class EventMasterWritePlatformServiceImpl implements
 			}
 			return new CommandProcessingResultBuilder().withEntityId(command.entityId()).withCommandId(command.commandId()).build();
 		} catch (DataIntegrityViolationException dve) {
+			return new CommandProcessingResult(Long.valueOf(-1));
+		} catch (ParseException e) {
 			return new CommandProcessingResult(Long.valueOf(-1));
 		}
 	}

@@ -1,6 +1,5 @@
 package org.mifosplatform.cms.eventorder.api;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -25,7 +24,6 @@ import org.mifosplatform.cms.eventorder.data.EventOrderDeviceData;
 import org.mifosplatform.cms.eventorder.service.EventOrderReadplatformServie;
 import org.mifosplatform.cms.eventpricing.data.ClientTypeData;
 import org.mifosplatform.cms.eventpricing.service.EventPricingReadPlatformService;
-import org.mifosplatform.cms.media.exceptions.NoEventPriceFoundException;
 import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -40,7 +38,6 @@ import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
 import org.mifosplatform.organisation.mcodevalues.service.MCodeReadPlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 
 @Path("/eventorder")
