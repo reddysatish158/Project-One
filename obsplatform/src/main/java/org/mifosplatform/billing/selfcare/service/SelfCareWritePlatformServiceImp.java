@@ -104,7 +104,7 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 				selfCare.setPassword(unencodedPassword);
 				selfCareRepository.save(selfCare);
 				//platformEmailService.sendToUserAccount(new EmailDetail("OBS Self Care Organisation ", "SelfCare",email, selfCare.getUserName()), unencodedPassword); 
-				List<BillingMessageTemplate> messageDetails=this.billingMessageTemplateRepository.findByTemplateDescription("SELFCARE REGISTRATION");
+				List<BillingMessageTemplate> messageDetails=this.billingMessageTemplateRepository.findByTemplateDescription("CREATE SELFCARE");
 				String subject=messageDetails.get(0).getSubject();
 				String body=messageDetails.get(0).getBody();
 				String header=messageDetails.get(0).getHeader().replace("<PARAM1>", selfCare.getUserName() +","+"\n");
@@ -301,7 +301,18 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 				selfCareTemporaryRepository.save(selfCareTemporary);
 				String generatedKey = selfCareTemporary.getGeneratedKey() + "11011";
 				
-				StringBuilder body = new StringBuilder();
+				List<BillingMessageTemplate> messageDetails=this.billingMessageTemplateRepository.findByTemplateDescription("SELFCARE REGISTRATION");
+				String subject=messageDetails.get(0).getSubject();
+				String body=messageDetails.get(0).getBody();
+				String header=messageDetails.get(0).getHeader()+","+"\n"+"\n";
+				body=body.replace("<PARAM1>", returnUrl + generatedKey+"\n");
+				StringBuilder prepareEmail =new StringBuilder();
+				prepareEmail.append(header);
+				prepareEmail.append("\t").append(body);
+				prepareEmail.append("\n").append("\n");
+				prepareEmail.append(messageDetails.get(0).getFooter());
+				
+				/*StringBuilder body = new StringBuilder();
 				body.append("hi");
 				body.append("\n");
 				body.append("\n");
@@ -314,10 +325,10 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 				body.append("\n");
 				body.append("Thankyou");
 				
-				String subject = "Register Conformation";
+				String subject = "Register Conformation";*/
 				
 					
-				String result = messagePlatformEmailService.sendGeneralMessage(selfCareTemporary.getUserName(), body.toString(), subject);
+				String result = messagePlatformEmailService.sendGeneralMessage(selfCareTemporary.getUserName(), prepareEmail.toString().trim(), subject);
 					
 				transactionHistoryWritePlatformService.saveTransactionHistory(clientId, "Self Care User Registration", new Date(),
 						"EmailId: "+selfCareTemporary.getUserName() + ", returnUrl: "+ returnUrl +", Email Sending Resopnse: " + result);
@@ -390,8 +401,19 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 				String generatedKey = RandomStringUtils.randomAlphabetic(10);	
 				selfCare.setPassword(generatedKey);
 				
+				List<BillingMessageTemplate> messageDetails=this.billingMessageTemplateRepository.findByTemplateDescription("NEW SELFCARE PASSWORD");
+				String subject=messageDetails.get(0).getSubject();
+				String body=messageDetails.get(0).getBody();
+				String header=messageDetails.get(0).getHeader().replace("<PARAM1>", selfCare.getUserName() +","+"\n"+"\n");
+				body=body.replace("<PARAM2>", uniqueReference);
+				body=body.replace("<PARAM3>", generatedKey+"\n"+"\n");
+				StringBuilder prepareEmail =new StringBuilder();
+				prepareEmail.append(header);
+				prepareEmail.append("\t").append(body);
+				prepareEmail.append("\n").append("\n");
+				prepareEmail.append(messageDetails.get(0).getFooter());
 				
-				StringBuilder body = new StringBuilder();
+				/*StringBuilder body = new StringBuilder();
 				body.append("Dear "+selfCare.getUserName() + ",");
 				body.append("\n");
 				body.append("\n");
@@ -402,10 +424,10 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 				body.append("\n");
 				body.append("Thankyou");
 				
-				String subject = "Reset Password";
+				String subject = "Reset Password";*/
 				
 					
-				String result = messagePlatformEmailService.sendGeneralMessage(selfCare.getUniqueReference(), body.toString(), subject);
+				String result = messagePlatformEmailService.sendGeneralMessage(selfCare.getUniqueReference(), prepareEmail.toString().trim(), subject);
 					
 				transactionHistoryWritePlatformService.saveTransactionHistory(selfCare.getClientId(), "Self Care Password Reset", new Date(),
 						"EmailId: "+selfCare.getUniqueReference() + ", Email Sending Resopnse: " + result);
