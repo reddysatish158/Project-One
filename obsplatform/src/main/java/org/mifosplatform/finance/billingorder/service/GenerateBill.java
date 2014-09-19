@@ -653,8 +653,11 @@ public class GenerateBill {
 	
 	// Discount Flat calculation
 	public BigDecimal calculateDiscountFlat(BigDecimal discountRate,BigDecimal chargePrice){
-		
+		if(chargePrice.compareTo(BigDecimal.ZERO)==1){
 		return chargePrice.subtract(discountRate).setScale(2,RoundingMode.HALF_UP);
+		}else{
+			return BigDecimal.ZERO;
+		}
 	}
 	
 	// create billing order command
