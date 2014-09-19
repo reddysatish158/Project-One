@@ -4,6 +4,7 @@
 package org.mifosplatform.cms.eventmaster.data;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.joda.time.LocalDate;
@@ -26,8 +27,8 @@ public class EventMasterData {
 	private String eventName;
 	private String eventDescription;
 	private String status;
-	private LocalDate eventStartDate;
-	private LocalDate eventEndDate;
+	private Date eventStartDate;
+	private Date eventEndDate;
 	private LocalDate eventValidity;
 	private Integer createdbyId;
 	private LocalDate createdDate;
@@ -72,8 +73,8 @@ public class EventMasterData {
 	}
 	
 	public EventMasterData(Long id,String eventName,String eventDescription,
-						   Long status, String mediaTitle, LocalDate eventStartDate,
-						   LocalDate eventEndDate,LocalDate eventValidity, String chargeData,String eventCategory) {
+						   Long status, String mediaTitle, Date eventStartDate,
+						   Date eventEndDate,LocalDate eventValidity, String chargeData,String eventCategory) {
 		this.id= id;
 		this.eventName= eventName;
 		this.eventDescription = eventDescription;
@@ -148,25 +149,25 @@ public class EventMasterData {
 	/**
 	 * @return the eventStartDate
 	 */
-	public LocalDate getEventStartDate() {
+	public Date getEventStartDate() {
 		return eventStartDate;
 	}
 	/**
 	 * @param eventStartDate the eventStartDate to set
 	 */
-	public void setEventStartDate(LocalDate eventStartDate) {
+	public void setEventStartDate(Date eventStartDate) {
 		this.eventStartDate = eventStartDate;
 	}
 	/**
 	 * @return the eventEndDate
 	 */
-	public LocalDate getEventEndDate() {
+	public Date getEventEndDate() {
 		return eventEndDate;
 	}
 	/**
 	 * @param eventEndDate the eventEndDate to set
 	 */
-	public void setEventEndDate(LocalDate eventEndDate) {
+	public void setEventEndDate(Date eventEndDate) {
 		this.eventEndDate = eventEndDate;
 	}
 	/**

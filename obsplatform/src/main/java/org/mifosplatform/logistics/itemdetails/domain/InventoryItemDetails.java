@@ -52,6 +52,9 @@ public class InventoryItemDetails extends AbstractAuditableCustom<AppUser, Long>
 	
 	@Column(name="remarks",nullable=true,length=100)
 	private String remarks;
+	
+	@Column(name="item_model",nullable=true,length=60)
+	private String itemModel;
 
 
 
@@ -59,7 +62,7 @@ public class InventoryItemDetails extends AbstractAuditableCustom<AppUser, Long>
 	
 	
 	public InventoryItemDetails(Long itemMasterId,String serialNumber,Long grnId,String provisioningSerialNumber,String quality,
-			String status,Long warranty,String remarks){
+			String status,Long warranty,String remarks,String itemModel){
 		this.itemMasterId=itemMasterId;
 		this.serialNumber=serialNumber;
 		this.grnId=grnId;
@@ -68,6 +71,7 @@ public class InventoryItemDetails extends AbstractAuditableCustom<AppUser, Long>
 		this.status=status;
 		this.warranty=warranty;
 		this.remarks=remarks;
+		this.itemModel=itemModel;
 	}
 	
 	public InventoryItemDetails(Long itemMasterId,String serialNumber,Long grnId,String provisioningSerialNumber,String quality,
@@ -209,7 +213,8 @@ public class InventoryItemDetails extends AbstractAuditableCustom<AppUser, Long>
 		String  q = command.stringValueOfParameterNamed("quality");
 		String quality = q.equalsIgnoreCase("Good")?"Good":"Defective";
 		String status = command.stringValueOfParameterNamed("status");
-		return new InventoryItemDetails(itemMasterId,serialNumber,grnId,provisioningSerialNumber,quality,status,null,remarks);
+		String itemModel = command.stringValueOfParameterNamed("itemModel");
+		return new InventoryItemDetails(itemMasterId,serialNumber,grnId,provisioningSerialNumber,quality,status,null,remarks,itemModel);
 	}
 
 

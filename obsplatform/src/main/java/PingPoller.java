@@ -1,34 +1,23 @@
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class PingPoller
 {
-    public static void main(String[] args)
+    public static void main(String[] args) throws ParseException
     {
-        System.out.println("Ping Poller Starts...");
-        String ipAddress = "localhost";
-        try
-        {
-            InetAddress inet = InetAddress.getByName(ipAddress);
-            System.out.println("Sending Ping Request to " + ipAddress);
-            boolean status = inet.isReachable(5000); //Timeout = 5000 milli seconds
-            if (status)
-            {
-                System.out.println("Status : Host is reachable");
-            }
-            else
-            {
-                System.out.println("Status : Host is not reachable");
-            }
-        }
-        catch (UnknownHostException e)
-        {
-            System.err.println("Host does not exists");
-        }
-        catch (IOException e)
-        {
-            System.err.println("Error in reaching the Host");
-        }
+    	String str="action:Active,  orderid:12928,  planid:3,  contractperiod:5";
+    	String[] resultdatas=str.split(",");
+  		Map<String,String> map=new HashMap<String, String>();
+
+  			for(String resultData:resultdatas){
+  				String[] data=resultData.split(":");
+  				map.put(data[0],data[1]);
+  			}
+  			System.out.println(map.get("  orderid"));
     }
-}
+    }

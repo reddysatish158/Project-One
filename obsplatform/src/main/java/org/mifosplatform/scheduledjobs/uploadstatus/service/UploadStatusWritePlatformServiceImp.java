@@ -195,6 +195,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 						jsonObject.put("status",currentLineData[5]);
 						jsonObject.put("warranty", currentLineData[6]);
 						jsonObject.put("remarks", currentLineData[7]);
+						jsonObject.put("itemModel", currentLineData[8]);
 						jsonObject.put("locale", "en");
 						//jsonObject.put("clientId", 1);
 						//jsonObject.put("officeId", 1);

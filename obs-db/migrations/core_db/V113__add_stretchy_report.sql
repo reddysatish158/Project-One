@@ -20,7 +20,7 @@ and c.office_id=of.id
 and of.hierarchy like concat((select ino.hierarchy from m_office ino where ino.id = ${officeId}),"%" ) 
 group by mcv.code_value','PaymodeCollection Chart',1,1);
 
-<<<<<<< HEAD
+
 Drop procedure IF EXISTS addstatus;
 DELIMITER //
 create procedure addstatus() 
@@ -42,9 +42,9 @@ INSERT IGNORE INTO m_permission VALUES (null,'organisation', 'UPDATECRASH_MEDIAD
 Drop procedure IF EXISTS addstatus;
 
 update IGNORE b_clientuser set status = 'ACTIVE';
-=======
-delete from m_permission where code='UPDATECRASH_MEDIADEVICE';
+
+
 INSERT IGNORE INTO m_permission VALUES (null,'organisation', 'UPDATECRASH_MEDIADEVICE', 'MEDIADEVICE', 'UPDATECRASH', 0);
 
->>>>>>> obsplatform-1.01
+
 

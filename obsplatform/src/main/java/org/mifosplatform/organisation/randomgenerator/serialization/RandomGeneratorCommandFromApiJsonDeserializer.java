@@ -82,7 +82,7 @@ public class RandomGeneratorCommandFromApiJsonDeserializer {
 		final BigDecimal Quantity1 = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("quantity", element);
 	    baseDataValidator.reset().parameter("quantity").value(Quantity1).notNull();
 	    
-		final BigDecimal Serial1 = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("serialNo", element);
+		final Long Serial1 = fromApiJsonHelper.extractLongNamed("serialNo", element);
 	    baseDataValidator.reset().parameter("serialNo").value(Serial1).notNull().inMinMaxRange(0, 18);
 		
 		final String pinType = fromApiJsonHelper.extractStringNamed("pinType",element);
