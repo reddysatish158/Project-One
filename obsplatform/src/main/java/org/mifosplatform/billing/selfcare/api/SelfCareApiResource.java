@@ -158,10 +158,10 @@ public class SelfCareApiResource {
         	   throw new BadCredentialsException(messages.getMessage(
                        "AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
         }*/
-        Long clientId = selfcare.getClientId();
+      
         if(selfcare != null && selfcare.getPassword().equals(password) && selfcare.getClientId()>0){
         	  SelfCareData careData = new SelfCareData();
-
+        	  Long clientId = selfcare.getClientId();
         	  //adding Is_paypal Global Data by Ashok
             GlobalConfigurationProperty paypalConfigData=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_PAYPAL_CHECK);
             careData.setPaypalConfigData(paypalConfigData);

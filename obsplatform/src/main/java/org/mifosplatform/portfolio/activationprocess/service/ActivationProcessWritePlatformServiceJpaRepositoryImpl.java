@@ -231,6 +231,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 			}
 			
 			if (temporary.getStatus().equalsIgnoreCase("PENDING")){
+				
 				String zipCode = command.stringValueOfParameterNamed("zipCode");
 				// client creation
 				AddressData addressData = this.addressReadPlatformService.retrieveName(city);
@@ -329,12 +330,11 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 				}
 
 				// book order
-				GlobalConfigurationProperty selfregistrationconfiguration = configurationRepository
-						.findOneByName(ConfigurationConstants.CONFIR_PROPERTY_SELF_REGISTRATION);
+				GlobalConfigurationProperty selfregistrationconfiguration = configurationRepository.findOneByName(ConfigurationConstants.CONFIR_PROPERTY_SELF_REGISTRATION);
 				
-				if (selfregistrationconfiguration != null) {
+				//if (selfregistrationconfiguration != null) {
 					
-					if (selfregistrationconfiguration.isEnabled()) {
+					/*if (selfregistrationconfiguration.isEnabled()) {
 						
 						JSONObject ordeJson = new JSONObject(selfregistrationconfiguration.getValue());
 						if (ordeJson.getString("paytermCode") != null && Long.valueOf(ordeJson.getLong("planCode")) != null
@@ -352,7 +352,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 												+ resultClient.getClientId(),"Book Order Failed");
 							}
 						}
-					} else{
+					} else{*/
 						JSONObject beeniusOrderJson = new JSONObject();
 					
 						String paytermCode = command.stringValueOfParameterNamed("paytermCode");
@@ -376,9 +376,9 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 											+ resultClient.getClientId(),"Book Order Failed");
 						}
 						
-					}
+					//}
 					
-				}
+				//}
 				
 				// payment Processing
 				if(temporary.getPaymentStatus().equalsIgnoreCase("PENDING")){
@@ -400,8 +400,8 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 					  object.addProperty("remarks",email);
 					  object.addProperty("paymentCode",27);
 					  
-					  final CommandWrapper commandRequest = new CommandWrapperBuilder().createPayment(resultClient.getClientId()).withJson(object.toString()).build();
-					  final CommandProcessingResult result = this.portfolioCommandSourceWritePlatformService.logCommandSource(commandRequest);
+					  final CommandWrapper paymentCommandRequest = new CommandWrapperBuilder().createPayment(resultClient.getClientId()).withJson(object.toString()).build();
+					  final CommandProcessingResult result = this.portfolioCommandSourceWritePlatformService.logCommandSource(paymentCommandRequest);
 					  if (result == null) {
 							throw new PlatformDataIntegrityException("error.msg.client.payment.creation","Payment Failed for ClientId:"
 											+ resultClient.getClientId(),"Payment Failed");

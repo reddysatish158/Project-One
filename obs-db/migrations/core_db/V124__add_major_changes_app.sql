@@ -71,7 +71,7 @@ call addcode_value();
 
 Drop procedure IF EXISTS addcode_value;
 
-alter table c_configuration modify column value varchar(150) default null;
-INSERT INTO `c_configuration` VALUES (null,'SMTP',0,'{\"mailId\":\"test@gmail.com\",\"password\":\"byMjk=\",\"hostName\":\"smtp.gmail.com\",\"port\":\"\"}');
+alter table c_configuration modify column value varchar(300) default null;
+INSERT IGNORE INTO `c_configuration` VALUES (null,'SMTP',0,'{\"mailId\":\"test@gmail.com\",\"password\":\"byMjk=\",\"hostName\":\"smtp.gmail.com\",\"port\":\"\"}');
 INSERT IGNORE INTO c_configuration values (null,'Disconnection Credit',1,'YES');
 

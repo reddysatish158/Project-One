@@ -468,8 +468,9 @@ public class OrderReadPlatformServiceImpl implements OrderReadPlatformService
 							final ClientActiveOrderMapper mapper = new ClientActiveOrderMapper();
                           
 							String sql="select "+mapper.activeOrderLookupSchema();
+							
 							if(serialNo !=null){
-								sql="select "+mapper.activeOrderLookupSchema()+" and a.hw_serial_no='"+serialNo+"'";
+								sql="select "+mapper.activeOrderLookupSchemaForAssociation()+" and a.hw_serial_no='"+serialNo+"'";
 							}
 							return jdbcTemplate.queryForObject(sql, mapper, new Object[] { clientId});
 							} catch (EmptyResultDataAccessException e) {
@@ -481,9 +482,13 @@ public class OrderReadPlatformServiceImpl implements OrderReadPlatformService
 					
 					private static final class ClientActiveOrderMapper implements RowMapper<Long> {
 						
-						public String activeOrderLookupSchema() {
+						public String activeOrderLookupSchemaForAssociation() {
 							return " ifnull(max(o.id),0) as orders from b_orders o, b_association a where  o.id = a.order_id and o.client_id = ? " +
 									" and  o.order_status=1 ";
+							}
+						
+						public String activeOrderLookupSchema() {
+							return " count(*) AS orders FROM b_orders o WHERE o.client_id = ? AND o.order_status = 1 ";
 							}
 
 						@Override

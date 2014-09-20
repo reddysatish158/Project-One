@@ -1,4 +1,23 @@
 
+CREATE  TABLE IF NOT EXISTS `b_itemsale` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `item_id` bigint(20) NOT NULL,
+  `purchase_from` int(10) NOT NULL,
+  `purchase_date` datetime NOT NULL,
+  `order_quantity` bigint(20) NOT NULL,
+  `received_quantity` bigint(20) NOT NULL DEFAULT '0',
+  `status` varchar(20) DEFAULT NULL,
+  `createdby_id` bigint(20) DEFAULT NULL,
+  `created_date` datetime DEFAULT NULL,
+  `lastmodified_date` datetime DEFAULT NULL,
+  `lastmodifiedby_id` bigint(20) DEFAULT NULL,
+  `charge_code` varchar(20) DEFAULT NULL,
+  `purchase_by` bigint(10) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `charge_code_key` (`charge_code`),
+  CONSTRAINT `charge_code_key` FOREIGN KEY (`charge_code`) REFERENCES `b_charge_codes` (`charge_code`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+
 Drop procedure IF EXISTS addchargecode;
 DELIMITER //
 create procedure addchargecode() 

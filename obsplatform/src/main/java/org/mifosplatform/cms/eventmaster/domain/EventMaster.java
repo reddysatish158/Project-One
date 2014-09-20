@@ -1,11 +1,12 @@
 package org.mifosplatform.cms.eventmaster.domain;
 
-import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -83,30 +84,48 @@ public class EventMaster extends AbstractPersistable<Long> {
     
 	
 	
-	public static EventMaster fromJsom(final JsonCommand command) {
+	public static EventMaster fromJsom(final JsonCommand command) throws ParseException {
 		
 		String eventName = command.stringValueOfParameterNamed("eventName");
 		String eventDescription = command.stringValueOfParameterNamed("eventDescription");
 		Integer status = command.integerValueOfParameterNamed("status");
-		LocalDate eventStartDate = command.localDateValueOfParameterNamed("eventStartDate"); 
-		LocalDate eventEndDate = command.localDateValueOfParameterNamed("eventEndDate");
+		String startDate = command.stringValueOfParameterNamed("eventStartDate"); 
+		String endDate = command.stringValueOfParameterNamed("eventEndDate"); 
+		Date eventStartDate =null;// command.DateValueOfParameterNamed("eventStartDate"); 
+		Date eventEndDate = null;//command.DateValueOfParameterNamed("eventEndDate");
 		String chargeCode = command.stringValueOfParameterNamed("chargeCode");
+		String eventCategory = command.stringValueOfParameterNamed("eventCategory");
+		DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy");
+		if("Live Event".equalsIgnoreCase(eventCategory)){
+			dateFormat = new SimpleDateFormat("dd MMMM yyyy HH:mm:ss");
+		}
+        
+		if(startDate.equalsIgnoreCase("")){
+			eventStartDate=null;
+		}else{
+			eventStartDate = dateFormat.parse(startDate);
+		}
+		if(endDate.equalsIgnoreCase("")){
+			eventEndDate=null;
+		}else{
+			eventEndDate = dateFormat.parse(endDate);
+		}
 		/*boolean allowCancellation = command.booleanPrimitiveValueOfParameterNamed("allowCancellation");*/
 		LocalDate eventValidity = command.localDateValueOfParameterNamed("eventValidity");
-		String eventCategory = command.stringValueOfParameterNamed("eventCategory");
+		
 
 		return new EventMaster(eventName,eventDescription,status,eventStartDate,eventEndDate,eventValidity,eventCategory,chargeCode);
 	}
 	
-	public EventMaster (String eventName, String eventDescription, Integer status, LocalDate eventStartDate,LocalDate eventEndDate,LocalDate eventValidity,
+	public EventMaster (String eventName, String eventDescription, Integer status,Date eventStartDate,Date eventEndDate,LocalDate eventValidity,
 			String eventCategory,String chargeCode) {
 
 		
 		this.eventName = eventName;
 		this.eventDescription = eventDescription;
 		this.status = status;
-		this.eventStartDate = eventStartDate.toDate();
-		this.eventEndDate =eventEndDate!=null?eventEndDate.toDate():null;
+		this.eventStartDate = eventStartDate;
+		this.eventEndDate =eventEndDate!=null?eventEndDate:null;
 		this.eventValidity = eventValidity.toDate();
 		this.createdDate = new Date();
 		this.eventCategory=eventCategory;
@@ -288,7 +307,7 @@ public class EventMaster extends AbstractPersistable<Long> {
 		return chargeCode;
 	}
 
-	public java.util.Map<String, Object> updateEventDetails(JsonCommand command) {
+	public java.util.Map<String, Object> updateEventDetails(JsonCommand command) throws ParseException {
 
 		final LinkedHashMap<String, Object> actualChanges = new LinkedHashMap<String, Object>(1);
 		
@@ -301,7 +320,16 @@ public class EventMaster extends AbstractPersistable<Long> {
 		final String eventValidityNamedParamName = "eventValidity";
 		final String eventCategoryNamedParamName = "eventCategory";
 		final String chargeCodeNamedParamName = "chargeCode";
+		 DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy");
 		
+		 if(command.isChangeInStringParameterNamed(eventCategoryNamedParamName, this.eventCategory)){
+				final String newValue = command.stringValueOfParameterNamed(eventCategoryNamedParamName);
+				actualChanges.put(eventCategoryNamedParamName, newValue);
+				this.eventCategory = StringUtils.defaultIfEmpty(newValue,null);
+			}
+		 if("Live Event".equalsIgnoreCase(this.eventCategory)){
+				dateFormat = new SimpleDateFormat("dd MMMM yyyy HH:mm:ss");
+			}
 		if(command.isChangeInStringParameterNamed(eventNameNamedParamName, this.eventName)){
 			final String newValue = command.stringValueOfParameterNamed(eventNameNamedParamName);
 			actualChanges.put(eventNameNamedParamName, newValue);
@@ -318,25 +346,33 @@ public class EventMaster extends AbstractPersistable<Long> {
 			actualChanges.put(statusNamedParamName, newValue);
 			this.status=newValue;
 		}
-		if(command.isChangeInDateParameterNamed(eventStartDateNamedParamName, this.eventStartDate)){
-			final Date newValue=command.DateValueOfParameterNamed(eventStartDateNamedParamName);
-			actualChanges.put(eventStartDateNamedParamName, newValue);
-			this.eventStartDate=newValue;
+		if(command.isChangeInStringParameterNamed(eventStartDateNamedParamName, this.eventStartDate.toString())){
+			String startDate = command.stringValueOfParameterNamed("eventStartDate"); 
+			
+				if(startDate.equalsIgnoreCase("")){
+					this.eventStartDate=null;
+				}else{
+					this.eventStartDate = dateFormat.parse(startDate);
+				}
+		//	final Date newValue=command.DateValueOfParameterNamed(eventStartDateNamedParamName);
+			actualChanges.put(eventStartDateNamedParamName, startDate);
+		//	this.eventStartDate=newValue;
 		}
-		if(command.isChangeInDateParameterNamed(eventEndDateNamedParamName, this.eventEndDate)){
-			final Date newValue=command.DateValueOfParameterNamed(eventEndDateNamedParamName);
-			actualChanges.put(eventEndDateNamedParamName, newValue);
-			this.eventEndDate=newValue;
+		if(command.isChangeInStringParameterNamed(eventEndDateNamedParamName, this.eventEndDate.toString())){
+			//final Date newValue=command.DateValueOfParameterNamed(eventEndDateNamedParamName);
+			String endDate = command.stringValueOfParameterNamed("eventEndDate");
+			if(endDate.equalsIgnoreCase("")){
+				this.eventEndDate=null;
+			}else{
+				this.eventEndDate = dateFormat.parse(endDate);
+			}
+			actualChanges.put(eventEndDateNamedParamName, endDate);
+			
 		}
 		if(command.isChangeInDateParameterNamed(eventValidityNamedParamName, this.eventValidity)){
 			final Date newValue=command.DateValueOfParameterNamed(eventValidityNamedParamName);
 			actualChanges.put(eventValidityNamedParamName, newValue);
 			this.eventValidity=newValue;
-		}
-		if(command.isChangeInStringParameterNamed(eventCategoryNamedParamName, this.eventCategory)){
-			final String newValue = command.stringValueOfParameterNamed(eventCategoryNamedParamName);
-			actualChanges.put(eventCategoryNamedParamName, newValue);
-			this.eventCategory = StringUtils.defaultIfEmpty(newValue,null);
 		}
 		if(command.isChangeInStringParameterNamed(chargeCodeNamedParamName, this.chargeCode)){
 			final String newValue = command.stringValueOfParameterNamed(chargeCodeNamedParamName);

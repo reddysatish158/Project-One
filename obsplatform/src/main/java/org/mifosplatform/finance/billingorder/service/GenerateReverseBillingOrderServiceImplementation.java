@@ -91,15 +91,13 @@ public class GenerateReverseBillingOrderServiceImplementation implements
 
 	@Override
 	public Invoice generateNegativeInvoice(List<BillingOrderCommand> billingOrderCommands) {
-		//BigDecimal totalChargeAmountForServices = BigDecimal.ZERO;
-		//BigDecimal totalTaxAmountForServices = BigDecimal.ZERO;
 		
 		BigDecimal invoiceAmount = BigDecimal.ZERO;
 		BigDecimal totalChargeAmount = BigDecimal.ZERO;
 		BigDecimal netTaxAmount = BigDecimal.ZERO;
 		
-		LocalDate invoiceDate = new LocalDate();
-		List<BillingOrder> charges = new ArrayList<BillingOrder>();
+		//LocalDate invoiceDate = new LocalDate();
+		//List<BillingOrder> charges = new ArrayList<BillingOrder>();
 		
 		TaxMappingRateData tax=this.billingOrderReadPlatformService.retriveExemptionTaxDetails(billingOrderCommands.get(0).getClientId());
 		
@@ -126,42 +124,42 @@ public class GenerateReverseBillingOrderServiceImplementation implements
 			//client taxExemption
 			if(tax.getTaxExemption().equalsIgnoreCase("N")){
 			
-			for(InvoiceTaxCommand invoiceTaxCommand : invoiceTaxCommands){
+			     for(InvoiceTaxCommand invoiceTaxCommand : invoiceTaxCommands){
 				
-				netChargeTaxAmount = netChargeTaxAmount.add(invoiceTaxCommand.getTaxAmount());
+				     netChargeTaxAmount = netChargeTaxAmount.add(invoiceTaxCommand.getTaxAmount());
 				
-				InvoiceTax invoiceTax = new InvoiceTax(invoice, charge, invoiceTaxCommand.getTaxCode(),
-						invoiceTaxCommand.getTaxValue(), invoiceTaxCommand.getTaxPercentage(), invoiceTaxCommand.getTaxAmount());
-				charge.addChargeTaxes(invoiceTax);
-				
-			}
+				     InvoiceTax invoiceTax = new InvoiceTax(invoice, charge, invoiceTaxCommand.getTaxCode(),invoiceTaxCommand.getTaxValue(), 
+						                  invoiceTaxCommand.getTaxPercentage(), invoiceTaxCommand.getTaxAmount());
+				      charge.addChargeTaxes(invoiceTax);
+			     }
 			
-			
-			if(billingOrderCommand.getTaxInclusive()!=null){
+			   if(billingOrderCommand.getTaxInclusive()!=null){
 				
-				if(isTaxInclusive(billingOrderCommand.getTaxInclusive())){
+				  if(isTaxInclusive(billingOrderCommand.getTaxInclusive())){
 					netChargeAmount = netChargeAmount.subtract(netChargeTaxAmount);
-					charge.setNetChargeAmount(netChargeAmount.negate());
+					charge.setNetChargeAmount(netChargeAmount);
+
 				}
 			}
+
 			}
 			netTaxAmount = netTaxAmount.add(netChargeTaxAmount);
 			totalChargeAmount = totalChargeAmount.add(netChargeAmount);
 			
 			invoice.addCharges(charge);		
 			
+		 }
+
+		    if(billingOrderCommands.get(0).getTaxInclusive()!=null){
+			    if(isTaxInclusive(billingOrderCommands.get(0).getTaxInclusive())){
+			      invoiceAmount = totalChargeAmount;
+			   }else{
+
+				invoiceAmount = totalChargeAmount.add(netTaxAmount);
+			   }
+			   }else{
+				invoiceAmount = totalChargeAmount.add(netTaxAmount);
 		}
-
-		if(billingOrderCommands.get(0).getTaxInclusive()!=null){
-			if(isTaxInclusive(billingOrderCommands.get(0).getTaxInclusive())){
-			invoiceAmount = totalChargeAmount;
-			}else{
-
-				invoiceAmount = totalChargeAmount.add(netTaxAmount);
-			}
-			}else{
-				invoiceAmount = totalChargeAmount.add(netTaxAmount);
-			}
 		//invoiceAmount = totalChargeAmount.add(netTaxAmount);
 		invoice.setNetChargeAmount(totalChargeAmount.negate());
 		invoice.setTaxAmount(netTaxAmount.negate());
