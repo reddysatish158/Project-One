@@ -213,6 +213,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 			Long homePhoneNumber = command.longValueOfParameterNamed("homePhoneNumber");	
 			String email = command.stringValueOfParameterNamed("email");
 			String nationalId = command.stringValueOfParameterNamed("nationalId");
+			String kortaToken = command.stringValueOfParameterNamed("kortaToken");
 			
 			SelfCareTemporary temporary = selfCareTemporaryRepository.findOneByEmailId(email);
 			
@@ -264,11 +265,13 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 					throw new PlatformDataIntegrityException("error.msg.client.creation.failed", "Client Creation Failed","Client Creation Failed");
 				}
 	
-				
 				SelfCare selfcare =  this.selfCareRepository.findOneByClientId(resultClient.getClientId());
 				selfcare.setNationalId(nationalId);
+				if(kortaToken !=null){
+					selfcare.setToken(kortaToken);
+				}			
 				temporary.setStatus("ACTIVE");
-
+				
 				//book device
 				if(deviceStatusConfiguration != null){
 					
