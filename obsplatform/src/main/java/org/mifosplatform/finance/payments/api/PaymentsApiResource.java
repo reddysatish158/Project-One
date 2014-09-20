@@ -34,6 +34,7 @@ import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.mifosplatform.finance.payments.data.PaymentData;
 import org.mifosplatform.finance.payments.exception.DalpayRequestFailureException;
+import org.mifosplatform.finance.payments.exception.KortaRequestFailureException;
 import org.mifosplatform.infrastructure.codes.data.CodeData;
 import org.mifosplatform.infrastructure.core.api.ApiRequestParameterHelper;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
@@ -238,14 +239,69 @@ public class PaymentsApiResource {
 	   }
 	 }
 	 
-	 @POST
-	 @Path("paypalEnquirey/{clientId}")
-	 @Consumes({ MediaType.APPLICATION_JSON })
-	 @Produces({ MediaType.APPLICATION_JSON })
-	 public String paypalEnquireyPayment(@PathParam("clientId") final Long clientId,final String apiRequestBodyAsJson) {
-		 
-			final CommandWrapper commandRequest = new CommandWrapperBuilder().PaypalPayment(clientId).withJson(apiRequestBodyAsJson).build();
-			final CommandProcessingResult result = this.writePlatformService.logCommandSource(commandRequest);
-			return this.toApiJsonSerializer.serialize(result);
+	@POST
+	@Path("paypalEnquirey/{clientId}")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String paypalEnquireyPayment(@PathParam("clientId") final Long clientId, final String apiRequestBodyAsJson) {
+
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().PaypalPayment(clientId).withJson(apiRequestBodyAsJson).build();
+		final CommandProcessingResult result = this.writePlatformService.logCommandSource(commandRequest);
+		return this.toApiJsonSerializer.serialize(result);
+	}
+
+	@POST
+	@Path("korta")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String KortaPayment(final String apiRequestBodyAsJson) {
+
+		try {
+			JSONObject json = new JSONObject(apiRequestBodyAsJson);
+			Long clientId = json.getLong("clientId");
+			String reference = json.getString("reference");
+			String totalAmount = json.getString("amount");
+			String emailId = json.getString("emailId");
+
+			if (clientId != null && clientId > 0) {
+				String date = new SimpleDateFormat("dd MMMM yyyy").format(new Date());
+				JsonObject object = new JsonObject();
+				object.addProperty("txn_id", reference);
+				object.addProperty("dateFormat", "dd MMMM yyyy");
+				object.addProperty("locale", "en");
+				object.addProperty("paymentDate", date);
+				object.addProperty("amountPaid", totalAmount);
+				object.addProperty("isChequeSelected", "no");
+				object.addProperty("receiptNo", reference);
+				object.addProperty("remarks","Payment With Korta PaymentGateway");
+				object.addProperty("paymentCode", 27);
+
+				final CommandWrapper commandRequest = new CommandWrapperBuilder().createPayment(clientId).withJson(object.toString()).build();
+				final CommandProcessingResult result = this.writePlatformService.logCommandSource(commandRequest);
+				return this.toApiJsonSerializer.serialize(result);
+
+			} else if (clientId != null && clientId == 0) {
+				SelfCareTemporary selfCareTemporary = this.selfCareTemporaryRepository.findOneByEmailId(emailId);
+				if (selfCareTemporary != null && selfCareTemporary.getPaymentStatus().equalsIgnoreCase("INACTIVE")) {
+					JsonObject obj = new JsonObject();
+					obj.addProperty("order_num", reference);
+					obj.addProperty("total_amount", totalAmount);
+					obj.addProperty("cust_email", emailId);
+
+					selfCareTemporary.setPaymentData(obj.toString());
+					selfCareTemporary.setPaymentStatus("PENDING");
+					this.selfCareTemporaryRepository.save(selfCareTemporary);
+					return selfCareTemporary.getId().toString();
+				} else if (selfCareTemporary != null) {
+					throw new SelfCareTemporaryAlreadyExistException(emailId);
+				} else {
+					throw new SelfCareTemporaryEmailIdNotFoundException(emailId);
+				}
+			} else {
+				throw new KortaRequestFailureException(clientId);
+			}
+		} catch (Exception e) {
+			return e.getMessage();
 		}
+	}
 }
