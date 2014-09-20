@@ -1,23 +1,33 @@
-import java.text.DateFormat;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Locale;
+
+import org.springframework.format.number.NumberFormatter;
 
 
 public class PingPoller
 {
     public static void main(String[] args) throws ParseException
     {
-    	String str="action:Active,  orderid:12928,  planid:3,  contractperiod:5";
-    	String[] resultdatas=str.split(",");
-  		Map<String,String> map=new HashMap<String, String>();
 
-  			for(String resultData:resultdatas){
-  				String[] data=resultData.split(":");
-  				map.put(data[0],data[1]);
-  			}
-  			System.out.println(map.get("  orderid"));
+        String source = "12.125,00".trim();
+           Locale locale=new Locale("is");
+        NumberFormat format = NumberFormat.getNumberInstance(locale);
+        DecimalFormat df = (DecimalFormat) format;
+        DecimalFormatSymbols symbols = df.getDecimalFormatSymbols();
+        // http://bugs.sun.com/view_bug.do?bug_id=4510618
+        char groupingSeparator = symbols.getGroupingSeparator();
+        if (groupingSeparator == '\u00a0') {
+            source = source.replaceAll(" ", Character.toString('\u00a0'));
+        }
+
+        NumberFormatter numberFormatter = new NumberFormatter();
+        Number parsedNumber = numberFormatter.parse(source,locale);
+        System.out.println(BigDecimal.valueOf(Double.valueOf(parsedNumber.doubleValue())));
     }
-    }
+    
+    
+}

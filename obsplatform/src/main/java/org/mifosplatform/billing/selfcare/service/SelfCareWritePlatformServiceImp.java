@@ -13,6 +13,8 @@ import org.mifosplatform.billing.selfcare.exception.SelfCareAlreadyVerifiedExcep
 import org.mifosplatform.billing.selfcare.exception.SelfCareEmailIdDuplicateException;
 import org.mifosplatform.billing.selfcare.exception.SelfCareTemporaryGeneratedKeyNotFoundException;
 import org.mifosplatform.billing.selfcare.exception.SelfcareEmailIdNotFoundException;
+import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
+import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -27,6 +29,7 @@ import org.mifosplatform.portfolio.client.domain.ClientRepository;
 import org.mifosplatform.portfolio.client.exception.ClientNotFoundException;
 import org.mifosplatform.portfolio.client.exception.ClientStatusException;
 import org.mifosplatform.portfolio.transactionhistory.service.TransactionHistoryWritePlatformService;
+import org.mockito.internal.configuration.GlobalConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,13 +52,13 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 	private SelfCareCommandFromApiJsonDeserializer selfCareCommandFromApiJsonDeserializer;
 	private TransactionHistoryWritePlatformService transactionHistoryWritePlatformService;
 	private final static Logger logger = (Logger) LoggerFactory.getLogger(SelfCareWritePlatformServiceImp.class);
-	
+	private final GlobalConfigurationRepository globalConfigurationRepository; 
 	@Autowired
 	public SelfCareWritePlatformServiceImp(final PlatformSecurityContext context, final SelfCareRepository selfCareRepository, 
 		    final SelfCareCommandFromApiJsonDeserializer selfCareCommandFromApiJsonDeserializer,final SelfCareReadPlatformService selfCareReadPlatformService, 
 			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,final SelfCareTemporaryRepository selfCareTemporaryRepository,
 			final BillingMessageTemplateRepository billingMessageTemplateRepository,final MessagePlatformEmailService messagePlatformEmailService,
-			ClientRepository clientRepository,final LoginHistoryRepository loginHistoryRepository) {
+			ClientRepository clientRepository,final LoginHistoryRepository loginHistoryRepository,final GlobalConfigurationRepository globalConfigurationRepository) {
 		
 		this.context = context;
 		this.selfCareRepository = selfCareRepository;
@@ -67,6 +70,7 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 		this.billingMessageTemplateRepository = billingMessageTemplateRepository;
 		this.messagePlatformEmailService= messagePlatformEmailService;
 		this.clientRepository=clientRepository;
+		this.globalConfigurationRepository=globalConfigurationRepository;
 		this.loginHistoryRepository=loginHistoryRepository;
 				
 	}
@@ -96,6 +100,8 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 						}
 					}
 			}
+			
+			GlobalConfigurationProperty configurationProperty=this.globalConfigurationRepository.findOneByName("");
 			if(clientId !=null && clientId > 0 ){
 				
 				selfCare.setClientId(clientId);

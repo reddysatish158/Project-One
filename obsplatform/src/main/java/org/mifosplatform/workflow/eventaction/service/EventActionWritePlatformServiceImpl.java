@@ -59,12 +59,12 @@ public class EventActionWritePlatformServiceImpl implements ActiondetailsWritePl
 	private final MessageDataRepository messageDataRepository;
 	private final AppUserReadPlatformService readPlatformService;
 	private final BillingOrderApiResourse billingOrderApiResourse;
+	private final ProcessRequestRepository processRequestRepository;
 	private final BillingMessageTemplateRepository messageTemplateRepository;
 	private final TicketMasterReadPlatformService ticketMasterReadPlatformService ;
     private final ActionDetailsReadPlatformService actionDetailsReadPlatformService;	
     private final ContractPeriodReadPlatformService contractPeriodReadPlatformService;
     private final HardwareAssociationReadplatformService hardwareAssociationReadplatformService;
-	private final ProcessRequestRepository processRequestRepository;
 
 
 	@Autowired
@@ -106,7 +106,6 @@ public class EventActionWritePlatformServiceImpl implements ActiondetailsWritePl
 	   	for(ActionDetaislData detailsData:actionDetaislDatas){
 		      EventActionProcedureData actionProcedureData=this.actionDetailsReadPlatformService.checkCustomeValidationForEvents(clientId, detailsData.getEventName(),detailsData.getActionName(),resourceId);
 			  JSONObject jsonObject=new JSONObject();
-				
 
 			  	if(actionProcedureData.isCheck()){
 				    SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy");
