@@ -36,6 +36,9 @@ public class SelfCare extends AbstractPersistable<Long>{
 	@Column(name="auth_pin")
 	private String authPin;
 	
+	@Column(name="korta_token")
+	private String token;
+	
 	public SelfCare() {
 		// TODO Auto-generated constructor stub
 	}
@@ -124,6 +127,13 @@ public class SelfCare extends AbstractPersistable<Long>{
 	public void setAuthPin(String authPin) {
 		this.authPin = authPin;
 	}
+	public String getToken() {
+		return token;
+	}
+	public void setToken(String token) {
+		this.token = token;
+	}
+	
 	
 	
 }

@@ -4,7 +4,10 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+
+import org.joda.time.LocalDate;
 import org.mifosplatform.billing.promotioncodes.data.PromotionCodeData;
+import org.mifosplatform.infrastructure.core.domain.JdbcSupport;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +51,7 @@ public class PromotionCodeReadPlatformServiceImpl implements PromotionCodeReadPl
 		public String schema() {
 			return "pm.id as id, pm.promotion_code as promotionCode, pm.promotion_description as promotionDescription," +
 				 " pm.duration_type as durationType,pm.duration as duration,pm.discount_type as discountType,"+
-					" pm.discount_rate as discountRate from b_promotion_master pm  where pm.is_delete='N' ";
+				" pm.discount_rate as discountRate,pm.start_date as startDate from b_promotion_master pm  where pm.is_delete='N' ";
 
 		}
 	
@@ -65,11 +68,11 @@ public class PromotionCodeReadPlatformServiceImpl implements PromotionCodeReadPl
 			Long duration=rs.getLong("duration");
 			String discountType = rs.getString("discountType");
 			BigDecimal discountRate=rs.getBigDecimal("discountRate");
+			LocalDate startDate = JdbcSupport.getLocalDate(rs,"startDate");
 			
 			//BigDecimal discountRate = rs.getBigDecimal("discountRate");
-			//LocalDate startDate = JdbcSupport.getLocalDate(rs,"startDate");
 			//String status = rs.getString("status");
-			return new PromotionCodeData(id, promotionCode, promotionDescription, durationType,duration,discountType,discountRate);
+			return new PromotionCodeData(id, promotionCode, promotionDescription, durationType,duration,discountType,discountRate,startDate);
 
 		}
 	}

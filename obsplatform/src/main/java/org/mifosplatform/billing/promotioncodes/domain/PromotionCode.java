@@ -135,11 +135,10 @@ public class PromotionCode extends AbstractPersistable<Long> {
 			}
 			
 			final String startDateParamName = "startDate";
-			if (command.isChangeInLocalDateParameterNamed(startDateParamName,
-					new LocalDate(this.startDate))) {
-				final LocalDate newValue = command
-						.localDateValueOfParameterNamed(startDateParamName);
+			if (command.isChangeInLocalDateParameterNamed(startDateParamName,new LocalDate(this.startDate))) {
+				final LocalDate newValue = command.localDateValueOfParameterNamed(startDateParamName);
 				actualChanges.put(startDateParamName, newValue);
+				this.startDate = newValue.toDate();
 			}
 	        				
 	        return actualChanges;
