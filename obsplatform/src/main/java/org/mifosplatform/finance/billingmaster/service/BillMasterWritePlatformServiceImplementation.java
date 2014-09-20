@@ -76,26 +76,21 @@ public class BillMasterWritePlatformServiceImplementation implements
 	public CommandProcessingResult createBillMaster(JsonCommand command,Long clientId) {
 		try
 		{
-			
+	     Long parentId=null;	
 		 this.apiJsonDeserializer.validateForCreate(command.json());
-			//final MifosPlatformTenant tenant = this.tenantDetailsService.loadTenantById("default"); 
-	        //ThreadLocalContextUtil.setTenant(tenant);
-		 Long parentId=null;
-		 Client client=this.clientRepository.findOne(clientId);
-		 if(client.getParentId() != null){
-		// GroupsDetails groupsDetails=this.groupsDetailsRepository.findOne(client.getGroupName());//findOneByGroupName(client.getGroupName());
-		 parentId=client.getParentId();
-		 }
 		 List<FinancialTransactionsData> financialTransactionsDatas = billMasterReadPlatformService.retrieveFinancialData(clientId);
 		 if (financialTransactionsDatas.size() == 0) {
 			String msg = "no Bills to Generate";
 			throw new BillingOrderNoRecordsFoundException(msg);
 		}
-	//	BillMaster billMaster = null;
-	//	BigDecimal previousBal = BigDecimal.ZERO;
-	//	List<BillMaster> billMasters = this.billMasterRepository.findAll();
-	//	for (BillMaster data : billMasters) {
-	//		if (data.getClientId().compareTo(clientId)==0) {
+		 Client client=this.clientRepository.findOne(clientId);
+		 if(client.getParentId() != null){
+		// GroupsDetails groupsDetails=this.groupsDetailsRepository.findOne(client.getGroupName());//findOneByGroupName(client.getGroupName());
+		  parentId=client.getParentId();
+		 }else{
+			parentId=clientId;
+		 }
+		
 		BigDecimal	previousBal = this.billMasterReadPlatformService.retrieveClientBalance(clientId);
 		
 		LocalDate billDate = new LocalDate();
