@@ -54,6 +54,7 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 	private String hostName;
 	private int portNumber;
 	private String port;
+	private String starttlsValue;
 	private GlobalConfigurationProperty configuration;
 	
 	@Autowired
@@ -80,6 +81,7 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 			} else {
 				portNumber = Integer.parseInt(port);
 			}
+			starttlsValue = (String) object.get("starttls");
 			
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -98,8 +100,8 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 		     properties.setProperty("mail.smtp.host", hostName);   
 		     properties.put("mail.smtp.ssl.trust",hostName);
 		     properties.put("mail.smtp.auth", "true");  
-		     properties.put("mail.smtp.starttls.enable", "true");
-		     properties.put("mail.smtp.starttls.required", "true");
+		     properties.put("mail.smtp.starttls.enable", starttlsValue);
+		     properties.put("mail.smtp.starttls.required", starttlsValue);
 
 
 		     Session session = Session.getDefaultInstance(properties,   
@@ -238,7 +240,7 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 		    String fileName="ReportEmail_"+new LocalDate().toString().replace("-","")+"_"+dateTime+".pdf";
 		    Properties props = new Properties();
 		    props.put("mail.smtp.auth", "true");
-			props.put("mail.smtp.starttls.enable", "true");
+			props.put("mail.smtp.starttls.enable", starttlsValue);
 			props.put("mail.smtp.host", hostName);
 			props.put("mail.smtp.port", portNumber);
 
@@ -298,7 +300,7 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 			try {
 				String sendToEmail = emailId;
 				StringBuilder messageBuilder = new StringBuilder().append(body);			
-				email.getMailSession().getProperties().put("mail.smtp.starttls.enable", "true");
+				email.getMailSession().getProperties().put("mail.smtp.starttls.enable", starttlsValue);
 				email.setFrom(authuser, authuser);
 				email.setSmtpPort(portNumber);
 				email.setSubject(subject);		

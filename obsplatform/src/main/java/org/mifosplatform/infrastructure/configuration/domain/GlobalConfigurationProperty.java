@@ -11,13 +11,14 @@ import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.mifosplatform.infrastructure.codes.domain.Code;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 @Entity
-@Table(name = "c_configuration")
+@Table(name = "c_configuration", uniqueConstraints = @UniqueConstraint(columnNames = { "name" }, name = "name_config"))
 public class GlobalConfigurationProperty extends AbstractPersistable<Long> {
 
     @SuppressWarnings("unused")
