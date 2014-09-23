@@ -1,10 +1,7 @@
 package org.mifosplatform.billing.selfcare.api;
 
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -24,6 +21,8 @@ import org.mifosplatform.billing.loginhistory.domain.LoginHistoryRepository;
 import org.mifosplatform.billing.loginhistory.service.LoginHistoryReadPlatformService;
 import org.mifosplatform.billing.paymode.service.PaymodeReadPlatformService;
 import org.mifosplatform.billing.selfcare.data.SelfCareData;
+import org.mifosplatform.billing.selfcare.domain.SelfCare;
+import org.mifosplatform.billing.selfcare.exception.SelfCareIdNotFoundException;
 import org.mifosplatform.billing.selfcare.service.ExceededNumberOfViewersException;
 import org.mifosplatform.billing.selfcare.service.SelfCareReadPlatformService;
 import org.mifosplatform.billing.selfcare.service.SelfCareRepository;
@@ -63,8 +62,6 @@ import org.springframework.stereotype.Component;
 @Scope("singleton")
 public class SelfCareApiResource {
 
-	
-	private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList(""));
 	private PlatformSecurityContext context;
 	private final String resourceNameForPermissions = "SELFCARE";
 	private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
@@ -119,8 +116,6 @@ public class SelfCareApiResource {
 		final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 	    return this.toApiJsonSerializerForItem.serialize(result);	
 	}
-	
-
 
 	@Path("password")
 	@POST
@@ -138,8 +133,6 @@ public class SelfCareApiResource {
 	    return this.toApiJsonSerializerForItem.serialize(result);	
 	}	
    
-
-	
 	@Path("/login")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -222,8 +215,7 @@ public class SelfCareApiResource {
        
         
 	}
-	
-	  
+		  
     @PUT
     @Path("status/{clientId}")
     @Consumes({ MediaType.APPLICATION_JSON })
@@ -275,7 +267,6 @@ public class SelfCareApiResource {
 	    
 	}
     
-
     @PUT
     @Path("resetpassword")
     @Consumes({ MediaType.APPLICATION_JSON})
@@ -293,8 +284,7 @@ public class SelfCareApiResource {
     	 /*	SelfCareData careData = new SelfCareData(email,password);
             Long clientId=this.selfCareWritePlatformService.updateSelfCareUDPassword(careData);
 			return this.toApiJsonSerializerForItem.serialize(CommandProcessingResult.resourceResult(clientId, null));*/
-        	
-    	
+        	  	
     }
    
 	@POST
@@ -308,8 +298,7 @@ public class SelfCareApiResource {
         .build(); //
     	final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializerForItem.serialize(result);
-
-    	
+   	
     }
     
     @PUT
@@ -322,6 +311,33 @@ public class SelfCareApiResource {
 		final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 	    return this.toApiJsonSerializerForItem.serialize(result);	
 	    
+	}
+    
+    @PUT
+    @Path("{clientId}")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String selfCareKortaTokenStore(@PathParam("clientId") Long clientId, final String jsonRequestBody) {
+
+		try {
+			context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+			JSONObject object = new JSONObject(jsonRequestBody);
+			String token = (String) object.get("kortaToken");
+
+			SelfCare selfcare = this.selfCareRepository.findOneByClientId(clientId);
+			if (selfcare != null) {
+				selfcare.setToken(token);
+			} else {
+				throw new SelfCareIdNotFoundException(clientId);
+			}
+
+			this.selfCareRepository.save(selfcare);
+			return selfcare.getId().toString();
+
+		} catch (JSONException e) {
+			throw new UnknownError(e.getLocalizedMessage());
+		}
+
 	}
 	
 }
