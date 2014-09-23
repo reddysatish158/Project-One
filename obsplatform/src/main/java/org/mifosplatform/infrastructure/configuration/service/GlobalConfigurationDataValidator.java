@@ -63,24 +63,22 @@ public class GlobalConfigurationDataValidator {
         final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource(ConfigurationConstants.CONFIGURATION_RESOURCE_NAME);
         final JsonElement element = this.fromApiJsonHelper.parse(json);
-
-        if (this.fromApiJsonHelper.parameterExists(ConfigurationConstants.NAME, element)) {
-            final String name = this.fromApiJsonHelper.extractStringNamed(ConfigurationConstants.NAME, element);
-            baseDataValidator.reset().parameter(ConfigurationConstants.NAME).value(name).notBlank();
-        }
         
-        if (this.fromApiJsonHelper.parameterExists(ConfigurationConstants.MAIL, element)) {
-            final String mailId = this.fromApiJsonHelper.extractStringNamed(ConfigurationConstants.MAIL, element);
-            baseDataValidator.reset().parameter(ConfigurationConstants.MAIL).value(mailId).notBlank();
-        }
-        if (this.fromApiJsonHelper.parameterExists(ConfigurationConstants.PASSWORD, element)) {
-            final String password = this.fromApiJsonHelper.extractStringNamed(ConfigurationConstants.PASSWORD, element);
-            baseDataValidator.reset().parameter(ConfigurationConstants.PASSWORD).value(password).notBlank();
-        }
-        if (this.fromApiJsonHelper.parameterExists(ConfigurationConstants.HOSTNAME, element)) {
-            final String hostName = this.fromApiJsonHelper.extractStringNamed(ConfigurationConstants.HOSTNAME, element);
-            baseDataValidator.reset().parameter(ConfigurationConstants.HOSTNAME).value(hostName).notBlank();
-        }
+        final String strttls = this.fromApiJsonHelper.extractStringNamed(ConfigurationConstants.STARTTLS, element);
+        baseDataValidator.reset().parameter(ConfigurationConstants.STARTTLS).value(strttls).notBlank();
+        
+        final String name = this.fromApiJsonHelper.extractStringNamed(ConfigurationConstants.NAME, element);
+        baseDataValidator.reset().parameter(ConfigurationConstants.NAME).value(name).notBlank();
+       
+        final String mailId = this.fromApiJsonHelper.extractStringNamed(ConfigurationConstants.MAIL, element);
+        baseDataValidator.reset().parameter(ConfigurationConstants.MAIL).value(mailId).notBlank();
+        
+        final String password = this.fromApiJsonHelper.extractStringNamed(ConfigurationConstants.PASSWORD, element);
+        baseDataValidator.reset().parameter(ConfigurationConstants.PASSWORD).value(password).notBlank();
+        
+        final String hostName = this.fromApiJsonHelper.extractStringNamed(ConfigurationConstants.HOSTNAME, element);
+        baseDataValidator.reset().parameter(ConfigurationConstants.HOSTNAME).value(hostName).notBlank();
+            
 
         if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException(dataValidationErrors); }
 
