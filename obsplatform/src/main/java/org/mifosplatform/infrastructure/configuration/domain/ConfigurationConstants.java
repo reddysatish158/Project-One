@@ -31,11 +31,13 @@ public class ConfigurationConstants {
 	public static final String PASSWORD = "password";
 	public static final String HOSTNAME = "hostName";
 	public static final String PORT = "port";
+	public static final String STARTTLS = "starttls";
 	public static final String CONFIGURATION_RESOURCE_NAME = "globalConfiguration";
 	public static final Set<String> UPDATE_CONFIGURATION_DATA_PARAMETERS = new HashSet<String>(Arrays.asList(ENABLED, VALUE));
-	public static final Set<String> CREATE_CONFIGURATION_DATA_PARAMETERS = new HashSet<String>(Arrays.asList(NAME, MAIL,PASSWORD,HOSTNAME,PORT));
+	public static final Set<String> CREATE_CONFIGURATION_DATA_PARAMETERS = new HashSet<String>(Arrays.asList(NAME, MAIL,PASSWORD,HOSTNAME,PORT,STARTTLS));
 	public final static String CONFIG_PROPERTY_IS_PAYPAL_CHECK="Is_Paypal";
 	public final static String CONFIG_PROPERTY_IS_PAYPAL_CHECK_IOS="Is_Paypal_For_Ios";
 	public static final String CONFIG_PROPERTY_IS_ACTIVE_VIEWERS = "Active Viewers";
+	
 	
 }
