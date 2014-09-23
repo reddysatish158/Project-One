@@ -136,7 +136,7 @@ public final class ClientDataValidator {
         }if (fromApiJsonHelper.parameterExists(ClientApiConstants.homePhoneNumberParamName, element)) {
             final String homePhoneNumber = fromApiJsonHelper.extractStringNamed(ClientApiConstants.homePhoneNumberParamName, element);
             baseDataValidator.reset().parameter(ClientApiConstants.homePhoneNumberParamName).value(homePhoneNumber).notNull()
-                    .notExceedingLengthOf(11);
+                    .notExceedingLengthOf(15);
         }
         if (fromApiJsonHelper.parameterExists(ClientApiConstants.emailParamName, element)) {
             final String email = fromApiJsonHelper.extractStringNamed(ClientApiConstants.emailParamName, element);
