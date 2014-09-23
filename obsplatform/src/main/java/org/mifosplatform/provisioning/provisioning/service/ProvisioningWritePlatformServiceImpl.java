@@ -103,6 +103,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 
     	this.context = context;
     	this.fromJsonHelper=fromJsonHelper;
+    	this.planRepository=planRepository;
 		this.orderRepository=orderRepository;
 		this.clientRepository=clientRepository;
 		this.fromApiJsonHelper=fromApiJsonHelper;
@@ -119,7 +120,6 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 		this.processRequestReadplatformService=processRequestReadplatformService;
 		this.processRequestWriteplatformService=processRequestWriteplatformService;
 		this.ipPoolManagementReadPlatformService=ipPoolManagementReadPlatformService;
-		this.planRepository=planRepository;
 		this.groupReadPlatformService=groupReadPlatformService;
 	}
 
@@ -238,8 +238,8 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 					ServiceParameters serviceParameter=ServiceParameters.fromJson(j,fromJsonHelper,clientId,orderId,planName,"ACTIVE",iprange,subnet);
 					this.serviceParametersRepository.saveAndFlush(serviceParameter);
 				
-					//	ip_pool_data status updation
-					String paramName = fromJsonHelper.extractStringNamed("paramName", j);
+   					    //ip_pool_data status updation
+					    String paramName = fromJsonHelper.extractStringNamed("paramName", j);
 					
 						if(paramName.equalsIgnoreCase(ProvisioningApiConstants.PROV_DATA_IPADDRESS)){
 							

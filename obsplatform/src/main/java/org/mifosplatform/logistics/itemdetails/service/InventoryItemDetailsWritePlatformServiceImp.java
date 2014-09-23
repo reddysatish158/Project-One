@@ -37,7 +37,9 @@ import org.mifosplatform.portfolio.association.data.AssociationData;
 import org.mifosplatform.portfolio.association.data.HardwareAssociationData;
 import org.mifosplatform.portfolio.association.service.HardwareAssociationReadplatformService;
 import org.mifosplatform.portfolio.association.service.HardwareAssociationWriteplatformService;
+import org.mifosplatform.portfolio.order.data.CustomValidationData;
 import org.mifosplatform.portfolio.order.exceptions.NoGrnIdFoundException;
+import org.mifosplatform.portfolio.order.service.OrderDetailsReadPlatformServices;
 import org.mifosplatform.portfolio.order.service.OrderReadPlatformService;
 import org.mifosplatform.portfolio.transactionhistory.service.TransactionHistoryWritePlatformService;
 import org.mifosplatform.provisioning.provisioning.service.ProvisioningWritePlatformService;
@@ -78,13 +80,14 @@ public class InventoryItemDetailsWritePlatformServiceImp implements InventoryIte
 	private final ItemRepository itemRepository;
     private final OneTimeSaleReadPlatformService oneTimeSaleReadPlatformService;
     private final OrderReadPlatformService orderReadPlatformService;
+    private final OrderDetailsReadPlatformServices orderDetailsReadPlatformServices;
     private final ProvisioningWritePlatformService provisioningWritePlatformService;
 	public final static String CONFIG_PROPERTY="Implicit Association";
 	
 	
 	@Autowired
 	public InventoryItemDetailsWritePlatformServiceImp(final InventoryItemDetailsReadPlatformService inventoryItemDetailsReadPlatformService, 
-			final PlatformSecurityContext context, final InventoryGrnRepository inventoryitemRopository,
+			final PlatformSecurityContext context, final InventoryGrnRepository inventoryitemRopository,final OrderDetailsReadPlatformServices detailsReadPlatformServices,
 			final InventoryItemCommandFromApiJsonDeserializer inventoryItemCommandFromApiJsonDeserializer,final InventoryItemAllocationCommandFromApiJsonDeserializer inventoryItemAllocationCommandFromApiJsonDeserializer, 
 			final InventoryItemDetailsAllocationRepository inventoryItemDetailsAllocationRepository,final OneTimeSaleReadPlatformService oneTimeSaleReadPlatformService, 
 			final OneTimeSaleRepository oneTimeSaleRepository,final InventoryItemDetailsRepository inventoryItemDetailsRepository,final FromJsonHelper fromJsonHelper, 
@@ -112,6 +115,7 @@ public class InventoryItemDetailsWritePlatformServiceImp implements InventoryIte
 		this.itemRepository=itemRepository;
 		this.orderReadPlatformService=orderReadPlatformService;
 		this.provisioningWritePlatformService=provisioningWritePlatformService;
+		this.orderDetailsReadPlatformServices=detailsReadPlatformServices;
 		
 	}
 	
@@ -407,8 +411,15 @@ public class InventoryItemDetailsWritePlatformServiceImp implements InventoryIte
         	   
         	   String serialNo=command.stringValueOfParameterNamed("serialNo");
         	   Long clientId=command.longValueOfParameterNamed("clientId");
-        	 Long activeorders=this.orderReadPlatformService.retrieveClientActiveOrderDetails(clientId,serialNo);
         	   
+        	   
+		        //Check for Custome_Validation
+				CustomValidationData customValidationData   = this.orderDetailsReadPlatformServices.checkForCustomValidations(clientId,"UnPairing", command.json());
+				if(customValidationData.getErrorCode() != 0 && customValidationData.getErrorMessage() != null){
+					throw new ActivePlansFoundException(customValidationData.getErrorMessage()); 
+				}
+          	   
+        	   Long activeorders=this.orderReadPlatformService.retrieveClientActiveOrderDetails(clientId,serialNo);
         	   if(activeorders!= 0){
         		   throw new ActivePlansFoundException();
         	   }
