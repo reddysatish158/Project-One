@@ -112,6 +112,7 @@ public class EventActionWritePlatformServiceImpl implements ActiondetailsWritePl
 				    List<SubscriptionData> subscriptionDatas=this.contractPeriodReadPlatformService.retrieveSubscriptionDatabyContractType("Month(s)",1);
 				    	 	
 				       if(detailsData.getActionName().equalsIgnoreCase(EventActionConstants.ACTION_SEND_EMAIL)){
+				    	   
 				          TicketMasterData data = this.ticketMasterReadPlatformService.retrieveTicket(clientId,new Long(resourceId));
 				          TicketMaster ticketMaster=this.repository.findOne(new Long(resourceId));
 				          AppUserData user = this.readPlatformService.retrieveUser(new Long(data.getUserId()));
@@ -125,6 +126,7 @@ public class EventActionWritePlatformServiceImpl implements ActiondetailsWritePl
 				        	  		this.messageDataRepository.save(billingMessage);
 				        	  	}else{
 				        	  	   if(actionProcedureData.getEmailId().isEmpty()){
+				        	  		   
 				        	  			throw new EmailNotFoundException(new Long(data.getUserId()));
 				        	  		}else{
 				        	  			BillingMessage billingMessage = new BillingMessage("CREATE TICKET", data.getProblemDescription()+"\n"
