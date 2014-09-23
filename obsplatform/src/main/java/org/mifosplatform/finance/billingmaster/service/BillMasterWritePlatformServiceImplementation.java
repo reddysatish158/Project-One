@@ -164,7 +164,7 @@ public class BillMasterWritePlatformServiceImplementation implements
 		              
 		    billingMessage=new BillingMessage(msgTemplate.getHeader(),msgTemplate.getBody(),msgTemplate.getFooter(),clientEmail,clientEmail,
 		    		                    msgTemplate.getSubject(),"N",msgTemplate,msgTemplate.getMessageType(),filePath);
-		this.messageDataRepository.save(billingMessage);
+		   this.messageDataRepository.save(billingMessage);
 			
 	      }
 
