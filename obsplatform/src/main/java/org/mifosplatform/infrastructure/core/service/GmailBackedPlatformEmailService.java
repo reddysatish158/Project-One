@@ -25,6 +25,7 @@ public class GmailBackedPlatformEmailService implements PlatformEmailService {
      String encodedPassword;
      String decodePassword;
      String hostName;
+     String starttlsValue;
      @Autowired
      public GmailBackedPlatformEmailService(final GlobalConfigurationRepository repository) {
          this.repository = repository;
@@ -53,6 +54,7 @@ public class GmailBackedPlatformEmailService implements PlatformEmailService {
 			encodedPassword=(String) object.get("password");
 			decodePassword=new String(Base64.decodeBase64(encodedPassword));
 			hostName=(String) object.get("hostName");
+			starttlsValue=(String)object.get("starttls");
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -67,7 +69,7 @@ public class GmailBackedPlatformEmailService implements PlatformEmailService {
         email.setDebug(false); // true if you want to debug
         email.setHostName(hostName);
         try {
-            email.getMailSession().getProperties().put("mail.smtp.starttls.enable", "true");
+            email.getMailSession().getProperties().put("mail.smtp.starttls.enable", starttlsValue);
             email.setFrom(authuser, authuserName);
 
             StringBuilder subjectBuilder = new StringBuilder().append("BillingX Prototype Demo: ").append(emailDetail.getContactName()).append(" user account creation.");
