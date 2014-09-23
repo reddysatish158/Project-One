@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
 import org.mifosplatform.infrastructure.codes.domain.Code;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
 import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
 import org.mifosplatform.infrastructure.configuration.exception.GlobalConfigurationPropertyNotFoundException;
@@ -64,7 +65,7 @@ public class GlobalConfigurationWritePlatformServiceJpaRepositoryImpl implements
             return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(configId).with(changes).build();
 
         } catch (final DataIntegrityViolationException dve) {
-            handleDataIntegrityIssues(dve);
+            handleDataIntegrityIssues(command,dve);
             return CommandProcessingResult.empty();
         }
 
@@ -75,18 +76,18 @@ public class GlobalConfigurationWritePlatformServiceJpaRepositoryImpl implements
 		try{
 			
 			this.context.authenticatedUser();
-			//this.globalConfigurationDataValidator.validateForCreate(command);
-			final String userName = command.stringValueOfParameterNamed("userName");
-			final String mailId = command.stringValueOfParameterNamed("mailId");
-			final String password = command.stringValueOfParameterNamed("password");
-			final String hostName=command.stringValueOfParameterNamed("hostName");
-			final String port=command.stringValueOfParameterNamed("port");
+			this.globalConfigurationDataValidator.validateForCreate(command);
+			final String userName = command.stringValueOfParameterNamed(ConfigurationConstants.NAME);
+			final String mailId = command.stringValueOfParameterNamed(ConfigurationConstants.MAIL);
+			final String password = command.stringValueOfParameterNamed(ConfigurationConstants.PASSWORD);
+			final String hostName=command.stringValueOfParameterNamed(ConfigurationConstants.HOSTNAME);
+			final String port=command.stringValueOfParameterNamed(ConfigurationConstants.PORT);
+			final String starttls=command.stringValueOfParameterNamed(ConfigurationConstants.STARTTLS);
 						
-			
 			final String unencodedPassword = password;
 			String encodedString = Base64.encodeBase64String(unencodedPassword.getBytes());
 			
-			/*  For Decoding above string
+			/**  For Decoding above string
 			 * 
 			 * byte[] decodeString = Base64.decodeBase64(encodedString);
 			 * System.out.println("decodeString: "+new String(decodeString));
@@ -97,14 +98,15 @@ public class GlobalConfigurationWritePlatformServiceJpaRepositoryImpl implements
 			json.addProperty("password", encodedString);
 			json.addProperty("hostName", hostName);
 			json.addProperty("port", port);
+			json.addProperty("starttls", starttls);
 			final GlobalConfigurationProperty globalConfigurationProperty = GlobalConfigurationProperty.fromJson(command, userName, json.toString());
 	        
 			this.repository.save(globalConfigurationProperty);
-	
+			
 			return new CommandProcessingResultBuilder().withEntityId(globalConfigurationProperty.getId()).build();
 		}
 		catch (final DataIntegrityViolationException dve) {
-            handleDataIntegrityIssues(dve);
+            handleDataIntegrityIssues(command,dve);
             return CommandProcessingResult.empty();
         }
 	}
@@ -115,9 +117,16 @@ public class GlobalConfigurationWritePlatformServiceJpaRepositoryImpl implements
         return property;
     }
     
-    private void handleDataIntegrityIssues(final DataIntegrityViolationException dve) {
+    private void handleDataIntegrityIssues(final JsonCommand command,final DataIntegrityViolationException dve) {
 
         final Throwable realCause = dve.getMostSpecificCause();
+        if (realCause.getMessage().contains("name_config")) {
+            final String username = command.stringValueOfParameterNamed(ConfigurationConstants.NAME);
+            final StringBuilder defaultMessageBuilder = new StringBuilder("Name with").append(username)
+                    .append(" already exists.");
+            throw new PlatformDataIntegrityException("error.msg.smtp.duplicate.name", defaultMessageBuilder.toString(), "username",
+                    username);
+        }
     //    logger.error(dve.getMessage(), dve);
         throw new PlatformDataIntegrityException("error.msg.globalConfiguration.unknown.data.integrity.issue",
                 "Unknown data integrity issue with resource: " + realCause.getMessage());
