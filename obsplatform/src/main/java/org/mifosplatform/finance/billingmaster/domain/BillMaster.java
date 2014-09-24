@@ -76,6 +76,9 @@ public class BillMaster {
 	@Column(name="parent_id")
 	private Long parentId;
 	
+	@Column(name = "is_deleted")
+	private char isDeleted;
+
 	
 	@LazyCollection(LazyCollectionOption.FALSE)
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "billMaster", orphanRemoval = true)
@@ -108,6 +111,7 @@ public class BillMaster {
 		this.fileName="invoice";
 		//this.billPeriod="monthly";
 		this.parentId=parentId;
+		this.isDeleted='N';
 
 	}
 
@@ -247,5 +251,18 @@ public class BillMaster {
 		return billDetails;
 	}
 
+	public char getIsDeleted() {
+		return isDeleted;
+	}
+
+	public void setIsDeleted(char isDeleted) {
+		this.isDeleted = isDeleted;
+	}
+	
+   public void delete() {
+		
+		this.isDeleted = 'Y';
+	}
+	
 
 }

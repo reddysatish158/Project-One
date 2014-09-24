@@ -11,4 +11,6 @@ public interface BillMasterWritePlatformService {
 
 	Long sendBillDetailFilePath(BillMaster billMaster);
 
+	CommandProcessingResult cancelBill(Long entityId);
+
 }
