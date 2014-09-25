@@ -504,9 +504,9 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 				this.adjustmentRepository.save(adjustment);
 			}
 			else if (transIds.getTransactionType().equalsIgnoreCase("TAXES")) {
-				InvoiceTax invoice = this.invoiceTaxRepository.findOne(transIds.getTransactionId());
-				invoice.updateBillId(billId);
-				this.invoiceTaxRepository.save(invoice);
+				InvoiceTax tax = this.invoiceTaxRepository.findOne(transIds.getTransactionId());
+				tax.updateBillId(billId);
+				this.invoiceTaxRepository.save(tax);
 			}
 			else if (transIds.getTransactionType().contains("PAYMENT")) {
 				Payment payment = this.paymentRepository.findOne(transIds.getTransactionId());

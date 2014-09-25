@@ -441,7 +441,7 @@ public class OrderReadPlatformServiceImpl implements OrderReadPlatformService
 
 						public String orderDiscountLookupSchema() {
 						return "od.id as id,od.orderprice_id as priceId,od.discount_rate as discountAmount,d.discount_code as discountCode," +
-								"d.discount_description as discountdescription,d.discount_type as discountType,od.discount_startdate as startDate," +
+								"d.discount_description as discountdescription,od.discount_type as discountType,od.discount_startdate as startDate," +
 								" od.discount_enddate as endDate  FROM b_order_discount od, b_discount_master d" +
 								" where od.discount_id=d.id and od.is_deleted='N' and od.order_id=?";
 						}

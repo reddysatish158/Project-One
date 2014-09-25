@@ -273,7 +273,7 @@ public class BillMasterReadPlatformServiceImplementation implements
 		@Override
 		public List<FinancialTransactionsData> retrieveStatments(Long clientId) {
 			BillStatmentMapper mapper = new BillStatmentMapper();
-			String sql = "select " + mapper.billStatemnetSchema();
+			String sql = "select " + mapper.billStatemnetSchema() +" and b.is_deleted='N'";
 			return this.jdbcTemplate.query(sql, mapper,new Object[] { clientId });
 
 		}
@@ -336,7 +336,7 @@ public class BillMasterReadPlatformServiceImplementation implements
 
 			public String billStatemnetSchema() {
 
-				String result =   " IFNULL(b.Due_amount,0) as dueAmount  from b_bill_master b  where b.Client_id=? and id=(Select max(id) from b_bill_master a where a.client_id=b.client_id)";
+				String result =   " IFNULL(b.Due_amount,0) as dueAmount  from b_bill_master b  where b.Client_id=? and id=(Select max(id) from b_bill_master a where a.client_id=b.client_id and a.is_deleted='N')";
 
 				return result;
 			}
