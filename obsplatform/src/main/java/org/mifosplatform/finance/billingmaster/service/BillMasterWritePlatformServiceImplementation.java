@@ -5,14 +5,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.joda.time.LocalDate;
+import org.mifosplatform.finance.adjustment.domain.Adjustment;
+import org.mifosplatform.finance.adjustment.domain.AdjustmentRepository;
 import org.mifosplatform.finance.billingmaster.domain.BillDetail;
+import org.mifosplatform.finance.billingmaster.domain.BillDetailRepository;
 import org.mifosplatform.finance.billingmaster.domain.BillMaster;
 import org.mifosplatform.finance.billingmaster.domain.BillMasterRepository;
 import org.mifosplatform.finance.billingmaster.serialize.BillMasterCommandFromApiJsonDeserializer;
+import org.mifosplatform.finance.billingorder.domain.BillingOrder;
+import org.mifosplatform.finance.billingorder.domain.BillingOrderRepository;
+import org.mifosplatform.finance.billingorder.domain.Invoice;
+import org.mifosplatform.finance.billingorder.domain.InvoiceRepository;
+import org.mifosplatform.finance.billingorder.domain.InvoiceTax;
+import org.mifosplatform.finance.billingorder.domain.InvoiceTaxRepository;
 import org.mifosplatform.finance.billingorder.exceptions.BillingOrderNoRecordsFoundException;
 import org.mifosplatform.finance.financialtransaction.data.FinancialTransactionsData;
+import org.mifosplatform.finance.payments.domain.Payment;
+import org.mifosplatform.finance.payments.domain.PaymentRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
+import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.organisation.groupsDetails.domain.GroupsDetails;
 import org.mifosplatform.organisation.groupsDetails.domain.GroupsDetailsRepository;
@@ -46,6 +58,13 @@ public class BillMasterWritePlatformServiceImplementation implements
 	    private final GroupsDetailsRepository groupsDetailsRepository;
 	    private final MessageDataRepository messageDataRepository;
 	    private final BillingMessageTemplateRepository messageTemplateRepository;
+		private final BillDetailRepository billDetailRepository;
+		private final BillingOrderRepository billingOrderRepository;
+		private final InvoiceTaxRepository invoiceTaxRepository;
+		private final InvoiceRepository invoiceRepository;
+		private final PaymentRepository paymentRepository;
+		private final AdjustmentRepository adjustmentRepository;
+		
 	    
 	   
 	@Autowired
@@ -53,10 +72,11 @@ public class BillMasterWritePlatformServiceImplementation implements
 				final BillMasterReadPlatformService billMasterReadPlatformService,final BillWritePlatformService billWritePlatformService,
 				final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,
 				final BillMasterCommandFromApiJsonDeserializer apiJsonDeserializer,final ClientRepository clientRepository,
-				final GroupsDetailsRepository groupsDetailsRepository,
-				final MessageDataRepository messageDataRepository,
-				final BillingMessageTemplateRepository messageTemplateRepository) {
-
+				final GroupsDetailsRepository groupsDetailsRepository,final MessageDataRepository messageDataRepository,
+				final BillingMessageTemplateRepository messageTemplateRepository,final BillDetailRepository billDetailRepository,
+				final BillingOrderRepository billingOrderRepository,InvoiceTaxRepository invoiceTaxRepository,
+		        final InvoiceRepository invoiceRepository, final PaymentRepository paymentRepository,
+		        final AdjustmentRepository adjustmentRepository){
 		    this.context = context;
 			this.billMasterRepository = billMasterRepository;
 			this.clientRepository=clientRepository;
@@ -67,6 +87,14 @@ public class BillMasterWritePlatformServiceImplementation implements
 			this.groupsDetailsRepository=groupsDetailsRepository;
 			this.messageDataRepository=messageDataRepository;
 			this.messageTemplateRepository=messageTemplateRepository;
+			this.billDetailRepository=billDetailRepository;
+			this.billingOrderRepository=billingOrderRepository;
+			this.invoiceRepository=invoiceRepository;
+			this.invoiceTaxRepository=invoiceTaxRepository;
+			this.adjustmentRepository=adjustmentRepository;
+			this.paymentRepository=paymentRepository;
+			
+			
 			
 	}
 	
@@ -76,9 +104,10 @@ public class BillMasterWritePlatformServiceImplementation implements
 	public CommandProcessingResult createBillMaster(JsonCommand command,Long clientId) {
 		try
 		{
-	     Long parentId=null;	
+	     Long parentId=null;
+	     List<FinancialTransactionsData> financialTransactionsDatas=new ArrayList<FinancialTransactionsData>();
 		 this.apiJsonDeserializer.validateForCreate(command.json());
-		 List<FinancialTransactionsData> financialTransactionsDatas = billMasterReadPlatformService.retrieveFinancialData(clientId);
+		 financialTransactionsDatas = billMasterReadPlatformService.retrieveFinancialData(clientId);
 		 if (financialTransactionsDatas.size() == 0) {
 			String msg = "no Bills to Generate";
 			throw new BillingOrderNoRecordsFoundException(msg);
@@ -139,7 +168,10 @@ public class BillMasterWritePlatformServiceImplementation implements
 
 	private void handleCodeDataIntegrityIssues(JsonCommand command,
 			DataIntegrityViolationException dve) {
-	
+		Throwable realCause = dve.getMostSpecificCause(); 
+		if(realCause.getMessage().contains("plan_code"))
+		throw new PlatformDataIntegrityException("error.msg.data.truncation.issue",
+                "Data truncation: Data too long for column 'plan_code'");
 		
 	}
 
@@ -164,7 +196,7 @@ public class BillMasterWritePlatformServiceImplementation implements
 		              
 		    billingMessage=new BillingMessage(msgTemplate.getHeader(),msgTemplate.getBody(),msgTemplate.getFooter(),clientEmail,clientEmail,
 		    		                    msgTemplate.getSubject(),"N",msgTemplate,msgTemplate.getMessageType(),filePath);
-		this.messageDataRepository.save(billingMessage);
+		   this.messageDataRepository.save(billingMessage);
 			
 	      }
 
@@ -172,4 +204,56 @@ public class BillMasterWritePlatformServiceImplementation implements
 		
 		return billMaster.getId();
 	}
-}
+
+
+	@Override
+	public CommandProcessingResult cancelBill(Long billId) {
+		try{
+		context.authenticatedUser();
+		List<BillDetail> BillingDetails = new ArrayList<BillDetail>();
+		
+		BillMaster billMaster=this.billMasterRepository.findOne(billId);
+		if(billMaster==null){
+		 throw  new	BillingOrderNoRecordsFoundException();
+		}//Get all billdetails for that billId 
+		BillingDetails = billMaster.getBillDetails();//this.billDetailRepository.findOneByBillId(billMaster);
+		for(BillDetail billDetail:BillingDetails){  
+			if (billDetail.getTransactionType().equalsIgnoreCase("SERVICE_CHARGES")) {
+				BillingOrder billingOrder = this.billingOrderRepository.findOne(billDetail.getTransactionId());
+				billingOrder.updateBillId(null);
+				this.billingOrderRepository.save(billingOrder);
+				Invoice invoice = this.invoiceRepository.findOne(billingOrder.getInvoice().getId());
+				invoice.updateBillId(null);
+				this.invoiceRepository.save(invoice);
+			} else if(billDetail.getTransactionType().equalsIgnoreCase("Taxes")){
+				InvoiceTax tax = this.invoiceTaxRepository.findOne(billDetail.getTransactionId());
+			    tax.updateBillId(null);
+			    this.invoiceTaxRepository.save(tax);
+		    }else if(billDetail.getTransactionType().equalsIgnoreCase("ADJUSTMENT")){
+		    	Adjustment adjustment = this.adjustmentRepository.findOne(billDetail.getTransactionId());
+				adjustment.updateBillId(null);
+				this.adjustmentRepository.save(adjustment);
+		   }else if(billDetail.getTransactionType().contains("PAYMENT")) {
+				Payment payment = this.paymentRepository.findOne(billDetail.getTransactionId());
+				payment.updateBillId(null);
+				this.paymentRepository.save(payment);
+			}else if (billDetail.getTransactionType().equalsIgnoreCase("ONETIME_CHARGES")) {
+            	BillingOrder billingOrder = this.billingOrderRepository.findOne(billDetail.getTransactionId());
+				billingOrder.updateBillId(null);
+				this.billingOrderRepository.save(billingOrder);
+				Invoice invoice = this.invoiceRepository.findOne(billingOrder.getInvoice().getId());
+				invoice.updateBillId(null);
+				this.invoiceRepository.save(invoice);
+            }
+			
+		}
+		 billMaster.delete();
+        this.billMasterRepository.save(billMaster);
+		return new CommandProcessingResult(billMaster.getId());
+	   }catch(DataIntegrityViolationException dve) {
+		logger.error(dve.getLocalizedMessage());
+		 //handleCodeDataIntegrityIssues(command, dve);
+		return  CommandProcessingResult.empty();
+	}
+   }
+}	

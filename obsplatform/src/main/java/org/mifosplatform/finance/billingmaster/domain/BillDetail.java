@@ -41,6 +41,7 @@ public class BillDetail {
 	
 	@Column(name = "description")
 	private String description;
+	
 
 	protected BillDetail() {
 
