@@ -109,7 +109,7 @@ public class IpPoolManagementWritePlatformServiceImpl implements IpPoolManagemen
 			String maxRangeIp = ipAddress.replaceAll(ipAddress.substring(Math.max(ipAddress.length()-2, 0)), ipRange);
 			//check given ip range is incremental way or not
 			if(ipAddress.compareTo(maxRangeIp)>0){
-				throw new PlatformDataIntegrityException("error.msg.ipaddress.give.incremental.iprange", "please select incremental iprange address", ipRange);
+				throw new PlatformDataIntegrityException("error.msg.ipaddress.give.incremental.iprange", "please select incremental iprange address", "ipRange");
 			}
 			List<IpPoolManagementDetail> IpPoolManagementDetails=this.ipPoolManagementJpaRepository.findBetweenIpAddresses(ipAddress,maxRangeIp);
 		   for(IpPoolManagementDetail ipPoolDetail:IpPoolManagementDetails)
