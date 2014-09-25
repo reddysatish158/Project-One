@@ -1,5 +1,7 @@
 package org.mifosplatform.organisation.ippool.domain;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -17,6 +19,10 @@ public interface IpPoolManagementJpaRepository extends JpaRepository<IpPoolManag
 	 @Query("from IpPoolManagementDetail ipPoolManagementDetail where ipPoolManagementDetail.ipAddress =:ipAddress")
 	 IpPoolManagementDetail findByIpAddress(@Param("ipAddress") String ipAddress);
 
-	
+	 @Query("from IpPoolManagementDetail ip where ip.status is 'I' and ip.ipAddress between ?1 and ?2 ")
+	 List<IpPoolManagementDetail> findBetweenIpAddresses(String ipAddress ,String maxRangeIp);
+
 
 }
+
+	

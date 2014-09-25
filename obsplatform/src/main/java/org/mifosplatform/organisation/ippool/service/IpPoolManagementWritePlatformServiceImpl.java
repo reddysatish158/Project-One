@@ -1,6 +1,7 @@
 package org.mifosplatform.organisation.ippool.service;
 
 import java.net.InetAddress;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.map.HashedMap;
@@ -95,21 +96,40 @@ public class IpPoolManagementWritePlatformServiceImpl implements IpPoolManagemen
 		try {
 			context.authenticatedUser();
 			this.apiJsonDeserializer.validateForUpdate(command.json());
-			
+		
+			String ipAddress = command.stringValueOfParameterNamed("ipAddress");
 			String statusType = command.stringValueOfParameterNamed("statusType");
 			String notes = command.stringValueOfParameterNamed("notes");
 			String poolDescription = command.stringValueOfParameterNamed("ipPoolDescription");
 			Long type = command.longValueOfParameterNamed("type");
-			Long subNet = command.longValueOfParameterNamed("subNet");
+			Long subNet = command.longValueOfParameterNamed("subnet");
+			String ipRange = command.stringValueOfParameterNamed("ipRange");
 			
-			IpPoolManagementDetail ipPoolManagementDetail = this.ipPoolManagementJpaRepository.findOne(command.entityId());
-			ipPoolManagementDetail.setStatus(statusType.trim().charAt(0));
-			ipPoolManagementDetail.setNotes(notes);
-			ipPoolManagementDetail.setIpPoolDescription(poolDescription);
-			ipPoolManagementDetail.setType(type);
-			ipPoolManagementDetail.setSubnet(subNet);
-			this.ipPoolManagementJpaRepository.save(ipPoolManagementDetail);
-			
+			if(ipRange.length() >0){
+			String maxRangeIp = ipAddress.replaceAll(ipAddress.substring(Math.max(ipAddress.length()-2, 0)), ipRange);
+			//check given ip range is incremental way or not
+			if(ipAddress.compareTo(maxRangeIp)>0){
+				throw new PlatformDataIntegrityException("error.msg.ipaddress.give.incremental.iprange", "please select incremental iprange address", ipRange);
+			}
+			List<IpPoolManagementDetail> IpPoolManagementDetails=this.ipPoolManagementJpaRepository.findBetweenIpAddresses(ipAddress,maxRangeIp);
+		   for(IpPoolManagementDetail ipPoolDetail:IpPoolManagementDetails)
+		    {
+			   ipPoolDetail.setStatus(statusType.trim().charAt(0));
+			   ipPoolDetail.setNotes(notes);
+			   ipPoolDetail.setIpPoolDescription(poolDescription);
+			   ipPoolDetail.setType(type);
+			   ipPoolDetail.setSubnet(subNet);
+			   this.ipPoolManagementJpaRepository.save(ipPoolDetail);
+		     }
+			}else{
+			 IpPoolManagementDetail  ipPoolManagementDetail = this.ipPoolManagementJpaRepository.findOne(command.entityId());
+			 ipPoolManagementDetail.setStatus(statusType.trim().charAt(0));
+			 ipPoolManagementDetail.setNotes(notes);
+			 ipPoolManagementDetail.setIpPoolDescription(poolDescription);
+			 ipPoolManagementDetail.setType(type);
+			 ipPoolManagementDetail.setSubnet(subNet);
+			 this.ipPoolManagementJpaRepository.save(ipPoolManagementDetail);
+			}
 			return new CommandProcessingResult(command.entityId());
 			
 		} catch (DataIntegrityViolationException dve) {
