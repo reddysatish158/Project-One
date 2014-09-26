@@ -268,7 +268,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 	
 				SelfCare selfcare =  this.selfCareRepository.findOneByClientId(resultClient.getClientId());
 				selfcare.setNationalId(nationalId);
-				if(kortaToken !=null){
+				if(kortaToken !=null && !(kortaToken.equalsIgnoreCase(""))){
 					selfcare.setToken(kortaToken);
 				}			
 				temporary.setStatus("ACTIVE");
