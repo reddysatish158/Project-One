@@ -18,6 +18,7 @@ import org.mifosplatform.infrastructure.dataqueries.service.ReadReportingService
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.organisation.ippool.data.IpPoolData;
 import org.mifosplatform.organisation.ippool.data.IpPoolManagementData;
+import org.mifosplatform.organisation.ippool.domain.IpPoolManagementDetail;
 import org.mifosplatform.organisation.ippool.exception.IpAddresNotAvailableException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -304,5 +305,7 @@ public class IpPoolManagementReadPlatformServiceImpl implements IpPoolManagement
 		return null;
 		}
 	}
+
+	
 }
 

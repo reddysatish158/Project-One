@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -20,6 +21,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.mifosplatform.commands.domain.CommandWrapper;
+import org.mifosplatform.commands.service.CommandWrapperBuilder;
+import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.mifosplatform.finance.billingmaster.domain.BillMaster;
 import org.mifosplatform.finance.billingmaster.domain.BillMasterRepository;
 import org.mifosplatform.finance.billingmaster.service.BillMasterReadPlatformService;
@@ -58,13 +62,14 @@ public class BillingMasterApiResourse {
 		private final BillWritePlatformService billWritePlatformService;
 	    private final FromJsonHelper fromApiJsonHelper;
 	    private final BillMasterWritePlatformService billMasterWritePlatformService;
-		
+	    private final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService;
 		
 		 @Autowired
 	    public BillingMasterApiResourse(final PlatformSecurityContext context, final FromJsonHelper fromJsonHelper,final BillWritePlatformService billWritePlatformService,
 	    final DefaultToApiJsonSerializer<FinancialTransactionsData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper,
 	    final BillMasterReadPlatformService billMasterReadPlatformService,final BillMasterRepository billMasterRepository,
-	    final BillMasterWritePlatformService billMasterWritePlatformService,final DefaultToApiJsonSerializer<BillDetailsData> ApiJsonSerializer) {
+	    final BillMasterWritePlatformService billMasterWritePlatformService,final DefaultToApiJsonSerializer<BillDetailsData> ApiJsonSerializer,
+	    final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
 		        
 			 this.context = context;
 		     this.toApiJsonSerializer = toApiJsonSerializer;
@@ -75,6 +80,7 @@ public class BillingMasterApiResourse {
 		     this.billMasterWritePlatformService=billMasterWritePlatformService;
 		     this.billWritePlatformService=billWritePlatformService;
 		     this.ApiJsonSerializer=ApiJsonSerializer;
+		     this.commandSourceWritePlatformService=commandsSourceWritePlatformService;
 		     
 		    }		
 		
@@ -88,7 +94,7 @@ public class BillingMasterApiResourse {
 		 final JsonElement parsedCommand = this.fromApiJsonHelper.parse(apiRequestBodyAsJson.toString());
          final JsonCommand command = JsonCommand.from(apiRequestBodyAsJson.toString(),parsedCommand,this.fromApiJsonHelper,
         		 "BILLMASTER",clientId,null,null,clientId,null,null,null,null,null,null,null);
-		final CommandProcessingResult result=this.billMasterWritePlatformService.createBillMaster(command,command.entityId());
+       	final CommandProcessingResult result=this.billMasterWritePlatformService.createBillMaster(command,command.entityId());
 	    //this.billWritePlatformService.ireportPdf(result.resourceId());
 	    return this.toApiJsonSerializer.serialize(result);
 	}
@@ -153,5 +159,17 @@ public class BillingMasterApiResourse {
 		Long msgId=this.billMasterWritePlatformService.sendBillDetailFilePath(billMaster);
 	    return this.toApiJsonSerializer.serialize(CommandProcessingResult.resourceResult(msgId, null));
 	}
+	
+	
+	@DELETE
+	@Path("{billId}")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String cancelBill(@PathParam("billId") final Long billId) {
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().cancelBill(billId).build();
+        final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
+        return this.toApiJsonSerializer.serialize(result);
+	}
+
 
 }

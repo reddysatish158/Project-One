@@ -27,7 +27,7 @@ public class IpPoolManagementCommandFromApiJsonDeserializer {
 
 	private FromJsonHelper fromJsonHelper;
 
-	private final Set<String> supportedParams = new HashSet<String>(Arrays.asList("ipPoolDescription","ipAddress","subnet","statusType","type","notes","clientId","ipAndSubnet"));
+	private final Set<String> supportedParams = new HashSet<String>(Arrays.asList("ipPoolDescription","ipAddress","subnet","statusType","type","notes","clientId","ipAndSubnet","ipRange"));
 
 
 	
