@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.hibernate.sql.ordering.antlr.TranslationContext;
 import org.mifosplatform.billing.loginhistory.domain.LoginHistory;
 import org.mifosplatform.billing.loginhistory.domain.LoginHistoryRepository;
 import org.mifosplatform.billing.selfcare.domain.SelfCare;
@@ -35,6 +36,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+
+import com.google.api.translate.Language;
+import com.google.api.translate.Translate;
 
 
 @Service
@@ -331,7 +335,8 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 				body.append("Thankyou");
 				
 				String subject = "Register Conformation";*/
-				
+				Language.fromString("IS");
+			//	String translatedText = Translate.execute("Bonjour le monde", "IS","en");
 					
 				String result = messagePlatformEmailService.sendGeneralMessage(selfCareTemporary.getUserName(), prepareEmail.toString().trim(), subject);
 					
@@ -345,6 +350,8 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 			throw new PlatformDataIntegrityException("duplicate.username", "duplicate.username","duplicate.username", "duplicate.username");
 		}catch(EmptyResultDataAccessException emp){
 			throw new PlatformDataIntegrityException("empty.result.set", "empty.result.set");
+		}catch (Exception e) {
+			e.printStackTrace();
 		}
 		
 		return new CommandProcessingResultBuilder().withEntityId(selfCareTemporary.getId()).build();
