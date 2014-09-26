@@ -9,6 +9,5 @@ public class IpAddresAllocatedException extends AbstractPlatformDomainRuleExcept
     public IpAddresAllocatedException(String msg) {
         super("error.msg.ipaddress.already.allocated.please.select.another.iprange", "Ipaddress already allocated please select another iprange", msg);
     }
-
 	
 }
