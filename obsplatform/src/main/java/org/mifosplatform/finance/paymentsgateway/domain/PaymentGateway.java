@@ -28,8 +28,8 @@ public class PaymentGateway extends AbstractPersistable<Long> {
 	@Column(name="party_id")
 	private String partyId;
 	
-	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "payment_date")
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date paymentDate;
 	
 	@Column(name = "amount_paid", scale = 6, precision = 19, nullable = false)

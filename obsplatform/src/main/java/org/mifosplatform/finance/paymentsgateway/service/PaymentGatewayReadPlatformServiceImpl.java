@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.mifosplatform.crm.clientprospect.service.SearchSqlQuery;
 import org.mifosplatform.finance.paymentsgateway.data.PaymentEnum;
@@ -76,7 +77,7 @@ public class PaymentGatewayReadPlatformServiceImpl implements PaymentGatewayRead
 			Long id = rs.getLong("id");
 			String serialNo = rs.getString("serialNo");
 			String phoneNo = rs.getString("phoneNo");
-			LocalDate paymentDate=JdbcSupport.getLocalDate(rs,"paymentDate");
+			DateTime paymentDate=JdbcSupport.getDateTime(rs,"paymentDate");
 			BigDecimal amountPaid = rs.getBigDecimal("amountPaid");
 			String receiptNo = rs.getString("receiptNo");
 			String clientName = rs.getString("clientName");
