@@ -3,6 +3,7 @@ package org.mifosplatform.finance.paymentsgateway.data;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.mifosplatform.infrastructure.core.data.MediaEnumoptionData;
 
@@ -11,7 +12,7 @@ public class PaymentGatewayData {
 	private Long id;
 	private Long paymentId;
 	private String serialNo;
-	private LocalDate paymentDate;
+	private DateTime paymentDate;
 	private String receiptNo;
 	private BigDecimal amountPaid;
 	private String status;
@@ -23,7 +24,7 @@ public class PaymentGatewayData {
 	private Object phoneMSISDN;
 
 	public PaymentGatewayData(Long id, String serialNo, String phoneNo,
-			LocalDate paymentDate, BigDecimal amountPaid, String receiptNo,
+			DateTime paymentDate, BigDecimal amountPaid, String receiptNo,
 			String clientName, String status, Long paymentId, String remarks) {
 		this.id=id;
 		this.paymentId=paymentId;
@@ -52,7 +53,7 @@ public class PaymentGatewayData {
 		return serialNo;
 	}
 
-	public LocalDate getPaymentDate() {
+	public DateTime getPaymentDate() {
 		return paymentDate;
 	}
 
