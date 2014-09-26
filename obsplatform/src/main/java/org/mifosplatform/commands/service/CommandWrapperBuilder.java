@@ -5,6 +5,8 @@
  */
 package org.mifosplatform.commands.service;
 
+import javax.ws.rs.core.Response.ResponseBuilder;
+
 import org.mifosplatform.commands.domain.CommandWrapper;
 
 public class CommandWrapperBuilder {
@@ -2495,7 +2497,18 @@ public CommandWrapperBuilder forgetSelfCareUDPassword() {
 	return this;
 }
 
+public CommandWrapperBuilder cancelBill(Long billId) {
+		
+	this.actionName = "DELETE";
+	this.entityName = "BILLMASTER";
+	this.entityId = billId;
+	this.href = "/billmaster/"+billId;
+	return this;
+	
+    }
 }
+
+
 
 
 
