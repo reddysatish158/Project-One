@@ -7,6 +7,8 @@ import org.mifosplatform.billing.selfcare.service.SelfCareRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
+import org.mifosplatform.organisation.message.domain.BillingMessageTemplate;
+import org.mifosplatform.organisation.message.domain.BillingMessageTemplateRepository;
 import org.mifosplatform.organisation.message.service.MessagePlatformEmailService;
 import org.mifosplatform.portfolio.client.domain.Client;
 import org.mifosplatform.portfolio.client.domain.ClientRepository;
@@ -27,19 +29,22 @@ public class EntitlementWritePlatformServiceImpl implements EntitlementWritePlat
 	private final ClientRepository clientRepository;
 	private final MessagePlatformEmailService messagePlatformEmailService;
 	private final SelfCareRepository selfCareRepository;
+	private final BillingMessageTemplateRepository billingMessageTemplateRepository;
 	
 
 	@Autowired
 	public EntitlementWritePlatformServiceImpl(
 			final ProcessRequestWriteplatformService processRequestWriteplatformService,
 			final ProcessRequestRepository entitlementRepository, final ClientRepository clientRepository,
-			final MessagePlatformEmailService messagePlatformEmailService,final SelfCareRepository selfCareRepository) {
+			final MessagePlatformEmailService messagePlatformEmailService,final SelfCareRepository selfCareRepository,
+			final BillingMessageTemplateRepository billingMessageTemplateRepository) {
 
 		this.processRequestWriteplatformService = processRequestWriteplatformService;
 		this.entitlementRepository = entitlementRepository;
 		this.clientRepository = clientRepository;
 		this.messagePlatformEmailService = messagePlatformEmailService;
 		this.selfCareRepository = selfCareRepository;
+		this.billingMessageTemplateRepository = billingMessageTemplateRepository;
 	}
 
 	/* In This create(JsonCommand command) method, 
@@ -72,7 +77,8 @@ public class EntitlementWritePlatformServiceImpl implements EntitlementWritePlat
 				if(selfcare == null){
 					throw new PlatformDataIntegrityException("client does not exist", "client not registered","clientId", "client is null ");
 				}
-				StringBuilder builder = new StringBuilder();
+				
+				/*StringBuilder builder = new StringBuilder();
 				builder.append("Dear " + client.getFirstname() + " " + client.getLastname()+ "\n");
 				builder.append("\n");
 				builder.append("Your Beenius Subscriber Account has been successfully created.");
@@ -91,7 +97,26 @@ public class EntitlementWritePlatformServiceImpl implements EntitlementWritePlat
 				this.selfCareRepository.save(selfcare);
 				
 				message = this.messagePlatformEmailService.sendGeneralMessage(client.getEmail(), builder.toString(), 
-						"Beenius StreamingMedia");	
+						"Beenius StreamingMedia");	*/
+				
+				String Name = client.getLastname();
+				
+				List<BillingMessageTemplate> messageDetails=this.billingMessageTemplateRepository.findByTemplateDescription("PROVISION CREDENTIALS");
+				
+				String subject=messageDetails.get(0).getSubject();
+				String body=messageDetails.get(0).getBody();
+				String header=messageDetails.get(0).getHeader()+","+"\n"+"\n";
+				
+				header = header.replace("<PARAM1>", Name);
+				body = body.replace("<PARAM2>", client.getAccountNumber());
+				body = body.replace("<PARAM3>", authPin);
+				StringBuilder prepareEmail =new StringBuilder();
+				prepareEmail.append(header);
+				prepareEmail.append("\t").append(body);
+				prepareEmail.append("\n").append("\n");
+				prepareEmail.append(messageDetails.get(0).getFooter());
+				
+				String result = messagePlatformEmailService.sendGeneralMessage(client.getEmail(), prepareEmail.toString().trim(), subject);
 						
 			}/*else{
 				throw new PlatformDataIntegrityException("error.msg.beenius.process.invalid","Invalid data from Beenius adapter," +
