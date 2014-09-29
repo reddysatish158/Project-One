@@ -99,6 +99,8 @@ public class EntitlementWritePlatformServiceImpl implements EntitlementWritePlat
 				message = this.messagePlatformEmailService.sendGeneralMessage(client.getEmail(), builder.toString(), 
 						"Beenius StreamingMedia");	*/
 				
+				selfcare.setAuthPin(authPin);
+				this.selfCareRepository.save(selfcare);
 				String Name = client.getLastname();
 				
 				List<BillingMessageTemplate> messageDetails=this.billingMessageTemplateRepository.findByTemplateDescription("PROVISION CREDENTIALS");

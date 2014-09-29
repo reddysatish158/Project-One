@@ -52,6 +52,9 @@ public class ActivationProcessCommandFromApiJsonDeserializer {
         
         final Long phone = fromApiJsonHelper.extractLongNamed("phone", element);
         baseDataValidator.reset().parameter("phone").value(phone).notNull().longGreaterThanZero();
+        
+        final String device = fromApiJsonHelper.extractStringNamed("device", element);
+        baseDataValidator.reset().parameter("device").value(device).notNull();
 
         final String city = fromApiJsonHelper.extractStringNamed("city", element);
         baseDataValidator.reset().parameter("city").value(city).notBlank().notExceedingLengthOf(50);
