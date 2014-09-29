@@ -101,7 +101,6 @@ public class EntitlementWritePlatformServiceImpl implements EntitlementWritePlat
 				
 				selfcare.setAuthPin(authPin);
 				this.selfCareRepository.save(selfcare);
-				
 				String Name = client.getLastname();
 				
 				List<BillingMessageTemplate> messageDetails=this.billingMessageTemplateRepository.findByTemplateDescription("PROVISION CREDENTIALS");
@@ -119,7 +118,7 @@ public class EntitlementWritePlatformServiceImpl implements EntitlementWritePlat
 				prepareEmail.append("\n").append("\n");
 				prepareEmail.append(messageDetails.get(0).getFooter());
 				
-				String result = messagePlatformEmailService.sendGeneralMessage(client.getEmail(), prepareEmail.toString().trim(), subject);
+				message = messagePlatformEmailService.sendGeneralMessage(client.getEmail(), prepareEmail.toString().trim(), subject);
 				
 				
 						

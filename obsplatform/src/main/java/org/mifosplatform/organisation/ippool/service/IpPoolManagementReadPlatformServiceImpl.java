@@ -122,7 +122,7 @@ public class IpPoolManagementReadPlatformServiceImpl implements IpPoolManagement
 		public String schema() {
 
 			return "  p.id ,p.pool_name as poolName, p.client_id as ClientId,c.display_name as ClientName,p.type as type,mc.code_value as typeValue,p.subnet as subNet,p.ip_address as ipAddress ,CASE p.status " +
-					" WHEN 'I' THEN 'Intermediate' WHEN 'F' THEN 'Free' WHEN 'A' THEN 'Assigned' WHEN 'B' THEN 'Blocked' ELSE 'Unknown Error' end  as status ," +
+					" WHEN 'I' THEN 'Intermediate' WHEN 'F' THEN 'Free' WHEN 'A' THEN 'Assigned' WHEN 'B' THEN 'Blocked'  WHEN 'T' THEN 'Terminated' ELSE 'Unknown Error' end  as status ," +
 					" p.notes from b_ippool_details p left join m_client c on p.client_id = c.id "+
 					"left outer join m_code_value mc on mc.id=p.type where p.status is not null ";
 
@@ -149,27 +149,23 @@ public class IpPoolManagementReadPlatformServiceImpl implements IpPoolManagement
 	@Override
 	public Page<IpPoolManagementData> retrieveIpPoolData(SearchSqlQuery searchIpPoolDetails, String tabType,String[] data) {
 		
-		// TODO Auto-generated method stub
 		context.authenticatedUser();
 		IpPoolMapper mapper=new IpPoolMapper();
-		
 		String sqlSearch = searchIpPoolDetails.getSqlSearch();
 	    String extraCriteria = "";
 		StringBuilder sqlBuilder = new StringBuilder(400);
         sqlBuilder.append("select ");
         sqlBuilder.append(mapper.schema());
-       
-          
+
         if (tabType!=null && !tabType.isEmpty()) {
-        	
 		        	tabType=tabType.trim();
 		        	sqlBuilder.append(" and  p.status like '"+tabType+"'");
 		        	sqlBuilder.append(extraCriteria);   
-	    
         }if (sqlSearch != null && !sqlSearch.isEmpty()) {
-        	sqlSearch=sqlSearch.trim();
         	
-        	if(sqlSearch.contains("/")){
+        	sqlSearch=sqlSearch.trim();
+         	 if(sqlSearch.contains("/")){
+        		
         		  List<IpPoolManagementData> ipPoolManagementDatas=new ArrayList<IpPoolManagementData>();
                 //  String[] data=this.ipGeneration.getInfo().getAllAddresses(sqlSearch);
 				int rowcount=0;

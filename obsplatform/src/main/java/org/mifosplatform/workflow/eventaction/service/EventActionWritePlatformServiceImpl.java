@@ -59,12 +59,12 @@ public class EventActionWritePlatformServiceImpl implements ActiondetailsWritePl
 	private final MessageDataRepository messageDataRepository;
 	private final AppUserReadPlatformService readPlatformService;
 	private final BillingOrderApiResourse billingOrderApiResourse;
+	private final ProcessRequestRepository processRequestRepository;
 	private final BillingMessageTemplateRepository messageTemplateRepository;
 	private final TicketMasterReadPlatformService ticketMasterReadPlatformService ;
     private final ActionDetailsReadPlatformService actionDetailsReadPlatformService;	
     private final ContractPeriodReadPlatformService contractPeriodReadPlatformService;
     private final HardwareAssociationReadplatformService hardwareAssociationReadplatformService;
-	private final ProcessRequestRepository processRequestRepository;
 
 
 	@Autowired
@@ -106,13 +106,13 @@ public class EventActionWritePlatformServiceImpl implements ActiondetailsWritePl
 	   	for(ActionDetaislData detailsData:actionDetaislDatas){
 		      EventActionProcedureData actionProcedureData=this.actionDetailsReadPlatformService.checkCustomeValidationForEvents(clientId, detailsData.getEventName(),detailsData.getActionName(),resourceId);
 			  JSONObject jsonObject=new JSONObject();
-				
 
 			  	if(actionProcedureData.isCheck()){
 				    SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy");
 				    List<SubscriptionData> subscriptionDatas=this.contractPeriodReadPlatformService.retrieveSubscriptionDatabyContractType("Month(s)",1);
 				    	 	
 				       if(detailsData.getActionName().equalsIgnoreCase(EventActionConstants.ACTION_SEND_EMAIL)){
+				    	   
 				          TicketMasterData data = this.ticketMasterReadPlatformService.retrieveTicket(clientId,new Long(resourceId));
 				          TicketMaster ticketMaster=this.repository.findOne(new Long(resourceId));
 				          AppUserData user = this.readPlatformService.retrieveUser(new Long(data.getUserId()));
@@ -126,6 +126,7 @@ public class EventActionWritePlatformServiceImpl implements ActiondetailsWritePl
 				        	  		this.messageDataRepository.save(billingMessage);
 				        	  	}else{
 				        	  	   if(actionProcedureData.getEmailId().isEmpty()){
+				        	  		   
 				        	  			throw new EmailNotFoundException(new Long(data.getUserId()));
 				        	  		}else{
 				        	  			BillingMessage billingMessage = new BillingMessage("CREATE TICKET", data.getProblemDescription()+"\n"

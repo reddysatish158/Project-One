@@ -34,9 +34,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-
 @Service
 public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestReadplatformService{
 
