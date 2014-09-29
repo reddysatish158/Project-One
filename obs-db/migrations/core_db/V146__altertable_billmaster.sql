@@ -12,3 +12,5 @@ END //
 DELIMITER ;
 call cancelbillmaster();
 Drop procedure IF EXISTS cancelbillmaster; 
+
+insert ignore into c_configuration VALUES (null,'include-network-broadcast-ip',1,'true');
