@@ -1,17 +1,28 @@
 package org.mifosplatform.provisioning.provisioning.service;
 
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.json.JSONObject;
-
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
+import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
+import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
@@ -47,6 +58,7 @@ import org.mifosplatform.provisioning.processrequest.domain.ProcessRequestReposi
 import org.mifosplatform.provisioning.processrequest.service.ProcessRequestReadplatformService;
 import org.mifosplatform.provisioning.processrequest.service.ProcessRequestWriteplatformService;
 import org.mifosplatform.provisioning.provisioning.api.ProvisioningApiConstants;
+import org.mifosplatform.provisioning.provisioning.data.ProvisionAdapter;
 import org.mifosplatform.provisioning.provisioning.data.ServiceParameterData;
 import org.mifosplatform.provisioning.provisioning.domain.ProvisioningCommand;
 import org.mifosplatform.provisioning.provisioning.domain.ProvisioningCommandParameters;
@@ -89,6 +101,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 	private final IpPoolManagementReadPlatformService ipPoolManagementReadPlatformService;
 	private final PlanRepository planRepository;
 	private final GroupReadPlatformService groupReadPlatformService;
+	private final GlobalConfigurationRepository globalConfigurationRepository;
 	
     @Autowired
 	public ProvisioningWritePlatformServiceImpl(final PlatformSecurityContext context,final InventoryItemDetailsRepository inventoryItemDetailsRepository,
@@ -99,7 +112,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 			final ProcessRequestReadplatformService processRequestReadplatformService,final IpPoolManagementJpaRepository ipPoolManagementJpaRepository,
 			final IpPoolManagementReadPlatformService ipPoolManagementReadPlatformService,final ProvisioningReadPlatformService provisioningReadPlatformService,
 			final ProcessRequestWriteplatformService processRequestWriteplatformService,final PlanRepository planRepository,
-			final GroupReadPlatformService groupReadPlatformService) {
+			final GroupReadPlatformService groupReadPlatformService,final GlobalConfigurationRepository globalConfigurationRepository) {
 
     	this.context = context;
     	this.fromJsonHelper=fromJsonHelper;
@@ -121,6 +134,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 		this.processRequestWriteplatformService=processRequestWriteplatformService;
 		this.ipPoolManagementReadPlatformService=ipPoolManagementReadPlatformService;
 		this.groupReadPlatformService=groupReadPlatformService;
+		this.globalConfigurationRepository=globalConfigurationRepository;
 	}
 
 	@Override
@@ -247,6 +261,8 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 									String ipAddress=fromJsonHelper.extractStringNamed("paramValue",j);
 									String ipData=ipAddress+"/"+subnet;
 									IpGeneration ipGeneration=new IpGeneration(ipData,this.ipPoolManagementReadPlatformService);
+									GlobalConfigurationProperty configuration = globalConfigurationRepository.findOneByName("include-network-broadcast-ip");
+									ipGeneration.setInclusiveHostCount(configuration.getValue().equalsIgnoreCase("true"));
 									ipAddressArray=ipGeneration.getInfo().getsubnetAddresses();
 										for(int i=0;i<ipAddressArray.length;i++){
 											IpPoolManagementDetail ipPoolManagementDetail= this.ipPoolManagementJpaRepository.findIpAddressData(ipAddressArray[i]);
@@ -301,6 +317,8 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 					return new CommandProcessingResult(Long.valueOf(processRequest.getId()));
 		}catch(DataIntegrityViolationException dve){
 			handleCodeDataIntegrityIssues(command, dve);
+			return new CommandProcessingResult(Long.valueOf(-1));
+		} catch (JSONException e) {
 			return new CommandProcessingResult(Long.valueOf(-1));
 		}
 	}
@@ -585,5 +603,108 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 		}
 		return new CommandProcessingResult(orderId);	
 		
+	}
+	
+	@Override
+	public String runAdapterCommands(String apiRequestBodyAsJson) {
+		
+		try {
+			JSONObject object = new JSONObject(apiRequestBodyAsJson);
+			String command = object.getString("command");
+			return ProvisioningWritePlatformServiceImpl.runScript(command);
+		} catch (JSONException e) {
+			return e.getLocalizedMessage();
+		}	
+	}
+	
+	public static String runScript(String command){
+	      
+		try {
+			System.out.println("Processing the command ...");
+			Process process = Runtime.getRuntime().exec(command);	
+			process.waitFor();
+			BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+		
+			String s,output="";
+			while ((s=br.readLine()) !=null) {
+				System.out.println(s);
+				output = output+ s + ",";
+			}
+		
+	        while ((s = stdError.readLine()) != null) {
+	        	System.out.println(s);
+	        	output = output+ s + ",";
+	        }
+	        
+	        System.out.println("Command Processing Completed ...");
+	        
+			return output;
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+			return e.getLocalizedMessage();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			return e.getLocalizedMessage();
+		}	
+    }
+
+	@Override
+	public List<ProvisionAdapter> gettingLogInformation(String apiRequestBodyAsJson) {
+		try {
+			JSONObject object = new JSONObject(apiRequestBodyAsJson);
+			Long days = object.getLong("days");
+			String dateFormat = object.getString("dateFormat");
+			String startDate = object.getString("startDate");
+			
+			DateFormat dateformater = new SimpleDateFormat(dateFormat);
+			String todayDate = dateformater.format(new Date());
+			
+			
+			String logFileLocation = object.getString("logFileLocation");
+			String datearray[] = calculateDate(days,startDate,dateFormat);
+			List<ProvisionAdapter> logLocation = new ArrayList<ProvisionAdapter>();
+			
+			for(String date : datearray){
+				if(todayDate.equalsIgnoreCase(date)){
+					logLocation.add(new ProvisionAdapter(date, logFileLocation));
+				}else{
+					String filedata = logFileLocation + "." + date;
+					File f = new File(filedata);
+					if(f.exists() && !f.isDirectory()) { 
+						logLocation.add(new ProvisionAdapter(date, filedata));
+					}
+				}
+				
+				
+			}
+			return logLocation;
+			
+		} catch (JSONException e) {
+			return null;
+		} catch (ParseException e) {
+			return null;
+		}
+		
+		
+	}
+	
+	private String[] calculateDate(Long days, String startDate, String dateFormat1) throws ParseException {
+		
+		String datearray[] = new String[days.intValue()];
+		DateFormat dateFormat = new SimpleDateFormat(dateFormat1);
+		Date date = dateFormat.parse(startDate);
+		
+        for(int day=0;day<days;day++){
+        	    Calendar cal = Calendar.getInstance();
+        	    cal.setTime(date);
+		        cal.add(Calendar.DATE, -day);
+		        Date todate1 = cal.getTime();    
+		        String fromdate = dateFormat.format(todate1);
+		        datearray[day] = fromdate;
+        }
+       
+		return datearray;
 	}
 }	

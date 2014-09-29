@@ -1,8 +1,11 @@
 package org.mifosplatform.provisioning.provisioning.service;
 
+import java.util.List;
+
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.portfolio.order.domain.Order;
+import org.mifosplatform.provisioning.provisioning.data.ProvisionAdapter;
 
 public interface ProvisioningWritePlatformService {
 
@@ -23,6 +26,10 @@ public interface ProvisioningWritePlatformService {
 	CommandProcessingResult updateIpDetails(Long entityId, JsonCommand command);
 
 	CommandProcessingResult confirmProvisioningDetails(Long entityId);
+
+	String runAdapterCommands(String apiRequestBodyAsJson);
+
+	List<ProvisionAdapter> gettingLogInformation(String apiRequestBodyAsJson);
 
 	
 

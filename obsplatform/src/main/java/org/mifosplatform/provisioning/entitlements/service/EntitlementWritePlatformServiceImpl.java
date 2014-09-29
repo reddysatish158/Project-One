@@ -119,6 +119,8 @@ public class EntitlementWritePlatformServiceImpl implements EntitlementWritePlat
 				prepareEmail.append(messageDetails.get(0).getFooter());
 				
 				String result = messagePlatformEmailService.sendGeneralMessage(client.getEmail(), prepareEmail.toString().trim(), subject);
+				
+				
 						
 			}/*else{
 				throw new PlatformDataIntegrityException("error.msg.beenius.process.invalid","Invalid data from Beenius adapter," +

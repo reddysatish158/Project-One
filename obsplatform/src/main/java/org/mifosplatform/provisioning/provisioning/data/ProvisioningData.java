@@ -23,6 +23,7 @@ public class ProvisioningData {
 	private List<IpPoolData> ipPoolDatas;
 	private List<ServiceParameterData> parameterDatas,serviceDatas;
 	private Collection<GroupData> groupDatas;
+	private List<ProvisionAdapter> provisionAdapterData;
 	
 
 	public ProvisioningData(final Long id,final String ProvisioningSystem,
@@ -54,9 +55,19 @@ public class ProvisioningData {
 	}
 
 
+	public ProvisioningData() {
+		// For ProvisioningAdapterApiResource.java
+	}
+
+
 	public String getProvisioningSystem() {
 		return provisioningSystem;
 	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
 
 	public String getCommandName() {
 		return commandName;
@@ -100,6 +111,16 @@ public class ProvisioningData {
 	public void setCommandParameters(
 			List<ProvisioningCommandParameterData> commandParameters) {
 		this.commandParameters = commandParameters;
+	}
+
+
+	public List<ProvisionAdapter> getProvisionAdapterData() {
+		return provisionAdapterData;
+	}
+
+
+	public void setProvisionAdapterData(List<ProvisionAdapter> provisionAdapterData) {
+		this.provisionAdapterData = provisionAdapterData;
 	}
 
 	

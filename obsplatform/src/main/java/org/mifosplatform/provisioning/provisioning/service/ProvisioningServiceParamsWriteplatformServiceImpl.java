@@ -6,6 +6,8 @@ import net.sf.json.JSONObject;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
+import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
+import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
@@ -58,13 +60,15 @@ public class ProvisioningServiceParamsWriteplatformServiceImpl implements Provis
 	private final IpPoolManagementJpaRepository ipPoolManagementJpaRepository;
 	private final InventoryItemDetailsRepository inventoryItemDetailsRepository;
     private final IpPoolManagementReadPlatformService ipPoolManagementReadPlatformService;
+    private final GlobalConfigurationRepository globalConfigurationRepository;
   
 @Autowired	
 public ProvisioningServiceParamsWriteplatformServiceImpl(final PlatformSecurityContext securityContext,
 		final FromJsonHelper fromJsonHelper,final ServiceParametersRepository parametersRepository,final PrepareRequsetRepository prepareRequsetRepository,
 		final ProcessRequestRepository processRequestRepository,final OrderRepository orderRepository,final InventoryItemDetailsRepository detailsRepository,
 		final IpPoolManagementJpaRepository ipPoolManagementJpaRepository,final ServiceMasterRepository masterRepository,
-		final IpPoolManagementReadPlatformService ipPoolManagementReadPlatformService,final ClientRepository clientRepository){
+		final IpPoolManagementReadPlatformService ipPoolManagementReadPlatformService,final ClientRepository clientRepository,
+		final GlobalConfigurationRepository globalConfigurationRepository){
 	
 	this.context=securityContext;
 	this.orderRepository=orderRepository;
@@ -77,6 +81,7 @@ public ProvisioningServiceParamsWriteplatformServiceImpl(final PlatformSecurityC
 	this.processRequestRepository=processRequestRepository;
 	this.ipPoolManagementJpaRepository=ipPoolManagementJpaRepository;
 	this.ipPoolManagementReadPlatformService=ipPoolManagementReadPlatformService;
+	this.globalConfigurationRepository=globalConfigurationRepository;
 }
 
 	@Transactional
@@ -133,7 +138,9 @@ public ProvisioningServiceParamsWriteplatformServiceImpl(final PlatformSecurityC
  						            String ipData=ipAddress+"/"+subnet;
  					      	      IpGeneration ipGeneration=new IpGeneration(ipData,this.ipPoolManagementReadPlatformService);
  					      	     //   ipAddressArray=this.ipGeneration.getInfo().getAllAddresses(ipData);//
- 					      	   ipAddressArray= ipGeneration.getInfo().getsubnetAddresses();
+ 					      	      GlobalConfigurationProperty configuration = globalConfigurationRepository.findOneByName("include-network-broadcast-ip");
+ 					      	      ipGeneration.setInclusiveHostCount(configuration.getValue().equalsIgnoreCase("true"));
+ 					      	      ipAddressArray= ipGeneration.getInfo().getsubnetAddresses();
  						            
  					      	         for(int i=0;i<ipAddressArray.length;i++){
 								         IpPoolManagementDetail ipPoolManagementDetail= this.ipPoolManagementJpaRepository.findIpAddressData(ipAddressArray[i]);
