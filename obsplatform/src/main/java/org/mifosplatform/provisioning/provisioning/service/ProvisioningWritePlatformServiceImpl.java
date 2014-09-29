@@ -12,6 +12,8 @@ import net.sf.json.JSONObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
+import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
@@ -89,6 +91,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 	private final IpPoolManagementReadPlatformService ipPoolManagementReadPlatformService;
 	private final PlanRepository planRepository;
 	private final GroupReadPlatformService groupReadPlatformService;
+	private final GlobalConfigurationRepository globalConfigurationRepository;
 	
     @Autowired
 	public ProvisioningWritePlatformServiceImpl(final PlatformSecurityContext context,final InventoryItemDetailsRepository inventoryItemDetailsRepository,
@@ -99,7 +102,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 			final ProcessRequestReadplatformService processRequestReadplatformService,final IpPoolManagementJpaRepository ipPoolManagementJpaRepository,
 			final IpPoolManagementReadPlatformService ipPoolManagementReadPlatformService,final ProvisioningReadPlatformService provisioningReadPlatformService,
 			final ProcessRequestWriteplatformService processRequestWriteplatformService,final PlanRepository planRepository,
-			final GroupReadPlatformService groupReadPlatformService) {
+			final GroupReadPlatformService groupReadPlatformService,final GlobalConfigurationRepository globalConfigurationRepository) {
 
     	this.context = context;
     	this.fromJsonHelper=fromJsonHelper;
@@ -121,6 +124,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 		this.ipPoolManagementReadPlatformService=ipPoolManagementReadPlatformService;
 		this.planRepository=planRepository;
 		this.groupReadPlatformService=groupReadPlatformService;
+		this.globalConfigurationRepository=globalConfigurationRepository;
 	}
 
 	@Override
@@ -247,6 +251,8 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 									String ipAddress=fromJsonHelper.extractStringNamed("paramValue",j);
 									String ipData=ipAddress+"/"+subnet;
 									IpGeneration ipGeneration=new IpGeneration(ipData,this.ipPoolManagementReadPlatformService);
+									GlobalConfigurationProperty configuration = globalConfigurationRepository.findOneByName("include-network-broadcast-ip");
+									ipGeneration.setInclusiveHostCount(configuration.getValue().equalsIgnoreCase("true"));
 									ipAddressArray=ipGeneration.getInfo().getsubnetAddresses();
 										for(int i=0;i<ipAddressArray.length;i++){
 											IpPoolManagementDetail ipPoolManagementDetail= this.ipPoolManagementJpaRepository.findIpAddressData(ipAddressArray[i]);

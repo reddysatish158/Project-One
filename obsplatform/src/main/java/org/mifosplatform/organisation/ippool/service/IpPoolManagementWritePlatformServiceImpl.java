@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.map.HashedMap;
+import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
+import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -28,19 +30,20 @@ public class IpPoolManagementWritePlatformServiceImpl implements IpPoolManagemen
 	private final IpPoolManagementCommandFromApiJsonDeserializer apiJsonDeserializer;
 	private final IpPoolManagementJpaRepository ipPoolManagementJpaRepository;
 	private final IpPoolManagementReadPlatformService ipPoolManagementReadPlatformService;
+	private final GlobalConfigurationRepository globalConfigurationRepository;
 
 	
 	
 	@Autowired
 	public IpPoolManagementWritePlatformServiceImpl(final PlatformSecurityContext context,
 			final IpPoolManagementJpaRepository ipPoolManagementJpaRepository,final IpPoolManagementCommandFromApiJsonDeserializer apiJsonDeserializer,
-			final IpPoolManagementReadPlatformService ipPoolManagementReadPlatformService) {	
+			final IpPoolManagementReadPlatformService ipPoolManagementReadPlatformService,final GlobalConfigurationRepository globalConfigurationRepository) {	
 		
 		this.context = context;
 		this.apiJsonDeserializer=apiJsonDeserializer;
 		this.ipPoolManagementJpaRepository=ipPoolManagementJpaRepository;
 		this.ipPoolManagementReadPlatformService=ipPoolManagementReadPlatformService;
-		
+		this.globalConfigurationRepository=globalConfigurationRepository;
 		
 	}
 
@@ -61,6 +64,8 @@ public class IpPoolManagementWritePlatformServiceImpl implements IpPoolManagemen
 			if(subnet !=null){
 				String ipData=ipAddress+"/"+subnet;
 				IpGeneration util=new IpGeneration(ipData,this.ipPoolManagementReadPlatformService);
+				GlobalConfigurationProperty configuration = globalConfigurationRepository.findOneByName("include-network-broadcast-ip");
+				util.setInclusiveHostCount(configuration.getValue().equalsIgnoreCase("true"));
 				String[] data=util.getInfo().getAllAddresses();
 					for(int i=0;i<data.length;i++){
 						int j=i+1;
@@ -171,6 +176,8 @@ public class IpPoolManagementWritePlatformServiceImpl implements IpPoolManagemen
 			Map<String,Object> generatedIPPoolID=new HashedMap();
 			String search = command.stringValueOfParameterNamed("ipAndSubnet");
 			IpGeneration ipGeneration = new IpGeneration(search,this.ipPoolManagementReadPlatformService);
+			GlobalConfigurationProperty configuration = globalConfigurationRepository.findOneByName("include-network-broadcast-ip");
+			ipGeneration.setInclusiveHostCount(configuration.getValue().equalsIgnoreCase("true"));
 			String[] data = ipGeneration.getInfo().getsubnetAddresses();
 			String ipPoolDescription=ipGeneration.getInfo().getNetmask();
 			
