@@ -268,8 +268,8 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 	
 				SelfCare selfcare =  this.selfCareRepository.findOneByClientId(resultClient.getClientId());
 				selfcare.setNationalId(nationalId);
-				if(kortaToken !=null){
-					selfcare.setToken(kortaToken);
+				if(kortaToken !=null && !(kortaToken.equalsIgnoreCase(""))){
+						selfcare.setToken(kortaToken);
 				}			
 				temporary.setStatus("ACTIVE");
 				
@@ -332,9 +332,9 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 				// book order
 				GlobalConfigurationProperty selfregistrationconfiguration = configurationRepository.findOneByName(ConfigurationConstants.CONFIR_PROPERTY_SELF_REGISTRATION);
 				
-				//if (selfregistrationconfiguration != null) {
+				if (selfregistrationconfiguration != null) {
 					
-					/*if (selfregistrationconfiguration.isEnabled()) {
+					if (selfregistrationconfiguration.isEnabled()) {
 						
 						JSONObject ordeJson = new JSONObject(selfregistrationconfiguration.getValue());
 						if (ordeJson.getString("paytermCode") != null && Long.valueOf(ordeJson.getLong("planCode")) != null
@@ -352,7 +352,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 												+ resultClient.getClientId(),"Book Order Failed");
 							}
 						}
-					} else{*/
+					} else{
 						JSONObject beeniusOrderJson = new JSONObject();
 					
 						String paytermCode = command.stringValueOfParameterNamed("paytermCode");
@@ -376,9 +376,9 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 											+ resultClient.getClientId(),"Book Order Failed");
 						}
 						
-					//}
+					}
 					
-				//}
+				}
 				
 				// payment Processing
 				if(temporary.getPaymentStatus().equalsIgnoreCase("PENDING")){
