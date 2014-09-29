@@ -27,10 +27,10 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.mail.DefaultAuthenticator;
-import org.apache.commons.mail.Email;
-import org.apache.commons.mail.SimpleEmail;
+import org.apache.commons.mail.HtmlEmail;
 import org.joda.time.LocalDate;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -290,8 +290,12 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 		SmtpDataProcessing();
 		
 		if(configuration != null){
-		
-			Email email = new SimpleEmail();
+			
+			HtmlEmail email = new HtmlEmail();
+			
+			email.setAuthenticator(new DefaultAuthenticator(authuser, authpwd));
+			email.setHostName(hostName);
+			/*Email email = new SimpleEmail();
 				// Very Important, Don't use email.setAuthentication()
 			email.setAuthenticator(new DefaultAuthenticator(authuser, authpwd));
 			email.setDebug(false); // true if you want to debug
@@ -311,8 +315,23 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 			} catch (Exception e) {
 				handleCodeDataIntegrityIssues(null, e);
 				return e.getMessage();
-			}
-			
+			}*/
+				try{
+					String sendToEmail = emailId;
+					email.setStartTLSRequired(starttlsValue.equalsIgnoreCase("true"));
+					email.setFrom(authuser);
+					email.setSmtpPort(portNumber);
+					email.setSubject(subject);
+					email.addTo(sendToEmail);
+					email.setHtmlMsg(body);	
+					email.send();
+					return "success";
+					
+				}catch (Exception e) {
+					handleCodeDataIntegrityIssues(null, e);
+					return e.getMessage();
+				}
+				
 		}else{			
 			throw new GlobalConfigurationPropertyNotFoundException("SMTP GlobalConfiguration Property Not Found"); 			
 		}
