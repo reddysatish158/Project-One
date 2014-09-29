@@ -98,7 +98,7 @@ public class IpPoolManagementApiResource {
   		  sqlSearch.trim();
   		  IpGeneration ipGeneration=new IpGeneration(sqlSearch,this.ipPoolManagementReadPlatformService);
   		  GlobalConfigurationProperty configuration = globalConfigurationRepository.findOneByName("include-network-broadcast-ip");
-  		  ipGeneration.setInclusiveHostCount(configuration.getValue().matches("true"));
+  		  ipGeneration.setInclusiveHostCount(configuration.getValue().equalsIgnoreCase("true"));
           data=ipGeneration.getInfo().getsubnetAddresses();
 			
 		}

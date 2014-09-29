@@ -65,7 +65,7 @@ public class IpPoolManagementWritePlatformServiceImpl implements IpPoolManagemen
 				String ipData=ipAddress+"/"+subnet;
 				IpGeneration util=new IpGeneration(ipData,this.ipPoolManagementReadPlatformService);
 				GlobalConfigurationProperty configuration = globalConfigurationRepository.findOneByName("include-network-broadcast-ip");
-				util.setInclusiveHostCount(configuration.getValue().matches("true"));
+				util.setInclusiveHostCount(configuration.getValue().equalsIgnoreCase("true"));
 				String[] data=util.getInfo().getAllAddresses();
 					for(int i=0;i<data.length;i++){
 						int j=i+1;
@@ -177,7 +177,7 @@ public class IpPoolManagementWritePlatformServiceImpl implements IpPoolManagemen
 			String search = command.stringValueOfParameterNamed("ipAndSubnet");
 			IpGeneration ipGeneration = new IpGeneration(search,this.ipPoolManagementReadPlatformService);
 			GlobalConfigurationProperty configuration = globalConfigurationRepository.findOneByName("include-network-broadcast-ip");
-			ipGeneration.setInclusiveHostCount(configuration.getValue().matches("true"));
+			ipGeneration.setInclusiveHostCount(configuration.getValue().equalsIgnoreCase("true"));
 			String[] data = ipGeneration.getInfo().getsubnetAddresses();
 			String ipPoolDescription=ipGeneration.getInfo().getNetmask();
 			

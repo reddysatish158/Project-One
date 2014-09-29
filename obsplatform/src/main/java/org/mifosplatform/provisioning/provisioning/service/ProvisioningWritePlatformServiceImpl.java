@@ -252,7 +252,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 									String ipData=ipAddress+"/"+subnet;
 									IpGeneration ipGeneration=new IpGeneration(ipData,this.ipPoolManagementReadPlatformService);
 									GlobalConfigurationProperty configuration = globalConfigurationRepository.findOneByName("include-network-broadcast-ip");
-									ipGeneration.setInclusiveHostCount(configuration.getValue().matches("true"));
+									ipGeneration.setInclusiveHostCount(configuration.getValue().equalsIgnoreCase("true"));
 									ipAddressArray=ipGeneration.getInfo().getsubnetAddresses();
 										for(int i=0;i<ipAddressArray.length;i++){
 											IpPoolManagementDetail ipPoolManagementDetail= this.ipPoolManagementJpaRepository.findIpAddressData(ipAddressArray[i]);
