@@ -58,12 +58,17 @@ import org.mifosplatform.portfolio.client.exception.InvalidClientStateTransition
 import org.mifosplatform.portfolio.group.domain.Group;
 import org.mifosplatform.portfolio.order.data.OrderData;
 import org.mifosplatform.portfolio.order.domain.Order;
+import org.mifosplatform.portfolio.order.domain.OrderHistory;
+import org.mifosplatform.portfolio.order.domain.OrderLine;
+import org.mifosplatform.portfolio.order.domain.OrderPrice;
 import org.mifosplatform.portfolio.order.domain.OrderRepository;
 import org.mifosplatform.portfolio.order.service.OrderReadPlatformService;
 import org.mifosplatform.portfolio.plan.domain.Plan;
 import org.mifosplatform.portfolio.plan.domain.PlanRepository;
 import org.mifosplatform.portfolio.plan.domain.UserActionStatusTypeEnum;
 import org.mifosplatform.portfolio.transactionhistory.service.TransactionHistoryWritePlatformService;
+import org.mifosplatform.provisioning.preparerequest.domain.PrepareRequest;
+import org.mifosplatform.provisioning.preparerequest.exception.PrepareRequestActivationException;
 import org.mifosplatform.provisioning.provisioning.domain.ServiceParameters;
 import org.mifosplatform.provisioning.provisioning.domain.ServiceParametersRepository;
 import org.mifosplatform.provisioning.provisioning.service.ProvisioningWritePlatformService;
@@ -567,5 +572,27 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 				}
 				return new CommandProcessingResultBuilder().withEntityId(childClient.getId()).build();
 		}
+	
+	
+	@Transactional
+	@Override
+	public CommandProcessingResult deleteChildFromParentClient(Long clientId, JsonCommand command) {
+		
+		try {
+			context.authenticatedUser();
+			Client childClient = this.clientRepository.findOneWithNotFoundDetection(clientId);
+			childClient.setParentId(null);
+			this.clientRepository.saveAndFlush(childClient);
+	
+		}catch(DataIntegrityViolationException dve){
+			handleDataIntegrityIssues(command, dve);
+        return CommandProcessingResult.empty();
+		}
+		return new CommandProcessingResultBuilder() //
+        .withCommandId(command.commandId()) //
+        .withClientId(clientId) //
+        .withEntityId(clientId) //
+        .build();
+	}
 
 }
