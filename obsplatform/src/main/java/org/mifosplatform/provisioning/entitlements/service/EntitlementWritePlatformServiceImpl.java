@@ -99,6 +99,8 @@ public class EntitlementWritePlatformServiceImpl implements EntitlementWritePlat
 				message = this.messagePlatformEmailService.sendGeneralMessage(client.getEmail(), builder.toString(), 
 						"Beenius StreamingMedia");	*/
 				
+				selfcare.setAuthPin(authPin);
+				this.selfCareRepository.save(selfcare);
 				String Name = client.getLastname();
 				
 				List<BillingMessageTemplate> messageDetails=this.billingMessageTemplateRepository.findByTemplateDescription("PROVISION CREDENTIALS");
@@ -116,7 +118,9 @@ public class EntitlementWritePlatformServiceImpl implements EntitlementWritePlat
 				prepareEmail.append("\n").append("\n");
 				prepareEmail.append(messageDetails.get(0).getFooter());
 				
-				String result = messagePlatformEmailService.sendGeneralMessage(client.getEmail(), prepareEmail.toString().trim(), subject);
+				message = messagePlatformEmailService.sendGeneralMessage(client.getEmail(), prepareEmail.toString().trim(), subject);
+				
+				
 						
 			}/*else{
 				throw new PlatformDataIntegrityException("error.msg.beenius.process.invalid","Invalid data from Beenius adapter," +

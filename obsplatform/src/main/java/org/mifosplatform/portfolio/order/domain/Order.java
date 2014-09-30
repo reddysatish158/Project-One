@@ -106,10 +106,11 @@ public class Order extends AbstractAuditableCustom<AppUser, Long> {
 		this.startDate = startDate.toDate();
 		if (endDate != null)
 			this.endDate = endDate.toDate();
+		 this.billingAlign = this.endDate == null?'Y':'N';
 		this.services = serviceDetails;
 		this.price = orderprice;
 		this.contarctPeriod = contract;
-		this.billingAlign=billalign;
+		//this.billingAlign=billalign;
 		this.isDeleted='n';
 		this.userAction=userAction;
 		this.orderNo="";

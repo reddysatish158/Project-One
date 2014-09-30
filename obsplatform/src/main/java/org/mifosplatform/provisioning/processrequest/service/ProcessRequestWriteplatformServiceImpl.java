@@ -1,16 +1,10 @@
 package org.mifosplatform.provisioning.processrequest.service;
 
-import java.util.Date;
 import java.util.List;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.mifosplatform.cms.eventmaster.domain.EventDetails;
-import org.mifosplatform.cms.eventmaster.domain.EventMaster;
+import org.json.JSONArray;
 import org.mifosplatform.cms.eventmaster.domain.EventMasterRepository;
-import org.mifosplatform.cms.eventorder.domain.EventOrder;
 import org.mifosplatform.cms.eventorder.domain.EventOrderRepository;
-import org.mifosplatform.cms.eventorder.domain.EventOrderdetials;
 import org.mifosplatform.infrastructure.configuration.domain.EnumDomainService;
 import org.mifosplatform.infrastructure.configuration.domain.EnumDomainServiceRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
@@ -21,6 +15,8 @@ import org.mifosplatform.infrastructure.core.service.DataSourcePerTenantService;
 import org.mifosplatform.infrastructure.core.service.ThreadLocalContextUtil;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.infrastructure.security.service.TenantDetailsService;
+import org.mifosplatform.organisation.ippool.domain.IpPoolManagementDetail;
+import org.mifosplatform.organisation.ippool.domain.IpPoolManagementJpaRepository;
 import org.mifosplatform.portfolio.client.domain.Client;
 import org.mifosplatform.portfolio.client.domain.ClientRepository;
 import org.mifosplatform.portfolio.client.domain.ClientStatus;
@@ -40,6 +36,8 @@ import org.mifosplatform.provisioning.processrequest.domain.ProcessRequest;
 import org.mifosplatform.provisioning.processrequest.domain.ProcessRequestDetails;
 import org.mifosplatform.provisioning.processrequest.domain.ProcessRequestRepository;
 import org.mifosplatform.provisioning.provisioning.api.ProvisioningApiConstants;
+import org.mifosplatform.provisioning.provisioning.domain.ServiceParameters;
+import org.mifosplatform.provisioning.provisioning.domain.ServiceParametersRepository;
 import org.mifosplatform.workflow.eventaction.data.ActionDetaislData;
 import org.mifosplatform.workflow.eventaction.service.ActionDetailsReadPlatformService;
 import org.mifosplatform.workflow.eventaction.service.ActiondetailsWritePlatformService;
@@ -71,6 +69,8 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 	  private final ProcessRequestRepository processRequestRepository;
 	  private final DataSourcePerTenantService dataSourcePerTenantService;
 	  private final EnumDomainServiceRepository enumDomainServiceRepository;
+	  private final ServiceParametersRepository serviceParametersRepository;
+	  private final IpPoolManagementJpaRepository ipPoolManagementJpaRepository;
 	  private final ActionDetailsReadPlatformService actionDetailsReadPlatformService;
 	  private final PrepareRequestReadplatformService prepareRequestReadplatformService;
 	  private final ActiondetailsWritePlatformService actiondetailsWritePlatformService; 
@@ -83,9 +83,9 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 	    		final PrepareRequestReadplatformService prepareRequestReadplatformService,final OrderReadPlatformService orderReadPlatformService,
 	    		final OrderRepository orderRepository,final ProcessRequestRepository processRequestRepository,final PrepareRequsetRepository prepareRequsetRepository,
 	    		final ClientRepository clientRepository,final PlanRepository planRepository,final ActionDetailsReadPlatformService actionDetailsReadPlatformService,
-	    		final ActiondetailsWritePlatformService actiondetailsWritePlatformService,final PlatformSecurityContext context,
-	    		final EnumDomainServiceRepository enumDomainServiceRepository,final EventOrderRepository eventOrderRepository,
-	    		final EventMasterRepository eventMasterRepository) {
+	    		final ActiondetailsWritePlatformService actiondetailsWritePlatformService,final PlatformSecurityContext context,final EventMasterRepository eventMasterRepository,
+	    		final EnumDomainServiceRepository enumDomainServiceRepository,final EventOrderRepository eventOrderRepository,final ServiceParametersRepository parametersRepository,
+	    		final IpPoolManagementJpaRepository ipPoolManagementJpaRepository) {
 	    	
 	    	    this.context = context;
 	    	    this.planRepository=planRepository;
@@ -94,11 +94,13 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 	    	    this.eventOrderRepository=eventOrderRepository;
 	    	    this.tenantDetailsService = tenantDetailsService;
 	    	    this.eventMasterRepository=eventMasterRepository;
+	    	    this.serviceParametersRepository=parametersRepository;
 	    	    this.prepareRequsetRepository=prepareRequsetRepository;
 	    	    this.processRequestRepository=processRequestRepository;
 	    	    this.orderReadPlatformService=orderReadPlatformService;
 	    	    this.enumDomainServiceRepository=enumDomainServiceRepository;
 	            this.dataSourcePerTenantService = dataSourcePerTenantService;
+	            this.ipPoolManagementJpaRepository=ipPoolManagementJpaRepository;
 	            this.actionDetailsReadPlatformService=actionDetailsReadPlatformService;
 	            this.prepareRequestReadplatformService=prepareRequestReadplatformService;
 	            this.actiondetailsWritePlatformService=actiondetailsWritePlatformService;
@@ -141,12 +143,12 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 					if(detailsData!=null && !(detailsData.getRequestType().equalsIgnoreCase(ProvisioningApiConstants.REQUEST_TERMINATE)) && status != 'F'){
 						Order order=this.orderRepository.findOne(detailsData.getOrderId());
 						Client client=this.clientRepository.findOne(order.getClientId());
+						Plan plan=this.planRepository.findOne(order.getPlanId());
 							
 							if(detailsData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.ACTIVATION.toString())){
 								
 								order.setStatus(OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.ACTIVE).getId());
 								client.setStatus(ClientStatus.ACTIVE.getValue());
-								Plan plan=this.planRepository.findOne(order.getPlanId());
 								this.orderRepository.saveAndFlush(order);
 								
 									if(plan.isPrepaid() == 'Y'){
@@ -169,18 +171,25 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 							}else if(detailsData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.TERMINATION.toString())){
 								order.setStatus(OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.TERMINATED).getId());
 								this.orderRepository.saveAndFlush(order);
-									/*if(plan.getProvisionSystem().equalsIgnoreCase(ProvisioningApiConstants.PROV_PACKETSPAN)){
+									if(plan.getProvisionSystem().equalsIgnoreCase(ProvisioningApiConstants.PROV_PACKETSPAN)){
 										
 										List<ServiceParameters> parameters=this.serviceParametersRepository.findDataByOrderId(order.getId());
 											
 											for(ServiceParameters serviceParameter:parameters){
+												
 												if(serviceParameter.getParameterName().equalsIgnoreCase(ProvisioningApiConstants.PROV_DATA_IPADDRESS)){
-													this.ipPoolManagementWritePlatformService.updateIpAddressStatus(serviceParameter.getParameterValue(),'F');
-													serviceParameter.setStatus("INACTIVE");
-													this.serviceParametersRepository.saveAndFlush(serviceParameter);
+													JSONArray ipAddresses = new  JSONArray(serviceParameter.getParameterValue());
+								  	            	for(int i=0;i<ipAddresses.length();i++){
+								  	            		IpPoolManagementDetail ipPoolManagementDetail= this.ipPoolManagementJpaRepository.findAllocatedIpAddressData(ipAddresses.getString(i));
+								  	            			if(ipPoolManagementDetail != null){
+								  	            				ipPoolManagementDetail.setStatus('T');
+								  	            				ipPoolManagementDetail.setClientId(null);
+								  	            				this.ipPoolManagementJpaRepository.save(ipPoolManagementDetail);
+								  	            			}
+								  	            	}
 												}
 											}
-									}*/
+									}
 							}else if(detailsData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.SUSPENTATION.toString())){
 								
 								EnumDomainService enumDomainService=this.enumDomainServiceRepository.findOneByEnumMessageProperty(StatusTypeEnum.SUSPENDED.toString());

@@ -202,8 +202,8 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 			String dateFormat = "dd MMMM yyyy";
 			String activationDate = new SimpleDateFormat(dateFormat).format(new Date());
 
-			GlobalConfigurationProperty deviceStatusConfiguration = configurationRepository.
-					findOneByName(ConfigurationConstants.CONFIR_PROPERTY_REGISTRATION_DEVICE);
+			/*GlobalConfigurationProperty deviceStatusConfiguration = configurationRepository.
+					findOneByName(ConfigurationConstants.CONFIR_PROPERTY_REGISTRATION_DEVICE);*/
 
 			String fullname = command.stringValueOfParameterNamed("fullname");
 			String firstName = command.stringValueOfParameterNamed("firstname");
@@ -213,6 +213,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 			Long homePhoneNumber = command.longValueOfParameterNamed("homePhoneNumber");	
 			String email = command.stringValueOfParameterNamed("email");
 			String nationalId = command.stringValueOfParameterNamed("nationalId");
+			String deviceId = command.stringValueOfParameterNamed("device");
 			String kortaToken = command.stringValueOfParameterNamed("kortaToken");
 			
 			SelfCareTemporary temporary = selfCareTemporaryRepository.findOneByEmailId(email);
@@ -255,6 +256,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 				clientcreation.put("activationDate", activationDate);
 				clientcreation.put("flag", false);
 				clientcreation.put("zipCode", zipCode);
+				clientcreation.put("device", deviceId);
 
 				final JsonElement element = fromJsonHelper.parse(clientcreation.toString());
 				JsonCommand clientCommand = new JsonCommand(null,clientcreation.toString(), element, fromJsonHelper,
@@ -273,7 +275,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 				}			
 				temporary.setStatus("ACTIVE");
 				
-				//book device
+				/*//book device
 				if(deviceStatusConfiguration != null){
 					
 					if(deviceStatusConfiguration.isEnabled()){
@@ -327,7 +329,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 						
 					}
 					
-				}
+				}*/
 
 				// book order
 				GlobalConfigurationProperty selfregistrationconfiguration = configurationRepository.findOneByName(ConfigurationConstants.CONFIR_PROPERTY_SELF_REGISTRATION);
