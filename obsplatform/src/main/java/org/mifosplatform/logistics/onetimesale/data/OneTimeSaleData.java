@@ -39,6 +39,8 @@ public class OneTimeSaleData {
 	private String serialNo;
 	private Collection<OfficeData> officesData;
 	private Collection<SubscriptionData> contractPeriods;
+	private Integer taxInclusive;
+	private String chargeType;
 	
 	public OneTimeSaleData(List<ChargesData> chargeDatas,List<ItemData> itemData, OneTimeSaleData salesData,List<DiscountMasterData> discountdata,
 			Collection<OfficeData> officesData, Collection<SubscriptionData> contractPeriods) {
@@ -69,19 +71,22 @@ public class OneTimeSaleData {
 	}
 
 
-	public OneTimeSaleData(Long oneTimeSaleId, Long clientId, String units,
-			String chargeCode, BigDecimal unitPrice, String quantity,
-			BigDecimal totalPrice, String isInvoiced, Long itemId, Long discountId) {
+	public OneTimeSaleData(Long oneTimeSaleId, Long clientId, String units,String chargeCode,
+			String chargeType, BigDecimal unitPrice, String quantity,BigDecimal totalPrice, 
+			String isInvoiced, Long itemId, Long discountId,Integer taxInclusive) {
 		this.id = oneTimeSaleId;
 		this.clientId = clientId;
 		this.units = units;
 		this.chargeCode = chargeCode;
+		this.chargeType = chargeType;
 		this.unitPrice = unitPrice;
 		this.quantity = quantity;
 		this.totalPrice = totalPrice;
 		this.isInvoiced = isInvoiced;
 		this.itemId = itemId;
 		this.discountId =discountId;
+		this.taxInclusive = taxInclusive;
+		
 	}
 
 
@@ -216,20 +221,29 @@ public class OneTimeSaleData {
 		return allocationData;
 	}
 
-	/**
-	 * @return the discountMasterDatas
-	 */
 	public List<DiscountMasterData> getDiscountMasterDatas() {
 		return discountMasterDatas;
 	}
 
-	/**
-	 * @return the discountId
-	 */
+
 	public Long getDiscountId() {
 		return discountId;
 	}
 
-	
+	public Integer getTaxInclusive() {
+		return taxInclusive;
+	}
+
+	public void setTaxInclusive(Integer taxInclusive) {
+		this.taxInclusive = taxInclusive;
+	}
+
+	public String getChargeType() {
+		return chargeType;
+	}
+
+	public void setChargeType(String chargeType) {
+		this.chargeType = chargeType;
+	}
 
 }

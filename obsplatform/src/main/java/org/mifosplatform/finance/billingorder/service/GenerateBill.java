@@ -292,7 +292,6 @@ public class GenerateBill {
 			
 		 listOfTaxes = this.calculateTax(billingOrderData,price);
 		}
-<<<<<<< HEAD
 
 		List<InvoiceTaxCommand> listOfTaxes = this.calculateTax(billingOrderData,price);*/
 
@@ -387,13 +386,19 @@ public class GenerateBill {
 	// One Time Bill
 	public BillingOrderCommand getOneTimeBill(BillingOrderData billingOrderData, DiscountMasterData discountMasterData) {
 
+		List<InvoiceTaxCommand> listOfTaxes=new ArrayList<InvoiceTaxCommand>();
+		
 		LocalDate startDate = new LocalDate(billingOrderData.getBillStartDate());
 		LocalDate endDate = startDate;
 		LocalDate invoiceTillDate = startDate;
 		LocalDate nextbillDate = invoiceTillDate.plusDays(1);
 		BigDecimal price = billingOrderData.getPrice().setScale(Integer.parseInt(roundingDecimal()));
 
-		List<InvoiceTaxCommand> listOfTaxes = this.calculateTax(billingOrderData,price);
+		if(discountMasterData.getDiscountAmount().compareTo(BigDecimal.ZERO)>=1){
+		    	listOfTaxes = this.calculateTax(billingOrderData,discountMasterData.getDiscountedChargeAmount());
+		    }else{
+		    	listOfTaxes = this.calculateTax(billingOrderData,billingOrderData.getPrice());
+		    }
 
 		return this.createBillingOrderCommand(billingOrderData, startDate, endDate, invoiceTillDate, nextbillDate, price, listOfTaxes,discountMasterData);
 	}
@@ -569,7 +574,6 @@ public class GenerateBill {
 		boolean isDiscountApplicable = false;
 		
 		if (discountMasterData != null) {
-			
 				    	
 			 if((chargeStartDate.toDate().after(discountMasterData.getDiscountStartDate().toDate())||(chargeStartDate.toDate().compareTo(discountMasterData.getDiscountStartDate().toDate())==0)) &&
 				       chargeStartDate.toDate().before(this.getDiscountEndDateIfNull(discountMasterData, chargeEndDate))){
@@ -627,7 +631,6 @@ public class GenerateBill {
 	public DiscountMasterData calculateDiscount(DiscountMasterData discountMasterData,BigDecimal discountAmount,BigDecimal chargePrice){
 		if(isDiscountPercentage(discountMasterData)){
 			
-			 
 			discountAmount = this.calculateDiscountPercentage(discountMasterData.getdiscountRate(), chargePrice);
 			discountMasterData.setDiscountAmount(discountAmount);
 			chargePrice = this.chargePriceNotLessThanZero(chargePrice, discountAmount);
@@ -636,10 +639,11 @@ public class GenerateBill {
 		}
 		
 		if(isDiscountFlat(discountMasterData)){
-			BigDecimal p=this.calculateDiscountFlat(discountMasterData.getdiscountRate(), chargePrice);	
-			discountAmount= chargePrice.subtract(p);
+			
+			BigDecimal netFlatAmount=this.calculateDiscountFlat(discountMasterData.getdiscountRate(), chargePrice);	
+			discountAmount= chargePrice.subtract(netFlatAmount);
 			discountMasterData.setDiscountAmount(discountAmount);
-			discountMasterData.setDiscountedChargeAmount(p);
+			discountMasterData.setDiscountedChargeAmount(netFlatAmount);
 		}
 		return discountMasterData;
 	

@@ -67,7 +67,7 @@ public class BillingOrderData {
 	
 	
 	public BillingOrderData(final Long itemId,final Long clientId,final Date startDate,final String chargeCode,final String chargeType,
-			final BigDecimal price){
+			final BigDecimal price,final Integer taxInclusive){
 		
 		this.clientOrderId = itemId;
 		this.clientId = clientId;
@@ -75,6 +75,7 @@ public class BillingOrderData {
 		this.chargeCode = chargeCode;
 		this.chargeType = chargeType;
 		this.price = price;
+		this.taxInclusive = taxInclusive;
 		
 	}
 
@@ -198,7 +199,6 @@ public class BillingOrderData {
 	}
 
 
-
 	public Long getPlanId() {
 		return planId;
 	}
@@ -235,20 +235,10 @@ public class BillingOrderData {
 		this.orderId = orderId;
 	}
 
-
-
-	/**
-	 * @return the taxInclusive
-	 */
 	public Integer getTaxInclusive() {
 		return taxInclusive;
 	}
 
-
-
-	/**
-	 * @param taxInclusive the taxInclusive to set
-	 */
 	public void setTaxInclusive(Integer taxInclusive) {
 		this.taxInclusive = taxInclusive;
 	}
