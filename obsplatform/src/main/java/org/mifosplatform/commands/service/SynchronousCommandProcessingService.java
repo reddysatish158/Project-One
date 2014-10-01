@@ -1120,6 +1120,8 @@ public class SynchronousCommandProcessingService implements
 			}else if(wrapper.isParentResource()){
 				     if(wrapper.isCreate()) {
 				         handler = applicationContext.getBean("createClientParentHandler",NewCommandSourceHandler.class);
+				     }else if(wrapper.isDelete()){
+				    	 handler = applicationContext.getBean("deleteChildFromParentClientCommandHandler",NewCommandSourceHandler.class);
 				     }else {
 				           throw new UnsupportedCommandException(wrapper.commandName());
 				     }

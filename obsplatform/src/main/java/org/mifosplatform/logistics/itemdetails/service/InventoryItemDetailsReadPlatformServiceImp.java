@@ -348,7 +348,29 @@ private final class SerialNumberForValidation implements RowMapper<String>{
 		
 		return new InventoryItemSerialNumberData(itemSerialNumbers);
 	}
+
+	@Override
+	public List<InventoryItemDetailsData> retriveSerialNumbersOnKeyStroke(String query) {
+		
+		context.authenticatedUser();
+		SerialNumberAndProvisionSerialMapper rowMapper = new SerialNumberAndProvisionSerialMapper();
 	
+		String sql="SELECT idt.serial_no AS serialNumber,idt.provisioning_serialno as provserialnumber FROM b_item_detail idt "+
+					" WHERE  idt.client_id IS NULL AND (idt.serial_no LIKE '%"+query+"%' OR idt.provisioning_serialno like '%"+query+"%') "+
+					" AND quality = 'Good' AND quality = 'Good' ORDER BY idt.id LIMIT 10";
+	
+		return this.jdbcTemplate.query(sql,rowMapper,new Object[]{});
+	}
+	
+	private class SerialNumberAndProvisionSerialMapper implements RowMapper<InventoryItemDetailsData>{
+
+		@Override
+		public InventoryItemDetailsData mapRow(ResultSet rs, int rowNum)throws SQLException {
+			String serialNumber = rs.getString("serialNumber");
+			String provisionSerialNumber = rs.getString("provserialnumber");
+			return new InventoryItemDetailsData(serialNumber,provisionSerialNumber);
+		}
+	}
 	
 
 }

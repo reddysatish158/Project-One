@@ -138,34 +138,7 @@ public class GenerateBillingOrderServiceImplementation implements	GenerateBillin
 		return billingOrderCommands;
 	}
 
-	@Override
-	public List<InvoiceTaxCommand> generateInvoiceTax(
-			List<TaxMappingRateData> taxMappingRateDatas, BigDecimal price,
-			Long clientId) {
-
-		BigDecimal taxPercentage = null;
-		String taxCode = null;
-		BigDecimal taxAmount = null;
-		List<InvoiceTaxCommand> invoiceTaxCommands = new ArrayList<InvoiceTaxCommand>();
-		InvoiceTaxCommand invoiceTaxCommand = null;
-		if (taxMappingRateDatas != null) {
-
-			for (TaxMappingRateData taxMappingRateData : taxMappingRateDatas) {
-
-				taxPercentage = taxMappingRateData.getRate();
-				taxCode = taxMappingRateData.getTaxCode();
-				taxAmount = price.multiply(taxPercentage.divide(new BigDecimal(
-						100)));
-
-				invoiceTaxCommand = new InvoiceTaxCommand(clientId, null, null,
-						taxCode, null, taxPercentage, taxAmount);
-				invoiceTaxCommands.add(invoiceTaxCommand);
-			}
-
-		}
-		return invoiceTaxCommands;
-
-	}
+	
 	@Override
 	public Invoice generateInvoice(List<BillingOrderCommand> billingOrderCommands) {
 
@@ -212,11 +185,11 @@ public class GenerateBillingOrderServiceImplementation implements	GenerateBillin
 			
 			  if(billingOrderCommand.getTaxInclusive()!=null){
 				  
-			   if(isTaxInclusive(billingOrderCommand.getTaxInclusive())){
+			    if(isTaxInclusive(billingOrderCommand.getTaxInclusive())){
 				netChargeAmount = netChargeAmount.subtract(netChargeTaxAmount);
 				charge.setNetChargeAmount(netChargeAmount);
 				//charge.setChargeAmount(netChargeAmount);
-			}
+			    }
 			  }
 			}
 			netTaxAmount = netTaxAmount.add(netChargeTaxAmount);
@@ -228,15 +201,11 @@ public class GenerateBillingOrderServiceImplementation implements	GenerateBillin
 		
 		if(billingOrderCommands.get(0).getTaxInclusive()!=null){
 		if(isTaxInclusive(billingOrderCommands.get(0).getTaxInclusive())){
-		invoiceAmount = totalChargeAmount;
-		}else{
-
-			invoiceAmount = totalChargeAmount.add(netTaxAmount);
-		}
+		    invoiceAmount = totalChargeAmount;
 		}else{
 			invoiceAmount = totalChargeAmount.add(netTaxAmount);
 		}
-		
+		}
 		invoice.setNetChargeAmount(totalChargeAmount);
 		invoice.setTaxAmount(netTaxAmount);
 		invoice.setInvoiceAmount(invoiceAmount);

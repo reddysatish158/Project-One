@@ -554,13 +554,11 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 			//this.fromApiJsonDeserializer.validateForUpDateIpDetails(command.json());
 			final Long clientId=command.longValueOfParameterNamed("clientId");
 			final JsonElement element = fromJsonHelper.parse(command.json());
-
-
-			final String[] exitIpsArray=fromApiJsonHelper.extractArrayNamed("existIps",element);
+			//final String[] exitIpsArray=fromApiJsonHelper.extractArrayNamed("existIps",element);
 
 			final String[] removeIpsArray=fromApiJsonHelper.extractArrayNamed("removeIps",element);
-
 			final String[] newIpsArray=fromApiJsonHelper.extractArrayNamed("newIps",element);
+			//find duplicate ips in String Array
 			List<String> tmpList = Arrays.asList(newIpsArray);
 			Set<String> uniqueList = new HashSet<String>(tmpList);
 			if(uniqueList.size()<tmpList.size()){

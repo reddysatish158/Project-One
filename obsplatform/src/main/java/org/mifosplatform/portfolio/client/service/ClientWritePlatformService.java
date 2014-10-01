@@ -39,4 +39,6 @@ public interface ClientWritePlatformService {
 
 	CommandProcessingResult createClientParent(Long entityId, JsonCommand command);
 
+	CommandProcessingResult deleteChildFromParentClient(Long entityId,JsonCommand command);
+
 }

@@ -73,7 +73,7 @@ public class EventOrderReadplatformServieImpl implements EventOrderReadplatformS
 			String chargeCode = rs.getString("chargeCode");
 			BigDecimal bookedPrice = rs.getBigDecimal("bookedPrice");
 			String isInvoiced = rs.getString("isInvoiced");
-			return new OneTimeSaleData(orderid,clientId, null, chargeCode, null,null, bookedPrice,isInvoiced,orderid,1l);
+			return new OneTimeSaleData(orderid,clientId, null, chargeCode,null, null,null, bookedPrice,isInvoiced,orderid,1l,null);
 
 		}
 	}

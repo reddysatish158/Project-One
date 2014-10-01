@@ -354,5 +354,25 @@ public class InventoryItemDetailsApiResource {
 		 final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 		  return this.toApiJsonSerializerForItem.serialize(result);
 	}
+	/**
+	 * This is for selfcare MacId's and serialNumbers
+	 * */
+	@GET
+	@Path("searchserialnum")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public String retriveItemSerialNumbersBasedOnSerialAndProvisionalSerialNum(@QueryParam("query") final String query,
+								@Context final UriInfo uriInfo){
+		
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissionsAllocation);
+		List<InventoryItemDetailsData> itemSerialNumbers = null;
+		ApiRequestJsonSerializationSettings settings = null;
+		if(query != null && query.length()>0){
+			itemSerialNumbers = this.itemDetailsReadPlatformService.retriveSerialNumbersOnKeyStroke(query);
+			settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+			
+		}
+		return this.toApiJsonSerializerForItem.serialize(settings, itemSerialNumbers, RESPONSE_DATA_SERIAL_NUMBER_PARAMETERS);
+	}
 
 }
