@@ -150,7 +150,9 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 				
 				
 				try{
-					String requestType=null,sentMessage=null;			        
+					String requestType=null;
+					String sentMessage=null;			        
+					
 					 Order order=this.orderRepository.findOne(requestData.getOrderId());
 					 AllocationDetailsData detailsData=this.allocationReadPlatformService.getTheHardwareItemDetails(requestData.getOrderId(),configProp);
 					 requestType=requestData.getRequestType();
@@ -169,6 +171,12 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 	                         this.orderRepository.saveAndFlush(order);
 	                                        
 					}else {
+						
+						   String HardWareId=null;
+							  if(detailsData!=null){
+								  HardWareId=detailsData.getSerialNo();
+							  }
+						
 
 /*<<<<<<< HEAD
 						String requestType=null,sentMessage=null;			        
@@ -246,16 +254,13 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 								 jobject.put("services", newServiceArray);
 								 ProcessRequestDetails processRequestDetails=new ProcessRequestDetails(orderLineData.get(0).getId(),
 									orderLineData.get(0).getServiceId(),jobject.toString(),"Recieved",
-									null,order.getStartDate(),order.getEndDate(),null,null,'N',requestType,null);
+									HardWareId,order.getStartDate(),order.getEndDate(),null,null,'N',requestType,null);
 								 processRequest.add(processRequestDetails);
 							
 						 
 						 }else{
 							 for(OrderLine orderLine:orderLineData){
-								    String HardWareId=null;
-								  if(detailsData!=null){
-									  HardWareId=detailsData.getSerialNo();
-								  }
+								 
 								  
 								  List<ProvisionServiceDetails> provisionServiceDetails=this.provisionServiceDetailsRepository.findOneByServiceId(orderLine.getServiceId());
 

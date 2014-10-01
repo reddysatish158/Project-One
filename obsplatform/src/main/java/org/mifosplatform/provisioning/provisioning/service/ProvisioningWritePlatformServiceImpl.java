@@ -18,9 +18,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.json.JSONObject;
+
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
+
 import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
 import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
@@ -240,7 +242,8 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 				String[] ipAddressArray =null;
 			
 				InventoryItemDetails inventoryItemDetails=this.inventoryItemDetailsRepository.getInventoryItemDetailBySerialNum(macId);
-					if(inventoryItemDetails == null){
+				HardwareAssociation hardwareAssociation=this.associationRepository.findOneByOrderId(orderId);
+					if(hardwareAssociation == null || inventoryItemDetails == null){
 						throw new PairingNotExistException(orderId);
 					}
 			
@@ -249,6 +252,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 					JSONObject jsonObject=new JSONObject();
 	        	
 				for(JsonElement j:serviceParameters){
+					
 					ServiceParameters serviceParameter=ServiceParameters.fromJson(j,fromJsonHelper,clientId,orderId,planName,"ACTIVE",iprange,subnet);
 					this.serviceParametersRepository.saveAndFlush(serviceParameter);
 				
@@ -258,6 +262,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 						if(paramName.equalsIgnoreCase(ProvisioningApiConstants.PROV_DATA_IPADDRESS)){
 							
 								if(iprange.equalsIgnoreCase(ProvisioningApiConstants.PROV_DATA_SUBNET)){
+									
 									String ipAddress=fromJsonHelper.extractStringNamed("paramValue",j);
 									String ipData=ipAddress+"/"+subnet;
 									IpGeneration ipGeneration=new IpGeneration(ipData,this.ipPoolManagementReadPlatformService);
@@ -277,6 +282,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 								}
 								
 								for(String ipAddress:ipAddressArray){
+									
 									IpPoolManagementDetail ipPoolManagementDetail= this.ipPoolManagementJpaRepository.findIpAddressData(ipAddress);
 										if(ipPoolManagementDetail == null){
 											throw new IpNotAvailableException(ipAddress);
@@ -289,6 +295,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 				jsonObject.put(serviceParameter.getParameterName(),serviceParameter.getParameterValue());
 				
 			    }
+				
 				Client client=this.clientRepository.findOne(clientId);
 				jsonObject.put(ProvisioningApiConstants.PROV_DATA_CLIENTID,client.getAccountNo());
 				jsonObject.put(ProvisioningApiConstants.PROV_DATA_CLIENTNAME,client.getFirstname());
@@ -303,6 +310,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 				List<OrderLine> orderLines=order.getServices();
 				
 					for(OrderLine orderLine:orderLines){
+						
 						ServiceMaster service=this.serviceMasterRepository.findOne(orderLine.getServiceId());
 						jsonObject.put(ProvisioningApiConstants.PROV_DATA_SERVICETYPE,service.getServiceType());
 						ProcessRequestDetails processRequestDetails=new ProcessRequestDetails(orderLine.getId(),orderLine.getServiceId(),
@@ -318,7 +326,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 		}catch(DataIntegrityViolationException dve){
 			handleCodeDataIntegrityIssues(command, dve);
 			return new CommandProcessingResult(Long.valueOf(-1));
-		} catch (JSONException e) {
+		} catch (net.sf.json.JSONException e) {
 			return new CommandProcessingResult(Long.valueOf(-1));
 		}
 	}
@@ -609,7 +617,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 	public String runAdapterCommands(String apiRequestBodyAsJson) {
 		
 		try {
-			JSONObject object = new JSONObject(apiRequestBodyAsJson);
+			org.json.JSONObject object = new org.json.JSONObject(apiRequestBodyAsJson);
 			String command = object.getString("command");
 			return ProvisioningWritePlatformServiceImpl.runScript(command);
 		} catch (JSONException e) {
@@ -653,7 +661,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 	@Override
 	public List<ProvisionAdapter> gettingLogInformation(String apiRequestBodyAsJson) {
 		try {
-			JSONObject object = new JSONObject(apiRequestBodyAsJson);
+			org.json.JSONObject object = new org.json.JSONObject(apiRequestBodyAsJson);
 			Long days = object.getLong("days");
 			String dateFormat = object.getString("dateFormat");
 			String startDate = object.getString("startDate");
