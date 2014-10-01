@@ -39,7 +39,7 @@ public class BillingOrderCommand {
 			String billingAlign,final List<InvoiceTaxCommand> listOfTax,final Date billStartDate,
 			final Date billEndDate,final DiscountMasterData discountMasterData,Integer taxInclusive) {
 		this.clientOrderId = clientOrderId;
-		this.orderPriceId = oderPriceId;
+		this.orderPriceId = (oderPriceId !=null) ? oderPriceId : new Long(0);
 		this.clientId = clientId;
 		this.startDate = startDate;
 		this.nextBillableDate = nextBillableDate;
