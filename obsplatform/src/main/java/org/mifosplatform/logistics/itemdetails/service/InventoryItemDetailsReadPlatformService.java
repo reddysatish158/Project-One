@@ -39,4 +39,6 @@ public interface InventoryItemDetailsReadPlatformService {
 
 	public InventoryItemSerialNumberData retriveAllocationData(
 			List<String> itemSerialNumbers);
+
+	public List<InventoryItemDetailsData> retriveSerialNumbersOnKeyStroke(String query);
 }

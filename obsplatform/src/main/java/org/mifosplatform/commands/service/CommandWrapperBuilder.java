@@ -2506,6 +2506,13 @@ public CommandWrapperBuilder cancelBill(Long billId) {
 	return this;
 	
     }
+public CommandWrapperBuilder deleteChildFromParentClient(Long clientId) {
+	this.actionName = "DELETE";
+	this.entityName = "PARENTCLIENT";
+	this.entityId = clientId;
+	this.href = "/parentclient/" +clientId;
+	return this;
+  }
 }
 
 

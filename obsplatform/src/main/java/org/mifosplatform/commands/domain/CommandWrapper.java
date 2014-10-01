@@ -1147,7 +1147,7 @@ public class CommandWrapper {
 		}
 		
 		public boolean isParentResource() {
-			return this.actionName.equalsIgnoreCase("CREATE") && this.entityName.equalsIgnoreCase("PARENTCLIENT");
+			return this.entityName.equalsIgnoreCase("PARENTCLIENT");
 		}
 
 		public boolean isUpdateIpStatus() {

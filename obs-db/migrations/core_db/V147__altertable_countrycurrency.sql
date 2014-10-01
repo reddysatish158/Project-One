@@ -41,3 +41,5 @@ END //
 DELIMITER ;
 call deviceId();
 Drop procedure IF EXISTS deviceId;
+
+INSERT IGNORE INTO m_permission VALUES (null,'billing', 'DELETE_PARENTCLIENT', 'PARENTCLIENT', 'DELETE', 0);
