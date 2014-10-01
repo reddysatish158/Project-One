@@ -280,6 +280,12 @@ public InventoryItemDetailsData(Long id,Long itemMasterId,String serialNumber,Lo
 
 	public InventoryItemDetailsData(){}
 
+	public InventoryItemDetailsData(String serialNumber,
+			String provisionSerialNumber) {
+		this.serialNumber=serialNumber;
+		this.provisioningSerialNumber=provisionSerialNumber;
+	}
+
 	/**
 	 * @return the itemDescription
 	 */
