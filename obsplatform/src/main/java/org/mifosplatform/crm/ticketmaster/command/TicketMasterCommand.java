@@ -112,4 +112,5 @@ public class TicketMasterCommand {
 	public Integer getStatusCode() {
 		return statusCode;
 	}
+	
 }

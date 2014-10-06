@@ -337,4 +337,43 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 		}
 		       
 	}
+	@Override
+	public String sendTicketMessage(BillingMessageDataForProcessing emailDetail) {
+
+		
+		SmtpDataProcessing();
+		
+		if(configuration != null){
+			
+			HtmlEmail email = new HtmlEmail();
+			
+			email.setAuthenticator(new DefaultAuthenticator(authuser, authpwd));
+			email.setHostName(hostName);
+				try{
+					String sendToEmail = emailDetail.getMessageTo();
+					email.setStartTLSRequired(starttlsValue.equalsIgnoreCase("true"));
+					email.setFrom(authuser);
+					email.setSmtpPort(portNumber);
+					email.setSubject(emailDetail.getSubject());
+					email.addTo(sendToEmail);
+					email.setHtmlMsg(emailDetail.getHeader()+"<br/>"+emailDetail.getBody());	
+					email.send();
+					//return "success";
+					BillingMessage billingMessage = this.messageDataRepository.findOne(emailDetail.getId());
+					if (billingMessage.getStatus().contentEquals("N")) {
+						billingMessage.updateStatus();
+					}
+					this.messageDataRepository.save(billingMessage);
+					return "success";
+					
+				}catch (Exception e) {
+					handleCodeDataIntegrityIssues(null, e);
+					return e.getMessage();
+				}
+				
+		}else{			
+			throw new GlobalConfigurationPropertyNotFoundException("SMTP GlobalConfiguration Property Not Found"); 			
+		}
+		       
+	}
 }
