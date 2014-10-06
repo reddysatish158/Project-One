@@ -209,7 +209,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             
             List<ActionDetaislData> actionDetaislDatas=this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_CLOSE_CLIENT);
 			if(actionDetaislDatas.size() != 0){
-			this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,command.entityId(), clientId.toString());
+			this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,command.entityId(), clientId.toString(),null);
 			}
 
             return new CommandProcessingResultBuilder() //
@@ -306,7 +306,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             
             List<ActionDetaislData> actionDetailsDatas=this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_CREATE_CLIENT);
             if(!actionDetailsDatas.isEmpty()){
-            this.actiondetailsWritePlatformService.AddNewActions(actionDetailsDatas,newClient.getId(),newClient.getId().toString());
+            this.actiondetailsWritePlatformService.AddNewActions(actionDetailsDatas,newClient.getId(),newClient.getId().toString(),null);
             }
             
             transactionHistoryWritePlatformService.saveTransactionHistory(newClient.getId(), "New Client", newClient.getActivationDate(),

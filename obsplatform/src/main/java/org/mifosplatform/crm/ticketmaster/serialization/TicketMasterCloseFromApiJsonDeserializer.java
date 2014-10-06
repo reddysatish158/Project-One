@@ -25,7 +25,7 @@ public class TicketMasterCloseFromApiJsonDeserializer {
 
 private final FromJsonHelper fromApiJsonHelper;
 	
-private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("status","resolutionDescription"));	
+private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("status","resolutionDescription","ticketURL"));	
 
 	@Autowired
 	public TicketMasterCloseFromApiJsonDeserializer(final FromJsonHelper fromApiJsonHelper) {

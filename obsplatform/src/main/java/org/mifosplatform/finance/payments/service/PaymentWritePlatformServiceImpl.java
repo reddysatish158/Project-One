@@ -131,7 +131,7 @@ public class PaymentWritePlatformServiceImpl implements PaymentWritePlatformServ
 					//Add New Action 
 					List<ActionDetaislData> actionDetaislDatas=this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_CREATE_PAYMENT);
 						if(actionDetaislDatas.size() != 0){
-							this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,command.entityId(), id.toString());
+							this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,command.entityId(), id.toString(),null);
 						}
 						return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(id).build();
 		
