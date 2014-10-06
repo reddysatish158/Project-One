@@ -567,5 +567,27 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 				}
 				return new CommandProcessingResultBuilder().withEntityId(childClient.getId()).build();
 		}
+	
+	
+	@Transactional
+	@Override
+	public CommandProcessingResult deleteChildFromParentClient(Long clientId, JsonCommand command) {
+		
+		try {
+			context.authenticatedUser();
+			Client childClient = this.clientRepository.findOneWithNotFoundDetection(clientId);
+			childClient.setParentId(null);
+			this.clientRepository.saveAndFlush(childClient);
+	
+		}catch(DataIntegrityViolationException dve){
+			handleDataIntegrityIssues(command, dve);
+        return CommandProcessingResult.empty();
+		}
+		return new CommandProcessingResultBuilder() //
+        .withCommandId(command.commandId()) //
+        .withClientId(clientId) //
+        .withEntityId(clientId) //
+        .build();
+	}
 
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -100,5 +101,17 @@ import org.springframework.stereotype.Component;
 			    return this.toApiJsonSerializer.serialize(parentClientData);
 		        
         }
+          @DELETE
+          @Path("{clientId}")
+          @Consumes({ MediaType.APPLICATION_JSON })
+          @Produces({ MediaType.APPLICATION_JSON })
+          public String delete(@PathParam("clientId") final Long clientId) {
+
+              final CommandWrapper commandRequest = new CommandWrapperBuilder() //
+                      .deleteChildFromParentClient(clientId) //
+                      .build(); //
+              final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+              return this.toApiJsonSerializer.serialize(result);
+          }
           
 	}
