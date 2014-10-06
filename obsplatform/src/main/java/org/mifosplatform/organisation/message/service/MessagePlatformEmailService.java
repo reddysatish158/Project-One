@@ -18,7 +18,8 @@ public interface MessagePlatformEmailService {
 	String createEmail(String pdfFileName, String emailId);
 
 	String sendGeneralMessage(String uniqueReference, String body, String subject);
-
+	
+	String sendTicketMessage(BillingMessageDataForProcessing emailDetail);
 	
 	
 }

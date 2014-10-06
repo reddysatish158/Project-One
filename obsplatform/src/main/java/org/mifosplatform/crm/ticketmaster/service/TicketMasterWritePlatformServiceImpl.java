@@ -79,7 +79,7 @@ public class TicketMasterWritePlatformServiceImpl implements TicketMasterWritePl
 	@Override
 	public Long upDateTicketDetails(
 			TicketMasterCommand ticketMasterCommand,
-			DocumentCommand documentCommand, Long ticketId,InputStream inputStream) {
+			DocumentCommand documentCommand, Long ticketId,InputStream inputStream,String ticketURL) {
 		
 	 	try {
 		 String fileUploadLocation = FileUtils.generateFileParentDirectory(documentCommand.getParentEntityType(),
@@ -94,6 +94,7 @@ public class TicketMasterWritePlatformServiceImpl implements TicketMasterWritePl
           fileLocation = FileUtils.saveToFileSystem(inputStream, fileUploadLocation, documentCommand.getFileName());
          }
          Long createdbyId = context.authenticatedUser().getId();
+         
          TicketDetail detail=new TicketDetail(ticketId,ticketMasterCommand.getComments(),fileLocation,ticketMasterCommand.getAssignedTo(),createdbyId);
          /*TicketMaster master = new TicketMaster(ticketMasterCommand.getStatusCode(), ticketMasterCommand.getAssignedTo());*/
          TicketMaster ticketMaster= this.ticketMasterRepository.findOne(ticketId);
@@ -105,7 +106,7 @@ public class TicketMasterWritePlatformServiceImpl implements TicketMasterWritePl
          
          List<ActionDetaislData> actionDetaislDatas=this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_EDIT_TICKET);
   		 if(actionDetaislDatas.size() != 0){
-  			this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,ticketMaster.getClientId(), ticketMaster.getId().toString());
+  			this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,ticketMaster.getClientId(), ticketMaster.getId().toString(),ticketURL);
   		 }
          return detail.getId();
 
@@ -134,7 +135,7 @@ catch (DataIntegrityViolationException dve) {
 			this.context.authenticatedUser();
 			
 			this.closeFromApiJsonDeserializer.validateForClose(command.json());
-			
+			String ticketURL=command.stringValueOfParameterNamed("ticketURL");
 			TicketMaster ticketMaster=this.repository.findOne(command.entityId());
 			
 			if (!ticketMaster.getStatus().equalsIgnoreCase("CLOSED")) {
@@ -145,7 +146,7 @@ catch (DataIntegrityViolationException dve) {
 				
 				List<ActionDetaislData> actionDetaislDatas=this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_CLOSE_TICKET);
 		  		 if(actionDetaislDatas.size() != 0){
-		  			this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,ticketMaster.getClientId(), ticketMaster.getId().toString());
+		  			this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,ticketMaster.getClientId(), ticketMaster.getId().toString(),ticketURL);
 		  		 }
 				
 			} else {
@@ -189,6 +190,7 @@ catch (DataIntegrityViolationException dve) {
 	        		created=new Long(0);
 	        }	 
 			 this.fromApiJsonDeserializer.validateForCreate(command.json());
+			 String ticketURL=command.stringValueOfParameterNamed("ticketURL");
 			 final TicketMaster ticketMaster = TicketMaster.fromJson(command);
 			 ticketMaster.setCreatedbyId(created);
 			 this.repository.saveAndFlush(ticketMaster);
@@ -201,7 +203,7 @@ catch (DataIntegrityViolationException dve) {
 			 List<ActionDetaislData> actionDetaislDatas=this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_CREATE_TICKET);
 		
 			 	if(!actionDetaislDatas.isEmpty()){
-			 		this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,command.getClientId(), ticketMaster.getId().toString());
+			 		this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,command.getClientId(), ticketMaster.getId().toString(),ticketURL);
 			 	}
 		return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(ticketMaster.getId()).build();
 		 } catch (DataIntegrityViolationException dve) {

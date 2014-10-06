@@ -154,7 +154,7 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 									if(plan.isPrepaid() == 'Y'){
 										List<ActionDetaislData> actionDetaislDatas=this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_ACTIVE_ORDER);
 										if(actionDetaislDatas.size() != 0){
-											this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,order.getClientId(), order.getId().toString());
+											this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,order.getClientId(), order.getId().toString(),null);
 										}
 									}
 					 
