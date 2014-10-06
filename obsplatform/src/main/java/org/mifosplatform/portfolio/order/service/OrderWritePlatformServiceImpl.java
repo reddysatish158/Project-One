@@ -448,6 +448,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 		try {
 			
 				this.fromApiJsonDeserializer.validateForDisconnectOrder(command.json());
+				final String description=command.stringValueOfParameterNamed("description"); 
 				Order order = this.orderRepository.findOne(orderId);
 				LocalDate disconnectionDate=command.localDateValueOfParameterNamed("disconnectionDate");
 				LocalDate currentDate = new LocalDate();
@@ -512,7 +513,8 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
  
 			//for TransactionHistory
 			transactionHistoryWritePlatformService.saveTransactionHistory(order.getClientId(),"Order Disconnection", new Date(),
-					"Price:"+order.getAllPriceAsString(),"PlanId:"+order.getPlanId(),"contarctPeriod:"+order.getContarctPeriod(),"Services:"+order.getAllServicesAsString(),"OrderID:"+order.getId(),"BillingAlign:"+order.getbillAlign());
+					"Price:"+order.getAllPriceAsString(),"PlanId:"+order.getPlanId(),"contarctPeriod:"+order.getContarctPeriod(),"Services:"+order.getAllServicesAsString(),"OrderID:"+order.getId(),"BillingAlign:"+order.getbillAlign(),
+					"Description :"+description);
 
 		  return new CommandProcessingResult(Long.valueOf(order.getId()));	
 		}catch (DataIntegrityViolationException dve) {
