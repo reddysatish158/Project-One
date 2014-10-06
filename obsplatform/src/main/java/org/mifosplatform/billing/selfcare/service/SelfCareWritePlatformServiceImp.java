@@ -37,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -102,7 +103,9 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 					}
 			}
 			
-			GlobalConfigurationProperty configurationProperty=this.globalConfigurationRepository.findOneByName("");
+			boolean mailnotification=command.booleanPrimitiveValueOfParameterNamed("mailNotification");
+			
+				String message=null;
 			if(clientId !=null && clientId > 0 ){
 				
 				selfCare.setClientId(clientId);
@@ -110,6 +113,7 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 				String unencodedPassword = passwordGenerator.generate();
 				selfCare.setPassword(unencodedPassword);
 				selfCareRepository.save(selfCare);
+				if(mailnotification){
 				//platformEmailService.sendToUserAccount(new EmailDetail("OBS Self Care Organisation ", "SelfCare",email, selfCare.getUserName()), unencodedPassword); 
 				List<BillingMessageTemplate> messageDetails=this.billingMessageTemplateRepository.findByTemplateDescription("CREATE SELFCARE");
 				String subject=messageDetails.get(0).getSubject();
@@ -122,7 +126,8 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 				prepareEmail.append("\t").append(body);
 				prepareEmail.append("\n").append("\n");
 				prepareEmail.append(messageDetails.get(0).getFooter());
-				String message = messagePlatformEmailService.sendGeneralMessage(selfCare.getUniqueReference(), prepareEmail.toString().trim(), subject);
+				 message = messagePlatformEmailService.sendGeneralMessage(selfCare.getUniqueReference(), prepareEmail.toString().trim(), subject);
+			
 				
 				/*//
 				
@@ -160,7 +165,9 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 				
 				transactionHistoryWritePlatformService.saveTransactionHistory(clientId, "Self Care user activation", new Date(), "USerName: "+selfCare.getUserName()+" ClientId" 
 						+ selfCare.getClientId() + "Email Sending Result :" + message);
-			}else{
+			
+				}
+				}else{
 				throw new PlatformDataIntegrityException("client does not exist", "client not registered","clientId", "client is null ");
 			}
 			
@@ -340,7 +347,7 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 					
 				transactionHistoryWritePlatformService.saveTransactionHistory(clientId, "Self Care User Registration", new Date(),
 						"EmailId: "+selfCareTemporary.getUserName() + ", returnUrl: "+ returnUrl +", Email Sending Resopnse: " + result);
-				
+				return new CommandProcessingResultBuilder().withEntityId(selfCareTemporary.getId()).build();
 			}
 				
 		}catch(DataIntegrityViolationException dve){
@@ -348,11 +355,7 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 			throw new PlatformDataIntegrityException("duplicate.username", "duplicate.username","duplicate.username", "duplicate.username");
 		}catch(EmptyResultDataAccessException emp){
 			throw new PlatformDataIntegrityException("empty.result.set", "empty.result.set");
-		}catch (Exception e) {
-			e.printStackTrace();
 		}
-		
-		return new CommandProcessingResultBuilder().withEntityId(selfCareTemporary.getId()).build();
 	}
 
 	@Override
