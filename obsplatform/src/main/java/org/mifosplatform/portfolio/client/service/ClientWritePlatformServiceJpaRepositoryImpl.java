@@ -201,8 +201,9 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             	SelfCare selfCare=this.selfCareRepository.findOneByEmail(client.getEmail());
             	 if(selfCare != null){
             		 selfCare.setIsDeleted(true);
+            		 this.selfCareRepository.save(selfCare);
             	 }
-            	 this.selfCareRepository.save(selfCare);
+            	
             }
             
             
@@ -256,9 +257,8 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     }
 
     
-    @Transactional
     @Override
-    public CommandProcessingResult createClient(final JsonCommand command) {
+    public CommandProcessingResult createClient(final JsonCommand command,boolean mailNotification) {
 
         try {
             context.authenticatedUser();
@@ -285,7 +285,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                 final AccountNumberGenerator accountNoGenerator = this.accountIdentifierGeneratorFactory
                         .determineClientAccountNoGenerator(newClient.getId());
                 newClient.updateAccountNo(accountNoGenerator.generate());
-                this.clientRepository.save(newClient);
+                this.clientRepository.saveAndFlush(newClient);
             }
             
             GlobalConfigurationProperty configuration=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_IS_SELFCAREUSER);
@@ -297,6 +297,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     				selfcarecreation.put("uniqueReference", newClient.getEmail());
     				selfcarecreation.put("clientId", newClient.getId());
     				selfcarecreation.put("device", command.stringValueOfParameterNamed("device"));
+    				selfcarecreation.put("mailNotification",mailNotification);
     				
     				final CommandWrapper selfcareCommandRequest = new CommandWrapperBuilder().createSelfCare().withJson(selfcarecreation.toString()).build();
     				final CommandProcessingResult selfcareCommandresult = this.portfolioCommandSourceWritePlatformService.logCommandSource(selfcareCommandRequest);

@@ -7,7 +7,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import org.json.JSONArray;
+import net.sf.json.JSONArray;
+
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
@@ -66,10 +67,11 @@ public class ServiceParameters extends AbstractAuditableCustom<AppUser,Long>{
 				  
 				  service=service+"/"+subnet;
 			  }else{
+				  
 			String[] ipaddresses = fromJsonHelper.extractArrayNamed("paramValue",j);
 			JSONArray array=new JSONArray();
 			for(String ipAddress:ipaddresses){
-				array.put(ipAddress);
+				array.add(ipAddress);
 			}
 			
 			service=array.toString();
@@ -158,7 +160,7 @@ public class ServiceParameters extends AbstractAuditableCustom<AppUser,Long>{
 						String[] ipaddresses = fromApiJsonHelper.extractArrayNamed("paramValue",element);
 						JSONArray array=new JSONArray();
 						for(String ipAddress:ipaddresses){
-							array.put(ipAddress);
+							array.add(ipAddress);
 						}
 						service=array.toString();
 					 }else

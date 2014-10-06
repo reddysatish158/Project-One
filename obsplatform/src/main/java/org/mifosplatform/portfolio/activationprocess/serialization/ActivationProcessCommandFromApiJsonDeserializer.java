@@ -36,7 +36,7 @@ public class ActivationProcessCommandFromApiJsonDeserializer {
         this.fromApiJsonHelper = fromApiJsonHelper;
     }
 
-    public void validateForCreate(final String json) {
+    public void validateForCreate(final String json, boolean isdeviceReq) {
         if (StringUtils.isBlank(json)) { throw new InvalidJsonException(); }
 
         final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
@@ -53,8 +53,10 @@ public class ActivationProcessCommandFromApiJsonDeserializer {
         final Long phone = fromApiJsonHelper.extractLongNamed("phone", element);
         baseDataValidator.reset().parameter("phone").value(phone).notNull().longGreaterThanZero();
         
+        if(isdeviceReq){
         final String device = fromApiJsonHelper.extractStringNamed("device", element);
         baseDataValidator.reset().parameter("device").value(device).notNull();
+        }
 
         final String city = fromApiJsonHelper.extractStringNamed("city", element);
         baseDataValidator.reset().parameter("city").value(city).notBlank().notExceedingLengthOf(50);
