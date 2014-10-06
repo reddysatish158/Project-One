@@ -128,7 +128,7 @@ public class GenerateReverseBillingOrderServiceImplementation implements
 				
 				     netChargeTaxAmount = netChargeTaxAmount.add(invoiceTaxCommand.getTaxAmount());
 				
-				     InvoiceTax invoiceTax = new InvoiceTax(invoice, charge, invoiceTaxCommand.getTaxCode(),invoiceTaxCommand.getTaxValue(), 
+				     InvoiceTax invoiceTax = new InvoiceTax(invoice, charge, invoiceTaxCommand.getTaxCode(),billingOrderCommand.getTaxInclusive(), 
 						                  invoiceTaxCommand.getTaxPercentage(), invoiceTaxCommand.getTaxAmount());
 				      charge.addChargeTaxes(invoiceTax);
 			     }
@@ -145,21 +145,17 @@ public class GenerateReverseBillingOrderServiceImplementation implements
 			}
 			netTaxAmount = netTaxAmount.add(netChargeTaxAmount);
 			totalChargeAmount = totalChargeAmount.add(netChargeAmount);
-			
 			invoice.addCharges(charge);		
 			
 		 }
 
 		    if(billingOrderCommands.get(0).getTaxInclusive()!=null){
 			    if(isTaxInclusive(billingOrderCommands.get(0).getTaxInclusive())){
-			      invoiceAmount = totalChargeAmount;
+			       invoiceAmount = totalChargeAmount;
 			   }else{
-
-				invoiceAmount = totalChargeAmount.add(netTaxAmount);
+				   invoiceAmount = totalChargeAmount.add(netTaxAmount);
 			   }
-			   }else{
-				invoiceAmount = totalChargeAmount.add(netTaxAmount);
-		}
+			   }
 		//invoiceAmount = totalChargeAmount.add(netTaxAmount);
 		invoice.setNetChargeAmount(totalChargeAmount.negate());
 		invoice.setTaxAmount(netTaxAmount.negate());
