@@ -15,14 +15,12 @@ import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 
-import org.joda.time.LocalDate;
 import org.mifosplatform.finance.adjustment.domain.Adjustment;
 import org.mifosplatform.finance.adjustment.domain.AdjustmentRepository;
 import org.mifosplatform.finance.billingmaster.domain.BillDetail;
 import org.mifosplatform.finance.billingmaster.domain.BillDetailRepository;
 import org.mifosplatform.finance.billingmaster.domain.BillMaster;
 import org.mifosplatform.finance.billingmaster.domain.BillMasterRepository;
-import org.mifosplatform.finance.billingmaster.service.BillWritePlatformService;
 import org.mifosplatform.finance.billingorder.data.BillDetailsData;
 import org.mifosplatform.finance.billingorder.domain.BillingOrder;
 import org.mifosplatform.finance.billingorder.domain.BillingOrderRepository;
@@ -39,7 +37,6 @@ import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSourc
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.portfolio.client.domain.Client;
 import org.mifosplatform.portfolio.client.domain.ClientRepository;
-import org.mifosplatform.portfolio.client.service.ClientWritePlatformServiceJpaRepositoryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
