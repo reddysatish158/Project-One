@@ -91,7 +91,7 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 		
 	}
 
-	@Override
+	/*@Override
 	public List<BillDetail> createBillDetail(List<FinancialTransactionsData> financialTransactionsDatas,BillMaster master) {
 		
 		try{
@@ -110,7 +110,7 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 		return null;
 	}
 	}
-
+*/
 	@Override
 	public CommandProcessingResult updateBillMaster(List<BillDetail> billDetails, BillMaster billMaster,BigDecimal clientBalance) {
 		

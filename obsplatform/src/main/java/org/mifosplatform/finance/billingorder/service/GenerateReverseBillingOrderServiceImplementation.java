@@ -128,7 +128,7 @@ public class GenerateReverseBillingOrderServiceImplementation implements
 				
 				     netChargeTaxAmount = netChargeTaxAmount.add(invoiceTaxCommand.getTaxAmount());
 				
-				     InvoiceTax invoiceTax = new InvoiceTax(invoice, charge, invoiceTaxCommand.getTaxCode(),billingOrderCommand.getTaxInclusive(), 
+				     InvoiceTax invoiceTax = new InvoiceTax(invoice, charge, invoiceTaxCommand.getTaxCode(),invoiceTaxCommand.getTaxValue(), 
 						                  invoiceTaxCommand.getTaxPercentage(), invoiceTaxCommand.getTaxAmount());
 				      charge.addChargeTaxes(invoiceTax);
 			     }

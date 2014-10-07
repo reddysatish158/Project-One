@@ -324,7 +324,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 						serialNumberObject.put("isNewHw", "Y");
 						JSONArray serialNumber = new JSONArray();
 						serialNumber.put(0, serialNumberObject);
-						bookDevice.put("chargeCode", "NONE");
+						bookDevice.put("chargeCode", itemMaster.getChargeCode());
 						bookDevice.put("unitPrice", itemMaster.getUnitPrice());
 						bookDevice.put("itemId", itemMaster.getId());
 						bookDevice.put("discountId", id);

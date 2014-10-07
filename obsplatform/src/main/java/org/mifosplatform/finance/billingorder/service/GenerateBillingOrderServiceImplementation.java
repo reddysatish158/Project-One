@@ -178,7 +178,7 @@ public class GenerateBillingOrderServiceImplementation implements	GenerateBillin
 			   if(invoiceTaxCommand.getTaxAmount().compareTo(BigDecimal.ZERO)>0){
 				netChargeTaxAmount = netChargeTaxAmount.add(invoiceTaxCommand.getTaxAmount());
 				InvoiceTax invoiceTax = new InvoiceTax(invoice, charge, invoiceTaxCommand.getTaxCode(),
-						billingOrderCommand.getTaxInclusive(), invoiceTaxCommand.getTaxPercentage(), invoiceTaxCommand.getTaxAmount());
+						invoiceTaxCommand.getTaxValue(), invoiceTaxCommand.getTaxPercentage(), invoiceTaxCommand.getTaxAmount());
 				charge.addChargeTaxes(invoiceTax);
 			}
 			}
