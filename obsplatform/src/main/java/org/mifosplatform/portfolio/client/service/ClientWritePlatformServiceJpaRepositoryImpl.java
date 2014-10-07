@@ -201,14 +201,15 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             	SelfCare selfCare=this.selfCareRepository.findOneByEmail(client.getEmail());
             	 if(selfCare != null){
             		 selfCare.setIsDeleted(true);
+            		 this.selfCareRepository.save(selfCare);
             	 }
-            	 this.selfCareRepository.save(selfCare);
+            	
             }
             
             
             List<ActionDetaislData> actionDetaislDatas=this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_CLOSE_CLIENT);
 			if(actionDetaislDatas.size() != 0){
-			this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,command.entityId(), clientId.toString());
+			this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,command.entityId(), clientId.toString(),null);
 			}
 
             return new CommandProcessingResultBuilder() //
@@ -256,9 +257,8 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     }
 
     
-    @Transactional
     @Override
-    public CommandProcessingResult createClient(final JsonCommand command) {
+    public CommandProcessingResult createClient(final JsonCommand command,boolean mailNotification) {
 
         try {
             context.authenticatedUser();
@@ -285,7 +285,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                 final AccountNumberGenerator accountNoGenerator = this.accountIdentifierGeneratorFactory
                         .determineClientAccountNoGenerator(newClient.getId());
                 newClient.updateAccountNo(accountNoGenerator.generate());
-                this.clientRepository.save(newClient);
+                this.clientRepository.saveAndFlush(newClient);
             }
             
             GlobalConfigurationProperty configuration=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_IS_SELFCAREUSER);
@@ -297,6 +297,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     				selfcarecreation.put("uniqueReference", newClient.getEmail());
     				selfcarecreation.put("clientId", newClient.getId());
     				selfcarecreation.put("device", command.stringValueOfParameterNamed("device"));
+    				selfcarecreation.put("mailNotification",mailNotification);
     				
     				final CommandWrapper selfcareCommandRequest = new CommandWrapperBuilder().createSelfCare().withJson(selfcarecreation.toString()).build();
     				final CommandProcessingResult selfcareCommandresult = this.portfolioCommandSourceWritePlatformService.logCommandSource(selfcareCommandRequest);
@@ -305,7 +306,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             
             List<ActionDetaislData> actionDetailsDatas=this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_CREATE_CLIENT);
             if(!actionDetailsDatas.isEmpty()){
-            this.actiondetailsWritePlatformService.AddNewActions(actionDetailsDatas,newClient.getId(),newClient.getId().toString());
+            this.actiondetailsWritePlatformService.AddNewActions(actionDetailsDatas,newClient.getId(),newClient.getId().toString(),null);
             }
             
             transactionHistoryWritePlatformService.saveTransactionHistory(newClient.getId(), "New Client", newClient.getActivationDate(),

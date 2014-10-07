@@ -27,6 +27,6 @@ public class CreateClientCommandHandler implements NewCommandSourceHandler {
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
 
-        return this.clientWritePlatformService.createClient(command);
+        return this.clientWritePlatformService.createClient(command,true);
     }
 }
