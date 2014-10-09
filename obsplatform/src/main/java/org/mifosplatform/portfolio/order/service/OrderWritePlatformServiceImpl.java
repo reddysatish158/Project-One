@@ -930,7 +930,10 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 		try{
 		
 		this.fromApiJsonDeserializer.validateForCreate(command.json());
-		LocalDate startDate=command.localDateValueOfParameterNamed("start_date");	
+		LocalDate startDate=command.localDateValueOfParameterNamed("start_date");
+		final String eventType=command.stringValueOfParameterNamed("eventType");
+		EventAction  eventAction=null;
+		JSONObject jsonObject=new JSONObject();
 		
 		//Check for Custome_Validation
 		CustomValidationData customValidationData = this.orderDetailsReadPlatformServices.checkForCustomValidations(clientId,EventActionConstants.EVENT_CREATE_ORDER,command.json());
@@ -939,26 +942,56 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 				throw new ActivePlansFoundException(customValidationData.getErrorMessage()); 
 				
 			}
-		//Check for Active Orders	
-			 Long activeorderId=this.orderReadPlatformService.retrieveClientActiveOrderDetails(clientId,null);
-			 if(activeorderId !=null && activeorderId !=0){
-				 Order order=this.orderRepository.findOne(activeorderId);
-				   	if(order.getEndDate() == null || !startDate.isAfter(new LocalDate(order.getEndDate()))){
-					   throw new SchedulerOrderFoundException(activeorderId);				   
-					   }
-			 }
-			JSONObject jsonObject=new JSONObject();
-			   jsonObject.put("billAlign",command.booleanPrimitiveValueOfParameterNamed("billAlign"));
-        	   jsonObject.put("contractPeriod",command.longValueOfParameterNamed("contractPeriod"));
-        	   jsonObject.put("dateFormat","dd MMMM yyyy");
-               jsonObject.put("locale","en");
-               jsonObject.put("isNewPlan","true");
-        	   jsonObject.put("paytermCode",command.stringValueOfParameterNamed("paytermCode"));
-        	   jsonObject.put("planCode",command.longValueOfParameterNamed("planCode"));
-        	   jsonObject.put("start_date",startDate.toDate());
+			
+	     // if(EventActionConstants.ACTION_CREATE_PLAN.equalsIgnoreCase(eventType)){		
+	    	  
+	    	  	//Check for Active Orders	
+	    	  Long activeorderId=this.orderReadPlatformService.retrieveClientActiveOrderDetails(clientId,null);
+	    	  	if(activeorderId !=null && activeorderId !=0){
+	    	  		Order order=this.orderRepository.findOne(activeorderId);
+				   		if(order.getEndDate() == null || !startDate.isAfter(new LocalDate(order.getEndDate()))){
+				   			throw new SchedulerOrderFoundException(activeorderId);				   
+				   		}
+	    	  	}
+	    	  
+	    	  	jsonObject.put("billAlign",command.booleanPrimitiveValueOfParameterNamed("billAlign"));
+	    	  	jsonObject.put("contractPeriod",command.longValueOfParameterNamed("contractPeriod"));
+	    	  	jsonObject.put("dateFormat","dd MMMM yyyy");
+	    	  	jsonObject.put("locale","en");
+	    	  	jsonObject.put("isNewPlan","true");
+	    	  	jsonObject.put("paytermCode",command.stringValueOfParameterNamed("paytermCode"));
+	    	  	jsonObject.put("planCode",command.longValueOfParameterNamed("planCode"));
+	    	  	jsonObject.put("start_date",startDate.toDate());
         	   
-        	  EventAction  eventAction=new EventAction(startDate.toDate(), "CREATE", "ORDER",EventActionConstants.ACTION_NEW,"/orders/"+clientId, 
+        	    eventAction=new EventAction(startDate.toDate(), "CREATE", "ORDER",EventActionConstants.ACTION_NEW,"/orders/"+clientId, 
         			  clientId,command.json(),null,clientId);
+        	    
+	     /* }else if(EventActionConstants.ACTION_SUSPEND.equalsIgnoreCase(eventType)){
+	    	   
+	    	    Date suspendDate=command.localDateValueOfParameterNamed("suspensionDate").toDate();
+	    	  	jsonObject.put("dateFormat","dd MMMM yyyy");
+	    	  	jsonObject.put("locale","en");
+	    	  	jsonObject.put("isNewPlan","true");
+	    	  	jsonObject.put("suspensionReason",command.stringValueOfParameterNamed("suspensionReason"));
+	    	  	jsonObject.put("suspensionDescription",command.stringValueOfParameterNamed("suspensionDescription"));
+	    	  	jsonObject.put("suspensionDate",suspendDate);
+      	   
+      	    eventAction=new EventAction(suspendDate,EventActionConstants.EVENT_SCHEDULE_ORDER_SUSPEND, "ORDER",EventActionConstants.ACTION_SUSPEND,"/orders/suspend/orderId"+clientId, 
+      			  clientId,command.json(),null,clientId);
+	    	  
+	      }else if(EventActionConstants.ACTION_DISCONNECT.equalsIgnoreCase(eventType)){
+	    	  
+	    	  Date disconnectionDate=command.localDateValueOfParameterNamed("disconnectionDate").toDate();
+	    	  	jsonObject.put("dateFormat","dd MMMM yyyy");
+	    	  	jsonObject.put("locale","en");
+	    	  	jsonObject.put("description",command.stringValueOfParameterNamed("description"));
+	    	  	jsonObject.put("disconnectReason",command.stringValueOfParameterNamed("disconnectReason"));
+	    	  	jsonObject.put("disconnectionDate",disconnectionDate);
+    	   
+    	    eventAction=new EventAction(startDate.toDate(),EventActionConstants.EVENT_SCHEDULE_ORDER_DISCONNECT, "ORDER",EventActionConstants.ACTION_DISCONNECT,"/orders/orderId"+clientId, 
+    			  clientId,command.json(),null,clientId);
+	    	  
+	      }*/
         	  this.eventActionRepository.save(eventAction);
 			
 			
