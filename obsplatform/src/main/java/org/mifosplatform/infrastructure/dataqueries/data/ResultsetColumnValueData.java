@@ -14,18 +14,18 @@ public class ResultsetColumnValueData {
     private final int id;
     private final String value;
     @SuppressWarnings("unused")
-    private final Integer score;
+    private final Integer codeId;
 
     public ResultsetColumnValueData(final int id, final String value) {
         this.id = id;
         this.value = value;
-        this.score =null;
+        this.codeId =null;
     }
     
-    public ResultsetColumnValueData(final int id, final String value, final int score) {
+    public ResultsetColumnValueData(final int id, final String value, final int codeId) {
         this.id = id;
         this.value = value;
-        this.score = score;
+        this.codeId = codeId;
     }
     
     public boolean matches(final String match) {

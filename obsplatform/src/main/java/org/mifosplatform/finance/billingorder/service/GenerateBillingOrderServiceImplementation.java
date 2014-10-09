@@ -194,17 +194,16 @@ public class GenerateBillingOrderServiceImplementation implements	GenerateBillin
 			}
 			netTaxAmount = netTaxAmount.add(netChargeTaxAmount);
 			totalChargeAmount = totalChargeAmount.add(netChargeAmount);
-			
 			invoice.addCharges(charge);	
 			
 		 }
 		
 		if(billingOrderCommands.get(0).getTaxInclusive()!=null){
-		if(isTaxInclusive(billingOrderCommands.get(0).getTaxInclusive())){
-		    invoiceAmount = totalChargeAmount;
-		}else{
+		    if(isTaxInclusive(billingOrderCommands.get(0).getTaxInclusive())){
+		        invoiceAmount = totalChargeAmount;
+		    }else{
 			invoiceAmount = totalChargeAmount.add(netTaxAmount);
-		}
+		   }
 		}
 		invoice.setNetChargeAmount(totalChargeAmount);
 		invoice.setTaxAmount(netTaxAmount);

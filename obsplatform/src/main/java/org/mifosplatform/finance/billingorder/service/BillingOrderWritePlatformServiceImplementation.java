@@ -1,20 +1,9 @@
 package org.mifosplatform.finance.billingorder.service;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.joda.time.LocalDate;
 import org.mifosplatform.finance.billingorder.commands.BillingOrderCommand;
-import org.mifosplatform.finance.billingorder.commands.InvoiceCommand;
-import org.mifosplatform.finance.billingorder.commands.InvoiceTaxCommand;
-import org.mifosplatform.finance.billingorder.domain.BillingOrder;
-import org.mifosplatform.finance.billingorder.domain.BillingOrderRepository;
 import org.mifosplatform.finance.billingorder.domain.Invoice;
-import org.mifosplatform.finance.billingorder.domain.InvoiceRepository;
-import org.mifosplatform.finance.billingorder.domain.InvoiceTax;
-import org.mifosplatform.finance.billingorder.domain.InvoiceTaxRepository;
-import org.mifosplatform.finance.billingorder.exceptions.BillingOrderNoRecordsFoundException;
 import org.mifosplatform.finance.clientbalance.data.ClientBalanceData;
 import org.mifosplatform.finance.clientbalance.domain.ClientBalance;
 import org.mifosplatform.finance.clientbalance.domain.ClientBalanceRepository;
@@ -38,9 +27,6 @@ public class BillingOrderWritePlatformServiceImplementation implements BillingOr
 	private final static Logger logger = LoggerFactory.getLogger(BillingOrderWritePlatformServiceImplementation.class);
 
 	private final PlatformSecurityContext context;
-	private final BillingOrderRepository invoiceChargeRepository;
-	private final InvoiceTaxRepository invoiceTaxRepository;
-	private final InvoiceRepository invoiceRepository;
 	private final OrderRepository orderRepository;
 	private final UpdateClientBalance updateClientBalance;
 	private final ClientBalanceRepository clientBalanceRepository;
@@ -48,15 +34,14 @@ public class BillingOrderWritePlatformServiceImplementation implements BillingOr
 	private final OrderPriceRepository orderPriceRepository;
 	
 	@Autowired
-	public BillingOrderWritePlatformServiceImplementation(final PlatformSecurityContext context,final BillingOrderRepository invoiceChargeRepository,
-			final OrderPriceRepository orderPriceRepository,final InvoiceTaxRepository invoiceTaxRepository,final InvoiceRepository invoiceRepository,
-			final OrderRepository orderRepository,final UpdateClientBalance updateClientBalance,
-			final ClientBalanceRepository clientBalanceRepository,final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService) {
+	public BillingOrderWritePlatformServiceImplementation(final PlatformSecurityContext context,
+			final OrderPriceRepository orderPriceRepository,
+			final OrderRepository orderRepository,
+			final UpdateClientBalance updateClientBalance,
+			final ClientBalanceRepository clientBalanceRepository,
+			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService) {
 
 		this.context = context;
-		this.invoiceChargeRepository = invoiceChargeRepository;
-		this.invoiceTaxRepository = invoiceTaxRepository;
-		this.invoiceRepository = invoiceRepository;
 		this.orderRepository = orderRepository;
 		this.updateClientBalance = updateClientBalance;
 		this.clientBalanceRepository = clientBalanceRepository;
@@ -66,50 +51,12 @@ public class BillingOrderWritePlatformServiceImplementation implements BillingOr
 
 	@Transactional
 	@Override
-	public List<BillingOrder> createBillingProduct(
-			List<BillingOrderCommand> billingOrderCommands) {
-		// check whether list size is zero
-		List<BillingOrder> listOfBillingOrders = null;
-		if (billingOrderCommands.size() != 0) {
-			listOfBillingOrders = new ArrayList<BillingOrder>();
-			for (BillingOrderCommand billingOrderCommand : billingOrderCommands) {
-				BigDecimal discount = BigDecimal.ZERO;
-				BigDecimal netCharge = billingOrderCommand.getPrice().add(
-						discount);
-				BillingOrder order = new BillingOrder(
-						billingOrderCommand.getClientId(),
-						billingOrderCommand.getClientOrderId(),
-						billingOrderCommand.getOrderPriceId(),
-						billingOrderCommand.getChargeCode(),
-						billingOrderCommand.getChargeType(), "abc",
-						billingOrderCommand.getPrice(), discount, netCharge,
-						billingOrderCommand.getStartDate(),
-						billingOrderCommand.getEndDate());
-
-				/*for (InvoiceTax invoiceTax : billingOrderCommand.getListOfTax()) {
-					//invoiceTax.setInvoiceChargeId(order.getId());
-					//this.invoiceTaxRepository.save(invoiceTax);
-				}*/
-
-				listOfBillingOrders.add(order);
-			}
-
-		} else if (billingOrderCommands.size() == 0) {
-			throw new BillingOrderNoRecordsFoundException();
-		}
-		return listOfBillingOrders;
-	}
-
-	@Transactional
-	@Override
-	public CommandProcessingResult updateBillingOrder(
-			List<BillingOrderCommand> commands) {
+	public CommandProcessingResult updateBillingOrder(List<BillingOrderCommand> commands) {
 		Order clientOrder = null;
 		for (BillingOrderCommand billingOrderCommand : commands) {
 			clientOrder = this.orderRepository.findOne(billingOrderCommand.getClientOrderId());
 
 			if (clientOrder != null) {
-
 				// if(billingOrderCommand.getChargeType().equalsIgnoreCase("RC")){
 				clientOrder.setNextBillableDay(billingOrderCommand.getNextBillableDate());
 				// }else
@@ -164,24 +111,7 @@ public class BillingOrderWritePlatformServiceImplementation implements BillingOr
 		return new CommandProcessingResult(Long.valueOf(orderData.getId()));
 	}
 
-	@Override
-	public List<InvoiceTax> createInvoiceTax(List<InvoiceTaxCommand> commands) {
-		List<InvoiceTax> invoiceTaxes = new ArrayList<InvoiceTax>();
-		if (commands != null) {
-			/*for (InvoiceTaxCommand invoiceTaxCommand : commands) {
-				InvoiceTax invoiceTax = new InvoiceTax(0l, 0l,
-						invoiceTaxCommand.getTaxCode(), null,
-						invoiceTaxCommand.getTaxPercentage(),
-						invoiceTaxCommand.getTaxAmount());
-				invoiceTax = this.invoiceTaxRepository.save(invoiceTax);
-				invoiceTaxes.add(invoiceTax);
-			}*/
-		}
-
-		return invoiceTaxes;
-	}
-
-	@Override
+	/*@Override
 	public Invoice createInvoice(InvoiceCommand invoiceCommand,
 			List<ClientBalanceData> clientBalanceDatas) {
 
@@ -220,40 +150,7 @@ public class BillingOrderWritePlatformServiceImplementation implements BillingOr
 				"AmountPaid:"+invoice.getInvoiceAmount(),"InvoiceStatus:"+invoice.getInvoiceStatus(),"NetChargeAmount:"+invoice.getNetChargeAmount(),"TaxAmount:"+invoice.getTaxAmount());
 		
 		return invoice;
-	}
-
-	@Override
-	public void updateInvoiceTax(Invoice invoice,
-			List<BillingOrderCommand> billingOrderCommands,
-			List<BillingOrder> orders) {
-
-		List<List<InvoiceTax>> listOfListOfTaxes = new ArrayList<List<InvoiceTax>>();
-		for (BillingOrderCommand billingCommand : billingOrderCommands) {
-			List<InvoiceTaxCommand> listOfTaxes = billingCommand.getListOfTax();
-			//listOfListOfTaxes.add(listOfTaxes);
-		}
-		for (BillingOrder billingOrder : orders) {
-
-			for (List<InvoiceTax> listOfTaxs : listOfListOfTaxes) {
-				for (InvoiceTax invoiceTax : listOfTaxs) {
-					// invoiceTax.setInvoiceChargeId(billingOrder.getId());
-					//invoiceTax.setInvoiceId(invoice.getId());
-					this.invoiceTaxRepository.save(invoiceTax);
-				}
-			}
-
-		}
-	}
-
-	@Override
-	public void updateInvoiceCharge(Invoice invoice,
-			List<BillingOrder> billingOrders) {
-		for (BillingOrder billingOrder : billingOrders) {
-			//billingOrder.setInvoiceId(invoice.getId());
-			this.invoiceChargeRepository.save(billingOrder);
-
-		}
-	}
+	}*/
 
 	@Override
 	public void updateClientBalance(Invoice invoice,
