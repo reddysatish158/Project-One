@@ -203,7 +203,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             		 selfCare.setIsDeleted(true);
             		 this.selfCareRepository.save(selfCare);
             	 }
-            	
+
             }
             
             
