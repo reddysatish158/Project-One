@@ -9,12 +9,9 @@ import java.util.List;
 import org.joda.time.LocalDate;
 import org.mifosplatform.billing.discountmaster.domain.DiscountMaster;
 import org.mifosplatform.billing.discountmaster.domain.DiscountMasterRepository;
-import org.mifosplatform.billing.taxmaster.data.TaxMappingRateData;
 import org.mifosplatform.finance.adjustment.service.AdjustmentReadPlatformService;
 import org.mifosplatform.finance.billingorder.commands.BillingOrderCommand;
-import org.mifosplatform.finance.billingorder.commands.InvoiceTaxCommand;
 import org.mifosplatform.finance.billingorder.data.BillingOrderData;
-import org.mifosplatform.finance.billingorder.domain.BillingOrder;
 import org.mifosplatform.finance.billingorder.domain.Invoice;
 import org.mifosplatform.finance.billingorder.service.BillingOrderReadPlatformService;
 import org.mifosplatform.finance.billingorder.service.BillingOrderWritePlatformService;
@@ -84,16 +81,7 @@ public class InvoiceOneTimeSale {
 				
 				this.billingOrderWritePlatformService.updateClientBalance(invoice,clientBalancesDatas);
 
-				// Insertion into invoice table
-				//Invoice invoice = billingOrderWritePlatformService.createInvoice(invoiceCommand, clientBalancesDatas);
-
-				// Updation of invoice id in invoice_tax table
-				//billingOrderWritePlatformService.updateInvoiceTax(invoice,billingOrderCommands, listOfBillingOrders);
-
-				// Updation of invoice id in charge table
-				//billingOrderWritePlatformService.updateInvoiceCharge(invoice,listOfBillingOrders);
-
-			} else {
+			 } else {
 
 			}
 		}

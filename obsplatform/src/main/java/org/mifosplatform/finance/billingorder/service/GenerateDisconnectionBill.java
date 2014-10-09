@@ -272,7 +272,6 @@ public class GenerateDisconnectionBill {
 			}
 
 			price = disconnectionCreditForWeeks.add(disconnectionCreditForDays);
-			
 			billingOrderData.setChargeType("DC");
 
 			this.startDate=invoiceTillDate;
@@ -281,7 +280,7 @@ public class GenerateDisconnectionBill {
 			this.nextbillDate = invoiceTillDate.plusDays(1);
 
 		}
-		
+		////If Invoice till date equal to null
 		 else if (billingOrderData.getInvoiceTillDate() == null) {
 
 				this.startDate = new LocalDate(billingOrderData.getBillStartDate());
@@ -305,36 +304,6 @@ public class GenerateDisconnectionBill {
 				endDate, invoiceTillDate, nextbillDate, price, listOfTaxes,discountMasterData);
 
 	}
-
-/*	// order cancelled bill
-	public BillingOrderCommand getCancelledOrderBill(
-			BillingOrderData billingOrderData,
-			DiscountMasterData discountMasterData) {
-
-		if (billingOrderData.getInvoiceTillDate() == null)
-			startDate = new LocalDate(billingOrderData.getStartDate());
-		else
-			startDate = new LocalDate(billingOrderData.getNextBillableDate());
-
-		endDate = new LocalDate(billingOrderData.getBillEndDate());
-
-		price = this
-				.getDisconnectionCredit(startDate, endDate,
-						billingOrderData.getPrice(),
-						billingOrderData.getDurationType());
-
-		nextbillDate = new LocalDate().plusYears(1000);
-
-		invoiceTillDate = endDate;
-
-		List<InvoiceTaxCommand> listOfTaxes = this.calculateTax(
-				billingOrderData, price);
-
-		return this.createBillingOrderCommand(billingOrderData, startDate,
-				endDate, invoiceTillDate, nextbillDate, price, listOfTaxes,
-				discountMasterData);
-
-	}*/
 
 	// Per day weekly price
 	public BigDecimal getWeeklyPricePerDay(BillingOrderData billingOrderData) {
@@ -373,8 +342,7 @@ public class GenerateDisconnectionBill {
 			 taxMappingRateDatas = billingOrderReadPlatformService.retrieveDefaultTaxMappingDate(billingOrderData.getClientId(),billingOrderData.getChargeCode());
 		}
 		List<InvoiceTaxCommand> invoiceTaxCommand = this.generateInvoiceTax(taxMappingRateDatas, billPrice, billingOrderData,disconnectionDate);
-		// List<InvoiceTax> listOfTaxes =
-		// invoiceTaxPlatformService.createInvoiceTax(invoiceTaxCommand);
+		// List<InvoiceTax> listOfTaxes = invoiceTaxPlatformService.createInvoiceTax(invoiceTaxCommand);
 		return invoiceTaxCommand;
 	}
 	
@@ -490,12 +458,4 @@ public class GenerateDisconnectionBill {
 				billingOrderData.getStartDate(), billingOrderData.getEndDate(),
 				discountMasterData, billingOrderData.getTaxInclusive());
 	}
-	
-	public BillingOrderCommand getDisconnectionCreditMonthyBill(
-			BillingOrderData billingOrderData,
-			DiscountMasterData discountMasterData, LocalDate disconnectionDate) {
-
-		return null;
-	}
-
 }
