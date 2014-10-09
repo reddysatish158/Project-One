@@ -33,7 +33,6 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
-import org.mifosplatform.infrastructure.security.service.RandomPasswordGenerator;
 import org.mifosplatform.logistics.item.domain.ItemMaster;
 import org.mifosplatform.logistics.item.domain.ItemRepository;
 import org.mifosplatform.logistics.item.exception.ItemNotFoundException;
@@ -86,7 +85,6 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 	private final MessagePlatformEmailService messagePlatformEmailService;
 	
 	
-	
     @Autowired
     public ActivationProcessWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,final FromJsonHelper fromJsonHelper,
     		final ClientWritePlatformService clientWritePlatformService,final OneTimeSaleWritePlatformService oneTimeSaleWritePlatformService,
@@ -96,6 +94,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
     		final SelfCareTemporaryRepository selfCareTemporaryRepository,final PortfolioCommandSourceWritePlatformService portfolioCommandSourceWritePlatformService,
     		final CodeValueRepository codeValueRepository, final SelfCareRepository selfCareRepository,final ItemRepository itemRepository,
     		final BillingMessageTemplateRepository billingMessageTemplateRepository,final MessagePlatformEmailService messagePlatformEmailService) {
+
         
     	this.context = context;
     	this.itemRepository=itemRepository;
@@ -284,12 +283,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 				if (resultClient == null && resultClient.getClientId() == null && resultClient.getClientId() <= 0) {
 					throw new PlatformDataIntegrityException("error.msg.client.creation.failed", "Client Creation Failed","Client Creation Failed");
 				}
-	
-				SelfCare selfcare =  this.selfCareRepository.findOneByClientId(resultClient.getClientId());
-				selfcare.setNationalId(nationalId);
-				if(kortaToken !=null && !(kortaToken.equalsIgnoreCase(""))){
-						selfcare.setToken(kortaToken);
-				}			
+				
 				temporary.setStatus("ACTIVE");
 				
 				//book device
@@ -305,6 +299,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 						
 						device = command.stringValueOfParameterNamed("device");
 						ItemDetails detail = itemDetailsRepository.findOneBySerialNo(device);
+
 						if (detail == null) {
 							throw new SerialNumberNotFoundException(device);
 						}
@@ -324,12 +319,14 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 						serialNumberObject.put("isNewHw", "Y");
 						JSONArray serialNumber = new JSONArray();
 						serialNumber.put(0, serialNumberObject);
+						
 						bookDevice.put("chargeCode", itemMaster.getChargeCode());
 						bookDevice.put("unitPrice", itemMaster.getUnitPrice());
 						bookDevice.put("itemId", itemMaster.getId());
 						bookDevice.put("discountId", id);
 						bookDevice.put("officeId",detail.getOfficeId());
 						bookDevice.put("totalPrice", itemMaster.getUnitPrice());
+
 						bookDevice.put("quantity", id);
 						bookDevice.put("locale", "en");
 						bookDevice.put("dateFormat", dateFormat);
@@ -461,21 +458,28 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 				if(selfcareCommandresult == null && selfcareCommandresult.resourceId() <= 0){			
 					throw new PlatformDataIntegrityException("error.msg.selfcare.creation.failed", "selfcare Creation Failed","selfcare Creation Failed");
 				}*/
+				SelfCare selfcare =  this.selfCareRepository.findOneByClientId(resultClient.getClientId());
 				
-				if(resultClient !=null && resultClient.getClientId() > 0 ){
-					 
+				if(selfcare != null && resultClient !=null && resultClient.getClientId() > 0 ){
+					
+					selfcare.setNationalId(nationalId);
+					if(kortaToken !=null && !(kortaToken.equalsIgnoreCase(""))){
+							selfcare.setToken(kortaToken);
+					}
+					
 					List<BillingMessageTemplate> messageDetails=this.billingMessageTemplateRepository.findByTemplateDescription("CREATE SELFCARE");
 					String subject=messageDetails.get(0).getSubject();
 					String body=messageDetails.get(0).getBody();
-					String header=messageDetails.get(0).getHeader().replace("<PARAM1>", selfcare.getUserName() +","+"\n");
+					String header=messageDetails.get(0).getHeader().replace("<PARAM1>", selfcare.getUserName() +",");
 					body=body.replace("<PARAM2>", selfcare.getUniqueReference());
 					body=body.replace("<PARAM3>", selfcare.getPassword());
 					StringBuilder prepareEmail =new StringBuilder();
 					prepareEmail.append(header);
 					prepareEmail.append("\t").append(body);
-					prepareEmail.append("\n").append("\n");
+				//	prepareEmail.append("\n").append("\n");
 					prepareEmail.append(messageDetails.get(0).getFooter());
 					String message = messagePlatformEmailService.sendGeneralMessage(selfcare.getUniqueReference(), prepareEmail.toString().trim(), subject);
+					System.out.println("Email sending to '"+ selfcare.getUniqueReference() + "' " + message);
 				}
 				
 				return resultClient;
