@@ -34,6 +34,8 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
+import org.mifosplatform.logistics.item.domain.ItemMaster;
+import org.mifosplatform.logistics.item.domain.ItemRepository;
 import org.mifosplatform.logistics.itemdetails.domain.ItemDetails;
 import org.mifosplatform.logistics.itemdetails.domain.ItemDetailsRepository;
 import org.mifosplatform.logistics.itemdetails.exception.SerialNumberAlreadyExistException;
@@ -75,6 +77,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 	private final PortfolioCommandSourceWritePlatformService portfolioCommandSourceWritePlatformService;
 	private final CodeValueRepository codeValueRepository;
 	private SelfCareRepository selfCareRepository;
+	private final ItemRepository itemRepository;
 	
     @Autowired
     public ActivationProcessWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,final FromJsonHelper fromJsonHelper,
@@ -83,7 +86,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
     		final OwnedHardwareWritePlatformService ownedHardwareWritePlatformService, final AddressReadPlatformService addressReadPlatformService,
     		final ActivationProcessCommandFromApiJsonDeserializer commandFromApiJsonDeserializer, final ItemDetailsRepository itemDetailsRepository,
     		final SelfCareTemporaryRepository selfCareTemporaryRepository,final PortfolioCommandSourceWritePlatformService portfolioCommandSourceWritePlatformService,
-    		final CodeValueRepository codeValueRepository, final SelfCareRepository selfCareRepository) {
+    		final CodeValueRepository codeValueRepository, final SelfCareRepository selfCareRepository, final ItemRepository itemRepository) {
         
     	this.context = context;
         this.fromJsonHelper = fromJsonHelper;
@@ -99,6 +102,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
         this.portfolioCommandSourceWritePlatformService = portfolioCommandSourceWritePlatformService;
         this.codeValueRepository = codeValueRepository;
         this.selfCareRepository = selfCareRepository;
+        this.itemRepository = itemRepository;
  
     }
 
@@ -281,8 +285,9 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 						device = command.stringValueOfParameterNamed("device");
 						
 						ItemDetails detail = itemDetailsRepository.findOneBySerialNo(device);
+						ItemMaster itemMasterData = itemRepository.findOne(detail.getItemMasterId());
 
-						if (detail == null) {
+						if (detail == null || itemMasterData == null) {
 							throw new SerialNumberNotFoundException(device);
 						}
 
@@ -299,14 +304,18 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 
 						JSONArray serialNumber = new JSONArray();
 						serialNumber.put(0, serialNumberObject);
+						
+						BigDecimal unitPrice = itemMasterData.getUnitPrice();
+						
+						
 
 						JSONObject bookDevice = new JSONObject();
-						bookDevice.put("chargeCode", "NONE");
-						bookDevice.put("unitPrice", new Long(100));
-						bookDevice.put("itemId", id);
+						bookDevice.put("chargeCode", itemMasterData.getChargeCode());
+						bookDevice.put("unitPrice", unitPrice);
+						bookDevice.put("itemId", itemMasterData.getId());
 						bookDevice.put("discountId", id);
-						bookDevice.put("officeId", id);
-						bookDevice.put("totalPrice", new Long(100));
+						bookDevice.put("officeId", detail.getOfficeId());
+						bookDevice.put("totalPrice", unitPrice);
 						bookDevice.put("quantity", id);
 						bookDevice.put("locale", "en");
 						bookDevice.put("dateFormat", dateFormat);

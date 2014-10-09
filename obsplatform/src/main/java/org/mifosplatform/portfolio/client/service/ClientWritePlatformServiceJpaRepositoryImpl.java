@@ -201,8 +201,9 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             	SelfCare selfCare=this.selfCareRepository.findOneByEmail(client.getEmail());
             	 if(selfCare != null){
             		 selfCare.setIsDeleted(true);
+            		 this.selfCareRepository.save(selfCare);
             	 }
-            	 this.selfCareRepository.save(selfCare);
+            	 
             }
             
             

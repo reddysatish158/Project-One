@@ -261,8 +261,7 @@ public class PaymentsApiResource {
 			Long clientId = json.getLong("clientId");
 			String reference = json.getString("reference");
 			String totalAmount = json.getString("amount");
-			String emailId = json.getString("emailId");
-
+			
 			if (clientId != null && clientId > 0) {
 				String date = new SimpleDateFormat("dd MMMM yyyy").format(new Date());
 				JsonObject object = new JsonObject();
@@ -281,6 +280,7 @@ public class PaymentsApiResource {
 				return this.toApiJsonSerializer.serialize(result);
 
 			} else if (clientId != null && clientId == 0) {
+				String emailId = json.getString("emailId");
 				SelfCareTemporary selfCareTemporary = this.selfCareTemporaryRepository.findOneByEmailId(emailId);
 				if (selfCareTemporary != null && selfCareTemporary.getPaymentStatus().equalsIgnoreCase("INACTIVE")) {
 					JsonObject obj = new JsonObject();

@@ -107,13 +107,13 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 				List<BillingMessageTemplate> messageDetails=this.billingMessageTemplateRepository.findByTemplateDescription("CREATE SELFCARE");
 				String subject=messageDetails.get(0).getSubject();
 				String body=messageDetails.get(0).getBody();
-				String header=messageDetails.get(0).getHeader().replace("<PARAM1>", selfCare.getUserName() +","+"\n");
+				String header=messageDetails.get(0).getHeader().replace("<PARAM1>", selfCare.getUserName() +",");
 				body=body.replace("<PARAM2>", selfCare.getUniqueReference());
 				body=body.replace("<PARAM3>", selfCare.getPassword());
 				StringBuilder prepareEmail =new StringBuilder();
 				prepareEmail.append(header);
 				prepareEmail.append("\t").append(body);
-				prepareEmail.append("\n").append("\n");
+				//prepareEmail.append("\n").append("\n");
 				prepareEmail.append(messageDetails.get(0).getFooter());
 				String message = messagePlatformEmailService.sendGeneralMessage(selfCare.getUniqueReference(), prepareEmail.toString().trim(), subject);
 				
@@ -304,12 +304,12 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 				List<BillingMessageTemplate> messageDetails=this.billingMessageTemplateRepository.findByTemplateDescription("SELFCARE REGISTRATION");
 				String subject=messageDetails.get(0).getSubject();
 				String body=messageDetails.get(0).getBody();
-				String header=messageDetails.get(0).getHeader()+","+"\n"+"\n";
-				body=body.replace("<PARAM1>", returnUrl + generatedKey+"\n");
+				String header=messageDetails.get(0).getHeader()+",";
+				body=body.replace("<PARAM1>", returnUrl + generatedKey);
 				StringBuilder prepareEmail =new StringBuilder();
 				prepareEmail.append(header);
 				prepareEmail.append("\t").append(body);
-				prepareEmail.append("\n").append("\n");
+			//	prepareEmail.append("\n").append("\n");
 				prepareEmail.append(messageDetails.get(0).getFooter());
 				
 				/*StringBuilder body = new StringBuilder();
@@ -332,6 +332,7 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 					
 				transactionHistoryWritePlatformService.saveTransactionHistory(clientId, "Self Care User Registration", new Date(),
 						"EmailId: "+selfCareTemporary.getUserName() + ", returnUrl: "+ returnUrl +", Email Sending Resopnse: " + result);
+				return new CommandProcessingResultBuilder().withEntityId(selfCareTemporary.getId()).build();
 				
 			}
 				
@@ -340,9 +341,12 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 			throw new PlatformDataIntegrityException("duplicate.username", "duplicate.username","duplicate.username", "duplicate.username");
 		}catch(EmptyResultDataAccessException emp){
 			throw new PlatformDataIntegrityException("empty.result.set", "empty.result.set");
-		}
+		}/*catch(SelfCareEmailIdDuplicateException exc){
+			//throw new PlatformDataIntegrityException("duplicate.username", "duplicate.username","duplicate.username", "duplicate.username");
+			throw new SelfCareEmailIdDuplicateException(exc);
+		}*/
 		
-		return new CommandProcessingResultBuilder().withEntityId(selfCareTemporary.getId()).build();
+		
 	}
 
 	@Override
@@ -404,13 +408,13 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 				List<BillingMessageTemplate> messageDetails=this.billingMessageTemplateRepository.findByTemplateDescription("NEW SELFCARE PASSWORD");
 				String subject=messageDetails.get(0).getSubject();
 				String body=messageDetails.get(0).getBody();
-				String header=messageDetails.get(0).getHeader().replace("<PARAM1>", selfCare.getUserName() +","+"\n"+"\n");
+				String header=messageDetails.get(0).getHeader().replace("<PARAM1>", selfCare.getUserName() +",");
 				body=body.replace("<PARAM2>", uniqueReference);
-				body=body.replace("<PARAM3>", generatedKey+"\n"+"\n");
+				body=body.replace("<PARAM3>", generatedKey);
 				StringBuilder prepareEmail =new StringBuilder();
 				prepareEmail.append(header);
 				prepareEmail.append("\t").append(body);
-				prepareEmail.append("\n").append("\n");
+				//prepareEmail.append("\n").append("\n");
 				prepareEmail.append(messageDetails.get(0).getFooter());
 				
 				/*StringBuilder body = new StringBuilder();
