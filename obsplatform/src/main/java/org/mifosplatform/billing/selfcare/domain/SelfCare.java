@@ -39,29 +39,35 @@ public class SelfCare extends AbstractPersistable<Long>{
 	@Column(name="korta_token")
 	private String token;
 	
+	@Column(name="device_id")
+	private String deviceId;
+	
 	public SelfCare() {
 		// TODO Auto-generated constructor stub
 	}
-	public SelfCare(Long clientId,String userName, String password, String uniqueReference, Boolean isDeleted){
+	public SelfCare(Long clientId,String userName, String password, String uniqueReference, Boolean isDeleted,String nationalId,String device){
 		this.clientId = clientId;
 		this.userName = userName;
 		this.password = password;
 		this.uniqueReference = uniqueReference;
 		this.isDeleted = isDeleted;
 		this.status="INACTIVE";
+		this.nationalId=nationalId;
+		this.deviceId=device;
 	}
 	
 	public static SelfCare fromJson(JsonCommand command) {
 		String userName = command.stringValueOfParameterNamed("userName");
 		String uniqueReference = command.stringValueOfParameterNamed("uniqueReference");
 		String nationalId = command.stringValueOfParameterNamed("nationalId");
-		SelfCare selfCare = new SelfCare();
-		selfCare.setUserName(userName);
+		String device = command.stringValueOfParameterNamed("device");
+		return new SelfCare(null,userName, null, uniqueReference,false,nationalId,device);
+	/*	selfCare.setUserName(userName);
 		selfCare.setUniqueReference(uniqueReference);
 		selfCare.setNationalId(nationalId);
 		selfCare.setIsDeleted(false);
-		selfCare.setStatus("INACTIVE");
-		return selfCare;
+		selfCare.setStatus("INACTIVE");*/
+		 
 		
 	}
 	

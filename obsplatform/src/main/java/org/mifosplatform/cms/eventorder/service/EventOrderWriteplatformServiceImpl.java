@@ -183,7 +183,7 @@ public class EventOrderWriteplatformServiceImpl implements EventOrderWriteplatfo
 						//Add New Action 
 				List<ActionDetaislData> actionDetaislDatas=this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_EVENT_ORDER);
 				   if(!actionDetaislDatas.isEmpty()){
-					  response = this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,clientId,eventOrder.getId().toString());
+					  response = this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,clientId,eventOrder.getId().toString(),null);
 				   }		
 				   transactionHistoryWritePlatformService.saveTransactionHistory(eventOrder.getClientId(), "Event Order", eventOrder.getEventBookedDate(),
 						   "CancelFlag:"+eventOrder.getCancelFlag(),"bookedPrice:"+eventOrder.getBookedPrice(),"EventValidTillDate:"+eventOrder.getEventValidtill(),

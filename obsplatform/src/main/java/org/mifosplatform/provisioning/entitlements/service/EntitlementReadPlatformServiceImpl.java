@@ -179,9 +179,13 @@ public class EntitlementReadPlatformServiceImpl implements
 		if (provisioningSystem != null) {
 			sql = sql + " and bpr.provisioing_system = '" + provisioningSystem + "' ";
 		}
+		
+		sql = sql + "group by bpr.id"; 
 		if (id != null) {
-			sql = sql + " and bprd.id limit " + id;
+			sql = sql + " limit " + id;
 		}
+		
+		
 
 		return jdbcTemplate.query(sql, mapper, new Object[] {});
 		
@@ -241,7 +245,7 @@ public class EntitlementReadPlatformServiceImpl implements
 					" join b_process_request_detail bprd on (bpr.id = bprd.processrequest_id )" +
 					" join b_client_address bca on (c.id=bca.client_id and address_key='PRIMARY')" +
 					" left join b_state bs on (bca.state = bs.state_name )" +
-					" left join b_priceregion_detail bpd on (bpd.state_id=bs.id and bpd.is_deleted='N')" +
+					" LEFT JOIN b_priceregion_detail bpd ON ((bpd.state_id = bs.id or bpd.state_id=0)  and bpd.country_id=bs.parent_code AND bpd.is_deleted = 'N')" +
 					" left join b_priceregion_master bprm on (bpd.priceregion_id = bprm.id ) " +
 					" left join b_ippool_details bipd on (bpr.client_id = bipd.client_id)" +
 					" left join b_item_detail bid on (bprd.hardware_id = bid.provisioning_serialno) " +

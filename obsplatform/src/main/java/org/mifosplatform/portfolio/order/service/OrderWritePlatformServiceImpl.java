@@ -337,7 +337,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 								this.clientRepository.save(client);
 								List<ActionDetaislData> actionDetaislDatas=this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_CREATE_ORDER);
 								if(actionDetaislDatas.size() != 0){
-									this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,command.entityId(), order.getId().toString());
+									this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,command.entityId(), order.getId().toString(),null);
 								}
 							}
 					return new CommandProcessingResult(order.getId());	
@@ -535,6 +535,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 				if(orderDetails == null){
 					throw new NoOrdersFoundException(orderId);
 				}
+				
 				//Check for Custome_Validation
 				CustomValidationData customValidationData   = this.orderDetailsReadPlatformServices.checkForCustomValidations(orderDetails.getClientId(),"Order Renewal", command.json());
 				if(customValidationData.getErrorCode() != 0 && customValidationData.getErrorMessage() != null){
@@ -886,7 +887,7 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 		
 	}
     
-	@Transactional
+	
 	@Override
 	public CommandProcessingResult applyPromo(JsonCommand command) {
 		
@@ -906,6 +907,8 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 						orderDiscount.updateDates(promotion.getDiscountRate(),promotion.getDiscountType(),enddate);
 						this.orderDiscountRepository.save(orderDiscount);
 					}
+					
+					this.orderRepository.save(order);
 			this.transactionHistoryWritePlatformService.saveTransactionHistory(order.getClientId(),"Apply Promotion",new Date(), "User :"+username,
 					"Promotion Code :" +promotion.getPromotionCode(),"Promotion Value" + promotion.getDiscountRate());
 			return new CommandProcessingResult(command.entityId());

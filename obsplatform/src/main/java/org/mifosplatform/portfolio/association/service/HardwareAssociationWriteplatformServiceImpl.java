@@ -2,15 +2,20 @@ package org.mifosplatform.portfolio.association.service;
 
 import java.util.Map;
 
+import net.sf.json.JSONObject;
+
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
+import org.mifosplatform.logistics.itemdetails.exception.ActivePlansFoundException;
 import org.mifosplatform.portfolio.association.domain.HardwareAssociation;
 import org.mifosplatform.portfolio.association.exception.HardwareDetailsNotFoundException;
+import org.mifosplatform.portfolio.order.data.CustomValidationData;
 import org.mifosplatform.portfolio.order.domain.HardwareAssociationRepository;
 import org.mifosplatform.portfolio.order.domain.Order;
 import org.mifosplatform.portfolio.order.domain.OrderRepository;
+import org.mifosplatform.portfolio.order.service.OrderDetailsReadPlatformServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -22,18 +27,21 @@ public class HardwareAssociationWriteplatformServiceImpl implements HardwareAsso
 {
 
 	private final PlatformSecurityContext context;
-	private final HardwareAssociationRepository associationRepository;
-	private final HardwareAssociationCommandFromApiJsonDeserializer fromApiJsonDeserializer;
 	private final OrderRepository orderRepository;
+	private final HardwareAssociationRepository associationRepository;
+	private final OrderDetailsReadPlatformServices orderDetailsReadPlatformServices;
+	private final HardwareAssociationCommandFromApiJsonDeserializer fromApiJsonDeserializer;
 	
     @Autowired
 	public HardwareAssociationWriteplatformServiceImpl(final PlatformSecurityContext context,final HardwareAssociationCommandFromApiJsonDeserializer fromApiJsonDeserializer,
-			final HardwareAssociationRepository associationRepository,final OrderRepository orderRepository){
+			final HardwareAssociationRepository associationRepository,final OrderRepository orderRepository,
+			final OrderDetailsReadPlatformServices orderDetailsReadPlatformServices ){
 		
 	    this.context=context;
 		this.associationRepository=associationRepository;
 		this.fromApiJsonDeserializer=fromApiJsonDeserializer;
 		this.orderRepository=orderRepository;
+		this.orderDetailsReadPlatformServices=orderDetailsReadPlatformServices;
 	}
 	
 	@Override
@@ -62,6 +70,12 @@ public class HardwareAssociationWriteplatformServiceImpl implements HardwareAsso
 			Order order=this.orderRepository.findOne(orderId);
 			String provisionNum = command.stringValueOfParameterNamed("provisionNum");
 			HardwareAssociation hardwareAssociation = new HardwareAssociation(command.entityId(), order.getPlanId(), provisionNum, orderId);
+			//Check for Custome_Validation
+			CustomValidationData customValidationData   = this.orderDetailsReadPlatformServices.checkForCustomValidations(hardwareAssociation.getClientId(),"Pairing", command.json());
+			if(customValidationData.getErrorCode() != 0 && customValidationData.getErrorMessage() != null){
+				throw new ActivePlansFoundException(customValidationData.getErrorMessage()); 
+			}
+			
 			this.associationRepository.saveAndFlush(hardwareAssociation);
 			return new CommandProcessingResultBuilder().withEntityId(
 					hardwareAssociation.getId()).build();
@@ -103,13 +117,23 @@ public class HardwareAssociationWriteplatformServiceImpl implements HardwareAsso
 //			AssociationData associationData=this.associationReadplatformService.retrieveSingleDetails(orderId);
 			
 		      HardwareAssociation association=this.associationRepository.findOne(associationId);
-
 		      if(association == null){
 					throw new HardwareDetailsNotFoundException(associationId);
 				}
-		
+		      
+		      JSONObject jsonObject=new JSONObject();
+		      jsonObject.put("clientId", association.getClientId());
+		      jsonObject.put("planId", association.getPlanId());
+		      jsonObject.put("serialNo", association.getSerialNo());
+		      jsonObject.put("orderId", association.getOrderId());
+		      
+		       
+		        //Check for Custome_Validation
+				CustomValidationData customValidationData   = this.orderDetailsReadPlatformServices.checkForCustomValidations(association.getClientId(),"UnPairing", jsonObject.toString());
+				if(customValidationData.getErrorCode() != 0 && customValidationData.getErrorMessage() != null){
+					throw new ActivePlansFoundException(customValidationData.getErrorMessage()); 
+				}
     		   association.delete();
-    		   
     		   this.associationRepository.save(association);
     		   return new CommandProcessingResult(association.getId());
     		   

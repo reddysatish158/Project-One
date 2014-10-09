@@ -1,6 +1,7 @@
 package org.mifosplatform.logistics.onetimesale.service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -48,43 +49,33 @@ public class InvoiceOneTimeSale {
 
 	public void invoiceOneTimeSale(Long clientId, OneTimeSaleData oneTimeSaleData) {
 		List<BillingOrderCommand> billingOrderCommands = new ArrayList<BillingOrderCommand>();
-		
+
 			// check whether one time sale is invoiced
 			// N - not invoiced
 			// y - invoiced
 			if (oneTimeSaleData.getIsInvoiced().equalsIgnoreCase("N")) {
 				BillingOrderData billingOrderData = new BillingOrderData(oneTimeSaleData.getId(),oneTimeSaleData.getClientId(),	new LocalDate().toDate(),
-						oneTimeSaleData.getChargeCode(), "NRC",	oneTimeSaleData.getTotalPrice());
+						oneTimeSaleData.getChargeCode(),oneTimeSaleData.getChargeType(),oneTimeSaleData.getTotalPrice(),oneTimeSaleData.getTaxInclusive());
 				
-				List<InvoiceTaxCommand> listOfTaxes = calculateTax(billingOrderData);
-				 
+				BigDecimal discountAmount = BigDecimal.ZERO; 
 				DiscountMaster discountMaster=this.discountMasterRepository.findOne(oneTimeSaleData.getDiscountId());
 				
-				BigDecimal discountAmount = BigDecimal.ZERO;
 				DiscountMasterData discountMasterData=new DiscountMasterData(discountMaster.getId(),discountMaster.getDiscountCode(),discountMaster.getDiscountDescription(),
 						discountMaster.getDiscountType(),discountMaster.getDiscountRate(),null,null);
 				
-				
-					
 			    discountMasterData = this.calculateDiscount(discountMasterData, discountAmount, billingOrderData.getPrice());
-					
-				
-				
-				
-				this.createBillingOrderCommand(billingOrderData,new LocalDate(), new LocalDate(), new LocalDate(), new LocalDate(),
+			    
+			    BillingOrderCommand   billingOrderCommand = this.generateBill.getOneTimeBill(billingOrderData, discountMasterData);
+				/*this.createBillingOrderCommand(billingOrderData,new LocalDate(), new LocalDate(), new LocalDate(), new LocalDate(),
 						billingOrderData.getPrice(), listOfTaxes, discountMasterData);
-				
-				
-				
-				
 				
 				BillingOrderCommand billingOrderCommand = new BillingOrderCommand(billingOrderData.getClientOrderId(),new Long(0),billingOrderData.getClientId(),
 						new LocalDate().toDate(), null,new LocalDate().toDate(), null,billingOrderData.getChargeCode(),	billingOrderData.getChargeType(), null,
 						billingOrderData.getDurationType(), null,billingOrderData.getPrice(), null, listOfTaxes,new LocalDate().toDate(), new LocalDate().toDate(),discountMasterData,billingOrderData.getTaxInclusive());
-				        billingOrderCommands.add(billingOrderCommand);
+				       */
 				        
-				        
-				List<BillingOrder> listOfBillingOrders = billingOrderWritePlatformService.createBillingProduct(billingOrderCommands);
+			    billingOrderCommands.add(billingOrderCommand);
+				//List<BillingOrder> listOfBillingOrders = billingOrderWritePlatformService.createBillingProduct(billingOrderCommands);
 				// calculation of invoice
 				Invoice invoice = this.generateBillingOrderService.generateInvoice(billingOrderCommands);
 
@@ -101,57 +92,11 @@ public class InvoiceOneTimeSale {
 
 				// Updation of invoice id in charge table
 				//billingOrderWritePlatformService.updateInvoiceCharge(invoice,listOfBillingOrders);
-				
-				// update column is_invoiceed of one-time-sale
-				
-			
 
 			} else {
 
 			}
 		}
-	
-
-	/*public void updateOneTimeSale(OneTimeSaleData oneTimeSaleData) {
-		EventOrder oneTimeSale = eventOrderRepository.findOne(oneTimeSaleData.getId());
-		oneTimeSale.setInvoiced();
-		eventOrderRepository.save(oneTimeSale);
-		
-		
-		OneTimeSale oneTimeSale = oneTimeSaleRepository.findOne(oneTimeSaleData.getId());
-		oneTimeSale.setDeleted('y');
-		oneTimeSaleRepository.save(oneTimeSale);
-		
-	}*/
-
-	public List<InvoiceTaxCommand> calculateTax(BillingOrderData billingOrderData) {
-
-		List<TaxMappingRateData> taxMappingRateDatas = billingOrderReadPlatformService.retrieveTaxMappingDate(billingOrderData.getClientId(),billingOrderData.getChargeCode());
-		if(taxMappingRateDatas.isEmpty()){
-			taxMappingRateDatas = billingOrderReadPlatformService.retrieveDefaultTaxMappingDate(billingOrderData.getClientId(),billingOrderData.getChargeCode());
-		}
-		List<InvoiceTaxCommand> invoiceTaxCommands = generateBill.generateInvoiceTax(taxMappingRateDatas,billingOrderData.getPrice(),billingOrderData.getClientId());
-		// List<InvoiceTax> listOfTaxes = billingOrderWritePlatformService.createInvoiceTax(invoiceTaxCommand);
-		return invoiceTaxCommands;
-	}
-	
-	// create billing order command
-	public BillingOrderCommand createBillingOrderCommand(BillingOrderData billingOrderData,LocalDate chargeStartDate,
-			LocalDate chargeEndDate,LocalDate invoiceTillDate,LocalDate nextBillableDate,BigDecimal price,List<InvoiceTaxCommand> listOfTaxes,DiscountMasterData discountMasterData){
-		
-		return new BillingOrderCommand(
-				billingOrderData.getClientOrderId(),
-				billingOrderData.getOderPriceId(),
-				billingOrderData.getClientId(), chargeStartDate.toDate(),
-				nextBillableDate.toDate(), chargeEndDate.toDate(),
-				billingOrderData.getBillingFrequency(),
-				billingOrderData.getChargeCode(),
-				billingOrderData.getChargeType(),
-				billingOrderData.getChargeDuration(),
-				billingOrderData.getDurationType(), invoiceTillDate.toDate(), price,
-				billingOrderData.getBillingAlign(), listOfTaxes,
-				billingOrderData.getStartDate(), billingOrderData.getEndDate(),discountMasterData,billingOrderData.getTaxInclusive());
-	}
 	
 	// Discount Applicable Logic
 	public Boolean isDiscountApplicable(DiscountMasterData discountMasterData) {
@@ -221,10 +166,9 @@ public class InvoiceOneTimeSale {
 		
 		if(isDiscountFlat(discountMasterData)){
 			
-			
-			BigDecimal   p=this.calculateDiscountFlat(discountMasterData.getdiscountRate(), chargePrice);
-			discountMasterData.setDiscountedChargeAmount(p);
-			discountAmount = chargePrice.subtract(p);
+			BigDecimal netFlatAmount=this.calculateDiscountFlat(discountMasterData.getdiscountRate(), chargePrice);
+			discountMasterData.setDiscountedChargeAmount(netFlatAmount);
+			discountAmount = chargePrice.subtract(netFlatAmount);
 			discountMasterData.setDiscountAmount(discountAmount);
 			
 		}
@@ -241,7 +185,12 @@ public class InvoiceOneTimeSale {
 	// Discount Flat calculation
 	public BigDecimal calculateDiscountFlat(BigDecimal discountRate,BigDecimal chargePrice){
 		
-		return chargePrice.subtract(discountRate);
+		BigDecimal calculateDiscountFlat=BigDecimal.ZERO;
+		//check for chargeprice zero and discountrate greater than zero
+		if(chargePrice.compareTo(BigDecimal.ZERO) == 1){
+		    calculateDiscountFlat=chargePrice.subtract(discountRate).setScale(2,RoundingMode.HALF_UP);
+		}
+		return calculateDiscountFlat;
 	}
 
 }

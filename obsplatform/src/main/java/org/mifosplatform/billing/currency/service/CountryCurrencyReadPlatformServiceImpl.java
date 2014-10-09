@@ -1,5 +1,6 @@
 package org.mifosplatform.billing.currency.service;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -46,7 +47,8 @@ public class CountryCurrencyReadPlatformServiceImpl implements CountryCurrencyRe
 	private static final class CurrencyMapper implements RowMapper<CountryCurrencyData> {
 
 		public String schema() {
-			return " c.id as id,c.country as country,c.currency as currency,c.status as status FROM b_country_currency c ";
+			return "  c.id as id,c.country as country,c.currency as currency,c.status as status,c.base_currency as baseCurrency, " +
+					"  c.conversion_rate as conversionRate FROM b_country_currency c ";
 
 		}
 
@@ -59,7 +61,9 @@ public class CountryCurrencyReadPlatformServiceImpl implements CountryCurrencyRe
 			String country = rs.getString("country");
 			String currency = rs.getString("currency");
 			String status = rs.getString("status");
-			return new CountryCurrencyData(id,country,currency,status);
+			String baseCurrency = rs.getString("baseCurrency");
+			BigDecimal conversionRate = rs.getBigDecimal("conversionRate");
+			return new CountryCurrencyData(id,country,currency,baseCurrency,conversionRate,status);
 
 		}
 	}

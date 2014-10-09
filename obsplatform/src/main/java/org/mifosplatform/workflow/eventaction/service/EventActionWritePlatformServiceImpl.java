@@ -59,12 +59,12 @@ public class EventActionWritePlatformServiceImpl implements ActiondetailsWritePl
 	private final MessageDataRepository messageDataRepository;
 	private final AppUserReadPlatformService readPlatformService;
 	private final BillingOrderApiResourse billingOrderApiResourse;
+	private final ProcessRequestRepository processRequestRepository;
 	private final BillingMessageTemplateRepository messageTemplateRepository;
 	private final TicketMasterReadPlatformService ticketMasterReadPlatformService ;
     private final ActionDetailsReadPlatformService actionDetailsReadPlatformService;	
     private final ContractPeriodReadPlatformService contractPeriodReadPlatformService;
     private final HardwareAssociationReadplatformService hardwareAssociationReadplatformService;
-	private final ProcessRequestRepository processRequestRepository;
 
 
 	@Autowired
@@ -96,7 +96,7 @@ public class EventActionWritePlatformServiceImpl implements ActiondetailsWritePl
 	
 	
 	@Override
-	public String AddNewActions(List<ActionDetaislData> actionDetaislDatas,final Long clientId,final String resourceId) {
+	public String AddNewActions(List<ActionDetaislData> actionDetaislDatas,final Long clientId,final String resourceId,String ticketURL) {
     
   try{
     	
@@ -106,30 +106,33 @@ public class EventActionWritePlatformServiceImpl implements ActiondetailsWritePl
 	   	for(ActionDetaislData detailsData:actionDetaislDatas){
 		      EventActionProcedureData actionProcedureData=this.actionDetailsReadPlatformService.checkCustomeValidationForEvents(clientId, detailsData.getEventName(),detailsData.getActionName(),resourceId);
 			  JSONObject jsonObject=new JSONObject();
-				
 
 			  	if(actionProcedureData.isCheck()){
 				    SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy");
 				    List<SubscriptionData> subscriptionDatas=this.contractPeriodReadPlatformService.retrieveSubscriptionDatabyContractType("Month(s)",1);
 				    	 	
 				       if(detailsData.getActionName().equalsIgnoreCase(EventActionConstants.ACTION_SEND_EMAIL)){
+				    	   
 				          TicketMasterData data = this.ticketMasterReadPlatformService.retrieveTicket(clientId,new Long(resourceId));
 				          TicketMaster ticketMaster=this.repository.findOne(new Long(resourceId));
 				          AppUserData user = this.readPlatformService.retrieveUser(new Long(data.getUserId()));
 				          List<BillingMessageTemplate> billingMessageTemplate = this.messageTemplateRepository.findByTemplateDescription("TICKET_TEMPLATE");
-				        	  	
+				          String value=ticketURL+""+resourceId;
+				          String removeUrl="<br/><b>URL : </b>"+"<a href="+value+">View Ticket</a>";
+				         // removeUrl.replaceAll("(PARAMURL)", ticketURL+""+resourceId); 	
 				        	if(detailsData.getEventName().equalsIgnoreCase(EventActionConstants.EVENT_CREATE_TICKET)){
 				        	  	if(!user.getEmail().isEmpty()){
-				        	  		BillingMessage billingMessage = new BillingMessage("CREATE TICKET", data.getProblemDescription()+"\n"
-				        	  	    +ticketMaster.getDescription(), "", user.getEmail(), user.getEmail(),
+				        	  		BillingMessage billingMessage = new BillingMessage("CREATE TICKET", data.getProblemDescription()+"<br/>"
+				        	  	    +ticketMaster.getDescription()+"\n"+removeUrl, "", user.getEmail(), user.getEmail(),
 									 "Ticket:"+resourceId, "N", billingMessageTemplate.get(0),'E',null);
 				        	  		this.messageDataRepository.save(billingMessage);
 				        	  	}else{
 				        	  	   if(actionProcedureData.getEmailId().isEmpty()){
+				        	  		   
 				        	  			throw new EmailNotFoundException(new Long(data.getUserId()));
 				        	  		}else{
-				        	  			BillingMessage billingMessage = new BillingMessage("CREATE TICKET", data.getProblemDescription()+"\n"
-				        	  		    +ticketMaster.getDescription(), "", actionProcedureData.getEmailId(), actionProcedureData.getEmailId(),
+				        	  			BillingMessage billingMessage = new BillingMessage("CREATE TICKET", data.getProblemDescription()+"<br/>"
+				        	  		    +ticketMaster.getDescription()+"\n"+removeUrl, "", actionProcedureData.getEmailId(), actionProcedureData.getEmailId(),
 										"Ticket:"+resourceId, "N", billingMessageTemplate.get(0),'E',null);
 				        	  			this.messageDataRepository.save(billingMessage);
 				        	  		}
@@ -138,16 +141,16 @@ public class EventActionWritePlatformServiceImpl implements ActiondetailsWritePl
 				        	}else if(detailsData.getEventName().equalsIgnoreCase(EventActionConstants.EVENT_EDIT_TICKET)){
 				        	  		
 				        	    if(!user.getEmail().isEmpty()){
-				        	  		BillingMessage billingMessage = new BillingMessage("ADD COMMENT", data.getProblemDescription()+"\n"
-				        	        +ticketMaster.getDescription()+"\n"+"COMMENT: \t"+data.getLastComment(), "", user.getEmail(), user.getEmail(),
+				        	  		BillingMessage billingMessage = new BillingMessage("ADD COMMENT", data.getProblemDescription()+"<br/>"
+				        	        +ticketMaster.getDescription()+"<br/>"+"COMMENT: "+data.getLastComment()+"<br/>"+removeUrl, "", user.getEmail(), user.getEmail(),
 									"Ticket:"+resourceId, "N", billingMessageTemplate.get(0),'E',null);
 				        	  		this.messageDataRepository.save(billingMessage);
 				        	  	}else{
 				        	  		if(actionProcedureData.getEmailId().isEmpty()){
 					        	  			throw new EmailNotFoundException(new Long(data.getUserId()));	
 					        	  	}else{
-					        	  		BillingMessage billingMessage = new BillingMessage("ADD COMMENT", data.getProblemDescription()+"\n"
-					        	  	     +ticketMaster.getDescription()+"\n"+"COMMENT: \t"+data.getLastComment(), "", actionProcedureData.getEmailId(),
+					        	  		BillingMessage billingMessage = new BillingMessage("ADD COMMENT", data.getProblemDescription()+"<br/>"
+					        	  	     +ticketMaster.getDescription()+"<br/>"+"COMMENT: \t"+data.getLastComment()+"<br/>"+removeUrl, "", actionProcedureData.getEmailId(),
 					        	  	     actionProcedureData.getEmailId(),"Ticket:"+resourceId, "N", billingMessageTemplate.get(0),'E',null);
 						        	  		this.messageDataRepository.save(billingMessage);
 					        	  	}
@@ -155,16 +158,16 @@ public class EventActionWritePlatformServiceImpl implements ActiondetailsWritePl
 				        	
 				        	}else if(detailsData.getEventName().equalsIgnoreCase(EventActionConstants.EVENT_CLOSE_TICKET)){
 				        	  	if(!user.getEmail().isEmpty()){
-				        	  			BillingMessage billingMessage = new BillingMessage("CLOSED TICKET", data.getProblemDescription()+"\n"
-				        	  			+ticketMaster.getDescription()+"\n"+"RESOLUTION: \t"+ticketMaster.getResolutionDescription(), "", user.getEmail(), user.getEmail(),
+				        	  			BillingMessage billingMessage = new BillingMessage("CLOSED TICKET", data.getProblemDescription()+"<br/>"
+				        	  			+ticketMaster.getDescription()+"<br/>"+"RESOLUTION: \t"+ticketMaster.getResolutionDescription()+"<br/>"+removeUrl, "", user.getEmail(), user.getEmail(),
 										"Ticket:"+resourceId, "N", billingMessageTemplate.get(0),'E',null);
 				        	  			this.messageDataRepository.save(billingMessage);
 				        	  	}else{
 				        	  		if(actionProcedureData.getEmailId().isEmpty()){
 					        	  		throw new EmailNotFoundException(new Long(data.getUserId()));	
 					        	  	}else{
-					        	  		     BillingMessage billingMessage = new BillingMessage("CLOSED TICKET", data.getProblemDescription()+"\n"
-					        	  		    +ticketMaster.getDescription()+"\n"+"RESOLUTION: \t"+ticketMaster.getResolutionDescription(), "", actionProcedureData.getEmailId(),
+					        	  		     BillingMessage billingMessage = new BillingMessage("CLOSED TICKET", data.getProblemDescription()+"<br/>"
+					        	  		    +ticketMaster.getDescription()+"<br/>"+"RESOLUTION: \t"+ticketMaster.getResolutionDescription()+"<br/>"+removeUrl, "", actionProcedureData.getEmailId(),
 					        	  	         actionProcedureData.getEmailId(),"Ticket:"+resourceId, "N", billingMessageTemplate.get(0),'E',null);
 						        	        this.messageDataRepository.save(billingMessage);
 					        	  }

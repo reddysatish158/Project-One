@@ -3,6 +3,8 @@ package org.mifosplatform.billing.selfcare.service;
 import java.util.Date;
 import java.util.List;
 
+import net.fortuna.ical4j.model.parameter.Language;
+
 import org.apache.commons.lang.RandomStringUtils;
 import org.mifosplatform.billing.loginhistory.domain.LoginHistory;
 import org.mifosplatform.billing.loginhistory.domain.LoginHistoryRepository;
@@ -13,6 +15,8 @@ import org.mifosplatform.billing.selfcare.exception.SelfCareAlreadyVerifiedExcep
 import org.mifosplatform.billing.selfcare.exception.SelfCareEmailIdDuplicateException;
 import org.mifosplatform.billing.selfcare.exception.SelfCareTemporaryGeneratedKeyNotFoundException;
 import org.mifosplatform.billing.selfcare.exception.SelfcareEmailIdNotFoundException;
+import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
+import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -33,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -49,13 +54,13 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 	private SelfCareCommandFromApiJsonDeserializer selfCareCommandFromApiJsonDeserializer;
 	private TransactionHistoryWritePlatformService transactionHistoryWritePlatformService;
 	private final static Logger logger = (Logger) LoggerFactory.getLogger(SelfCareWritePlatformServiceImp.class);
-	
+	private final GlobalConfigurationRepository globalConfigurationRepository; 
 	@Autowired
 	public SelfCareWritePlatformServiceImp(final PlatformSecurityContext context, final SelfCareRepository selfCareRepository, 
 		    final SelfCareCommandFromApiJsonDeserializer selfCareCommandFromApiJsonDeserializer,final SelfCareReadPlatformService selfCareReadPlatformService, 
 			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,final SelfCareTemporaryRepository selfCareTemporaryRepository,
 			final BillingMessageTemplateRepository billingMessageTemplateRepository,final MessagePlatformEmailService messagePlatformEmailService,
-			ClientRepository clientRepository,final LoginHistoryRepository loginHistoryRepository) {
+			ClientRepository clientRepository,final LoginHistoryRepository loginHistoryRepository,final GlobalConfigurationRepository globalConfigurationRepository) {
 		
 		this.context = context;
 		this.selfCareRepository = selfCareRepository;
@@ -67,6 +72,7 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 		this.billingMessageTemplateRepository = billingMessageTemplateRepository;
 		this.messagePlatformEmailService= messagePlatformEmailService;
 		this.clientRepository=clientRepository;
+		this.globalConfigurationRepository=globalConfigurationRepository;
 		this.loginHistoryRepository=loginHistoryRepository;
 				
 	}
@@ -96,6 +102,10 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 						}
 					}
 			}
+			
+			boolean mailnotification=command.booleanPrimitiveValueOfParameterNamed("mailNotification");
+			
+				String message=null;
 			if(clientId !=null && clientId > 0 ){
 				
 				selfCare.setClientId(clientId);
@@ -103,6 +113,7 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 				String unencodedPassword = passwordGenerator.generate();
 				selfCare.setPassword(unencodedPassword);
 				selfCareRepository.save(selfCare);
+				if(mailnotification){
 				//platformEmailService.sendToUserAccount(new EmailDetail("OBS Self Care Organisation ", "SelfCare",email, selfCare.getUserName()), unencodedPassword); 
 				List<BillingMessageTemplate> messageDetails=this.billingMessageTemplateRepository.findByTemplateDescription("CREATE SELFCARE");
 				String subject=messageDetails.get(0).getSubject();
@@ -115,7 +126,8 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 				prepareEmail.append("\t").append(body);
 				//prepareEmail.append("\n").append("\n");
 				prepareEmail.append(messageDetails.get(0).getFooter());
-				String message = messagePlatformEmailService.sendGeneralMessage(selfCare.getUniqueReference(), prepareEmail.toString().trim(), subject);
+				 message = messagePlatformEmailService.sendGeneralMessage(selfCare.getUniqueReference(), prepareEmail.toString().trim(), subject);
+			
 				
 				/*//
 				
@@ -153,7 +165,9 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 				
 				transactionHistoryWritePlatformService.saveTransactionHistory(clientId, "Self Care user activation", new Date(), "USerName: "+selfCare.getUserName()+" ClientId" 
 						+ selfCare.getClientId() + "Email Sending Result :" + message);
-			}else{
+			
+				}
+				}else{
 				throw new PlatformDataIntegrityException("client does not exist", "client not registered","clientId", "client is null ");
 			}
 			
@@ -327,13 +341,13 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 				
 				String subject = "Register Conformation";*/
 				
+			//	String translatedText = Translate.execute("Bonjour le monde", "IS","en");
 					
 				String result = messagePlatformEmailService.sendGeneralMessage(selfCareTemporary.getUserName(), prepareEmail.toString().trim(), subject);
 					
 				transactionHistoryWritePlatformService.saveTransactionHistory(clientId, "Self Care User Registration", new Date(),
 						"EmailId: "+selfCareTemporary.getUserName() + ", returnUrl: "+ returnUrl +", Email Sending Resopnse: " + result);
 				return new CommandProcessingResultBuilder().withEntityId(selfCareTemporary.getId()).build();
-				
 			}
 				
 		}catch(DataIntegrityViolationException dve){
@@ -341,12 +355,7 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 			throw new PlatformDataIntegrityException("duplicate.username", "duplicate.username","duplicate.username", "duplicate.username");
 		}catch(EmptyResultDataAccessException emp){
 			throw new PlatformDataIntegrityException("empty.result.set", "empty.result.set");
-		}/*catch(SelfCareEmailIdDuplicateException exc){
-			//throw new PlatformDataIntegrityException("duplicate.username", "duplicate.username","duplicate.username", "duplicate.username");
-			throw new SelfCareEmailIdDuplicateException(exc);
-		}*/
-		
-		
+		}
 	}
 
 	@Override

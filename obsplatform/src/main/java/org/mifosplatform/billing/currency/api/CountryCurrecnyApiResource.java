@@ -44,7 +44,7 @@ import org.springframework.stereotype.Component;
 @Scope("singleton")
 public class CountryCurrecnyApiResource {
 	
-	private final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(Arrays.asList("id","country","currency","status"));
+	private final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(Arrays.asList("id","country","currency","status","baseCurrency","conversionRate"));
 	
 	private final String resorceNameForPermission="COUNTRYCURRENCY";
 	private final PlatformSecurityContext context;

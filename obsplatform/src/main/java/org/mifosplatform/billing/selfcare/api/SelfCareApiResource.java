@@ -159,9 +159,11 @@ public class SelfCareApiResource {
             GlobalConfigurationProperty paypalConfigData=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_PAYPAL_CHECK);
             careData.setPaypalConfigData(paypalConfigData);
      
-          GlobalConfigurationProperty viewers=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_ACTIVE_VIEWERS); 
+          GlobalConfigurationProperty viewers=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_ACTIVE_VIEWERS);
+          if(viewers != null && viewers.isEnabled()){
           int maxViewersAllowed=Integer.parseInt(viewers.getValue());
           int activeUsers=0;
+          
          /* if(username.contains("@")){
         	  
         	  SelfCare selfcare=this.selfCareRepository.findOneByEmail(username);
@@ -176,7 +178,8 @@ public class SelfCareApiResource {
            * */
           if(activeUsers >=maxViewersAllowed ){
          	 throw new ExceededNumberOfViewersException(clientId);
-         } 	 
+         }
+          }
         String ipAddress=request.getRemoteHost();
         String sessionId=request.getSession().getId();
         Long loginHistoryId=null;

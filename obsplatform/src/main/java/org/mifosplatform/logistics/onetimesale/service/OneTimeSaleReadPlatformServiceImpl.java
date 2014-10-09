@@ -115,7 +115,7 @@ public class OneTimeSaleReadPlatformServiceImpl implements	OneTimeSaleReadPlatfo
 		OneTimeSalesDataMapper mapper = new OneTimeSalesDataMapper();
 
 		String sql = "select " + mapper.schema()
-				+ " where ots.client_id = ? ";
+				+ " and ots.client_id = ? ";
 
 		return this.jdbcTemplate.query(sql, mapper, new Object[] { clientId });
 	}
@@ -124,9 +124,9 @@ public class OneTimeSaleReadPlatformServiceImpl implements	OneTimeSaleReadPlatfo
 			RowMapper<OneTimeSaleData> {
 
 		public String schema() {
-			return " ots.id as oneTimeSaleId, ots.client_id AS clientId,ots.units AS units,ots.charge_code AS chargeCode,ots.unit_price AS unitPrice,"
-				 + " ots.quantity AS quantity,ots.total_price AS totalPrice,ots.is_invoiced as isInvoiced,ots.item_id as itemId,ots.discount_id as discountId" +
-				   " FROM b_onetime_sale ots ";
+			return " ots.id as oneTimeSaleId, ots.client_id AS clientId,ots.units AS units,ots.charge_code AS chargeCode,ots.unit_price AS unitPrice,"+
+				   " ots.quantity AS quantity,ots.total_price AS totalPrice,ots.is_invoiced as isInvoiced,ots.item_id as itemId,ots.discount_id as discountId,"+
+				   "  cc.tax_inclusive as taxInclusive,cc.charge_type as chargeType FROM b_onetime_sale ots,b_charge_codes cc where ots.charge_code=cc.charge_code ";
 
 		}
 
@@ -144,7 +144,10 @@ public class OneTimeSaleReadPlatformServiceImpl implements	OneTimeSaleReadPlatfo
 			String isInvoiced = rs.getString("isInvoiced");
 			Long itemId = rs.getLong("itemId");
 			Long discountId=rs.getLong("discountId");
-			return new OneTimeSaleData(oneTimeSaleId,clientId, units, chargeCode, unitPrice,quantity, totalPrice,isInvoiced,itemId,discountId);
+			Integer taxInclusive = rs.getInt("taxInclusive");
+			String chargeType = rs.getString("chargeType");
+			return new OneTimeSaleData(oneTimeSaleId,clientId, units, chargeCode,chargeType, unitPrice,quantity, totalPrice,isInvoiced,
+					                    itemId,discountId,taxInclusive);
 
 		}
 

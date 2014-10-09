@@ -14,7 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 public interface ClientWritePlatformService {
 
-    CommandProcessingResult createClient(JsonCommand command);
+    CommandProcessingResult createClient(JsonCommand command, boolean isMailnotification);
 
     CommandProcessingResult updateClient(Long clientId, JsonCommand command);
 
@@ -38,5 +38,7 @@ public interface ClientWritePlatformService {
 			JsonCommand command);
 
 	CommandProcessingResult createClientParent(Long entityId, JsonCommand command);
+
+	CommandProcessingResult deleteChildFromParentClient(Long entityId,JsonCommand command);
 
 }

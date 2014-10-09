@@ -1,8 +1,3 @@
-/**
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this file,
- * You can obtain one at http://mozilla.org/MPL/2.0/.
- */
 package org.mifosplatform.portfolio.client.handler;
 
 import org.mifosplatform.commands.handler.NewCommandSourceHandler;
@@ -14,12 +9,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class CreateClientCommandHandler implements NewCommandSourceHandler {
+public class DeleteChildFromParentClientCommandHandler implements NewCommandSourceHandler {
 
     private final ClientWritePlatformService clientWritePlatformService;
 
     @Autowired
-    public CreateClientCommandHandler(final ClientWritePlatformService clientWritePlatformService) {
+    public DeleteChildFromParentClientCommandHandler(final ClientWritePlatformService clientWritePlatformService) {
         this.clientWritePlatformService = clientWritePlatformService;
     }
 
@@ -27,6 +22,6 @@ public class CreateClientCommandHandler implements NewCommandSourceHandler {
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
 
-        return this.clientWritePlatformService.createClient(command,true);
+        return this.clientWritePlatformService.deleteChildFromParentClient(command.entityId(),command);
     }
 }

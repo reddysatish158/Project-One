@@ -216,7 +216,8 @@ public class DocumentManagementApiResource {
 	public String addTicketDetails(@PathParam("ticketId") Long ticketId,@PathParam("entityType") String entityType, @PathParam("entityId") Long entityId,
             @HeaderParam("Content-Length") Long fileSize, @FormDataParam("file") InputStream inputStream,
             @FormDataParam("file") FormDataContentDisposition fileDetails, @FormDataParam("file") FormDataBodyPart bodyPart,
-            @FormDataParam("comments") String comments, @FormDataParam("status") Integer status, @FormDataParam("assignedTo") Integer assignedTo) {
+            @FormDataParam("comments") String comments, @FormDataParam("status") Integer status, @FormDataParam("assignedTo") Integer assignedTo,
+            @FormDataParam("ticketURL") String ticketURL) {
 	   
 
         FileUtils.validateFileSizeWithinPermissibleRange(fileSize, null, ApiConstants.MAX_FILE_UPLOAD_SIZE_IN_MB);
@@ -241,7 +242,7 @@ public class DocumentManagementApiResource {
         	        null, null, null);
         }
 
-					Long detailId = this.ticketMasterWritePlatformService.upDateTicketDetails(ticketMasterCommand,documentCommand,ticketId,inputStream);
+					Long detailId = this.ticketMasterWritePlatformService.upDateTicketDetails(ticketMasterCommand,documentCommand,ticketId,inputStream,ticketURL);
 					return this.toApiJsonSerializer.serialize(CommandProcessingResult.resourceResult(detailId, null));
 	}
 }
