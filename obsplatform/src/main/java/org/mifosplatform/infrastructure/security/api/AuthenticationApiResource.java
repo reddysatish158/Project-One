@@ -65,30 +65,28 @@ public class AuthenticationApiResource {
     public String authenticate(@QueryParam("username") final String username, @QueryParam("password") final String password,
     		@Context HttpServletRequest req) {
     	
-    	String ipAddress = req.getRemoteHost();
-        String session = req.getSession().getId();
-        int maxTime=req.getSession().getMaxInactiveInterval();
-
         Authentication authentication = new UsernamePasswordAuthenticationToken(username, password);
         Authentication authenticationCheck = customAuthenticationProvider.authenticate(authentication);
-        
-        if (req.getSession().isNew()) { 
-    	    LoginHistory loginHistory=new LoginHistory(ipAddress,null,session,new Date(),null, username, "ACTIVE");
-    		this.loginHistoryRepository.save(loginHistory);
-    		Long loginHistoryId=loginHistory.getId();
-    		req.getSession().setAttribute("lId", loginHistoryId);
-        }
-        
         Collection<String> permissions = new ArrayList<String>();
         AuthenticatedUserData authenticatedUserData = new AuthenticatedUserData(username, permissions);
-        if (req.getSession().isNew()) { 
-    	    LoginHistory loginHistory=new LoginHistory(ipAddress,null,session,new Date(),null,username,"ACTIVE");
-    		this.loginHistoryRepository.save(loginHistory);
-    		Long loginHistoryId=loginHistory.getId();
-    		req.getSession().setAttribute("lId", loginHistoryId);
-        }
-
+      
         if (authenticationCheck.isAuthenticated()) {
+        	
+        	String ipAddress = req.getRemoteHost();		/** Returns IpAddress of user*/
+            String session = req.getSession().getId();	/** creates session and returns sessionId*/
+            int maxTime=req.getSession().getMaxInactiveInterval();
+            /**
+             * Condition to Login History 
+             * Calls When Session is New One
+             * @author rakesh
+             * */
+            if (req.getSession().isNew()) { 
+        	    LoginHistory loginHistory=new LoginHistory(ipAddress,null,session,new Date(),null,username,"ACTIVE");
+        		this.loginHistoryRepository.save(loginHistory);
+        		Long loginHistoryId=loginHistory.getId();
+        		req.getSession().setAttribute("lId", loginHistoryId);
+            }
+            
             Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(authenticationCheck.getAuthorities());
             for (GrantedAuthority grantedAuthority : authorities) {
                 permissions.add(grantedAuthority.getAuthority());

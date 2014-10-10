@@ -38,6 +38,26 @@ public enum ClientStatus {
         }
         return enumeration;
     }
+    
+    public static Integer fromStatus(final String statusValue) {
+
+        int enumeration = 0;
+        switch (statusValue.toUpperCase()) {
+            case "NEW":
+                enumeration = 100;
+            break;
+            case "ACTIVE":
+                enumeration = 300;
+            break;
+            case "CLOSED":
+                enumeration = 400;
+            break;
+            case "DEACTIVE":
+                enumeration = 600;
+            break;
+        }
+        return enumeration;
+    }
 
     private ClientStatus(final Integer value, final String code) {
         this.value = value;
