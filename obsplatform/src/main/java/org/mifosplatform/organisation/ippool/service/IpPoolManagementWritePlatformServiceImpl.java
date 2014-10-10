@@ -186,10 +186,13 @@ public class IpPoolManagementWritePlatformServiceImpl implements IpPoolManagemen
 				for(int i=0;i<data.length;i++){
 					int j=i+1;
 					IpPoolManagementData ipPoolManagementData=this.ipPoolManagementReadPlatformService.retrieveIdByIpAddress(data[i]);
-					IpPoolManagementDetail ipPoolManagementDetail = this.ipPoolManagementJpaRepository.findOne(ipPoolManagementData.getId());
-					ipPoolManagementDetail.setIpPoolDescription(ipPoolDescription); // netMask id
-					this.ipPoolManagementJpaRepository.save(ipPoolManagementDetail);
-					generatedIPPoolID.put(String.valueOf(j), ipPoolManagementDetail.getId());
+						
+					if(ipPoolManagementData != null){
+							IpPoolManagementDetail ipPoolManagementDetail = this.ipPoolManagementJpaRepository.findOne(ipPoolManagementData.getId());
+							ipPoolManagementDetail.setIpPoolDescription(ipPoolDescription); // netMask id
+							this.ipPoolManagementJpaRepository.save(ipPoolManagementDetail);
+							generatedIPPoolID.put(String.valueOf(j), ipPoolManagementDetail.getId());
+						}
 				}
 				return new CommandProcessingResultBuilder().with(generatedIPPoolID).build();
 	}

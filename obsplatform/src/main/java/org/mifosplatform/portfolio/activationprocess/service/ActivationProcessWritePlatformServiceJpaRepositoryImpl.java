@@ -266,7 +266,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 				clientcreation.put("state", addressData.getState());
 				clientcreation.put("country", addressData.getCountry());
 				clientcreation.put("email", email);
-				clientcreation.put("locale", "is");
+				clientcreation.put("locale", "en");
 				clientcreation.put("active", true);
 				clientcreation.put("dateFormat", dateFormat);
 				clientcreation.put("activationDate", activationDate);
@@ -328,7 +328,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 						bookDevice.put("totalPrice", itemMaster.getUnitPrice());
 
 						bookDevice.put("quantity", id);
-						bookDevice.put("locale", "is");
+						bookDevice.put("locale", "en");
 						bookDevice.put("dateFormat", dateFormat);
 						bookDevice.put("saleType", "SALE");
 						bookDevice.put("saleDate", activationDate);
@@ -348,7 +348,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 					}else{
 						
 						List<ItemMaster> itemMaster=this.itemRepository.findAll(); 
-						bookDevice.put("locale", "is");
+						bookDevice.put("locale", "en");
 						bookDevice.put("dateFormat", dateFormat);
 						bookDevice.put("allocationDate",activationDate);
 						bookDevice.put("provisioningSerialNumber",deviceId);
@@ -377,7 +377,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 						JSONObject ordeJson = new JSONObject(selfregistrationconfiguration.getValue());
 						if (ordeJson.getString("paytermCode") != null && Long.valueOf(ordeJson.getLong("planCode")) != null
 								&& Long.valueOf(ordeJson.getLong("contractPeriod")) != null) {
-							ordeJson.put("locale", "is");
+							ordeJson.put("locale", "en");
 							ordeJson.put("isNewplan", true);
 							ordeJson.put("dateFormat", dateFormat);
 							ordeJson.put("start_date", activationDate);
@@ -401,7 +401,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 						beeniusOrderJson.put("contractPeriod", contractPeriod);
 						beeniusOrderJson.put("paytermCode", paytermCode);
 						beeniusOrderJson.put("billAlign", false);
-						beeniusOrderJson.put("locale", "is");
+						beeniusOrderJson.put("locale", "en");
 						beeniusOrderJson.put("isNewplan", true);
 						beeniusOrderJson.put("dateFormat", dateFormat);
 						beeniusOrderJson.put("start_date", activationDate);
@@ -430,7 +430,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 					  JsonObject object=new JsonObject();
 					  object.addProperty("txn_id", orderNumber);
 					  object.addProperty("dateFormat",dateFormat);
-					  object.addProperty("locale","is");
+					  object.addProperty("locale","en");
 					  object.addProperty("paymentDate",activationDate);
 					  object.addProperty("amountPaid",totalAmount);
 					  object.addProperty("isChequeSelected","no");
