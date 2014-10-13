@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -224,6 +225,16 @@ public class InventoryItemDetailsApiResource {
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String updateEventAction(@PathParam("id") final Long id,final String apiRequestBodyAsJson) {
 		 final CommandWrapper commandRequest = new CommandWrapperBuilder().updateInventoryItem(id).withJson(apiRequestBodyAsJson).build();
+		 final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+		  return this.toApiJsonSerializerForItem.serialize(result);
+	}
+	
+	@DELETE
+	@Path("{id}")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String deleteItemDetail(@PathParam("id") final Long id,final String apiRequestBodyAsJson) {
+		 final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteInventoryItem(id).withJson(apiRequestBodyAsJson).build();
 		 final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 		  return this.toApiJsonSerializerForItem.serialize(result);
 	}

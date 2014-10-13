@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.joda.time.LocalDate;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
@@ -209,21 +210,21 @@ public class InventoryItemDetailsWritePlatformServiceImp implements InventoryIte
 	        	if(!changes.isEmpty()){
 	        		this.inventoryItemDetailsRepository.save(inventoryItemDetails);
 	        	}
-	        
 	        	
 	        	if(!oldHardware.equalsIgnoreCase(inventoryItemDetails.getProvisioningSerialNumber())){
 	          	  
 	        		this.provisioningWritePlatformService.updateHardwareDetails(inventoryItemDetails.getClientId(),inventoryItemDetails.getSerialNumber(),oldSerilaNumber,
 	        				inventoryItemDetails .getProvisioningSerialNumber(),oldHardware);
-	        		
 	        	}
 	        	
-	        	return new CommandProcessingResult(id);
-	        	
 	        }catch(DataIntegrityViolationException dve){
-	        	handleDataIntegrityIssues(command, dve);
-	        	return null;        }
-			
+	        	
+	        	 if(dve.getCause()instanceof ConstraintViolationException){
+	        		 handleDataIntegrityIssues(command, dve);
+	        	 }
+	        }
+	        
+	      return new CommandProcessingResultBuilder().withEntityId(command.entityId()).build();
 	         
 	}
 		private InventoryItemDetails ItemretrieveById(Long id) {
@@ -452,7 +453,27 @@ public class InventoryItemDetailsWritePlatformServiceImp implements InventoryIte
         	   return new CommandProcessingResult(Long.valueOf(-1));
            }
 		}
+		
+		@Transactional
+		@Override
+		public CommandProcessingResult deleteItem(Long id,JsonCommand command)
+		{
+	        try{
+	        	this.context.authenticatedUser();
+	        	InventoryItemDetails inventoryItemDetails=ItemretrieveById(id);
+	        	InventoryGrn grn=this.inventoryGrnRepository.findOne(inventoryItemDetails.getGrnId());
+	        	inventoryItemDetails.itemDelete();
+	        	this.inventoryItemDetailsRepository.saveAndFlush(inventoryItemDetails);
+	        	Long ReceivedItems=grn.getReceivedQuantity()-new Long(1);
+	        	grn.setReceivedQuantity(ReceivedItems);
+	        	this.inventoryGrnRepository.save(grn);
+	        	return new CommandProcessingResult(id);
+	        	
+	        }catch(DataIntegrityViolationException dve){
+	        	handleDataIntegrityIssues(command, dve);
+	        	return new CommandProcessingResult(Long.valueOf(-1));
+	        }	
+    }
 }
-
 
 

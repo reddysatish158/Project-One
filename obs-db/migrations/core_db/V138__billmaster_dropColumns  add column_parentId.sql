@@ -19,12 +19,12 @@ alter  table b_bill_master drop column bill_period;
 END IF;
 
 
-IF  EXISTS (
+IF NOT EXISTS (
      SELECT * FROM information_schema.COLUMNS
      WHERE COLUMN_NAME = 'group_id'
      and TABLE_NAME = 'b_bill_master'
      and TABLE_SCHEMA = DATABASE())THEN
-alter  table b_bill_master drop column group_id;
+alter  table b_bill_master add column group_id bigint(20) DEFAULT NULL;
 END IF;
 
 IF NOT EXISTS (

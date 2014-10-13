@@ -1937,6 +1937,14 @@ public CommandWrapperBuilder updateInventoryItem(final Long id) {
 	return this;
 }
 
+public CommandWrapperBuilder deleteInventoryItem(final Long id) {
+	this.actionName = "DELETE";
+	this.entityName = "INVENTORY";
+	this.entityId = id;
+	this.href = "/itemdetails"+id;
+	return this;
+}
+
 public CommandWrapperBuilder createPromotionCode() {
 	this.actionName = "CREATE";
 	this.entityName = "PROMOTIONCODE";
@@ -2513,6 +2521,7 @@ public CommandWrapperBuilder deleteChildFromParentClient(Long clientId) {
 	this.href = "/parentclient/" +clientId;
 	return this;
   }
+
 }
 
 

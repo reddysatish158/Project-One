@@ -55,6 +55,10 @@ public class InventoryItemDetails extends AbstractAuditableCustom<AppUser, Long>
 	
 	@Column(name="item_model",nullable=true,length=60)
 	private String itemModel;
+	
+	@Column(name = "is_deleted")
+	private char isDeleted;
+
 
 
 
@@ -72,6 +76,7 @@ public class InventoryItemDetails extends AbstractAuditableCustom<AppUser, Long>
 		this.warranty=warranty;
 		this.remarks=remarks;
 		this.itemModel=itemModel;
+		this.isDeleted='N';
 	}
 	
 	public InventoryItemDetails(Long itemMasterId,String serialNumber,Long grnId,String provisioningSerialNumber,String quality,
@@ -86,6 +91,7 @@ public class InventoryItemDetails extends AbstractAuditableCustom<AppUser, Long>
 		this.clientId=clientId;
 		this.warranty=warranty;
 		this.remarks=remarks;
+		this.isDeleted='N';
 	}
 	
 	
@@ -180,6 +186,15 @@ public class InventoryItemDetails extends AbstractAuditableCustom<AppUser, Long>
 		this.remarks = remarks;
 	}
 	
+	public char getIsDeleted() {
+		return isDeleted;
+	}
+
+	public void setIsDeleted(char isDeleted) {
+		this.isDeleted = isDeleted;
+	}
+
+
 	public Map<String, Object> update(JsonCommand command) {
 		 final Map<String, Object> actualChanges = new LinkedHashMap<String, Object>(1);
 		  final String quality = "quality";
@@ -194,6 +209,13 @@ public class InventoryItemDetails extends AbstractAuditableCustom<AppUser, Long>
 	            final String newValue = command.stringValueOfParameterNamed(provisionSerialNum);
 	            actualChanges.put(provisionSerialNum, newValue);
 	            this.provisioningSerialNumber = StringUtils.defaultIfEmpty(newValue, null);
+	        }
+	        
+	        final String serialNumber = "serialNumber";
+	        if (command.isChangeInStringParameterNamed(serialNumber, this.serialNumber)) {
+	            final String newValue = command.stringValueOfParameterNamed(serialNumber);
+	            actualChanges.put(serialNumber, newValue);
+	            this.serialNumber = StringUtils.defaultIfEmpty(newValue, null);
 	        }
 	        			
 	        return actualChanges;
@@ -222,6 +244,12 @@ public class InventoryItemDetails extends AbstractAuditableCustom<AppUser, Long>
 		
 		this.clientId=null;
 		this.status="NEW";
+		
+	}
+	
+	public void itemDelete() {
+	
+		this.isDeleted='Y';
 		
 	}
 	
