@@ -118,13 +118,13 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 				List<BillingMessageTemplate> messageDetails=this.billingMessageTemplateRepository.findByTemplateDescription("CREATE SELFCARE");
 				String subject=messageDetails.get(0).getSubject();
 				String body=messageDetails.get(0).getBody();
-				String header=messageDetails.get(0).getHeader().replace("<PARAM1>", selfCare.getUserName() +","+"\n");
+				String header=messageDetails.get(0).getHeader().replace("<PARAM1>", selfCare.getUserName() +",");
 				body=body.replace("<PARAM2>", selfCare.getUniqueReference());
 				body=body.replace("<PARAM3>", selfCare.getPassword());
 				StringBuilder prepareEmail =new StringBuilder();
 				prepareEmail.append(header);
 				prepareEmail.append("\t").append(body);
-				prepareEmail.append("\n").append("\n");
+				//prepareEmail.append("\n").append("\n");
 				prepareEmail.append(messageDetails.get(0).getFooter());
 				 message = messagePlatformEmailService.sendGeneralMessage(selfCare.getUniqueReference(), prepareEmail.toString().trim(), subject);
 			
@@ -318,12 +318,12 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 				List<BillingMessageTemplate> messageDetails=this.billingMessageTemplateRepository.findByTemplateDescription("SELFCARE REGISTRATION");
 				String subject=messageDetails.get(0).getSubject();
 				String body=messageDetails.get(0).getBody();
-				String header=messageDetails.get(0).getHeader()+","+"\n"+"\n";
-				body=body.replace("<PARAM1>", returnUrl + generatedKey+"\n");
+				String header=messageDetails.get(0).getHeader()+",";
+				body=body.replace("<PARAM1>", returnUrl + generatedKey);
 				StringBuilder prepareEmail =new StringBuilder();
 				prepareEmail.append(header);
 				prepareEmail.append("\t").append(body);
-				prepareEmail.append("\n").append("\n");
+			//	prepareEmail.append("\n").append("\n");
 				prepareEmail.append(messageDetails.get(0).getFooter());
 				
 				/*StringBuilder body = new StringBuilder();
@@ -417,13 +417,13 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 				List<BillingMessageTemplate> messageDetails=this.billingMessageTemplateRepository.findByTemplateDescription("NEW SELFCARE PASSWORD");
 				String subject=messageDetails.get(0).getSubject();
 				String body=messageDetails.get(0).getBody();
-				String header=messageDetails.get(0).getHeader().replace("<PARAM1>", selfCare.getUserName() +","+"\n"+"\n");
+				String header=messageDetails.get(0).getHeader().replace("<PARAM1>", selfCare.getUserName() +",");
 				body=body.replace("<PARAM2>", uniqueReference);
-				body=body.replace("<PARAM3>", generatedKey+"\n"+"\n");
+				body=body.replace("<PARAM3>", generatedKey);
 				StringBuilder prepareEmail =new StringBuilder();
 				prepareEmail.append(header);
 				prepareEmail.append("\t").append(body);
-				prepareEmail.append("\n").append("\n");
+				//prepareEmail.append("\n").append("\n");
 				prepareEmail.append(messageDetails.get(0).getFooter());
 				
 				/*StringBuilder body = new StringBuilder();
