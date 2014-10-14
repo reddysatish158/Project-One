@@ -208,7 +208,7 @@ public class InventoryItemDetailsWritePlatformServiceImp implements InventoryIte
 	        	final Map<String, Object> changes = inventoryItemDetails.update(command);  
 	        	
 	        	if(!changes.isEmpty()){
-	            this.inventoryItemDetailsRepository.save(inventoryItemDetails);
+	            this.inventoryItemDetailsRepository.saveAndFlush(inventoryItemDetails);
 	        	}
 	        	
 	        	if(!oldHardware.equalsIgnoreCase(inventoryItemDetails.getProvisioningSerialNumber())&&inventoryItemDetails.getClientId()!=null){
