@@ -103,10 +103,11 @@ public final class InventoryItemCommandFromApiJsonDeserializer {
 
        final String provisioningSerialNumber = fromApiJsonHelper.extractStringNamed("provisioningSerialNumber", element);
        baseDataValidator.reset().parameter("provisioningSerialNumber").value(provisioningSerialNumber).notBlank().notExceedingLengthOf(100);
-      
+       
+       if (fromApiJsonHelper.parameterExists("serialNumber", element)) {
        final String serialNumber = fromApiJsonHelper.extractStringNamed("serialNumber",element);
        baseDataValidator.reset().parameter("serialNumber").value(serialNumber).notBlank().notExceedingLengthOf(100);
-          
+       }    
 
         throwExceptionIfValidationWarningsExist(dataValidationErrors);
     }

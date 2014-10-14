@@ -6,15 +6,16 @@ import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
+import org.apache.commons.lang.StringUtils;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
 import org.mifosplatform.useradministration.domain.AppUser;
-import org.apache.commons.lang.StringUtils;
 
 @Entity
-@Table(name = "b_item_detail")//, uniqueConstraints = @UniqueConstraint(name = "serial_no_constraint", columnNames = { "serial_no" }))
+@Table(name = "b_item_detail", uniqueConstraints = @UniqueConstraint(name = "serial_no_constraint", columnNames = { "serial_no" }))
 public class InventoryItemDetails extends AbstractAuditableCustom<AppUser, Long>{
 
 	
@@ -26,7 +27,7 @@ public class InventoryItemDetails extends AbstractAuditableCustom<AppUser, Long>
 	@Column(name="item_master_id", nullable=false, length=20)
 	private Long itemMasterId;
 	
-	@Column(name="serial_no", nullable=true, length=100)
+	@Column(name="serial_no", nullable=false, length=100)
 	private String serialNumber;
 	
 	@Column(name="grn_id", nullable=false, length=20)

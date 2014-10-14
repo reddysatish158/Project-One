@@ -182,14 +182,14 @@ public class InventoryItemDetailsWritePlatformServiceImp implements InventoryIte
 	}
 	
 	
-		private void handleDataIntegrityIssues(final JsonCommand element, final DataIntegrityViolationException dve) {
+		private void handleDataIntegrityIssues(final JsonCommand command, final DataIntegrityViolationException dve) {
 
 	         Throwable realCause = dve.getMostSpecificCause();
 	        if (realCause.getMessage().contains("serial_no_constraint")){
-	        	throw new PlatformDataIntegrityException("validation.error.msg.inventory.item.duplicate.serialNumber", "validation.error.msg.inventory.item.duplicate.serialNumber", "validation.error.msg.inventory.item.duplicate.serialNumber","");
+	        	final String serialNumber=command.stringValueOfParameterNamed("serialNumber");
+	        	throw new PlatformDataIntegrityException("validation.error.msg.inventory.item.duplicate.serialNumber", "validation.error.msg.inventory.item.duplicate.serialNumber", "validation.error.msg.inventory.item.duplicate.serialNumber",serialNumber);
 	        	
 	        }
-
 
 	        logger.error(dve.getMessage(), dve);   	
 	}
@@ -208,23 +208,27 @@ public class InventoryItemDetailsWritePlatformServiceImp implements InventoryIte
 	        	final Map<String, Object> changes = inventoryItemDetails.update(command);  
 	        	
 	        	if(!changes.isEmpty()){
-	        		this.inventoryItemDetailsRepository.save(inventoryItemDetails);
+	            this.inventoryItemDetailsRepository.save(inventoryItemDetails);
 	        	}
 	        	
-	        	if(!oldHardware.equalsIgnoreCase(inventoryItemDetails.getProvisioningSerialNumber())){
+	        	if(!oldHardware.equalsIgnoreCase(inventoryItemDetails.getProvisioningSerialNumber())&&inventoryItemDetails.getClientId()!=null){
 	          	  
 	        		this.provisioningWritePlatformService.updateHardwareDetails(inventoryItemDetails.getClientId(),inventoryItemDetails.getSerialNumber(),oldSerilaNumber,
 	        				inventoryItemDetails .getProvisioningSerialNumber(),oldHardware);
 	        	}
 	        	
-	        }catch(DataIntegrityViolationException dve){
+	         return new CommandProcessingResultBuilder().withEntityId(inventoryItemDetails.getId()).build();
+	        	
+	        }
+	        catch(DataIntegrityViolationException dve){
 	        	
 	        	 if(dve.getCause()instanceof ConstraintViolationException){
 	        		 handleDataIntegrityIssues(command, dve);
 	        	 }
+	        	 return CommandProcessingResult.empty(); 
 	        }
 	        
-	      return new CommandProcessingResultBuilder().withEntityId(command.entityId()).build();
+	      
 	         
 	}
 		private InventoryItemDetails ItemretrieveById(Long id) {
