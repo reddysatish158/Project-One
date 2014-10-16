@@ -642,6 +642,7 @@ public class GenerateBill {
 			
 			BigDecimal netFlatAmount=this.calculateDiscountFlat(discountMasterData.getdiscountRate(), chargePrice);	
 			discountAmount= chargePrice.subtract(netFlatAmount);
+			netFlatAmount=this.chargePriceNotLessThanZero(chargePrice, discountAmount);
 			discountMasterData.setDiscountAmount(discountAmount);
 			discountMasterData.setDiscountedChargeAmount(netFlatAmount);
 		}

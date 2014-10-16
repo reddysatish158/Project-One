@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.joda.time.LocalDate;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
@@ -181,14 +182,14 @@ public class InventoryItemDetailsWritePlatformServiceImp implements InventoryIte
 	}
 	
 	
-		private void handleDataIntegrityIssues(final JsonCommand element, final DataIntegrityViolationException dve) {
+		private void handleDataIntegrityIssues(final JsonCommand command, final DataIntegrityViolationException dve) {
 
 	         Throwable realCause = dve.getMostSpecificCause();
 	        if (realCause.getMessage().contains("serial_no_constraint")){
-	        	throw new PlatformDataIntegrityException("validation.error.msg.inventory.item.duplicate.serialNumber", "validation.error.msg.inventory.item.duplicate.serialNumber", "validation.error.msg.inventory.item.duplicate.serialNumber","");
+	        	final String serialNumber=command.stringValueOfParameterNamed("serialNumber");
+	        	throw new PlatformDataIntegrityException("validation.error.msg.inventory.item.duplicate.serialNumber", "validation.error.msg.inventory.item.duplicate.serialNumber", "validation.error.msg.inventory.item.duplicate.serialNumber",serialNumber);
 	        	
 	        }
-
 
 	        logger.error(dve.getMessage(), dve);   	
 	}
@@ -207,23 +208,27 @@ public class InventoryItemDetailsWritePlatformServiceImp implements InventoryIte
 	        	final Map<String, Object> changes = inventoryItemDetails.update(command);  
 	        	
 	        	if(!changes.isEmpty()){
-	        		this.inventoryItemDetailsRepository.save(inventoryItemDetails);
+	            this.inventoryItemDetailsRepository.saveAndFlush(inventoryItemDetails);
 	        	}
-	        
 	        	
-	        	if(!oldHardware.equalsIgnoreCase(inventoryItemDetails.getProvisioningSerialNumber())){
+	        	if(!oldHardware.equalsIgnoreCase(inventoryItemDetails.getProvisioningSerialNumber())&&inventoryItemDetails.getClientId()!=null){
 	          	  
 	        		this.provisioningWritePlatformService.updateHardwareDetails(inventoryItemDetails.getClientId(),inventoryItemDetails.getSerialNumber(),oldSerilaNumber,
 	        				inventoryItemDetails .getProvisioningSerialNumber(),oldHardware);
-	        		
 	        	}
 	        	
-	        	return new CommandProcessingResult(id);
+	         return new CommandProcessingResultBuilder().withEntityId(inventoryItemDetails.getId()).build();
 	        	
-	        }catch(DataIntegrityViolationException dve){
-	        	handleDataIntegrityIssues(command, dve);
-	        	return null;        }
-			
+	        }
+	        catch(DataIntegrityViolationException dve){
+	        	
+	        	 if(dve.getCause()instanceof ConstraintViolationException){
+	        		 handleDataIntegrityIssues(command, dve);
+	        	 }
+	        	 return CommandProcessingResult.empty(); 
+	        }
+	        
+	      
 	         
 	}
 		private InventoryItemDetails ItemretrieveById(Long id) {
@@ -452,7 +457,27 @@ public class InventoryItemDetailsWritePlatformServiceImp implements InventoryIte
         	   return new CommandProcessingResult(Long.valueOf(-1));
            }
 		}
+		
+		@Transactional
+		@Override
+		public CommandProcessingResult deleteItem(Long id,JsonCommand command)
+		{
+	        try{
+	        	this.context.authenticatedUser();
+	        	InventoryItemDetails inventoryItemDetails=ItemretrieveById(id);
+	        	InventoryGrn grn=this.inventoryGrnRepository.findOne(inventoryItemDetails.getGrnId());
+	        	inventoryItemDetails.itemDelete();
+	        	this.inventoryItemDetailsRepository.saveAndFlush(inventoryItemDetails);
+	        	Long ReceivedItems=grn.getReceivedQuantity()-new Long(1);
+	        	grn.setReceivedQuantity(ReceivedItems);
+	        	this.inventoryGrnRepository.save(grn);
+	        	return new CommandProcessingResult(id);
+	        	
+	        }catch(DataIntegrityViolationException dve){
+	        	handleDataIntegrityIssues(command, dve);
+	        	return new CommandProcessingResult(Long.valueOf(-1));
+	        }	
+    }
 }
-
 
 
