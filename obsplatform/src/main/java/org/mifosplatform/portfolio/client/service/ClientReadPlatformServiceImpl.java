@@ -33,6 +33,7 @@ import org.mifosplatform.portfolio.client.data.ClientAccountSummaryCollectionDat
 import org.mifosplatform.portfolio.client.data.ClientAccountSummaryData;
 import org.mifosplatform.portfolio.client.data.ClientData;
 import org.mifosplatform.portfolio.client.domain.ClientEnumerations;
+import org.mifosplatform.portfolio.client.domain.ClientStatus;
 import org.mifosplatform.portfolio.client.exception.ClientNotFoundException;
 import org.mifosplatform.portfolio.group.data.GroupGeneralData;
 import org.mifosplatform.portfolio.group.service.SearchParameters;
@@ -143,6 +144,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
         final String lastname = searchParameters.getLastname();
         final String hierarchy = searchParameters.getHierarchy();
         final String groupName = searchParameters.getGroupName();
+        final String status=searchParameters.getStatus();
 
         String extraCriteria = "";
         if (sqlSearch != null) {
@@ -188,6 +190,11 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
         
         if (StringUtils.isNotBlank(extraCriteria)) {
             extraCriteria = extraCriteria.substring(4);
+        }
+        
+        if(status !=null){
+        	Integer statusValue=ClientStatus.fromStatus(status); 
+        	extraCriteria += " c.status_enum like " + statusValue;
         }
 
         return extraCriteria;

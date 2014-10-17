@@ -153,7 +153,7 @@ public class InventoryItemDetailsReadPlatformServiceImp implements InventoryItem
 		StringBuilder sqlBuilder = new StringBuilder(200);
         sqlBuilder.append("select ");
         sqlBuilder.append(itemDetails.schema());
-        sqlBuilder.append(" where item.office_id = office.id ");
+        sqlBuilder.append(" where item.office_id = office.id and item.is_deleted='N' ");
         
         String sqlSearch = searchItemDetails.getSqlSearch();
         String extraCriteria = "";
@@ -340,7 +340,7 @@ private final class SerialNumberForValidation implements RowMapper<String>{
 		context.authenticatedUser();
 		SerialNumberMapper rowMapper = new SerialNumberMapper();
 		String sql = "SELECT idt.serial_no AS serialNumber  FROM b_item_detail idt  where idt.item_master_id=? AND idt.office_id=? AND idt.client_id IS NULL" +
-    "  AND idt.serial_no like '%"+query+"%'  AND quality = 'Good' ORDER BY idt.id  LIMIT 20";
+    "  AND idt.serial_no like '%"+query+"%'  AND quality = 'Good' AND idt.is_deleted='N' ORDER BY idt.id  LIMIT 20";
 		return this.jdbcTemplate.query(sql,rowMapper,new Object[]{oneTimeSaleId,officeId});
 	}
 	@Override

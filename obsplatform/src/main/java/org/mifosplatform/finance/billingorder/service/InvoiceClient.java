@@ -94,11 +94,7 @@ public class InvoiceClient {
 
 			//Update Client Balance
 			this.billingOrderWritePlatformService.updateClientBalance(invoice,clientBalancesDatas);
-		//	Invoice invoice = billingOrderWritePlatformService.createInvoice(invoiceCommand, clientBalancesDatas);
-			// Update invoice-tax
-			//billingOrderWritePlatformService.updateInvoiceTax(invoice, billingOrderCommands, listOfBillingOrders);
-			// Update charge
-			// billingOrderWritePlatformService.updateInvoiceCharge(invoice,listOfBillingOrders);
+		    //  Invoice invoice = billingOrderWritePlatformService.createInvoice(invoiceCommand, clientBalancesDatas);
 			 // Update order-price
 			billingOrderWritePlatformService.updateBillingOrder(billingOrderCommands);
 			 billingOrderWritePlatformService.updateOrderPrice(billingOrderCommands);
@@ -107,8 +103,6 @@ public class InvoiceClient {
 			 transactionHistoryWritePlatformService.saveTransactionHistory(clientId,"Invoice", new Date(),"Amount:"
 	    				+invoice.getInvoiceAmount(),"Charge Startdate:"+billingOrderCommands.get(0).getBillStartDate(),
 	    				"Charge Enddate:"+billingOrderCommands.get(0).getEndDate());
-			
-			//CommandProcessingResult entityIdentifier = billingOrderWritePlatformService.updateBillingOrder(billingOrderCommands);
                if(invoice.getInvoiceAmount() == null){
             	   return null;
                }
@@ -140,12 +134,11 @@ public class InvoiceClient {
 	
 	public CommandProcessingResult createInvoiceBill(JsonCommand command) {
 		try {
-		//	context.authenticatedUser();
 			// validation not written
 			 this.apiJsonDeserializer.validateForCreate(command.json());
 			
 			LocalDate processDate = ProcessDate.fromJson(command);
-//	List<GenerateInvoiceData> invoiceDatas = this.billingOrderReadPlatformService.retrieveClientsWithOrders(processDate);
+      //	List<GenerateInvoiceData> invoiceDatas = this.billingOrderReadPlatformService.retrieveClientsWithOrders(processDate);
 			/*if (invoiceDatas == null || invoiceDatas.size() == 0) {
 				throw new BillingOrderNoRecordsFoundException();
 			} else {
@@ -154,9 +147,8 @@ public class InvoiceClient {
 				}
 
 			}*/
-			
 				BigDecimal invoiceAmount=this.invoicingSingleClient(command.entityId(), processDate);
-	                    invoiceAmount.doubleValue();
+	                  //  invoiceAmount.doubleValue();
 			
 			return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withResourceIdAsString(invoiceAmount.toString()).build();
 
