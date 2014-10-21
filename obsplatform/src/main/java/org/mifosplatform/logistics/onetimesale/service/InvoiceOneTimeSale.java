@@ -105,17 +105,6 @@ public class InvoiceOneTimeSale {
 
 	}
 	
-	// to check price not less than zero
-	public BigDecimal chargePriceNotLessThanZero(BigDecimal chargePrice,BigDecimal discountPrice){
-		
-		chargePrice = chargePrice.subtract(discountPrice);
-		if(chargePrice.compareTo(discountPrice) < 0){
-			chargePrice = BigDecimal.ZERO;
-		}
-		return chargePrice;
-		
-	}
-	
 	// if is percentage
 	public boolean isDiscountPercentage(DiscountMasterData discountMasterData){
 		boolean isDiscountPercentage = false;
@@ -130,6 +119,7 @@ public class InvoiceOneTimeSale {
 	public boolean isDiscountFlat(DiscountMasterData discountMasterData){
 		boolean isDiscountFlat = false;
 		if(discountMasterData.getDiscounType().equalsIgnoreCase("flat")){
+			
 			isDiscountFlat = true;
 		}
 		return isDiscountFlat;
@@ -180,5 +170,17 @@ public class InvoiceOneTimeSale {
 		}
 		return calculateDiscountFlat;
 	}
+	
+	// to check price not less than zero
+	public BigDecimal chargePriceNotLessThanZero(BigDecimal chargePrice,BigDecimal discountPrice){
+		
+		chargePrice = chargePrice.subtract(discountPrice);
+		if(chargePrice.compareTo(discountPrice) < 0){
+			chargePrice = BigDecimal.ZERO;
+		}
+		return chargePrice;
+		
+	}
+	
 
 }
