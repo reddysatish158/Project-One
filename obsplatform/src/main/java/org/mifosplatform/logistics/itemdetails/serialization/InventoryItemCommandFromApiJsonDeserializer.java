@@ -96,10 +96,18 @@ public final class InventoryItemCommandFromApiJsonDeserializer {
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("code");
 
         final JsonElement element = fromApiJsonHelper.parse(json);
-        if (fromApiJsonHelper.parameterExists("name", element)) {
+        /*if (fromApiJsonHelper.parameterExists("name", element)) {
             final String name = fromApiJsonHelper.extractStringNamed("name", element);
             baseDataValidator.reset().parameter("name").value(name).notBlank().notExceedingLengthOf(100);
-        }
+        }*/
+
+       final String provisioningSerialNumber = fromApiJsonHelper.extractStringNamed("provisioningSerialNumber", element);
+       baseDataValidator.reset().parameter("provisioningSerialNumber").value(provisioningSerialNumber).notBlank().notExceedingLengthOf(100);
+       
+       if (fromApiJsonHelper.parameterExists("serialNumber", element)) {
+       final String serialNumber = fromApiJsonHelper.extractStringNamed("serialNumber",element);
+       baseDataValidator.reset().parameter("serialNumber").value(serialNumber).notBlank().notExceedingLengthOf(100);
+       }    
 
         throwExceptionIfValidationWarningsExist(dataValidationErrors);
     }

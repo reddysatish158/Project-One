@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import com.googlecode.flyway.core.Flyway;
 
+
+
 /**
  * A service that picks up on tenants that are configured to auto-update their
  * specific schema on application startup.
@@ -39,8 +41,14 @@ public class TenantDatabaseUpgradeService {
                 flyway.setDataSource(tenant.databaseURL(), tenant.getSchemaUsername(), tenant.getSchemaPassword());
                 flyway.setLocations("sql");
                 flyway.repair();
+                //flyway.setValidateOnMigrate(false);
                 flyway.setOutOfOrder(true);
                 flyway.migrate();
+                //FlywayCallback[] callbacks =flyway.getCallbacks();
+                //System.out.println(callbacks);
+                //flyway.setCallbacks(callbacks);
+              //  flyway.clean();
+             
                
             }
         }

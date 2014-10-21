@@ -657,11 +657,14 @@ public class SynchronousCommandProcessingService implements
 			} else if (wrapper.isInventoryResource()) {
 	        	if (wrapper.isCreate()) {
 					handler = applicationContext.getBean("createInventoryItemsCommandHandler", NewCommandSourceHandler.class);
-	        	}
-	        	else if(wrapper.isUpdateInventoryItem()){
-	        		handler = applicationContext.getBean("updateInventoryItemsCommandHandler", NewCommandSourceHandler.class);
-	        	} else if (wrapper.isDeAllocateHardwareResource()) {
 					
+	        	}else if(wrapper.isUpdateInventoryItem()){
+	        		handler = applicationContext.getBean("updateInventoryItemsCommandHandler", NewCommandSourceHandler.class);
+	        		
+	        	}else if(wrapper.isDeleteInventoryItem()){
+	        		handler = applicationContext.getBean("deleteInventoryItemsCommandHandler", NewCommandSourceHandler.class);
+	        		
+	        	}else if (wrapper.isDeAllocateHardwareResource()) {
 					handler = applicationContext.getBean("deAllocateItemCommandHandler",NewCommandSourceHandler.class);
 			    }
 			}else if (wrapper.isGrnResource()) {

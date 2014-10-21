@@ -46,7 +46,7 @@ public class HardwarePlanMapper  extends AbstractPersistable<Long> {
 	        }
 	        
 	        final String itemCodeParamName = "itemCode";
-	        if (command.isChangeInStringParameterNamed(itemCode, this.itemCode)) {
+	        if (command.isChangeInStringParameterNamed(itemCodeParamName, this.itemCode)) {
 	            final String newValue = command.stringValueOfParameterNamed(itemCodeParamName);
 	            actualChanges.put(firstnameParamName, newValue);
 	            this.itemCode = StringUtils.defaultIfEmpty(newValue, null);
