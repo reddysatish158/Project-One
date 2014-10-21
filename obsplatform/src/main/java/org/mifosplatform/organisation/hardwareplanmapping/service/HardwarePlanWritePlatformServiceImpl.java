@@ -93,6 +93,12 @@ public class HardwarePlanWritePlatformServiceImpl implements HardwarePlanWritePl
 			     context.authenticatedUser();
 	            this.fromApiJsonDeserializer.validateForCreate(command.json());
 	            final HardwarePlanMapper  hardwarePlanMapper = retrieveHardwarePlanMappingById(planMapId);
+	            List<HardwarePlanData> datas=this.hardwarePlanReadPlatformService.retrieveItems(command.stringValueOfParameterNamed("itemCode"));
+	              for(HardwarePlanData data:datas){
+	            	   if(data.getplanCode().equalsIgnoreCase(command.stringValueOfParameterNamed("planCode"))){
+	            		  throw new ItemCodeDuplicateException(command.stringValueOfParameterNamed("planCode"));   
+	            	   } 
+	              }
  		        final Map<String, Object> changes = hardwarePlanMapper.update(command);
                 this.hardwarePlanMapperRepository.save(hardwarePlanMapper);
 
