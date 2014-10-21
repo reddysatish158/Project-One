@@ -215,12 +215,11 @@ public class InventoryItemDetailsWritePlatformServiceImp implements InventoryIte
 	          	  
 	        		this.provisioningWritePlatformService.updateHardwareDetails(inventoryItemDetails.getClientId(),inventoryItemDetails.getSerialNumber(),oldSerilaNumber,
 	        				inventoryItemDetails .getProvisioningSerialNumber(),oldHardware);
-	        		
 	        	}
-	        	
 	        	return new CommandProcessingResult(id);
 	        	
 	        }catch(DataIntegrityViolationException dve){
+	        	
 	        	handleDataIntegrityIssues(command, dve);
 	        	return null;        }
 			

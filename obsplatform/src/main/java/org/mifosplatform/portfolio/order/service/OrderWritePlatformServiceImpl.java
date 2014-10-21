@@ -228,76 +228,92 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 				this.fromApiJsonDeserializer.validateForCreate(command.json());
 			
 			//Check for Custome_Validation
-				CustomValidationData customValidationData   = this.orderDetailsReadPlatformServices.checkForCustomValidations(clientId,EventActionConstants.EVENT_CREATE_ORDER,command.json());
-					if(customValidationData.getErrorCode() != 0 && customValidationData.getErrorMessage() != null){
-						throw new ActivePlansFoundException(customValidationData.getErrorMessage()); 
-					}
-					List<OrderLine> serviceDetails = new ArrayList<OrderLine>();
-					List<OrderPrice> orderprice = new ArrayList<OrderPrice>();
-					List<PriceData> datas = new ArrayList<PriceData>();
-					Order order=Order.fromJson(clientId,command);
-					Plan plan = this.planRepository.findOne(order.getPlanId());
-					List<ServiceData> details =this.orderDetailsReadPlatformServices.retrieveAllServices(order.getPlanId());
-					datas=this.orderDetailsReadPlatformServices.retrieveAllPrices(order.getPlanId(),order.getBillingFrequency(),clientId);
-						if(datas.isEmpty()){
-							datas=this.orderDetailsReadPlatformServices.retrieveDefaultPrices(order.getPlanId(),order.getBillingFrequency(),clientId);
-						}
-						if(datas.isEmpty()){
-							throw new NoRegionalPriceFound();
-						}
-						Contract subscriptionData = this.subscriptionRepository.findOne(order.getContarctPeriod());
-						LocalDate startDate=new LocalDate(order.getStartDate());
-							if(plan.getProvisionSystem().equalsIgnoreCase("None")){
-								orderStatus = OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.ACTIVE).getId();
-							}else{
-								orderStatus = OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.PENDING).getId();
-							}
+			CustomValidationData customValidationData   = this.orderDetailsReadPlatformServices.checkForCustomValidations(clientId,EventActionConstants.EVENT_CREATE_ORDER,command.json());
+			if(customValidationData.getErrorCode() != 0 && customValidationData.getErrorMessage() != null){
+				throw new ActivePlansFoundException(customValidationData.getErrorMessage()); 
+			}
+			
+			List<OrderLine> serviceDetails = new ArrayList<OrderLine>();
+			List<OrderPrice> orderprice = new ArrayList<OrderPrice>();
+			List<PriceData> datas = new ArrayList<PriceData>();
+			
+			Order order=Order.fromJson(clientId,command);
+			
+			Plan plan = this.planRepository.findOne(order.getPlanId());
+			
+			List<ServiceData> details =this.orderDetailsReadPlatformServices.retrieveAllServices(order.getPlanId());
+			datas=this.orderDetailsReadPlatformServices.retrieveAllPrices(order.getPlanId(),order.getBillingFrequency(),clientId);
+			if(datas.isEmpty()){
+				datas=this.orderDetailsReadPlatformServices.retrieveDefaultPrices(order.getPlanId(),order.getBillingFrequency(),clientId);
+			}
+			if(datas.isEmpty()){
+				throw new NoRegionalPriceFound();
+			}
 
-							//Calculate EndDate
-							endDate = calculateEndDate(startDate,subscriptionData.getSubscriptionType(),subscriptionData.getUnits());
-							order=new Order(order.getClientId(),order.getPlanId(),orderStatus,null,order.getBillingFrequency(),startDate, endDate,
-							order.getContarctPeriod(), serviceDetails, orderprice,order.getbillAlign(),UserActionStatusTypeEnum.ACTIVATION.toString());
-							BigDecimal priceforHistory=BigDecimal.ZERO;
-		
-								for (PriceData data : datas) {
-									LocalDate billstartDate = startDate;
-									LocalDate billEndDate = null;
-									//end date is null for rc
-										if (data.getChagreType().equalsIgnoreCase("RC")	&& endDate != null) {
-											billEndDate = endDate;
-										} else if(data.getChagreType().equalsIgnoreCase("NRC")) {
-											billEndDate = billstartDate;
-										}
-										final DiscountMaster discountMaster=this.discountMasterRepository.findOne(data.getDiscountId());
-										if(discountMaster == null){
-											throw new DiscountMasterNoRecordsFoundException();
-										}
+			Contract subscriptionData = this.subscriptionRepository.findOne(order.getContarctPeriod());
+			LocalDate startDate=new LocalDate(order.getStartDate());
+			
+			if(plan.getProvisionSystem().equalsIgnoreCase("None")){
+				orderStatus = OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.ACTIVE).getId();
 
-										//	If serviceId Not Exist
-									OrderPrice price = new OrderPrice(data.getServiceId(),data.getChargeCode(), data.getCharging_variant(),data.getPrice(), 
-											null, data.getChagreType(),
-									data.getChargeDuration(), data.getDurationType(),billstartDate.toDate(), billEndDate,data.isTaxInclusive());
-									order.addOrderDeatils(price);
-									priceforHistory=priceforHistory.add(data.getPrice());
-									//discount Order
-									OrderDiscount orderDiscount=new OrderDiscount(order,price,discountMaster.getId(),discountMaster.getStartDate(),null,discountMaster.getDiscountType(),
-									discountMaster.getDiscountRate());
-									price.addOrderDiscount(orderDiscount);
-								}
-								for (ServiceData data : details) {
-									OrderLine orderdetails = new OrderLine(data.getPlanId(),data.getServiceType(), plan.getStatus(), 'n');
-									order.addServiceDeatils(orderdetails);
-								}
-								this.orderRepository.save(order);
-								Long userId=null;
-								SecurityContext context = SecurityContextHolder.getContext();
-									if (context.getAuthentication() != null) {
-										AppUser appUser=this.context.authenticatedUser();
-										userId=appUser.getId();
-									}else{
-										userId=new Long(0);
-									}
-					boolean isNewPlan=command.booleanPrimitiveValueOfParameterNamed("isNewplan");
+			}else{
+			orderStatus = OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.PENDING).getId();
+			}
+
+			//Calculate EndDate
+			endDate = calculateEndDate(startDate,subscriptionData.getSubscriptionType(),subscriptionData.getUnits());
+			order=new Order(order.getClientId(),order.getPlanId(),orderStatus,null,order.getBillingFrequency(),startDate, endDate,
+					order.getContarctPeriod(), serviceDetails, orderprice,order.getbillAlign(),UserActionStatusTypeEnum.ACTIVATION.toString());
+					
+			BigDecimal priceforHistory=BigDecimal.ZERO;
+
+			for (PriceData data : datas) {
+				LocalDate billstartDate = startDate;
+				LocalDate billEndDate = null;
+
+				//end date is null for rc
+				if (data.getChagreType().equalsIgnoreCase("RC")	&& endDate != null) {
+					billEndDate = endDate;
+				} else if(data.getChagreType().equalsIgnoreCase("NRC")) {
+					billEndDate = billstartDate;
+				}
+				
+				final DiscountMaster discountMaster=this.discountMasterRepository.findOne(data.getDiscountId());
+				if(discountMaster == null){
+					throw new DiscountMasterNoRecordsFoundException();
+				}
+				
+				//	If serviceId Not Exist
+				OrderPrice price = new OrderPrice(data.getServiceId(),data.getChargeCode(), data.getCharging_variant(),data.getPrice(), 
+						null, data.getChagreType(),
+			    data.getChargeDuration(), data.getDurationType(),billstartDate.toDate(), billEndDate,data.isTaxInclusive());
+				order.addOrderDeatils(price);
+				priceforHistory=priceforHistory.add(data.getPrice());
+				
+				//discount Order
+				OrderDiscount orderDiscount=new OrderDiscount(order,price,discountMaster.getId(),discountMaster.getStartDate(),null,discountMaster.getDiscountType(),
+						discountMaster.getDiscountRate());
+				price.addOrderDiscount(orderDiscount);
+			}
+			
+			for (ServiceData data : details) {
+				OrderLine orderdetails = new OrderLine(data.getPlanId(),data.getServiceType(), plan.getStatus(), 'n');
+				order.addServiceDeatils(orderdetails);
+			}
+			
+			this.orderRepository.save(order);
+			Long userId=null;
+			
+			SecurityContext context = SecurityContextHolder.getContext();
+			
+			if (context.getAuthentication() != null) {
+				AppUser appUser=this.context.authenticatedUser();
+				userId=appUser.getId();
+			}else{
+				userId=new Long(0);
+			}
+
+			boolean isNewPlan=command.booleanPrimitiveValueOfParameterNamed("isNewplan");
 					String requstStatus =UserActionStatusTypeEnum.ACTIVATION.toString();
 						if(isNewPlan){
 							final AccountNumberGenerator orderNoGenerator = this.accountIdentifierGeneratorFactory.determineClientAccountNoGenerator(order.getId());
