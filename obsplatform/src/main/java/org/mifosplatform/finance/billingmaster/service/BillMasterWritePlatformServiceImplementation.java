@@ -26,7 +26,6 @@ import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
-import org.mifosplatform.organisation.groupsDetails.domain.GroupsDetails;
 import org.mifosplatform.organisation.groupsDetails.domain.GroupsDetailsRepository;
 import org.mifosplatform.organisation.message.domain.BillingMessage;
 import org.mifosplatform.organisation.message.domain.BillingMessageTemplate;
@@ -34,7 +33,6 @@ import org.mifosplatform.organisation.message.domain.BillingMessageTemplateRepos
 import org.mifosplatform.organisation.message.domain.MessageDataRepository;
 import org.mifosplatform.portfolio.client.domain.Client;
 import org.mifosplatform.portfolio.client.domain.ClientRepository;
-import org.mifosplatform.portfolio.service.service.ServiceMasterWritePlatformServiceImpl;
 import org.mifosplatform.portfolio.transactionhistory.service.TransactionHistoryWritePlatformService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class BillMasterWritePlatformServiceImplementation implements
 		BillMasterWritePlatformService {
 	
-	 private final static Logger logger = LoggerFactory.getLogger(ServiceMasterWritePlatformServiceImpl.class);
+	 private final static Logger logger = LoggerFactory.getLogger(BillMasterWritePlatformServiceImplementation.class);
 		private final PlatformSecurityContext context;
 		private final BillMasterRepository billMasterRepository;
 		private final BillMasterReadPlatformService billMasterReadPlatformService;

@@ -67,7 +67,7 @@ public class BillingOrderApiResourse {
 	public String retrieveBillingProducts(@PathParam("clientId") final Long clientId,final String apiRequestBodyAsJson) {
 		 final CommandWrapper wrapper = new CommandWrapperBuilder().createInvoice(clientId).withJson(apiRequestBodyAsJson).build();
 		 final String json = wrapper.getJson();
-			CommandProcessingResult result = null;
+		 CommandProcessingResult result = null;
 			
 				final JsonElement parsedCommand = this.fromApiJsonHelper.parse(json);
 				final JsonCommand command = JsonCommand.from(json, parsedCommand,
@@ -77,7 +77,7 @@ public class BillingOrderApiResourse {
 						wrapper.getLoanId(), wrapper.getSavingsId(),
 						wrapper.getCodeId(), wrapper.getSupportedEntityType(),
 						wrapper.getSupportedEntityId(), wrapper.getTransactionId(),null);
-		this.invoiceClient.createInvoiceBill(command); 
+		result=this.invoiceClient.createInvoiceBill(command); 
 		return this.toApiJsonSerializer.serialize(result);
 	}
 	

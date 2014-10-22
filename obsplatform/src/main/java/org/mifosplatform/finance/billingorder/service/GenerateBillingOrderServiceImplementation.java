@@ -50,7 +50,7 @@ public class GenerateBillingOrderServiceImplementation implements	GenerateBillin
 		if (products.size() != 0) {
 
 			for (BillingOrderData billingOrderData : products) {
-				// discount master 7
+				// discount master 
 				DiscountMasterData discountMasterData = null;
 				
 				List<DiscountMasterData> discountMasterDatas = billingOrderReadPlatformService.retrieveDiscountOrders(billingOrderData.getClientOrderId(),billingOrderData.getOderPriceId());
@@ -147,8 +147,9 @@ public class GenerateBillingOrderServiceImplementation implements	GenerateBillin
 		BigDecimal netTaxAmount = BigDecimal.ZERO;
 		
 		//LocalDate invoiceDate = new LocalDate();
-	//	List<BillingOrder> charges = new ArrayList<BillingOrder>();
+	    //List<BillingOrder> charges = new ArrayList<BillingOrder>();
 		
+		//Get taxExemption status
 		TaxMappingRateData tax=this.billingOrderReadPlatformService.retriveExemptionTaxDetails(billingOrderCommands.get(0).getClientId());
 		
 	   Invoice invoice = new Invoice(billingOrderCommands.get(0).getClientId(),new LocalDate().toDate(), invoiceAmount, 
