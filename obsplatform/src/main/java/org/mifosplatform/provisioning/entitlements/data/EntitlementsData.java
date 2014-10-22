@@ -1,5 +1,7 @@
 package org.mifosplatform.provisioning.entitlements.data;
 
+import java.math.BigDecimal;
+
 import org.joda.time.LocalDate;
 
 public class EntitlementsData {
@@ -20,6 +22,11 @@ public class EntitlementsData {
 	private String accountNo;
 	private String firstName;
 	private String lastName;
+	private String email;
+	private String phone;
+	private String city;
+	private String address;
+	private String zip;
 
 	private String officeUId;
 	private String branch;
@@ -39,6 +46,10 @@ public class EntitlementsData {
 	private LocalDate startDate;
 	private LocalDate endDate;
 	private StakerData stalkerData;
+	
+	private Long zebraSubscriberId;
+	private BigDecimal itemPrice;
+	private Long itemId;
 
 	public EntitlementsData() {
 
@@ -110,6 +121,35 @@ public class EntitlementsData {
 		this.deviceId = deviceId;
 		this.ipAddress = ipAddress;
 
+	}
+
+	public EntitlementsData(Long id, Long clientId, String accountNo,String firstName, String lastName, String email, String phone,
+			String city, String zip, String address, String provisioingSystem,Long serviceId, Long prdetailsId, String product,
+			String macId,String requestType, Long zebraSubscriberId, BigDecimal itemPrice,
+			Long itemId, String itemCode, String itemDescription) {
+		
+		this.id= id;
+		this.clientId = clientId;
+		this.accountNo = accountNo;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.phone = phone;
+		this.city = city;
+		this.zip = zip;
+		this.address = address;
+		this.provisioingSystem = provisioingSystem;
+		this.serviceId = serviceId;
+		this.prdetailsId = prdetailsId;
+		this.product = product;
+		this.hardwareId = macId;
+		this.zebraSubscriberId = zebraSubscriberId;
+		this.itemPrice = itemPrice;
+		this.itemCode = itemCode;
+		this.itemDescription = itemDescription;
+		this.itemId = itemId;
+		this.requestType = requestType;
+		
 	}
 
 	public Long getId() {
