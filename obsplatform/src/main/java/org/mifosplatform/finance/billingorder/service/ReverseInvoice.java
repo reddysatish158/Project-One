@@ -39,23 +39,30 @@ public class ReverseInvoice {
 	
 	 
 	public BigDecimal reverseInvoiceServices(Long orderId,Long clientId,LocalDate disconnectionDate){
+		
 	    Invoice invoice=null;
+	    BigDecimal invoiceAmount=BigDecimal.ZERO;
+	   
 		List<BillingOrderData> billingOrderProducts = this.billingOrderReadPlatformService.getReverseBillingOrderData(clientId, disconnectionDate, orderId);
+		
 		List<BillingOrderCommand> billingOrderCommands = this.generateReverseBillingOrderService.generateReverseBillingOrder(billingOrderProducts,disconnectionDate);
+		
 		if(billingOrderCommands.get(0).getChargeType().equalsIgnoreCase("RC")){
-			 invoice = this.generateBillingOrderService. generateInvoice(billingOrderCommands);	
+			 invoice = this.generateBillingOrderService. generateInvoice(billingOrderCommands);
+			 invoiceAmount=invoice.getInvoiceAmount();
 		}else{
-	      invoice = this.generateReverseBillingOrderService.generateNegativeInvoice(billingOrderCommands);
+	        invoice = this.generateReverseBillingOrderService.generateNegativeInvoice(billingOrderCommands);
+	        invoiceAmount=invoice.getInvoiceAmount();
 		}
 		
 		List<ClientBalanceData> clientBalancesDatas = clientBalanceReadPlatformService.retrieveAllClientBalances(clientId);
 		
 		this.billingOrderWritePlatformService.updateClientBalance(invoice,clientBalancesDatas);
 		
-		billingOrderWritePlatformService.updateBillingOrder(billingOrderCommands);
-		billingOrderWritePlatformService.updateOrderPrice(billingOrderCommands);
+		this.billingOrderWritePlatformService.updateBillingOrder(billingOrderCommands);
+	    this.billingOrderWritePlatformService.updateOrderPrice(billingOrderCommands);
 		 
-		return null;
+		return invoiceAmount;
 	}
 
 }
