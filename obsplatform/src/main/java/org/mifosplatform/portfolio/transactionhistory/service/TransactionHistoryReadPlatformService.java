@@ -10,4 +10,5 @@ public interface TransactionHistoryReadPlatformService {
 
 	public List<TransactionHistoryData> retriveTransactionHistoryTemplate();
 	public Page<TransactionHistoryData> retriveTransactionHistoryById(SearchSqlQuery searchTransactionHistory, Long clientId);
+	public Page<TransactionHistoryData> retriveTransactionHistoryClientId(SearchSqlQuery searchTransactionHistory, Long clientId);
 }

@@ -88,4 +88,17 @@ public class TransactionHistoryApiResource {
 	
 	}
 	
+	@GET
+	@Path("{clientId}")
+	@Produces({MediaType.APPLICATION_JSON})
+	@Consumes({MediaType.APPLICATION_JSON})
+	public String retriveTransactionHistoryByClientId(@PathParam("clientId") final Long clientId, @Context final UriInfo uriInfo,
+			@QueryParam("sqlSearch") final String sqlSearch, @QueryParam("limit") final Integer limit, @QueryParam("offset") final Integer offset){
+		context.authenticatedUser().validateHasReadPermission(resourceType);
+		
+		final SearchSqlQuery searchTransactionHistory =SearchSqlQuery.forSearch(sqlSearch, offset,limit );
+		Page<TransactionHistoryData> transactionHistory = transactionHistoryReadPlatformService.retriveTransactionHistoryClientId(searchTransactionHistory,clientId);
+		return apiJsonSerializer.serialize(transactionHistory);
+	}
+	
 }

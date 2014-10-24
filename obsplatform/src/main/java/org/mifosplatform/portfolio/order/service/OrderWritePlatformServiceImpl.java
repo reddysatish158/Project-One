@@ -340,7 +340,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 									this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,command.entityId(), order.getId().toString(),null);
 								}
 							}
-					return new CommandProcessingResult(order.getId());	
+					return new CommandProcessingResult(order.getId(),order.getClientId());	
 		}catch (DataIntegrityViolationException dve) {
 			handleCodeDataIntegrityIssues(command, dve);
 			return new CommandProcessingResult(Long.valueOf(-1));
@@ -390,6 +390,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 				.withCommandId(command.commandId()) //
 				.withEntityId(order.getId()) //
 				.with(null) //
+				.withClientId(order.getClientId())
 				.build();
 		} catch (DataIntegrityViolationException dve) {
 			handleCodeDataIntegrityIssues(command, dve);
@@ -439,7 +440,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 		this.orderHistoryRepository.save(orderHistory);
 		transactionHistoryWritePlatformService.saveTransactionHistory(order.getClientId(), "Order Canceled", order.getEndDate(),"Price:"+order.getAllPriceAsString(),"PlanId:"+order.getPlanId(),"contarctPeriod:"+order.getContarctPeriod(),"Services:"+order.getAllServicesAsString(),"OrderID:"+order.getId(),"BillingAlign:"+order.getbillAlign());
 
-		return new CommandProcessingResult(order.getId());
+		return new CommandProcessingResult(order.getId(),order.getClientId());
 	}
 	
     @Transactional
@@ -514,7 +515,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 			transactionHistoryWritePlatformService.saveTransactionHistory(order.getClientId(),"Order Disconnection", new Date(),
 					"Price:"+order.getAllPriceAsString(),"PlanId:"+order.getPlanId(),"contarctPeriod:"+order.getContarctPeriod(),"Services:"+order.getAllServicesAsString(),"OrderID:"+order.getId(),"BillingAlign:"+order.getbillAlign());
 
-		  return new CommandProcessingResult(Long.valueOf(order.getId()));	
+		  return new CommandProcessingResult(Long.valueOf(order.getId()),order.getClientId());	
 		}catch (DataIntegrityViolationException dve) {
 			handleCodeDataIntegrityIssues(null,dve);
 			return new CommandProcessingResult(Long.valueOf(-1));
@@ -657,7 +658,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 		   						transactionHistoryWritePlatformService.saveTransactionHistory(orderDetails.getClientId(),"Order Renewal", orderDetails.getStartDate(),
 		   								"Order No:"+orderDetails.getOrderNo(),"Plan Id:"+orderDetails.getPlanId(),"Contarct Period:"+contractDetails.getSubscriptionPeriod(),"Billing Align:"+orderDetails.getbillAlign());
 		   						
-         		     			return new CommandProcessingResult(Long.valueOf(orderDetails.getClientId()));
+         		     			return new CommandProcessingResult(Long.valueOf(orderDetails.getClientId()),orderDetails.getClientId());
 			}catch (DataIntegrityViolationException dve) {
 				handleCodeDataIntegrityIssues(null,dve);
 			  return new CommandProcessingResult(Long.valueOf(-1));
@@ -728,7 +729,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 		   						//for TransactionHistory
 		   						transactionHistoryWritePlatformService.saveTransactionHistory(order.getClientId(),"Order Reconnection", order.getStartDate(),
 		   								"PlanId:"+order.getPlanId(),"contarctPeriod:"+order.getContarctPeriod(),"Services:"+order.getAllServicesAsString(),"OrderID:"+order.getId(),"Billing Align:"+order.getbillAlign());
-		   						return new CommandProcessingResult(order.getId());
+		   						return new CommandProcessingResult(order.getId(),order.getClientId());
 	  	}catch(DataIntegrityViolationException dve){
 	  		handleCodeDataIntegrityIssues(null, dve);
 	  		return new CommandProcessingResult(Long.valueOf(-1));
@@ -798,7 +799,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 						"contarctPeriod:" + order.getContarctPeriod(), "OrderID:" + order.getId(),"BillingAlign:" + order.getbillAlign());
 				
 			}
-			return new CommandProcessingResult(order.getId());
+			return new CommandProcessingResult(order.getId(),order.getClientId());
 		} catch (EmptyResultDataAccessException dve) {
 			throw new PlatformDataIntegrityException("retrack.already.done", "retrack.already.done", "retrack.already.done");
 		} catch (DataIntegrityViolationException dve) {
@@ -879,7 +880,7 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 			this.orderHistoryRepository.save(orderHistory);
 			this.transactionHistoryWritePlatformService.saveTransactionHistory(order.getClientId(),"Change Order", new Date(),"Old Order :"+entityId,
 					                               " New OrderId :"+result.resourceId());
-			return new CommandProcessingResult(result.resourceId());
+			return new CommandProcessingResult(result.resourceId(),order.getClientId());
 		}catch(DataIntegrityViolationException exception){
 			handleCodeDataIntegrityIssues(command, exception);
 			return new CommandProcessingResult(new Long(-1));
@@ -911,7 +912,7 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 					this.orderRepository.save(order);
 			this.transactionHistoryWritePlatformService.saveTransactionHistory(order.getClientId(),"Apply Promotion",new Date(), "User :"+username,
 					"Promotion Code :" +promotion.getPromotionCode(),"Promotion Value" + promotion.getDiscountRate());
-			return new CommandProcessingResult(command.entityId());
+			return new CommandProcessingResult(command.entityId(),order.getClientId());
 		
 		}catch(DataIntegrityViolationException dve){
 			handleCodeDataIntegrityIssues(command, dve);
@@ -960,7 +961,7 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
         	  this.eventActionRepository.save(eventAction);
 			
 			
-        	  return  new CommandProcessingResult(command.entityId());
+        	  return  new CommandProcessingResult(command.entityId(),clientId);
 	}catch(DataIntegrityViolationException dve){
 		handleCodeDataIntegrityIssues(command, null);
 		return new CommandProcessingResult(Long.valueOf(-1));
@@ -984,7 +985,7 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 					eventAction.updateStatus('C');
 					this.eventActionRepository.saveAndFlush(eventAction);
 				}
-			return new CommandProcessingResult(Long.valueOf(entityId));
+			return new CommandProcessingResult(Long.valueOf(entityId),eventAction.getClientId());
 		}catch(DataIntegrityViolationException dve){
 			handleCodeDataIntegrityIssues(command, dve);
 			return new CommandProcessingResult(Long.valueOf(-1));
@@ -1059,7 +1060,7 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 		    UserActionStatusTypeEnum.EXTENSION.toString(),userId,extensionReason);
 			this.orderHistoryRepository.save(orderHistory);
 			this.transactionHistoryWritePlatformService.saveTransactionHistory(order.getClientId(),"Extension Order", new Date(),"End Date"+endDate);
-			return new CommandProcessingResult(entityId);
+			return new CommandProcessingResult(entityId,order.getClientId());
 
 		}catch(DataIntegrityViolationException dve){
 			handleCodeDataIntegrityIssues(command, dve);
@@ -1100,7 +1101,7 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 			this.orderHistoryRepository.save(orderHistory);	
 		    transactionHistoryWritePlatformService.saveTransactionHistory(order.getClientId(),"Order Termination", new Date(),"User :"+appUser.getUsername(),
 									"PlanId:"+order.getPlanId(),"contarctPeriod:"+order.getContarctPeriod(),"Services:"+order.getAllServicesAsString(),"OrderID:"+order.getId(),"BillingAlign:"+order.getbillAlign());
-		    return new CommandProcessingResult(orderId);
+		    return new CommandProcessingResult(orderId,order.getClientId());
 		
 		}catch(DataIntegrityViolationException exception){
 			handleCodeDataIntegrityIssues(command, exception);
@@ -1152,7 +1153,7 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 				    transactionHistoryWritePlatformService.saveTransactionHistory(order.getClientId(),"Order Suspentation", new Date(),
 										"User :"+appUser.getUsername(),"PlanId:"+order.getPlanId(),"contarctPeriod:"+order.getContarctPeriod(),
 										"Services:"+order.getAllServicesAsString(),"OrderID:"+order.getId(),"BillingAlign:"+order.getbillAlign());
-			return new CommandProcessingResult(entityId);			
+			return new CommandProcessingResult(entityId,order.getClientId());			
 		}catch(DataIntegrityViolationException dve){
 			handleCodeDataIntegrityIssues(command, dve);
 			return new CommandProcessingResult(Long.valueOf(-1));
@@ -1211,7 +1212,7 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 		    transactionHistoryWritePlatformService.saveTransactionHistory(order.getClientId(),"Reactive Order", new Date(),
 								"User :"+appUser.getUsername(),"PlanId:"+order.getPlanId(),"contarctPeriod:"+order.getContarctPeriod(),
 								"Services:"+order.getAllServicesAsString(),"OrderID:"+order.getId(),"BillingAlign:"+order.getbillAlign());
-		    return new CommandProcessingResult(entityId);	
+		    return new CommandProcessingResult(entityId,order.getClientId());	
 			
 		}catch(DataIntegrityViolationException dve){
 			handleCodeDataIntegrityIssues(command, dve);
