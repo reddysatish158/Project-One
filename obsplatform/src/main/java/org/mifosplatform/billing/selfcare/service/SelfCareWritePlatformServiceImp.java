@@ -178,7 +178,7 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 			throw new PlatformDataIntegrityException("empty.result.set", "empty.result.set");
 		}
 		
-		return new CommandProcessingResultBuilder().withEntityId(selfCare.getId()).build();
+		return new CommandProcessingResultBuilder().withEntityId(selfCare.getId()).withClientId(clientId).build();
 	}
 	
 
@@ -220,7 +220,7 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 			throw new PlatformDataIntegrityException("empty.result.set", "empty.result.set");
 		}
 		
-		return new CommandProcessingResultBuilder().withEntityId(loginHistoryId).build();
+		return new CommandProcessingResultBuilder().withEntityId(loginHistoryId).withClientId(clientId).build();
 	}
 	@Override
 	public CommandProcessingResult updateSelfCareUDPassword(JsonCommand command) {
@@ -347,7 +347,7 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 					
 				transactionHistoryWritePlatformService.saveTransactionHistory(clientId, "Self Care User Registration", new Date(),
 						"EmailId: "+selfCareTemporary.getUserName() + ", returnUrl: "+ returnUrl +", Email Sending Resopnse: " + result);
-				return new CommandProcessingResultBuilder().withEntityId(selfCareTemporary.getId()).build();
+				return new CommandProcessingResultBuilder().withEntityId(selfCareTemporary.getId()).withClientId(clientId).build();
 			}
 				
 		}catch(DataIntegrityViolationException dve){
@@ -395,7 +395,7 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 			throw new PlatformDataIntegrityException("empty.result.set", "empty.result.set");
 		}
 		
-		return new CommandProcessingResultBuilder().withEntityId(selfCareTemporary.getId()).build();
+		return new CommandProcessingResultBuilder().withEntityId(selfCareTemporary.getId()).withClientId(clientId).build();
 	}
 
 	@Override
@@ -446,7 +446,7 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 						"EmailId: "+selfCare.getUniqueReference() + ", Email Sending Resopnse: " + result);
 			}
 			
-			return new CommandProcessingResultBuilder().withEntityId(selfCare.getId()).build();
+			return new CommandProcessingResultBuilder().withEntityId(selfCare.getId()).withClientId(selfCare.getClientId()).build();
 			
 		}catch(DataIntegrityViolationException dve){
 			handleDataIntegrityIssues(command, dve);
@@ -479,7 +479,7 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 						"EmailId: "+selfCare.getUniqueReference());
 			}
 			
-			return new CommandProcessingResultBuilder().withEntityId(selfCare.getId()).build();
+			return new CommandProcessingResultBuilder().withEntityId(selfCare.getId()).withClientId(selfCare.getClientId()).build();
 			
 		} catch(EmptyResultDataAccessException emp){
 			throw new PlatformDataIntegrityException("empty.result.set", "empty.result.set");
