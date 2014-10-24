@@ -102,7 +102,7 @@ public class AdjustmentWritePlatformServiceJpaRepositoryImpl implements
 						command.entityId(), command);
 
 			return new CommandProcessingResultBuilder()
-					.withCommandId(command.commandId()).withEntityId(id)
+					.withCommandId(command.commandId()).withEntityId(id).withClientId(command.entityId())
 					.build();
 		} catch (DataIntegrityViolationException dve) {
 			return CommandProcessingResult.empty();

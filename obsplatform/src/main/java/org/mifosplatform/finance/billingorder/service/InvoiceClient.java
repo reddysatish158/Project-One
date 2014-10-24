@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-import org.joda.time.Days;
 import org.joda.time.LocalDate;
 import org.mifosplatform.finance.billingorder.commands.BillingOrderCommand;
 import org.mifosplatform.finance.billingorder.data.BillingOrderData;
@@ -82,21 +81,22 @@ public class InvoiceClient {
 	public GenerateInvoiceData invoiceServices(BillingOrderData billingOrderData,Long clientId,LocalDate processDate){
 		
 			
-			// Charges
-			List<BillingOrderData> products = this.billingOrderReadPlatformService.retrieveBillingOrderData(clientId, processDate,billingOrderData.getOrderId());
+            // Get qualified order complete details			
+		    List<BillingOrderData> products = this.billingOrderReadPlatformService.retrieveBillingOrderData(clientId, processDate,billingOrderData.getOrderId());
+			
 			List<BillingOrderCommand> billingOrderCommands = this.generateBillingOrderService.generatebillingOrder(products);
 			//List<BillingOrder> listOfBillingOrders = billingOrderWritePlatformService.createBillingProduct(billingOrderCommands);
 			// Invoice
 			Invoice invoice = this.generateBillingOrderService.generateInvoice(billingOrderCommands);
+			
 			// Client Balance
-			// List<ClientBalanceData> clientBalancesDatas = adjustmentReadPlatformService.retrieveAllAdjustments(clientId);
 			List<ClientBalanceData> clientBalancesDatas = clientBalanceReadPlatformService.retrieveAllClientBalances(clientId);
 
 			//Update Client Balance
 			this.billingOrderWritePlatformService.updateClientBalance(invoice,clientBalancesDatas);
-		    //  Invoice invoice = billingOrderWritePlatformService.createInvoice(invoiceCommand, clientBalancesDatas);
+		  
 			 // Update order-price
-			billingOrderWritePlatformService.updateBillingOrder(billingOrderCommands);
+			 billingOrderWritePlatformService.updateBillingOrder(billingOrderCommands);
 			 billingOrderWritePlatformService.updateOrderPrice(billingOrderCommands);
 			 System.out.println("---------------------"+billingOrderCommands.get(0).getNextBillableDate());
 
@@ -109,7 +109,7 @@ public class InvoiceClient {
 		return new GenerateInvoiceData(clientId,billingOrderCommands.get(0).getNextBillableDate(),invoice.getInvoiceAmount());
 	}
 	
-	public Integer getQualifiedNumberOfTimes(LocalDate billStartDate , LocalDate processDate,String durationType ){
+/*	public Integer getQualifiedNumberOfTimes(LocalDate billStartDate , LocalDate processDate,String durationType ){
 		int qualifiedNumberOfTimes = 0;
 		int qualifiedBillingDays = Days.daysBetween(billStartDate, processDate).getDays()+1;
 		
@@ -128,7 +128,7 @@ public class InvoiceClient {
 			}
 		}
 		return qualifiedNumberOfTimes;
-	}
+	}*/
 	
 	
 	
@@ -148,7 +148,6 @@ public class InvoiceClient {
 
 			}*/
 				BigDecimal invoiceAmount=this.invoicingSingleClient(command.entityId(), processDate);
-	                  //  invoiceAmount.doubleValue();
 			
 			return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withResourceIdAsString(invoiceAmount.toString()).build();
 

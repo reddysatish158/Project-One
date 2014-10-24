@@ -243,6 +243,7 @@ public class InventoryItemDetailsWritePlatformServiceImp implements InventoryIte
 		@Override
 		public CommandProcessingResult allocateHardware(JsonCommand command) {
 			Long id = null;
+			OneTimeSale ots=null;
 			try{
 				context.authenticatedUser();
 				
@@ -297,7 +298,7 @@ public class InventoryItemDetailsWritePlatformServiceImp implements InventoryIte
 						this.inventoryItemDetailsRepository.flush();
 						this.inventoryItemDetailsAllocationRepository.save(inventoryItemDetailsAllocation);
 						this.inventoryItemDetailsAllocationRepository.flush();
-						OneTimeSale ots = this.oneTimeSaleRepository.findOne(inventoryItemDetailsAllocation.getOrderId());
+						ots = this.oneTimeSaleRepository.findOne(inventoryItemDetailsAllocation.getOrderId());
 						ots.setHardwareAllocated("ALLOCATED");
 						this.oneTimeSaleRepository.save(ots);
 						this.oneTimeSaleRepository.flush();
@@ -355,7 +356,7 @@ public class InventoryItemDetailsWritePlatformServiceImp implements InventoryIte
 				handleDataIntegrityIssues(command, dve); 
 				return new CommandProcessingResult(Long.valueOf(-1));
 			}
-			return new CommandProcessingResultBuilder().withCommandId(1L).withEntityId(id).build();
+			return new CommandProcessingResultBuilder().withCommandId(1L).withEntityId(id).withClientId(ots.getClientId()).build();
 			/*command is has to be changed to command.commandId() in the above code*/
 		}
 		
@@ -452,7 +453,7 @@ public class InventoryItemDetailsWritePlatformServiceImp implements InventoryIte
         		transactionHistoryWritePlatformService.saveTransactionHistory(clientId, "Device Return", new Date(),"Serial Number :"
 	    				+inventoryItemDetailsAllocation.getSerialNumber(),"Item Code:"+itemCode,"Order Id: "+inventoryItemDetailsAllocation.getOrderId());
         	   
-        	   return new CommandProcessingResult(command.entityId());
+        	   return new CommandProcessingResult(command.entityId(),clientId);
            }catch(DataIntegrityViolationException exception){
         	   
         	   return new CommandProcessingResult(Long.valueOf(-1));
