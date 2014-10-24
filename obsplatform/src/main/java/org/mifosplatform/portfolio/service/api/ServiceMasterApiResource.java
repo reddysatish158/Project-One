@@ -41,7 +41,7 @@ import org.springframework.stereotype.Component;
 @Scope("singleton")
 public class ServiceMasterApiResource {
 	private  final Set<String> RESPONSE_DATA_PARAMETERS=new HashSet<String>(Arrays.asList("id","serviceType","serviceCode","serviceDescription","serviceTypes",
-			"serviceUnitTypes","serviceUnitTypes","isOptional","status","serviceStatus"));
+			"serviceUnitTypes","serviceUnitTypes","isOptional","status","serviceStatus","isAutoProvision"));
         private final String resourceNameForPermissions = "SERVICE";
 	    private final PlatformSecurityContext context;
 	    private final DefaultToApiJsonSerializer<ServiceMasterOptionsData> toApiJsonSerializer;

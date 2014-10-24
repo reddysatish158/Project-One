@@ -75,6 +75,7 @@ import org.mifosplatform.portfolio.order.exceptions.SchedulerOrderFoundException
 import org.mifosplatform.portfolio.order.serialization.OrderCommandFromApiJsonDeserializer;
 import org.mifosplatform.portfolio.plan.data.ServiceData;
 import org.mifosplatform.portfolio.plan.domain.Plan;
+import org.mifosplatform.portfolio.plan.domain.PlanDetails;
 import org.mifosplatform.portfolio.plan.domain.PlanRepository;
 import org.mifosplatform.portfolio.plan.domain.StatusTypeEnum;
 import org.mifosplatform.portfolio.plan.domain.UserActionStatusTypeEnum;
@@ -128,7 +129,6 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 	private final SubscriptionRepository subscriptionRepository;
 	private final OrderDiscountRepository orderDiscountRepository;
 	private final ServiceMasterRepository serviceMasterRepository;
-	private final PriceReadPlatformService priceReadPlatformService;
 	private final ProcessRequestRepository processRequestRepository;
 	private final DiscountMasterRepository discountMasterRepository;
 	private final OrderReadPlatformService orderReadPlatformService;
@@ -172,8 +172,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 		    final ActiondetailsWritePlatformService actiondetailsWritePlatformService,final OrderDetailsReadPlatformServices orderDetailsReadPlatformServices,
 		    final EventActionRepository eventActionRepository,final ContractPeriodReadPlatformService contractPeriodReadPlatformService,
 		   final HardwareAssociationRepository associationRepository,final ProvisioningWritePlatformService provisioningWritePlatformService,
-		   final PaymentFollowupRepository paymentFollowupRepository,final PriceRepository priceRepository,
-		   final PriceReadPlatformService priceReadPlatformService,final ChargeCodeRepository chargeCodeRepository) {
+		   final PaymentFollowupRepository paymentFollowupRepository,final PriceRepository priceRepository,final ChargeCodeRepository chargeCodeRepository) {
 		
 		this.context = context;
 		this.reverseInvoice=reverseInvoice;
@@ -196,7 +195,6 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 		this.orderDiscountRepository=orderDiscountRepository;
 		this.discountMasterRepository=discountMasterRepository;
 		this.processRequestRepository=processRequestRepository;
-		this.priceReadPlatformService=priceReadPlatformService;
 		this.prepareRequsetRepository=prepareRequsetRepository;
 		this.orderReadPlatformService = orderReadPlatformService;
 		this.paymentFollowupRepository=paymentFollowupRepository;
@@ -315,13 +313,22 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 
 			boolean isNewPlan=command.booleanPrimitiveValueOfParameterNamed("isNewplan");
 					String requstStatus =UserActionStatusTypeEnum.ACTIVATION.toString();
+					
 						if(isNewPlan){
 							final AccountNumberGenerator orderNoGenerator = this.accountIdentifierGeneratorFactory.determineClientAccountNoGenerator(order.getId());
 							order.updateOrderNum(orderNoGenerator.generate());
 							this.orderRepository.save(order);
-
-							//Prepare a Requset For Order
-							CommandProcessingResult processingResult=this.prepareRequestWriteplatformService.prepareNewRequest(order,plan,requstStatus);
+							
+							List<PlanDetails> planDetails=plan.getDetails();
+							
+							ServiceMaster service=this.serviceMasterRepository.findOneByServiceCode(planDetails.get(0).getServiceCode());
+							
+                              Long commandId=Long.valueOf(0);
+							if(service != null && service.isAuto() == 'Y'){
+								//Prepare a Requset For Order
+								CommandProcessingResult processingResult=this.prepareRequestWriteplatformService.prepareNewRequest(order,plan,requstStatus);
+								commandId=processingResult.commandId();
+							}
 							
 							//For Transaction History
 							transactionHistoryWritePlatformService.saveTransactionHistory(order.getClientId(), "New Order", order.getStartDate(),"Price:"+priceforHistory,
@@ -329,7 +336,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 								"BillingAlign:"+order.getbillAlign());
 			     
 							//	For Order History
-							OrderHistory orderHistory=new OrderHistory(order.getId(),new LocalDate(),new LocalDate(),processingResult.commandId(),requstStatus,userId,null);
+							OrderHistory orderHistory=new OrderHistory(order.getId(),new LocalDate(),new LocalDate(),commandId,requstStatus,userId,null);
 							this.orderHistoryRepository.save(orderHistory);
 						}
 
@@ -356,7 +363,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 									this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,command.entityId(), order.getId().toString(),null);
 								}
 							}
-					return new CommandProcessingResult(order.getId());	
+					return new CommandProcessingResult(order.getId(),order.getClientId());	
 		}catch (DataIntegrityViolationException dve) {
 			handleCodeDataIntegrityIssues(command, dve);
 			return new CommandProcessingResult(Long.valueOf(-1));
@@ -365,7 +372,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 		}
 
     //Calculate EndDate
-	public LocalDate calculateEndDate(LocalDate startDate,String durationType,Long duration) {
+	private LocalDate calculateEndDate(LocalDate startDate,String durationType,Long duration) {
 
 			LocalDate contractEndDate = null;
 			 		if (durationType.equalsIgnoreCase("DAY(s)")) {
