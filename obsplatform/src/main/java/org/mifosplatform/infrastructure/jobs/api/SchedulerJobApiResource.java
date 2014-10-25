@@ -87,6 +87,7 @@ public class SchedulerJobApiResource {
         this.planReadPlatformService=planReadPlatformService;
         this.context = context;
     }
+    
     @Autowired
 	private ScheduledJobRunHistoryRepository scheduledJobRunHistoryRepository;
     

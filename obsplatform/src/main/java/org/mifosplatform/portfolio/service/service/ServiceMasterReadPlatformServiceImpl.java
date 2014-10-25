@@ -83,16 +83,17 @@ public class ServiceMasterReadPlatformServiceImpl implements  ServiceMasterReadP
 			String serviceUnitType=rs.getString("serviceUnitType");
 			String status=rs.getString("status");
 			String isOptional=rs.getString("isOptional");
+			String isAutoProvision=rs.getString("isAuto");
 
 
-			return new ServiceMasterOptionsData(id,serviceCode,serviceDescription,serviceType,serviceUnitType,status,isOptional);
+			return new ServiceMasterOptionsData(id,serviceCode,serviceDescription,serviceType,serviceUnitType,status,isOptional,isAutoProvision);
 
 		}
 
 
 		public String schema() {
 			return "d.id AS id,d.service_code AS serviceCode,d.service_description AS serviceDescription,d.service_type AS serviceType," +
-					"d.service_unittype as serviceUnitType,d.status as status,d.is_optional as isOptional FROM b_service d";
+					"d.service_unittype as serviceUnitType,d.status as status,d.is_optional as isOptional,d.is_auto as isAuto FROM b_service d";
 		}
 
 }
@@ -106,7 +107,7 @@ public class ServiceMasterReadPlatformServiceImpl implements  ServiceMasterReadP
 
 	}
 
-	private static final class ServicesMapper implements RowMapper<ServiceMasterOptionsData> {
+	/*private static final class ServicesMapper implements RowMapper<ServiceMasterOptionsData> {
 
 		@Override
 		public ServiceMasterOptionsData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum)
@@ -126,7 +127,7 @@ public class ServiceMasterReadPlatformServiceImpl implements  ServiceMasterReadP
 			return "d.id AS id,d.service_code AS serviceCode,d.service_description AS serviceDescription,d.service_type AS serviceType," +
 					"d.service_unittype as serviceUnitType,d.status as status,d.is_optional as isOptional FROM b_service d";
 		}
-}
+}*/
 
 	@Override
 	public List<EnumOptionData> retrieveServicesTypes() {

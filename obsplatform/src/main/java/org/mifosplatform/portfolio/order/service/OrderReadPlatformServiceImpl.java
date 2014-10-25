@@ -408,7 +408,7 @@ public class OrderReadPlatformServiceImpl implements OrderReadPlatformService
 					private static final class ClientOrderServiceMapper implements RowMapper<OrderLineData> {
 
 						public String orderServiceLookupSchema() {
-						return " ol.id as id,s.id as serviceId,ol.order_id as orderId,s.service_code as serviceCode, s.service_description as serviceDescription,s.service_type as serviceType FROM b_order_line ol, b_service s" +
+						return " ol.id as id,s.id as serviceId,ol.order_id as orderId,s.service_code as serviceCode,s.is_auto as isAuto,s.service_description as serviceDescription,s.service_type as serviceType FROM b_order_line ol, b_service s" +
 								" WHERE order_id =? and ol.service_id=s.id and ol.is_deleted ='N'";
 						}
 
@@ -421,7 +421,8 @@ public class OrderReadPlatformServiceImpl implements OrderReadPlatformService
 						final String serviceDescription=rs.getString("serviceDescription");
 						final String serviceType=rs.getString("serviceType");
 						final Long serviceId=rs.getLong("serviceId");
-						return new OrderLineData(id,orderId,serviceCode,serviceDescription,serviceType,serviceId);
+						final String isAutoProvision=rs.getString("isAuto");
+						return new OrderLineData(id,orderId,serviceCode,serviceDescription,serviceType,serviceId,isAutoProvision);
 						}
 				}
 

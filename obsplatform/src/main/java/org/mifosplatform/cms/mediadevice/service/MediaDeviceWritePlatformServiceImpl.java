@@ -111,6 +111,7 @@ public class MediaDeviceWritePlatformServiceImpl implements MediaDeviceWritePlat
 	}
 
 	private SelfCare SelfCareRetrieveByClientId(Long clientId) {
+		
 		SelfCare selfCare = selfCareRepository.findOneByClientId(clientId);
 		if(selfCare==null){throw new SelfCareIdNotFoundException(clientId);}
 		return selfCare;

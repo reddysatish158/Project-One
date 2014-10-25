@@ -17,8 +17,8 @@ private String serviceStatus;
 private String serviceUnitType;
 private String isOptional;
 private Collection<EnumValuesData> serviceTypes;
-
 private List<EnumOptionData> serviceUnitTypes,status;
+private String isAutoProvision;
 
 public ServiceMasterOptionsData(Collection<ServiceMasterData> serviceMasterOptions)
 {
@@ -26,7 +26,7 @@ public ServiceMasterOptionsData(Collection<ServiceMasterData> serviceMasterOptio
 }
 
 public ServiceMasterOptionsData(Long id, String serviceCode,
-		String serviceDescription,String serviceType, String serviceUnitType, String status, String isOptional) {
+		String serviceDescription,String serviceType, String serviceUnitType, String status, String isOptional, String isAutoProvision) {
 	this.id=id;
 	this.serviceDescription=serviceDescription;
 	this.serviceCode=serviceCode;
@@ -34,6 +34,7 @@ public ServiceMasterOptionsData(Long id, String serviceCode,
 	this.serviceUnitType=serviceUnitType;
 	this.serviceStatus=status;
 	this.isOptional=isOptional;
+	this.isAutoProvision=isAutoProvision;
 
 }
 

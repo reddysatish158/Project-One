@@ -124,7 +124,8 @@ public class TransactionHistoryReadPlatformServiceImp implements TransactionHist
 			Long id = rs.getLong("id");
 			Long clientId = rs.getLong("clientId");
 			String transactionType = rs.getString("transactionType");
-			DateTime transactionDate = JdbcSupport.getDateTime(rs, "transactionDate");
+			//DateTime transactionDate = JdbcSupport.getDateTime(rs, "transactionDate");
+			LocalDate transactionDate=JdbcSupport.getLocalDate(rs,"transactionDate");
 			String history = rs.getString("history");
 			String user=rs.getString("userName");
 			return new TransactionHistoryData(id,clientId, transactionType, transactionDate, history,user);
@@ -203,7 +204,8 @@ public class TransactionHistoryReadPlatformServiceImp implements TransactionHist
 			String actionName = rs.getString("actionName");
 			String entityName= rs.getString("entityName");
 			String transactionType = actionName+" "+entityName;
-			DateTime transactionDate = JdbcSupport.getDateTime(rs, "transactionDate");
+			//DateTime transactionDate = JdbcSupport.getDateTime(rs, "transactionDate");
+			LocalDate transactionDate=JdbcSupport.getLocalDate(rs,"transactionDate");
 			String history = rs.getString("history");
 			String user=rs.getString("userName");
 			return new TransactionHistoryData(id,clientId, transactionType, transactionDate, history,user);

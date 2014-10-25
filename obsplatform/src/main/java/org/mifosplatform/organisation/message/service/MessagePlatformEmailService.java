@@ -22,4 +22,6 @@ public interface MessagePlatformEmailService {
 	String sendTicketMessage(BillingMessageDataForProcessing emailDetail);
 	
 	
+	
+	
 }
