@@ -9,8 +9,6 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-
-import org.flywaydb.core.api.callback.FlywayCallback;
 import org.mifosplatform.infrastructure.core.domain.MifosPlatformTenant;
 import org.mifosplatform.infrastructure.security.service.TenantDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -50,7 +50,7 @@ public class EventOrderReadplatformServieImpl implements EventOrderReadplatformS
 		EventOrderDataMapper mapper = new EventOrderDataMapper();
 
 		String sql = "select " + mapper.schema()
-				+ " where e.client_id = ? ";
+				+ " and  e.client_id = ?  group by e.id";
 
 		return this.jdbcTemplate.query(sql, mapper, new Object[] { clientId });
 	}
@@ -59,8 +59,9 @@ public class EventOrderReadplatformServieImpl implements EventOrderReadplatformS
 			RowMapper<OneTimeSaleData> {
 
 		public String schema() {
-			return " e.id as orderid,e.client_id as clientId,e.event_id as eventId,e.eventprice_id as eventpriceId,0 as movieLink,e.booked_price as bookedPrice,"
-			     +" e.charge_code as chargeCode,e.is_invoiced as isInvoiced from b_eventorder e ";
+			return "  e.id AS orderid,e.client_id AS clientId,e.event_id AS eventId,e.eventprice_id AS eventpriceId,0 AS movieLink,e.booked_price AS bookedPrice," +
+					" e.charge_code AS chargeCode,e.is_invoiced AS isInvoiced,c.charge_type as chargeType FROM b_eventorder e, b_charge_codes c " +
+					" where e.charge_code = c.charge_code ";
 
 		}
 
@@ -73,7 +74,8 @@ public class EventOrderReadplatformServieImpl implements EventOrderReadplatformS
 			String chargeCode = rs.getString("chargeCode");
 			BigDecimal bookedPrice = rs.getBigDecimal("bookedPrice");
 			String isInvoiced = rs.getString("isInvoiced");
-			return new OneTimeSaleData(orderid,clientId, null, chargeCode,null, null,null, bookedPrice,isInvoiced,orderid,1l,null);
+			String chargeType = rs.getString("chargeType");
+			return new OneTimeSaleData(orderid,clientId, null, chargeCode,chargeType, null,null, bookedPrice,isInvoiced,orderid,1l,null);
 
 		}
 	}

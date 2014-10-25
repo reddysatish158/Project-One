@@ -182,7 +182,6 @@ public class TicketMasterApiResource {
 
 			context.authenticatedUser().validateHasReadPermission(resourceNameForPermission);
 	        final List<TicketMasterData> data = this.ticketMasterReadPlatformService.retrieveClientTicketDetails(clientId);
-	        
 	        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 	        return this.toApiJsonSerializer.serialize(settings, data, RESPONSE_PARAMETERS);
 	    }

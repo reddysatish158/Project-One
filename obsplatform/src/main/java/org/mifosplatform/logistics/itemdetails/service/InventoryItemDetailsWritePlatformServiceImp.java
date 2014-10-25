@@ -216,6 +216,7 @@ public class InventoryItemDetailsWritePlatformServiceImp implements InventoryIte
 	        		this.provisioningWritePlatformService.updateHardwareDetails(inventoryItemDetails.getClientId(),inventoryItemDetails.getSerialNumber(),oldSerilaNumber,
 	        				inventoryItemDetails .getProvisioningSerialNumber(),oldHardware);
 	        	}
+
 	        	
 	         return new CommandProcessingResultBuilder().withEntityId(inventoryItemDetails.getId()).build();
 	        	
