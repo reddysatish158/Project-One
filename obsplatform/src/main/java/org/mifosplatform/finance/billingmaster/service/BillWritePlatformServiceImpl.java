@@ -155,7 +155,7 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 	  //billMaster.setAdjustmentsAndPayments(paymentAmount.subtract(adjustmentAmount));
 	  billMaster.setPreviousBalance(clientBalance);
 	  this.billMasterRepository.save(billMaster);
-	  return new CommandProcessingResult(billMaster.getId());
+	  return new CommandProcessingResult(billMaster.getId(),billMaster.getClientId());
 		}catch(DataIntegrityViolationException dve){
 			return null;
 		}

@@ -510,7 +510,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 			 handleDataIntegrityIssues(command, dve);
 	            return CommandProcessingResult.empty();
 		}
-		return new CommandProcessingResultBuilder().withEntityId(clientTaxStatus.getId()).build();
+		return new CommandProcessingResultBuilder().withEntityId(clientTaxStatus.getId()).withClientId(clientId).build();
 	}
 
 	@Override
