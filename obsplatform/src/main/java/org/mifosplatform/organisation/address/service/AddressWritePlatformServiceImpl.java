@@ -58,7 +58,7 @@ public class AddressWritePlatformServiceImpl implements AddressWritePlatformServ
 			context.authenticatedUser();
 			final Address address = Address.fromJson(clientId,command);
 			this.addressRepository.save(address);
-			return new CommandProcessingResult(address.getId());
+			return new CommandProcessingResult(address.getId(),clientId);
 		} catch (DataIntegrityViolationException dve) {
 			 handleCodeDataIntegrityIssues(command, dve);
 			return  CommandProcessingResult.empty();
@@ -77,7 +77,7 @@ public class AddressWritePlatformServiceImpl implements AddressWritePlatformServ
 		{
 			  context.authenticatedUser();
 	            //this.fromApiJsonDeserializer.validateForUpdate(command.json());
-	          
+	          Long ClientId=command.longValueOfParameterNamed("clientId");
 	            
 	             Map<String, Object> changes =new HashMap<String, Object>();
 	             List<AddressData> addressDatas =this.addressReadPlatformService.retrieveClientAddressDetails(command.longValueOfParameterNamed("clientId"));
@@ -87,7 +87,7 @@ public class AddressWritePlatformServiceImpl implements AddressWritePlatformServ
 	             
 	             if(addressDatas.size()==1 && addressType.equalsIgnoreCase("BILLING")){
 	            	 
-	            	 Address  newAddress=Address.fromJson(command.longValueOfParameterNamed("clientId"), command);
+	            	 Address  newAddress=Address.fromJson(ClientId, command);
                	  this.addressRepository.save(newAddress);
 	            	 
 	             }
@@ -117,6 +117,7 @@ public class AddressWritePlatformServiceImpl implements AddressWritePlatformServ
          return new CommandProcessingResultBuilder() //
          .withCommandId(command.commandId()) //
          .withEntityId(addrId) //
+         .withClientId(ClientId)
          .with(changes) //
          .build();
 	} catch (DataIntegrityViolationException dve) {

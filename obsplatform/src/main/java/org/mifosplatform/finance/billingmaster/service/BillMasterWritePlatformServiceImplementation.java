@@ -156,7 +156,7 @@ public class BillMasterWritePlatformServiceImplementation implements
 		transactionHistoryWritePlatformService.saveTransactionHistory(billMaster.getClientId(), "Statement", billMaster.getBillDate(),"DueAmount:"+billMaster.getDueAmount(),
 				"AmountPaid:"+billMaster.getPaidAmount(),"AdjustmentAmount:"+billMaster.getAdjustmentAmount(),"PromotionDescription:"+billMaster.getPromotionDescription(),"BillNumber:"+billMaster.getBillNumber(),"StatementID:"+billMaster.getId());
        // this.billWritePlatformService.generatePdf(billDetails,financialTransactionsDatas);
-        return new CommandProcessingResult(billMaster.getId(),billMaster.getClientId());
+        return new CommandProcessingResult(billMaster.getId(),clientId);
 	}   catch (DataIntegrityViolationException dve) {
 		logger.error(dve.getLocalizedMessage());
 		 handleCodeDataIntegrityIssues(command, dve);
@@ -247,7 +247,7 @@ public class BillMasterWritePlatformServiceImplementation implements
 		}
 		 billMaster.delete();
         this.billMasterRepository.save(billMaster);
-		return new CommandProcessingResult(billMaster.getId());
+		return new CommandProcessingResult(billMaster.getId(),billMaster.getClientId());
 	   }catch(DataIntegrityViolationException dve) {
 		logger.error(dve.getLocalizedMessage());
 		 //handleCodeDataIntegrityIssues(command, dve);
