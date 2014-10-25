@@ -111,16 +111,11 @@ public class TicketMasterWritePlatformServiceImpl implements TicketMasterWritePl
          return detail.getId();
 
 	 	}
-catch (DataIntegrityViolationException dve) {
+	 	catch (DataIntegrityViolationException dve) {
 		handleDataIntegrityIssues(ticketMasterCommand, dve);
 		return Long.valueOf(-1);
-	
 		
-		
-		
-		
-		
-	} catch (IOException e) {
+	 	} catch (IOException e) {
          throw new DocumentManagementException(documentCommand.getName());
 }
 		
@@ -131,12 +126,13 @@ catch (DataIntegrityViolationException dve) {
 
 	@Override
 	public CommandProcessingResult closeTicket( final JsonCommand command) {
+		TicketMaster ticketMaster = null;
 		try {
 			this.context.authenticatedUser();
 			
 			this.closeFromApiJsonDeserializer.validateForClose(command.json());
 			String ticketURL=command.stringValueOfParameterNamed("ticketURL");
-			TicketMaster ticketMaster=this.repository.findOne(command.entityId());
+			ticketMaster=this.repository.findOne(command.entityId());
 			
 			if (!ticketMaster.getStatus().equalsIgnoreCase("CLOSED")) {
 				ticketMaster.closeTicket(command,this.context.authenticatedUser().getId());
@@ -155,7 +151,7 @@ catch (DataIntegrityViolationException dve) {
 		}catch (DataIntegrityViolationException dve) {
 			handleDataIntegrityIssuesforJson(command, dve);
 		}
-		return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(command.entityId()).build();
+		return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(command.entityId()).withClientId(ticketMaster.getClientId()).build();
 	}
 
 	private void handleDataIntegrityIssuesforJson(JsonCommand command,
@@ -205,7 +201,7 @@ catch (DataIntegrityViolationException dve) {
 			 	if(!actionDetaislDatas.isEmpty()){
 			 		this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,command.getClientId(), ticketMaster.getId().toString(),ticketURL);
 			 	}
-		return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(ticketMaster.getId()).build();
+		return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(ticketMaster.getId()).withClientId(command.getClientId()).build();
 		 } catch (DataIntegrityViolationException dve) {
 		/*handleDataIntegrityIssues(command, dve);*/
 		return new CommandProcessingResult(Long.valueOf(-1));

@@ -77,9 +77,9 @@ public class SynchronousCommandProcessingService implements
 					maker);
 		}
 		commandSourceResult.updateResourceId(result.resourceId());
+		commandSourceResult.updateClientId(result.getClientId());
 		commandSourceResult.updateForAudit(result.getOfficeId(),
-				result.getGroupId(), result.getClientId(), result.getLoanId(),
-				result.getSavingsId());
+				result.getGroupId(), result.getClientId());
 
 		String changesOnlyJson = null;
 		if (result.hasChanges()) {

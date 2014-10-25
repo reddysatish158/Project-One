@@ -227,7 +227,7 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 				ProcessRequestDetails processRequestDetails = ProcessRequestDetails.fromJson(processRequest,command);	
 				processRequest.add(processRequestDetails);
 				this.processRequestRepository.save(processRequest);
-				return	new CommandProcessingResult(Long.valueOf(processRequest.getPrepareRequestId()));
+				return	new CommandProcessingResult(Long.valueOf(processRequest.getPrepareRequestId()),processRequest.getClientId());
 
 			}catch(DataIntegrityViolationException dve){
 				handleCodeDataIntegrityIssues(command,dve);

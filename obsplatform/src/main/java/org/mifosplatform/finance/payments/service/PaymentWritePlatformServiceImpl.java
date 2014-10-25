@@ -133,7 +133,7 @@ public class PaymentWritePlatformServiceImpl implements PaymentWritePlatformServ
 						if(actionDetaislDatas.size() != 0){
 							this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,command.entityId(), id.toString(),null);
 						}
-						return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(id).build();
+						return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(id).withClientId(command.entityId()).build();
 		
 		} catch (DataIntegrityViolationException dve) {
 			return CommandProcessingResult.empty();
@@ -208,7 +208,7 @@ public class PaymentWritePlatformServiceImpl implements PaymentWritePlatformServ
 			
 			transactionHistoryWritePlatformService.saveTransactionHistory(payment.getClientId(), "Cancel Payment", payment.getPaymentDate(),
 					"Amount :"+payment.getAmountPaid(),"Remarks:"+payment.getCancelRemark(),"ReceiptNo: "+payment.getReceiptNo());
-			return new CommandProcessingResult(paymentId);
+			return new CommandProcessingResult(paymentId,payment.getClientId());
 			
 			
 		}catch(DataIntegrityViolationException exception){

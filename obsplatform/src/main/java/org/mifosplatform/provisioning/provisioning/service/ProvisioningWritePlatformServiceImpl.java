@@ -322,7 +322,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 					//Update Prepare Request table
 					//prepareRequest.updateProvisioning('Y');
 					//this.prepareRequsetRepository.save(prepareRequest);
-					return new CommandProcessingResult(Long.valueOf(processRequest.getId()));
+					return new CommandProcessingResult(Long.valueOf(processRequest.getId()),clientId);
 		}catch(DataIntegrityViolationException dve){
 			handleCodeDataIntegrityIssues(command, dve);
 			return new CommandProcessingResult(Long.valueOf(-1));
@@ -342,7 +342,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 						processRequest.update();
 						this.processRequestRepository.saveAndFlush(processRequest);
 					}
-		return new CommandProcessingResult(entityId);	
+		return new CommandProcessingResult(entityId,processRequest.getClientId());	
 	   }catch(DataIntegrityViolationException dve){
 			handleCodeDataIntegrityIssues(null, dve);
 			return new CommandProcessingResult(Long.valueOf(-1));
@@ -536,7 +536,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
              		this.processRequestRepository.save(processRequest);
              	    this.processRequestWriteplatformService.notifyProcessingDetails(processRequest, 'Y');	
              	
-			return new CommandProcessingResult(entityId);
+			return new CommandProcessingResult(entityId,processRequest.getClientId());
 		
 		}catch(DataIntegrityViolationException dve){
 			handleCodeDataIntegrityIssues(null, dve);
@@ -548,7 +548,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 	@Transactional
 	@Override
 	public CommandProcessingResult updateIpDetails(Long orderId,JsonCommand command) {
-		
+		IpPoolManagementDetail ipPoolManagement=null;
 		try{
 			this.context.authenticatedUser();
 			//this.fromApiJsonDeserializer.validateForUpDateIpDetails(command.json());
@@ -564,7 +564,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 			if(uniqueList.size()<tmpList.size()){
 				 throw new IpNotAvailableException(orderId);
 			}
-			IpPoolManagementDetail ipPoolManagement=null;
+			
 			JSONArray array=new JSONArray();
 			List<ServiceParameters> parameters=this.serviceParametersRepository.findDataByOrderId(orderId);
 			
@@ -607,7 +607,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 		}catch(DataIntegrityViolationException dve){
 			handleCodeDataIntegrityIssues(null, dve);
 		}
-		return new CommandProcessingResult(orderId);	
+		return new CommandProcessingResult(orderId,ipPoolManagement.getClientId());	
 		
 	}
 	

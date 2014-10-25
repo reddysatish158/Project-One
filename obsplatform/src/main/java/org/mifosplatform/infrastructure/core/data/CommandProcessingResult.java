@@ -80,6 +80,22 @@ public class CommandProcessingResult {
         this.transactionId = null;
         this.changes = new HashMap<String, Object>();
     }
+    
+    public CommandProcessingResult(final Long entityId,final Long clientId) {
+        if (entityId != null) {
+            this.resourceIdentifier = entityId.toString();
+        } else {
+            this.resourceIdentifier = null;
+        }
+        this.resourceId = entityId;
+        this.officeId = null;
+        this.groupId = null;
+        this.clientId = clientId;
+        this.loanId = null;
+        this.savingsId = null;
+        this.transactionId = null;
+        this.changes = new HashMap<String, Object>();
+    }
 
     private CommandProcessingResult(final Long commandId, final Long officeId, final Long groupId, final Long clientId, final Long loanId,
             final Long savingsId, final String resourceIdentifier, final Long resourceId, final String transactionId,
@@ -118,6 +134,18 @@ public class CommandProcessingResult {
        this.officeId = null;
        this.groupId = null;
        this.clientId = null;
+       this.loanId = null;
+       this.savingsId = null;
+       this.resourceIdentifier = entityId;
+       this.resourceId = null;
+       this.changes = null;
+   }
+   public CommandProcessingResult(final String entityId,final Long clientId){
+	   this.transactionId=null;
+	   this.commandId = null;
+       this.officeId = null;
+       this.groupId = null;
+       this.clientId = clientId;
        this.loanId = null;
        this.savingsId = null;
        this.resourceIdentifier = entityId;
