@@ -243,6 +243,7 @@ public class DocumentManagementApiResource {
         }
 
 					Long detailId = this.ticketMasterWritePlatformService.upDateTicketDetails(ticketMasterCommand,documentCommand,ticketId,inputStream,ticketURL);
+					//return this.toApiJsonSerializer.serialize(detailId);
 					return this.toApiJsonSerializer.serialize(CommandProcessingResult.resourceResult(detailId, null));
 	}
 }

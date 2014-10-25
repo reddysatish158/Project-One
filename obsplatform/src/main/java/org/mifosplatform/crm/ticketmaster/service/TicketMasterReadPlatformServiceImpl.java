@@ -219,6 +219,7 @@ public class TicketMasterReadPlatformServiceImpl  implements TicketMasterReadPla
 			private static final class ClientTicketMapper implements RowMapper<TicketMasterData> {
 
 			public String clientOrderLookupSchema() {
+				
 			return "tckt.id as id, tckt.priority as priority, tckt.ticket_date as ticketDate, tckt.assigned_to as userId,tckt.source_of_ticket as sourceOfTicket, "
 					+" tckt.due_date as dueDate,tckt.description as description,tckt.resolution_description as resolutionDescription, "
 			        + " (select code_value from m_code_value mcv where tckt.problem_code=mcv.id)as problemDescription," 

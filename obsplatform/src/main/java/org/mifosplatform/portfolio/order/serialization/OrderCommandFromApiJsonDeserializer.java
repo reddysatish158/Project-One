@@ -120,6 +120,7 @@ public final class OrderCommandFromApiJsonDeserializer {
 	        
 	        final String disconnectReason = fromApiJsonHelper.extractStringNamed("disconnectReason", element);
 	        baseDataValidator.reset().parameter("disconnectReason").value(disconnectReason).notBlank();
+	     
 	        throwExceptionIfValidationWarningsExist(dataValidationErrors);
 		
 	}
@@ -181,8 +182,8 @@ public final class OrderCommandFromApiJsonDeserializer {
         baseDataValidator.reset().parameter("suspensionDate").value(suspensionDate).notBlank();
         final String suspensionReason = fromApiJsonHelper.extractStringNamed("suspensionReason", element);
         baseDataValidator.reset().parameter("suspensionReason").value(suspensionReason).notBlank();
-        final String suspensionDescription = fromApiJsonHelper.extractStringNamed("suspensionDescription", element);
-        baseDataValidator.reset().parameter("suspensionDescription").value(suspensionDescription).notBlank();
+       /* final String suspensionDescription = fromApiJsonHelper.extractStringNamed("suspensionDescription", element);
+        baseDataValidator.reset().parameter("suspensionDescription").value(suspensionDescription).notBlank();*/
         throwExceptionIfValidationWarningsExist(dataValidationErrors);
 		
 	}

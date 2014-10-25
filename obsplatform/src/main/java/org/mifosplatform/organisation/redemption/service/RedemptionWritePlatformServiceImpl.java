@@ -104,7 +104,8 @@ public class RedemptionWritePlatformServiceImpl implements
 				 if(orderIds.isEmpty()){
 					 
 					 json.addProperty("billAlign", false);json.addProperty("planCode", planId);
-					 json.addProperty("contractPeriod", subscriptionDatas.get(0).getId());json.addProperty("isNewplan", true);
+					 json.addProperty("contractPeriod", subscriptionDatas.get(0).getId());
+					 json.addProperty("isNewplan", true);
 					 json.addProperty("paytermCode", "Monthly");json.addProperty("locale", "en");
 					 json.addProperty("dateFormat","dd MMMM yyyy"); json.addProperty("start_date", new SimpleDateFormat("dd MMMM yyyy").format(new Date()));
 					 JsonCommand commd = new JsonCommand(null, json.toString(), json, fromJsonHelper, null,clientId, null, null, null, null, null, null, null, null, null,null);

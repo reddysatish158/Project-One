@@ -42,15 +42,7 @@ public class CommandSource extends AbstractPersistable<Long> {
     @SuppressWarnings("unused")
     @Column(name = "client_id")
     private Long clientId;
-
-    @SuppressWarnings("unused")
-    @Column(name = "loan_id")
-    private Long loanId;
-
-    @SuppressWarnings("unused")
-    @Column(name = "savings_account_id")
-    private Long savingsId;
-
+    
     @Column(name = "api_get_url", length = 100)
     private String resourceGetUrl;
 
@@ -172,15 +164,17 @@ public class CommandSource extends AbstractPersistable<Long> {
         return false;
     }
 
-    public void updateForAudit(final Long officeId, final Long groupId, final Long clientId, final Long loanId, final Long savingsId) {
+    public void updateForAudit(final Long officeId, final Long groupId, final Long clientId) {
         this.officeId = officeId;
         this.groupId = groupId;
         this.clientId = clientId;
-        this.loanId = loanId;
-        this.savingsId = savingsId;
     }
 
     public String getResourceGetUrl() {
         return this.resourceGetUrl;
+    }
+    
+    public void updateClientId(final Long clientId) {
+        this.clientId = clientId;
     }
 }

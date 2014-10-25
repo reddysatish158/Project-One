@@ -5,7 +5,10 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.mifosplatform.crm.clientprospect.service.SearchSqlQuery;
+import org.mifosplatform.infrastructure.core.domain.JdbcSupport;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.core.service.Page;
 import org.mifosplatform.infrastructure.core.service.PaginationHelper;
@@ -121,7 +124,88 @@ public class TransactionHistoryReadPlatformServiceImp implements TransactionHist
 			Long id = rs.getLong("id");
 			Long clientId = rs.getLong("clientId");
 			String transactionType = rs.getString("transactionType");
-			Date transactionDate = rs.getDate("transactionDate");
+			//DateTime transactionDate = JdbcSupport.getDateTime(rs, "transactionDate");
+			LocalDate transactionDate=JdbcSupport.getLocalDate(rs,"transactionDate");
+			String history = rs.getString("history");
+			String user=rs.getString("userName");
+			return new TransactionHistoryData(id,clientId, transactionType, transactionDate, history,user);
+		}
+
+	}
+	
+	private String queryBasedOnClientId(){
+		
+		return "SQL_CALC_FOUND_ROWS pcs.id AS id,pcs.client_id AS clientId,"+
+			   "pcs.action_name AS actionName,pcs.entity_name AS entityName,pcs.made_on_date AS transactionDate,"+
+			   "pcs.command_as_json AS history,a.username as userName "+
+			   "FROM m_portfolio_command_source pcs,m_appuser a WHERE a.id = pcs.maker_id";
+	}
+
+	public Page<TransactionHistoryData> retriveTransactionHistoryClientId(SearchSqlQuery searchTransactionHistory,final Long clientId) {
+		
+		return  retriveByClientId(searchTransactionHistory,clientId);
+	}
+	
+	private Page<TransactionHistoryData> retriveByClientId(SearchSqlQuery searchTransactionHistory,Long id){
+		try{
+			context.authenticatedUser();
+			String sql = "select "+queryBasedOnClientId()+" and  pcs.client_id = ? order by transactionDate desc ";
+			ClientTransactionHistoryMapper rowMapper = new ClientTransactionHistoryMapper();
+			StringBuilder sqlBuilder = new StringBuilder(200);
+		     //   sqlBuilder.append("select ");
+		        sqlBuilder.append(sql);
+		     //   sqlBuilder.append(" where a.id = th.createdby_id ");
+		        
+		        String sqlSearch = searchTransactionHistory.getSqlSearch();
+		        String extraCriteria = "";
+			    if (sqlSearch != null) {
+			    	sqlSearch=sqlSearch.trim();
+			    	extraCriteria = " and (th.transaction_type like '%"+sqlSearch+"%' OR "
+			    				+ " th.transaction_date like '%"+sqlSearch+"%' OR "
+			    				+ " a.username like '%"+sqlSearch+"%' OR "
+			    				+ " th.history like '%"+sqlSearch+"%') " ;
+			    }
+			   
+		            sqlBuilder.append(extraCriteria);
+		        
+		        /*if (StringUtils.isNotBlank(extraCriteria)) {
+		            sqlBuilder.append(extraCriteria);
+		        }*/
+
+
+		        if (searchTransactionHistory.isLimited()) {
+		            sqlBuilder.append(" limit ").append(searchTransactionHistory.getLimit());
+		        }
+
+		        if (searchTransactionHistory.isOffset()) {
+		            sqlBuilder.append(" offset ").append(searchTransactionHistory.getOffset());
+		        }
+				
+				
+				
+				
+
+				//	return jdbcTemplate.query(sql, rowMapper,new Object[]{id});
+				return this.paginationHelper.fetchPage(this.jdbcTemplate, "SELECT FOUND_ROWS()",sqlBuilder.toString(),
+			            new Object[] {id}, rowMapper);
+				
+		}catch(DataIntegrityViolationException dve){
+			throw new PlatformDataIntegrityException("", "", "");
+		}
+		
+	}
+	
+	private class ClientTransactionHistoryMapper implements RowMapper<TransactionHistoryData>{
+		
+		@Override
+		public TransactionHistoryData mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Long id = rs.getLong("id");
+			Long clientId = rs.getLong("clientId");
+			String actionName = rs.getString("actionName");
+			String entityName= rs.getString("entityName");
+			String transactionType = actionName+" "+entityName;
+			//DateTime transactionDate = JdbcSupport.getDateTime(rs, "transactionDate");
+			LocalDate transactionDate=JdbcSupport.getLocalDate(rs,"transactionDate");
 			String history = rs.getString("history");
 			String user=rs.getString("userName");
 			return new TransactionHistoryData(id,clientId, transactionType, transactionDate, history,user);

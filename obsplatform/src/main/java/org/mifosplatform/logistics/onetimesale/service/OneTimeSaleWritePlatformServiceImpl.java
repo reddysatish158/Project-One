@@ -115,7 +115,7 @@ public class OneTimeSaleWritePlatformServiceImpl implements OneTimeSaleWritePlat
 						JsonCommand jsonCommand=new JsonCommand(null, jsonObject.toString(),element, fromJsonHelper, null, null, null, null, null, null, null, 
         			                       null, null, null, null,null);
 						this.inventoryItemDetailsWritePlatformService.allocateHardware(jsonCommand);
-						return new CommandProcessingResult(Long.valueOf(oneTimeSale.getId()));
+						return new CommandProcessingResult(Long.valueOf(oneTimeSale.getId()),clientId);
 			} catch (DataIntegrityViolationException dve) {
 				handleCodeDataIntegrityIssues(command, dve);
 				return new CommandProcessingResult(Long.valueOf(-1));
@@ -179,6 +179,6 @@ public class OneTimeSaleWritePlatformServiceImpl implements OneTimeSaleWritePlat
 		}catch(DataIntegrityViolationException dve){
 			handleCodeDataIntegrityIssues(null, dve);
 		}
-		return new CommandProcessingResult(Long.valueOf(oneTimeSale.getId()));
+		return new CommandProcessingResult(Long.valueOf(oneTimeSale.getId()),oneTimeSale.getClientId());
 	}
 }

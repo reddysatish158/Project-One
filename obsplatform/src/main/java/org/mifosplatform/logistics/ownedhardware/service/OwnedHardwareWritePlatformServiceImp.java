@@ -131,7 +131,7 @@ public class OwnedHardwareWritePlatformServiceImp implements OwnedHardwareWriteP
         if(configurationProperty.isEnabled()){
         	balanceCheck="Y";
         }*/
-		return new CommandProcessingResultBuilder().withEntityId(ownedHardware.getId()).build();
+		return new CommandProcessingResultBuilder().withEntityId(ownedHardware.getId()).withClientId(clientId).build();
 		
 	}catch(DataIntegrityViolationException dve){
 		handleDataIntegrityIssues(command, dve);

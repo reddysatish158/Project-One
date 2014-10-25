@@ -293,7 +293,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             if(configuration !=null && configuration.isEnabled()){
             	
             		JSONObject selfcarecreation = new JSONObject();
-            		selfcarecreation.put("userName", newClient.getLastname());
+            		selfcarecreation.put("userName", newClient.getFirstname());
     				selfcarecreation.put("uniqueReference", newClient.getEmail());
     				selfcarecreation.put("clientId", newClient.getId());
     				selfcarecreation.put("device", command.stringValueOfParameterNamed("device"));
@@ -536,7 +536,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 	            return CommandProcessingResult.empty();
 		}
 		
-		return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(clientBillMode.getId()).build();
+		return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(clientBillMode.getId()).withClientId(clientId).build();
 	}
 
     @Transactional
@@ -571,17 +571,18 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 					handleDataIntegrityIssues(command, dve);
 	            return CommandProcessingResult.empty();
 				}
-				return new CommandProcessingResultBuilder().withEntityId(childClient.getId()).build();
+				return new CommandProcessingResultBuilder().withEntityId(childClient.getId()).withClientId(childClient.getId()).build();
 		}
 	
 	
 	@Transactional
 	@Override
 	public CommandProcessingResult deleteChildFromParentClient(Long clientId, JsonCommand command) {
-		
+		Long parentId=null;
 		try {
 			context.authenticatedUser();
 			Client childClient = this.clientRepository.findOneWithNotFoundDetection(clientId);
+			parentId=childClient.getParentId();
 			childClient.setParentId(null);
 			this.clientRepository.saveAndFlush(childClient);
 	
@@ -591,7 +592,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 		}
 		return new CommandProcessingResultBuilder() //
         .withCommandId(command.commandId()) //
-        .withClientId(clientId) //
+        .withClientId(parentId) //
         .withEntityId(clientId) //
         .build();
 	}

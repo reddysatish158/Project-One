@@ -192,7 +192,7 @@ public CommandProcessingResult dohardWareSwapping(Long entityId,JsonCommand comm
 				OrderHistory orderHistory=new OrderHistory(order.getId(),new LocalDate(),new LocalDate(),null,"DEVICE SWAP",userId,null);
 		
 				this.orderHistoryRepository.save(orderHistory);
-		return new CommandProcessingResult(entityId);		
+		return new CommandProcessingResult(entityId,order.getClientId());		
 	}catch(Exception exception){
 		return new CommandProcessingResult(Long.valueOf(-1));
 	}
