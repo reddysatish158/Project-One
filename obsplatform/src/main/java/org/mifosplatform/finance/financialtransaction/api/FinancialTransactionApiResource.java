@@ -20,8 +20,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.io.FileUtils;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -40,7 +40,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.google.gson.Gson;
 import com.lowagie.text.Document;
 import com.lowagie.text.PageSize;
 import com.lowagie.text.pdf.PdfPTable;
@@ -54,7 +53,7 @@ import com.lowagie.text.pdf.PdfWriter;
 @Scope("singleton")
 public class FinancialTransactionApiResource {
 	private  final Set<String> RESPONSE_DATA_PARAMETERS=new HashSet<String>(Arrays.asList("transactionId","transactionDate","transactionType","amount",
-			"invoiceId","chrageAmount","taxAmount","discountAmount","snetChargeAmount","chargeType","amount","billDate","dueDate","id","transaction",
+			"invoiceId","chrageAmount","taxAmount","discountAmount","netChargeAmount","chargeType","amount","billDate","dueDate","id","transaction",
 			"chargeStartDate","chargeEndDate"));
 	private BillMasterReadPlatformService billMasterReadPlatformService;
 	private PlatformSecurityContext context;

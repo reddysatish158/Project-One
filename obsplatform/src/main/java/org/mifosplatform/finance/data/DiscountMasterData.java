@@ -40,18 +40,6 @@ public class DiscountMasterData {
 		this.discountStartDate=startDate;
 
 	}
-
-	/*public DiscountMasterData(Long id, String discountcode, String discountdesc) {
-		this.id = id;
-		this.discountCode = discountcode;
-		this.discountDescription = discountdesc;
-		this.discounType = null;
-		this.discountMasterId=id;
-		this.discountAmount = BigDecimal.ZERO;
-		this.discountedChargeAmount = BigDecimal.ZERO;
-		// this.discountRate=;
-	}*/
-
 	// discount master manoj
 	public DiscountMasterData(Long discountMasterid, Long orderPriceId,Long orderDiscountId, LocalDate discountStartDate,Date discountEndDate, 
 			String discountType, BigDecimal discountRate,String isDeleted) {
@@ -111,14 +99,6 @@ public class DiscountMasterData {
 
 	public void setDiscounType(String discounType) {
 		this.discounType = discounType;
-	}
-
-	public BigDecimal getdiscountRate() {
-		return discountRate;
-	}
-
-	public void setdiscountRate(BigDecimal discountRate) {
-		this.discountRate = discountRate;
 	}
 
 	public LocalDate getDiscountStartDate() {
