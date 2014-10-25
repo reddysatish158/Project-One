@@ -125,6 +125,7 @@ public class DiscountMaster extends AbstractPersistable<Long> {
 				final LocalDate newValue = command
 						.localDateValueOfParameterNamed(startDateParamName);
 				actualChanges.put(startDateParamName, newValue);
+				this.startDate = newValue.toDate();
 			}
 			
 		        final String discountRateParamName = "discountRate";

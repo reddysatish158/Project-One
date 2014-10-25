@@ -130,10 +130,10 @@ public class InvoiceOneTimeSale {
 	public DiscountMasterData calculateDiscount(DiscountMasterData discountMasterData,BigDecimal discountAmount,BigDecimal chargePrice){
 		if(isDiscountPercentage(discountMasterData)){
 			
-			if(discountMasterData.getdiscountRate().compareTo(new BigDecimal(100)) ==-1 ||
-			 discountMasterData.getdiscountRate().compareTo(new BigDecimal(100)) == 0){
+			if(discountMasterData.getDiscountRate().compareTo(new BigDecimal(100)) ==-1 ||
+			 discountMasterData.getDiscountRate().compareTo(new BigDecimal(100)) == 0){
 				
-			discountAmount = this.calculateDiscountPercentage(discountMasterData.getdiscountRate(), chargePrice);
+			discountAmount = this.calculateDiscountPercentage(discountMasterData.getDiscountRate(), chargePrice);
 			discountMasterData.setDiscountAmount(discountAmount);
 			chargePrice = this.chargePriceNotLessThanZero(chargePrice, discountAmount);
 			discountMasterData.setDiscountedChargeAmount(chargePrice);
@@ -144,7 +144,8 @@ public class InvoiceOneTimeSale {
 		
 		if(isDiscountFlat(discountMasterData)){
 			
-			BigDecimal netFlatAmount=this.calculateDiscountFlat(discountMasterData.getdiscountRate(), chargePrice);
+			BigDecimal netFlatAmount=this.calculateDiscountFlat(discountMasterData.getDiscountRate(), chargePrice);
+			netFlatAmount=this.chargePriceNotLessThanZero(chargePrice, discountAmount);
 			discountMasterData.setDiscountedChargeAmount(netFlatAmount);
 			discountAmount = chargePrice.subtract(netFlatAmount);
 			discountMasterData.setDiscountAmount(discountAmount);
@@ -165,7 +166,7 @@ public class InvoiceOneTimeSale {
 		
 		BigDecimal calculateDiscountFlat=BigDecimal.ZERO;
 		//check for chargeprice zero and discountrate greater than zero
-		if(chargePrice.compareTo(BigDecimal.ZERO) == 1){
+		if(chargePrice.compareTo(BigDecimal.ZERO) == 1 ){
 		    calculateDiscountFlat=chargePrice.subtract(discountRate).setScale(2,RoundingMode.HALF_UP);
 		}
 		return calculateDiscountFlat;

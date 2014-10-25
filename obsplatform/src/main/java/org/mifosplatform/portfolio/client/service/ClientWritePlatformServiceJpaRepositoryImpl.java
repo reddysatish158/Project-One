@@ -490,6 +490,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         logger.error(dve.getMessage(), dve);
     }
 
+    @Transactional
 	@Override
 	public CommandProcessingResult updateClientTaxExemption(Long clientId,JsonCommand command) {
 		
@@ -506,6 +507,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 				 taxValue='N';
 				 clientTaxStatus.setTaxExemption(taxValue);
 			 }
+			 this.clientRepository.save(clientTaxStatus); 
 		}catch(DataIntegrityViolationException dve){
 			 handleDataIntegrityIssues(command, dve);
 	            return CommandProcessingResult.empty();
@@ -513,6 +515,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 		return new CommandProcessingResultBuilder().withEntityId(clientTaxStatus.getId()).withClientId(clientId).build();
 	}
 
+    @Transactional
 	@Override
 	public CommandProcessingResult updateClientBillMode(Long clientId,JsonCommand command) {
 		
@@ -527,6 +530,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 			 }else{
 				 
 			 }
+		 this.clientRepository.save(clientBillMode); 	 
 		}catch(DataIntegrityViolationException dve){
 			 handleDataIntegrityIssues(command, dve);
 	            return CommandProcessingResult.empty();
@@ -535,6 +539,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 		return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(clientBillMode.getId()).withClientId(clientId).build();
 	}
 
+    @Transactional
 	@Override
 	public CommandProcessingResult createClientParent(Long entityId,JsonCommand command) {
 			Client childClient=null;
