@@ -532,6 +532,7 @@ JobParameterData data=this.sheduleJobReadPlatformService.getJobParameters(JobNam
          }
          
          for (ScheduleJobData scheduleJobData : sheduleDatas) {
+        	 
         	 fw.append("ScheduleJobData id= "+scheduleJobData.getId()+" ,BatchName= "+scheduleJobData.getBatchName()+
         			 " ,query="+scheduleJobData.getQuery()+"\r\n");
         	 fw.append("Selected Message Template Name is :" +data.getMessageTemplate()+" \r\n");
