@@ -18,7 +18,7 @@ import org.mifosplatform.finance.billingorder.service.BillingOrderWritePlatformS
 import org.mifosplatform.finance.billingorder.service.GenerateBill;
 import org.mifosplatform.finance.billingorder.service.GenerateBillingOrderService;
 import org.mifosplatform.finance.clientbalance.data.ClientBalanceData;
-import org.mifosplatform.finance.data.DiscountMasterData;
+import org.mifosplatform.billing.discountmaster.data.DiscountMasterData;
 import org.mifosplatform.logistics.onetimesale.data.OneTimeSaleData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -97,18 +97,18 @@ public class InvoiceOneTimeSale {
 	// Discount End Date calculation if null
 	@SuppressWarnings("deprecation")
 	public Date getDiscountEndDateIfNull(DiscountMasterData discountMasterData) {
-		Date discountDate = discountMasterData.getDiscountEndDate();
+		LocalDate discountEndDate = discountMasterData.getDiscountEndDate();
 		if (discountMasterData.getDiscountEndDate() == null) {
-			discountDate = new Date(2099, 0, 01);
+			discountEndDate = new LocalDate(2099, 0, 01);
 		}
-		return discountDate;
+		return discountEndDate.toDate();
 
 	}
 	
 	// if is percentage
 	public boolean isDiscountPercentage(DiscountMasterData discountMasterData){
 		boolean isDiscountPercentage = false;
-		if(discountMasterData.getDiscounType().equalsIgnoreCase("percentage")){
+		if(discountMasterData.getDiscountType().equalsIgnoreCase("percentage")){
 																
 			isDiscountPercentage = true;
 		}
@@ -118,7 +118,7 @@ public class InvoiceOneTimeSale {
 	// if is discount
 	public boolean isDiscountFlat(DiscountMasterData discountMasterData){
 		boolean isDiscountFlat = false;
-		if(discountMasterData.getDiscounType().equalsIgnoreCase("flat")){
+		if(discountMasterData.getDiscountType().equalsIgnoreCase("flat")){
 			
 			isDiscountFlat = true;
 		}

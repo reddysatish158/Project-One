@@ -3,7 +3,7 @@ package org.mifosplatform.billing.taxmaster.data;
 import java.util.Collection;
 
 import org.mifosplatform.billing.chargecode.data.ChargeCodeTemplateData;
-import org.mifosplatform.billing.discountmaster.commands.DiscountValues;
+import org.mifosplatform.billing.discountmaster.data.DiscountValues;
 
 public class TaxMappingRateOptionsData {
 	private Collection<DiscountValues> datass;

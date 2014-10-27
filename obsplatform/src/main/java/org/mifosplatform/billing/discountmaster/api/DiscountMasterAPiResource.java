@@ -23,7 +23,7 @@ import org.mifosplatform.billing.discountmaster.service.DiscountReadPlatformServ
 import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
-import org.mifosplatform.finance.data.DiscountMasterData;
+import org.mifosplatform.billing.discountmaster.data.DiscountMasterData;
 import org.mifosplatform.infrastructure.core.api.ApiRequestParameterHelper;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
@@ -37,112 +37,184 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+
+
+/**
+ * @author hugo
+ *
+ */
 @Path("/discounts")
 @Component
 @Scope("singleton")
 public class DiscountMasterAPiResource {
+
+	private final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(
+			Arrays.asList("id", "discountCode", "discountDescription",
+					"discountType", "discountRate", "startDate",
+					"discountStatus"));
+	private final String resourceNameForPermissions = "DISCOUNT";
+	private final PlatformSecurityContext context;
+	private final DefaultToApiJsonSerializer<DiscountMasterData> toApiJsonSerializer;
+	private final ApiRequestParameterHelper apiRequestParameterHelper;
+	private final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService;
+	private final DiscountReadPlatformService discountReadPlatformService;
+	private final PlanReadPlatformService planReadPlatformService;
+	private final MCodeReadPlatformService mCodeReadPlatformService;
+
+
+	@Autowired
+	public DiscountMasterAPiResource(
+			final PlatformSecurityContext context,
+			final DefaultToApiJsonSerializer<DiscountMasterData> toApiJsonSerializer,
+			final ApiRequestParameterHelper apiRequestParameterHelper,
+			final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService,
+			final DiscountReadPlatformService discountReadPlatformService,
+			final PlanReadPlatformService planReadPlatformService,
+			final MCodeReadPlatformService codeReadPlatformService) {
+		this.context = context;
+		this.toApiJsonSerializer = toApiJsonSerializer;
+		this.apiRequestParameterHelper = apiRequestParameterHelper;
+		this.commandSourceWritePlatformService = commandSourceWritePlatformService;
+		this.discountReadPlatformService = discountReadPlatformService;
+		this.planReadPlatformService = planReadPlatformService;
+		this.mCodeReadPlatformService = codeReadPlatformService;
+	}
+ 
+	
+	/**
+	 * @param apiRequestBodyAsJson
+	 * @return
+	 */
+	@POST
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String createNewDiscount(final String apiRequestBodyAsJson) {
+
+		final CommandWrapper commandRequest = new CommandWrapperBuilder()
+				.createDiscount().withJson(apiRequestBodyAsJson).build();
+		final CommandProcessingResult result = this.commandSourceWritePlatformService
+				.logCommandSource(commandRequest);
+		return this.toApiJsonSerializer.serialize(result);
+	}
+
+
+	/**
+	 * @param uriInfo
+	 * @return
+	 */
+	@GET
+	@Path("template")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String retrieveDiscountTemplate(@Context final UriInfo uriInfo) {
+
+		context.authenticatedUser().validateHasReadPermission(
+				resourceNameForPermissions);
+		DiscountMasterData discountMasterData = handleTemplateData();
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper
+				.process(uriInfo.getQueryParameters());
+		return this.toApiJsonSerializer.serialize(settings, discountMasterData,
+				RESPONSE_DATA_PARAMETERS);
+
+	}
+
+	private DiscountMasterData handleTemplateData() {
+		final List<EnumOptionData> status = this.planReadPlatformService
+				.retrieveNewStatus();
+		final Collection<MCodeData> discountTypeData = mCodeReadPlatformService
+				.getCodeValue("type");
+		return new DiscountMasterData(status, discountTypeData);
+	}
+
+	
+	/**
+	 * @param planType
+	 * @param uriInfo
+	 * @return
+	 */
+	@GET
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String retrieveAllDiscountDetails(
+			@QueryParam("planType") final String planType,
+			@Context final UriInfo uriInfo) {
+		context.authenticatedUser().validateHasReadPermission(
+				resourceNameForPermissions);
+		final List<DiscountMasterData> discountMasterDatas = this.discountReadPlatformService
+				.retrieveAllDiscounts();
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper
+				.process(uriInfo.getQueryParameters());
+		return this.toApiJsonSerializer.serialize(settings,
+				discountMasterDatas, RESPONSE_DATA_PARAMETERS);
+	}
+
+
+	/**
+	 * @param discountId
+	 * @param uriInfo
+	 * @return single discount details
+	 */
+	@GET
+	@Path("{discountId}")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String retrieveSingleDiscountDetails(
+			@PathParam("discountId") final Long discountId,
+			@Context final UriInfo uriInfo) {
+
+		context.authenticatedUser().validateHasReadPermission(
+				resourceNameForPermissions);
+		DiscountMasterData discountMasterData = this.discountReadPlatformService
+				.retrieveSingleDiscountDetail(discountId);
+		List<EnumOptionData> status = this.planReadPlatformService
+				.retrieveNewStatus();
+		Collection<MCodeData> discountTypeData = mCodeReadPlatformService
+				.getCodeValue("type");
+		discountMasterData.setStatus(status);
+		discountMasterData.setDiscounTypeData(discountTypeData);
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper
+				.process(uriInfo.getQueryParameters());
+		return this.toApiJsonSerializer.serialize(settings, discountMasterData,
+				RESPONSE_DATA_PARAMETERS);
+	}
+
+	
+	/**
+	 * @param discountId
+	 * @param apiRequestBodyAsJson
+	 * @return single discount details for editing
+	 */
+	@PUT
+	@Path("{discountId}")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String updateDiscount(
+			@PathParam("discountId") final Long discountId,
+			final String apiRequestBodyAsJson) {
+		final CommandWrapper commandRequest = new CommandWrapperBuilder()
+				.updateDiscount(discountId).withJson(apiRequestBodyAsJson)
+				.build();
+		final CommandProcessingResult result = this.commandSourceWritePlatformService
+				.logCommandSource(commandRequest);
+		return this.toApiJsonSerializer.serialize(result);
+	}
 	
 	
-	private  final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(Arrays.asList("id", "discountCode","discountdescription","discountType",
-			"discountRate","startDate","status","discountstatus"));
-	 private final String resourceNameForPermissions = "DISCOUNT";
-	  private final PlatformSecurityContext context;
-	    private final DefaultToApiJsonSerializer<DiscountMasterData> toApiJsonSerializer;
-	    private final ApiRequestParameterHelper apiRequestParameterHelper;
-	    private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
-	    private final DiscountReadPlatformService discountReadPlatformService;
-	    private final PlanReadPlatformService planReadPlatformService;
-	    private final MCodeReadPlatformService mCodeReadPlatformService;
-	    
-	    @Autowired
-	    public DiscountMasterAPiResource(final PlatformSecurityContext context,final DefaultToApiJsonSerializer<DiscountMasterData> toApiJsonSerializer,
-	    		final ApiRequestParameterHelper apiRequestParameterHelper,final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
-	    		final DiscountReadPlatformService discountReadPlatformService,final PlanReadPlatformService planReadPlatformService,final MCodeReadPlatformService codeReadPlatformService) {
-		        this.context = context;
-		        this.toApiJsonSerializer = toApiJsonSerializer;
-		        this.apiRequestParameterHelper = apiRequestParameterHelper;
-		        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
-		        this.discountReadPlatformService=discountReadPlatformService;
-		        this.planReadPlatformService=planReadPlatformService;
-		        this.mCodeReadPlatformService=codeReadPlatformService;
-		    }		
-	    
-	    @POST
-		@Consumes({ MediaType.APPLICATION_JSON })
-		@Produces({ MediaType.APPLICATION_JSON })
-		public String createNewDiscount(final String apiRequestBodyAsJson) {
+	/**
+	 * @param discountId
+	 * @return 
+	 */
+	@DELETE
+	@Path("{discountId}")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String deleteDiscount(@PathParam("discountId") final Long discountId) {
+		final CommandWrapper commandRequest = new CommandWrapperBuilder()
+				.deleteDiscount(discountId).build();
+		final CommandProcessingResult result = this.commandSourceWritePlatformService
+				.logCommandSource(commandRequest);
+		return this.toApiJsonSerializer.serialize(result);
 
-	        final CommandWrapper commandRequest=new CommandWrapperBuilder().createDiscount().withJson(apiRequestBodyAsJson).build();
-			final CommandProcessingResult result=this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-			  return this.toApiJsonSerializer.serialize(result);
-		}
-	    
-	    @GET
-		@Path("template")
-		@Consumes({ MediaType.APPLICATION_JSON })
-		@Produces({ MediaType.APPLICATION_JSON })
-		public String retrieveDiscountTemplate(@Context final UriInfo uriInfo) {
-			 
-	    	context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-			 DiscountMasterData discountMasterData=handleTemplateData();
-			final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-			return this.toApiJsonSerializer.serialize(settings, discountMasterData, RESPONSE_DATA_PARAMETERS);
-		
-		}
-		
-		private DiscountMasterData handleTemplateData() {
-			 List<EnumOptionData> status = this.planReadPlatformService.retrieveNewStatus();
-		     Collection<MCodeData> discountTypeData = mCodeReadPlatformService.getCodeValue("type");
-		     return new DiscountMasterData(status,discountTypeData);
-		}
-
-		@GET
-		@Consumes({ MediaType.APPLICATION_JSON })
-		@Produces({ MediaType.APPLICATION_JSON })
-		public String retrieveAllDiscountDetails(@QueryParam("planType") final String planType,  @Context final UriInfo uriInfo) {
-	 		 context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-			List<DiscountMasterData> discountMasterDatas= this.discountReadPlatformService.retrieveAllDiscounts();
-			final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-			return this.toApiJsonSerializer.serialize(settings,discountMasterDatas, RESPONSE_DATA_PARAMETERS);
-		}
-	    
-		
-		@GET
-		@Path("{discountId}")
-		@Consumes({ MediaType.APPLICATION_JSON })
-		@Produces({ MediaType.APPLICATION_JSON })
-		public String retrieveSingleDiscountDetails(@PathParam("discountId") final Long discountId,@Context final UriInfo uriInfo) {
-			
-			context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-			DiscountMasterData discountMasterData= this.discountReadPlatformService.retrieveDiscountDetails(discountId);
-			List<EnumOptionData> status = this.planReadPlatformService.retrieveNewStatus();
-		     Collection<MCodeData> discountTypeData = mCodeReadPlatformService.getCodeValue("type");
-		     discountMasterData.setStatus(status);
-		     discountMasterData.setDiscounTypeData(discountTypeData);
-		     final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-			 return this.toApiJsonSerializer.serialize(settings, discountMasterData, RESPONSE_DATA_PARAMETERS);
-		}
-		
-		@PUT
-		@Path("{discountId}")
-		@Consumes({ MediaType.APPLICATION_JSON })
-		@Produces({ MediaType.APPLICATION_JSON })
-		public String updateDiscount(@PathParam("discountId") final Long discountId,final String apiRequestBodyAsJson) {
-			 final CommandWrapper commandRequest = new CommandWrapperBuilder().updateDiscount(discountId).withJson(apiRequestBodyAsJson).build();
-			 final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-			  return this.toApiJsonSerializer.serialize(result);
-		}
-		
-		
-		 @DELETE
-			@Path("{discountId}")
-			@Consumes({MediaType.APPLICATION_JSON})
-			@Produces({MediaType.APPLICATION_JSON})
-			public String deletePlan(@PathParam("discountId") final Long discountId) {
-			 final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteDiscount(discountId).build();
-	     final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-	     return this.toApiJsonSerializer.serialize(result);
-
-			}
+	}
 
 }

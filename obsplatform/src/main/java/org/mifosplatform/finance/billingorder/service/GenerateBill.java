@@ -12,7 +12,7 @@ import org.mifosplatform.billing.taxmaster.data.TaxMappingRateData;
 import org.mifosplatform.finance.billingorder.commands.BillingOrderCommand;
 import org.mifosplatform.finance.billingorder.commands.InvoiceTaxCommand;
 import org.mifosplatform.finance.billingorder.data.BillingOrderData;
-import org.mifosplatform.finance.data.DiscountMasterData;
+import org.mifosplatform.billing.discountmaster.data.DiscountMasterData;
 import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
 import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
 import org.mifosplatform.infrastructure.configuration.exception.GlobalConfigurationPropertyNotFoundException;
@@ -573,18 +573,18 @@ public class GenerateBill {
 
 	// Discount End Date calculation if null
 	public Date getDiscountEndDateIfNull(DiscountMasterData discountMasterData,LocalDate chargeEndDate) {
-		Date discountDate = discountMasterData.getDiscountEndDate();
+		LocalDate discountEndDate = discountMasterData.getDiscountEndDate();
 		if (discountMasterData.getDiscountEndDate() == null) {
-			discountDate = chargeEndDate.toDate();
+			discountEndDate = chargeEndDate;
 		}
-		return discountDate;
+		return discountEndDate.toDate();
 
 	}
 	
 	// if is percentage
 	public boolean isDiscountPercentage(DiscountMasterData discountMasterData){
 		boolean isDiscountPercentage = false;
-		if(discountMasterData.getDiscounType().equalsIgnoreCase("percentage")){
+		if(discountMasterData.getDiscountType().equalsIgnoreCase("percentage")){
 			isDiscountPercentage = true;
 		}
 		return isDiscountPercentage;
@@ -593,7 +593,7 @@ public class GenerateBill {
 	// if is discount
 	public boolean isDiscountFlat(DiscountMasterData discountMasterData){
 		boolean isDiscountFlat = false;
-		if(discountMasterData.getDiscounType().equalsIgnoreCase("Flat")){
+		if(discountMasterData.getDiscountType().equalsIgnoreCase("Flat")){
 			isDiscountFlat = true;
 		}
 		return isDiscountFlat;

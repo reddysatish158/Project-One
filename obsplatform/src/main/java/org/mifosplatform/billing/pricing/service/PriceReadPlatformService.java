@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.mifosplatform.billing.chargecode.data.ChargesData;
 import org.mifosplatform.billing.pricing.data.PricingData;
-import org.mifosplatform.finance.data.DiscountMasterData;
+import org.mifosplatform.billing.discountmaster.data.DiscountMasterData;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
 import org.mifosplatform.portfolio.contract.data.SubscriptionData;
 import org.mifosplatform.portfolio.plan.data.ServiceData;

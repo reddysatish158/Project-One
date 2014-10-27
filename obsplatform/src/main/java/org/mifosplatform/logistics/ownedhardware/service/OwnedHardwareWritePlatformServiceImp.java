@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.mifosplatform.billing.discountmaster.exceptions.DiscountNotFoundException;
+import org.mifosplatform.billing.discountmaster.exceptions.DiscountMasterNotFoundException;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
 import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
@@ -212,7 +212,7 @@ public class OwnedHardwareWritePlatformServiceImp implements OwnedHardwareWriteP
 	private OwnedHardware OwnedHardwareretrieveById(Long id) {
              
 		OwnedHardware ownedHardware=this.ownedHardwareJpaRepository.findOne(id);
-              if (ownedHardware== null) { throw new DiscountNotFoundException(id.toString()); }
+              if (ownedHardware== null) { throw new DiscountMasterNotFoundException(id); }
 	          return ownedHardware;	
 	}
 
@@ -224,7 +224,7 @@ public class OwnedHardwareWritePlatformServiceImp implements OwnedHardwareWriteP
     	 OwnedHardware ownedHardware=this.ownedHardwareJpaRepository.findOne(id);
     	 
     	 if(ownedHardware==null){
-    		 throw new DiscountNotFoundException(id.toString());
+    		 throw new DiscountMasterNotFoundException(id);
     	 }
     	 
     	 //Check if Active plans are exist

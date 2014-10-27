@@ -2,12 +2,16 @@ package org.mifosplatform.billing.discountmaster.service;
 
 import java.util.List;
 
-import org.mifosplatform.finance.data.DiscountMasterData;
+import org.mifosplatform.billing.discountmaster.data.DiscountMasterData;
 
+/**
+ * @author hugo
+ * 
+ */
 public interface DiscountReadPlatformService {
 
 	List<DiscountMasterData> retrieveAllDiscounts();
 
-	DiscountMasterData retrieveDiscountDetails(Long discountId);
+	DiscountMasterData retrieveSingleDiscountDetail(Long discountId);
 
 }

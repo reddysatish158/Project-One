@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.joda.time.LocalDate;
 import org.mifosplatform.billing.discountmaster.domain.DiscountMaster;
+import org.mifosplatform.billing.discountmaster.data.DiscountMasterData;
 import org.mifosplatform.billing.discountmaster.domain.DiscountMasterRepository;
 import org.mifosplatform.billing.taxmaster.data.TaxMappingRateData;
 import org.mifosplatform.finance.billingorder.commands.BillingOrderCommand;
@@ -15,7 +16,6 @@ import org.mifosplatform.finance.billingorder.domain.BillingOrder;
 import org.mifosplatform.finance.billingorder.domain.Invoice;
 import org.mifosplatform.finance.billingorder.domain.InvoiceRepository;
 import org.mifosplatform.finance.billingorder.domain.InvoiceTax;
-import org.mifosplatform.finance.data.DiscountMasterData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

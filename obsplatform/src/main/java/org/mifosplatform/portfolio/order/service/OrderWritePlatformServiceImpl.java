@@ -12,7 +12,7 @@ import org.mifosplatform.billing.chargecode.domain.ChargeCode;
 import org.mifosplatform.billing.chargecode.domain.ChargeCodeRepository;
 import org.mifosplatform.billing.discountmaster.domain.DiscountMaster;
 import org.mifosplatform.billing.discountmaster.domain.DiscountMasterRepository;
-import org.mifosplatform.billing.discountmaster.exceptions.DiscountMasterNoRecordsFoundException;
+import org.mifosplatform.billing.discountmaster.exceptions.DiscountMasterNotFoundException;
 import org.mifosplatform.billing.pricing.data.PriceData;
 import org.mifosplatform.billing.pricing.domain.Price;
 import org.mifosplatform.billing.pricing.domain.PriceRepository;
@@ -278,7 +278,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 				
 				final DiscountMaster discountMaster=this.discountMasterRepository.findOne(data.getDiscountId());
 				if(discountMaster == null){
-					throw new DiscountMasterNoRecordsFoundException();
+					throw new DiscountMasterNotFoundException();
 				}
 				
 				//	If serviceId Not Exist

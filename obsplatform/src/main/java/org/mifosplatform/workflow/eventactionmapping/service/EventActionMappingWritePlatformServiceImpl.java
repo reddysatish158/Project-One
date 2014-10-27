@@ -3,7 +3,7 @@ package org.mifosplatform.workflow.eventactionmapping.service;
 import java.util.List;
 import java.util.Map;
 
-import org.mifosplatform.billing.discountmaster.exceptions.DiscountNotFoundException;
+import org.mifosplatform.billing.discountmaster.exceptions.DiscountMasterNotFoundException;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
@@ -109,7 +109,7 @@ public EventActionMappingWritePlatformServiceImpl(final PlatformSecurityContext 
 	private EventActionMapping EventActionretrieveById(Long id) {
              
 		EventActionMapping eventAction=this.eventActionMappingRepository.findOne(id);
-              if (eventAction== null) { throw new DiscountNotFoundException(id.toString()); }
+              if (eventAction== null) { throw new DiscountMasterNotFoundException(id); }
 	          return eventAction;	
 	}
 	
@@ -123,7 +123,7 @@ public EventActionMappingWritePlatformServiceImpl(final PlatformSecurityContext 
     	 EventActionMapping event=this.eventActionMappingRepository.findOne(id);
     	 
     	 if(event==null){
-    		 throw new DiscountNotFoundException(id.toString());
+    		 throw new DiscountMasterNotFoundException(id);
     	 }
     	 
     	 event.delete();

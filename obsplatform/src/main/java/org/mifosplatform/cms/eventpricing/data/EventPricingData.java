@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.mifosplatform.cms.eventpricing.domain.EventPricing;
 import org.mifosplatform.cms.mediadetails.data.MediaAssetLocationDetails;
-import org.mifosplatform.finance.data.DiscountMasterData;
+import org.mifosplatform.billing.discountmaster.data.DiscountMasterData;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
 
 /**

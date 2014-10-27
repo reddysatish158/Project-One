@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.mifosplatform.billing.chargecode.data.ChargesData;
 import org.mifosplatform.billing.pricing.service.PriceReadPlatformService;
-import org.mifosplatform.finance.data.DiscountMasterData;
+import org.mifosplatform.billing.discountmaster.data.DiscountMasterData;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.api.JsonQuery;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
