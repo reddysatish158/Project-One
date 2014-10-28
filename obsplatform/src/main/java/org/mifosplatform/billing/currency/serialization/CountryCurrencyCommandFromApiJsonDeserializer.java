@@ -26,41 +26,63 @@ import com.google.gson.reflect.TypeToken;
 @Component
 public final class CountryCurrencyCommandFromApiJsonDeserializer {
 
-    /**
-     * The parameters supported for this command.
-     */
-    private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("country","currency","status","baseCurrency","conversionRate","locale"));
-    private final FromJsonHelper fromApiJsonHelper;
+	/**
+	 * The parameters supported for this command.
+	 */
+	private final Set<String> supportedParameters = new HashSet<String>(
+			Arrays.asList("country", "currency", "status", "baseCurrency",
+					"conversionRate", "locale"));
+	private final FromJsonHelper fromApiJsonHelper;
 
-    @Autowired
-    public CountryCurrencyCommandFromApiJsonDeserializer(final FromJsonHelper fromApiJsonHelper) {
-        this.fromApiJsonHelper = fromApiJsonHelper;
-    }
+	@Autowired
+	public CountryCurrencyCommandFromApiJsonDeserializer(
+			final FromJsonHelper fromApiJsonHelper) {
+		this.fromApiJsonHelper = fromApiJsonHelper;
+	}
 
-    public void validateForCreate(final String json) {
-        if (StringUtils.isBlank(json)) { throw new InvalidJsonException(); }
+	/**
+	 * @param json
+	 * check validation for create country currency configuration
+	 */
+	public void validateForCreate(final String json) {
+		if (StringUtils.isBlank(json)) {
+			throw new InvalidJsonException();
+		}
 
-        final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
-        fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, supportedParameters);
+		final Type typeOfMap = new TypeToken<Map<String, Object>>() {
+		}.getType();
+		fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json,
+				supportedParameters);
 
-        final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
-        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("countrycurrency");
+		final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
+		final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(
+				dataValidationErrors).resource("countrycurrency");
 
-        final JsonElement element = fromApiJsonHelper.parse(json);
+		final JsonElement element = fromApiJsonHelper.parse(json);
 
-        final String country = fromApiJsonHelper.extractStringNamed("country", element);
-        baseDataValidator.reset().parameter("country").value(country).notBlank();
-        final String currency= fromApiJsonHelper.extractStringNamed("currency", element);
-        baseDataValidator.reset().parameter("currency").value(currency).notBlank();
-        final String  status= fromApiJsonHelper.extractStringNamed("status", element);
-        baseDataValidator.reset().parameter("status").value(status).notBlank();
-        
-        throwExceptionIfValidationWarningsExist(dataValidationErrors);
-    }
+		final String country = fromApiJsonHelper.extractStringNamed("country",
+				element);
+		baseDataValidator.reset().parameter("country").value(country)
+				.notBlank();
+		
+		final String currency = fromApiJsonHelper.extractStringNamed(
+				"currency", element);
+		baseDataValidator.reset().parameter("currency").value(currency)
+				.notBlank();
+		
+		final String status = fromApiJsonHelper.extractStringNamed("status",
+				element);
+		baseDataValidator.reset().parameter("status").value(status).notBlank();
 
-    
-    private void throwExceptionIfValidationWarningsExist(final List<ApiParameterError> dataValidationErrors) {
-        if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist",
-                "Validation errors exist.", dataValidationErrors); }
-    }
+		throwExceptionIfValidationWarningsExist(dataValidationErrors);
+	}
+
+	private void throwExceptionIfValidationWarningsExist(
+			final List<ApiParameterError> dataValidationErrors) {
+		if (!dataValidationErrors.isEmpty()) {
+			throw new PlatformApiDataValidationException(
+					"validation.msg.validation.errors.exist",
+					"Validation errors exist.", dataValidationErrors);
+		}
+	}
 }

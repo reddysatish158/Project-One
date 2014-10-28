@@ -7,25 +7,25 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * @author hugo
+ * 
+ */
 @Service
-public class UpdateChargeCodeCommandHandler implements NewCommandSourceHandler{
+public class UpdateChargeCodeCommandHandler implements NewCommandSourceHandler {
 
-	
 	private final ChargeCodeWritePlatformService chargeCodeWritePlatformService;
-	
+
 	@Autowired
-	public UpdateChargeCodeCommandHandler(final ChargeCodeWritePlatformService chargeCodeWritePlatformService) {
+	public UpdateChargeCodeCommandHandler(
+			final ChargeCodeWritePlatformService chargeCodeWritePlatformService) {
 		this.chargeCodeWritePlatformService = chargeCodeWritePlatformService;
 	}
 
 	@Override
-	public CommandProcessingResult processCommand(JsonCommand command) {
-		return chargeCodeWritePlatformService.updateChargeCode(command,command.entityId());
+	public CommandProcessingResult processCommand(final JsonCommand command) {
+		return chargeCodeWritePlatformService.updateChargeCode(command,
+				command.entityId());
 	}
-	
-	
-	
-	
-	
-	
+
 }

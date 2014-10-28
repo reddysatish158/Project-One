@@ -1,3 +1,8 @@
+/**
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 package org.mifosplatform.billing.currency.handler;
 
 import org.mifosplatform.billing.currency.service.CountryCurrencyWritePlatformService;
@@ -10,25 +15,25 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author hugo
- *
+ * 
  */
 @Service
-public class CreateCountryCurrencyCommandHandler implements
+public class UpdateCountryCurrencyCommandHandler implements
 		NewCommandSourceHandler {
 
-	CountryCurrencyWritePlatformService countryCurrencyWritePlatformService;
+	private final CountryCurrencyWritePlatformService writePlatformService;
 
 	@Autowired
-	public CreateCountryCurrencyCommandHandler(
-			final CountryCurrencyWritePlatformService countryCurrencyWritePlatformService) {
-		this.countryCurrencyWritePlatformService = countryCurrencyWritePlatformService;
+	public UpdateCountryCurrencyCommandHandler(
+			final CountryCurrencyWritePlatformService writePlatformService) {
+		this.writePlatformService = writePlatformService;
 	}
 
 	@Transactional
 	@Override
 	public CommandProcessingResult processCommand(final JsonCommand command) {
-		return countryCurrencyWritePlatformService
-				.createCountryCurrency(command);
-	}
 
+		return this.writePlatformService.updateCountryCurrency(
+				command.entityId(), command);
+	}
 }

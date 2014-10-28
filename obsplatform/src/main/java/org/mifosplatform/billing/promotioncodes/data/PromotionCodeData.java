@@ -87,7 +87,7 @@ public class PromotionCodeData {
 		return discounTypeData;
 	}
 
-	public void setDiscounTypeData(Collection<MCodeData> discounTypeData) {
+	public void setDiscounTypeData(final Collection<MCodeData> discounTypeData) {
 		this.discounTypeData = discounTypeData;
 	}
 
@@ -95,7 +95,7 @@ public class PromotionCodeData {
 		return contractTypedata;
 	}
 
-	public void setContractTypedata(List<PeriodData> contractTypedata) {
+	public void setContractTypedata(final List<PeriodData> contractTypedata) {
 		this.contractTypedata = contractTypedata;
 	}
 

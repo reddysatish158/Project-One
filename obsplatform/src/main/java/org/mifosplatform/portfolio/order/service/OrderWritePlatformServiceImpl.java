@@ -8,11 +8,11 @@ import java.util.List;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.joda.time.LocalDate;
-import org.mifosplatform.billing.chargecode.domain.ChargeCode;
+import org.mifosplatform.billing.chargecode.domain.ChargeCodeMaster;
 import org.mifosplatform.billing.chargecode.domain.ChargeCodeRepository;
 import org.mifosplatform.billing.discountmaster.domain.DiscountMaster;
 import org.mifosplatform.billing.discountmaster.domain.DiscountMasterRepository;
-import org.mifosplatform.billing.discountmaster.exceptions.DiscountMasterNotFoundException;
+import org.mifosplatform.billing.discountmaster.exception.DiscountMasterNotFoundException;
 import org.mifosplatform.billing.pricing.data.PriceData;
 import org.mifosplatform.billing.pricing.domain.Price;
 import org.mifosplatform.billing.pricing.domain.PriceRepository;
@@ -586,7 +586,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 								    Price price=this.priceRepository.findOneByPlanAndService(plan.getId(), service.getServiceCode(),contractDetails.getSubscriptionPeriod());
 								    
 								    if(price != null){
-								    	ChargeCode chargeCode=this.chargeCodeRepository.findOneByChargeCode(price.getChargeCode());
+								    	ChargeCodeMaster chargeCode=this.chargeCodeRepository.findOneByChargeCode(price.getChargeCode());
 								    	orderprice.setChargeCode(chargeCode.getChargeCode());
 								    	orderprice.setChargeDuration(chargeCode.getChargeDuration().toString());
 								    	orderprice.setChargeType(chargeCode.getChargeType());
@@ -619,7 +619,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 								    Price price=this.priceRepository.findOneByPlanAndService(plan.getId(), service.getServiceCode(),contractDetails.getSubscriptionPeriod());
 								    
 								    if(price != null){
-								    	ChargeCode chargeCode=this.chargeCodeRepository.findOneByChargeCode(price.getChargeCode());
+								    	ChargeCodeMaster chargeCode=this.chargeCodeRepository.findOneByChargeCode(price.getChargeCode());
 								    	orderprice.setChargeCode(chargeCode.getChargeCode());
 								    	orderprice.setChargeDuration(chargeCode.getChargeDuration().toString());
 								    	orderprice.setChargeType(chargeCode.getChargeType());

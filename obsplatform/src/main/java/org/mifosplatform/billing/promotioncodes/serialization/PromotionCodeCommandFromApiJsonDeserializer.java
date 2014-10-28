@@ -44,7 +44,7 @@ public final class PromotionCodeCommandFromApiJsonDeserializer {
 
 	/**
 	 * @param json
-	 *            * check validation for create promotion codes
+	 * check validation for create promotion codes
 	 */
 	public void validateForCreate(final String json) {
 		if (StringUtils.isBlank(json)) {

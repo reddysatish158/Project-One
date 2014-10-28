@@ -1570,7 +1570,7 @@ public CommandWrapperBuilder updateCountryCurrency(Long id) {
 	return this;
 }
 
-public CommandWrapperBuilder deleteCuntryCurrency(Long id) {
+public CommandWrapperBuilder deleteCountryCurrency(Long id) {
 	this.actionName="DELETE";
 	this.entityName="COUNTRYCURRENCY";
 	this.entityId=id;

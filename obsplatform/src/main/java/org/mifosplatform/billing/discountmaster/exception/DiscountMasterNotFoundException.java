@@ -1,5 +1,5 @@
 
-package org.mifosplatform.billing.discountmaster.exceptions;
+package org.mifosplatform.billing.discountmaster.exception;
 
 import org.mifosplatform.infrastructure.core.exception.AbstractPlatformResourceNotFoundException;
 

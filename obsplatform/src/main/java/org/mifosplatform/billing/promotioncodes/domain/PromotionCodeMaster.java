@@ -53,7 +53,6 @@ public class PromotionCodeMaster extends AbstractPersistable<Long> {
 	private char isDeleted = 'N';
 
 	public PromotionCodeMaster() {
-		// TODO Auto-generated constructor stub
 
 	}
 
@@ -151,7 +150,7 @@ public class PromotionCodeMaster extends AbstractPersistable<Long> {
 
 	/**
 	 * @param command
-	 * @return PromotionCodeMaster
+	 * @return PromotionCodeMaster constructor
 	 */
 	public static PromotionCodeMaster fromJson(final JsonCommand command) {
 
@@ -181,66 +180,58 @@ public class PromotionCodeMaster extends AbstractPersistable<Long> {
 	public Map<String, Object> updatePromotion(final JsonCommand command) {
 		final Map<String, Object> actualChanges = new ConcurrentHashMap<String, Object>(
 				1);
-		final String promotionCodeParamName = "promotionCode";
-		if (command.isChangeInStringParameterNamed(promotionCodeParamName,
+		if (command.isChangeInStringParameterNamed("promotionCode",
 				this.promotionCode)) {
 			final String newValue = command
-					.stringValueOfParameterNamed(promotionCodeParamName);
-			actualChanges.put(promotionCodeParamName, newValue);
+					.stringValueOfParameterNamed("promotionCode");
+			actualChanges.put("promotionCode", newValue);
 			this.promotionCode = StringUtils.defaultIfEmpty(newValue, null);
 		}
 
-		final String descriptionParamName = "promotionDescription";
-		if (command.isChangeInStringParameterNamed(descriptionParamName,
+		if (command.isChangeInStringParameterNamed("promotionDescription",
 				this.promotionDescription)) {
 			final String newValue = command
-					.stringValueOfParameterNamed(descriptionParamName);
-			actualChanges.put(descriptionParamName, newValue);
+					.stringValueOfParameterNamed("promotionDescription");
+			actualChanges.put("promotionDescription", newValue);
 			this.promotionDescription = StringUtils.defaultIfEmpty(newValue,
 					null);
 		}
 
-		final String durationTypeParam = "durationType";
-		if (command.isChangeInStringParameterNamed(durationTypeParam,
+		if (command.isChangeInStringParameterNamed("durationType",
 				this.durationType)) {
 			final String newValue = command
-					.stringValueOfParameterNamed(durationTypeParam);
-			actualChanges.put(durationTypeParam, newValue);
+					.stringValueOfParameterNamed("durationType");
+			actualChanges.put("durationType", newValue);
 			this.durationType = StringUtils.defaultIfEmpty(newValue, null);
 		}
 
-		final String durationParam = "duration";
-		if (command.isChangeInLongParameterNamed(durationParam, this.duration)) {
-			final Long newValue = command
-					.longValueOfParameterNamed(durationParam);
-			actualChanges.put(durationParam, newValue);
+		if (command.isChangeInLongParameterNamed("duration", this.duration)) {
+			final Long newValue = command.longValueOfParameterNamed("duration");
+			actualChanges.put("duration", newValue);
 			this.duration = newValue;
 		}
 
-		final String discountTypeParam = "discountType";
-		if (command.isChangeInStringParameterNamed(discountTypeParam,
+		if (command.isChangeInStringParameterNamed("discountType",
 				this.discountType)) {
 			final String newValue = command
-					.stringValueOfParameterNamed(discountTypeParam);
-			actualChanges.put(discountTypeParam, newValue);
+					.stringValueOfParameterNamed("discountType");
+			actualChanges.put("discountType", newValue);
 			this.discountType = StringUtils.defaultIfEmpty(newValue, null);
 		}
 
-		final String discountRateParamName = "discountRate";
-		if (command.isChangeInBigDecimalParameterNamed(discountRateParamName,
+		if (command.isChangeInBigDecimalParameterNamed("discountRate",
 				this.discountRate)) {
 			final BigDecimal newValue = command
-					.bigDecimalValueOfParameterNamed(discountRateParamName);
-			actualChanges.put(discountRateParamName, newValue);
+					.bigDecimalValueOfParameterNamed("discountRate");
+			actualChanges.put("discountRate", newValue);
 			this.discountRate = newValue;
 		}
 
-		final String startDateParamName = "startDate";
-		if (command.isChangeInLocalDateParameterNamed(startDateParamName,
+		if (command.isChangeInLocalDateParameterNamed("startDate",
 				new LocalDate(this.startDate))) {
 			final LocalDate newValue = command
-					.localDateValueOfParameterNamed(startDateParamName);
-			actualChanges.put(startDateParamName, newValue);
+					.localDateValueOfParameterNamed("startDate");
+			actualChanges.put("startDate", newValue);
 			this.startDate = newValue.toDate();
 		}
 

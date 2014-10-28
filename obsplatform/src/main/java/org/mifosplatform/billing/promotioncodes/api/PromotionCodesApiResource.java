@@ -104,7 +104,7 @@ public class PromotionCodesApiResource {
 	@Path("template")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrievePromotionTemplate(@Context final UriInfo uriInfo) {
+	public String retrievePromotionTemplateData(@Context final UriInfo uriInfo) {
 
 		context.authenticatedUser().validateHasReadPermission(
 				resourceNameForPermissions);

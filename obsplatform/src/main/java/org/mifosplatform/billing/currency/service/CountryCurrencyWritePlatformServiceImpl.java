@@ -2,121 +2,149 @@ package org.mifosplatform.billing.currency.service;
 
 import java.util.Map;
 
+import org.mifosplatform.billing.chargecode.service.ChargeCodeWritePlatformServiceImp;
+import org.mifosplatform.billing.currency.domain.CountryCurrency;
 import org.mifosplatform.billing.currency.domain.CountryCurrencyRepository;
+import org.mifosplatform.billing.currency.exception.DuplicateCurrencyConfigurationException;
 import org.mifosplatform.billing.currency.serialization.CountryCurrencyCommandFromApiJsonDeserializer;
-import org.mifosplatform.billing.pricing.domain.CountryCurrency;
-import org.mifosplatform.infrastructure.codes.exception.CodeNotFoundException;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * @author hugo
+ * 
+ */
 @Service
-public class CountryCurrencyWritePlatformServiceImpl implements CountryCurrencyWritePlatformService{
+public class CountryCurrencyWritePlatformServiceImpl implements
+		CountryCurrencyWritePlatformService {
+
+	private final static Logger LOGGER = LoggerFactory
+			.getLogger(ChargeCodeWritePlatformServiceImp.class);
 	private final PlatformSecurityContext context;
 	private final CountryCurrencyCommandFromApiJsonDeserializer fromApiJsonDeserializer;
-	private final CountryCurrencyReadPlatformService countryCurrencyReadPlatformService;
 	private final CountryCurrencyRepository countryCurrencyRepository;
-	
 
-@Autowired	
-public CountryCurrencyWritePlatformServiceImpl(final PlatformSecurityContext context,CountryCurrencyCommandFromApiJsonDeserializer apiJsonDeserializer,
-		final CountryCurrencyReadPlatformService countryCurrencyReadPlatformService,final CountryCurrencyRepository countryCurrencyRepository){
-	
-	this.context=context;
-	this.fromApiJsonDeserializer=apiJsonDeserializer;
-	this.countryCurrencyReadPlatformService=countryCurrencyReadPlatformService;
-	this.countryCurrencyRepository=countryCurrencyRepository;
-}
-	
+	@Autowired
+	public CountryCurrencyWritePlatformServiceImpl(
+			final PlatformSecurityContext context,
+			final CountryCurrencyCommandFromApiJsonDeserializer apiJsonDeserializer,
+			final CountryCurrencyRepository countryCurrencyRepository) {
+
+		this.context = context;
+		this.fromApiJsonDeserializer = apiJsonDeserializer;
+		this.countryCurrencyRepository = countryCurrencyRepository;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * #createCountryCurrency(org.mifosplatform.infrastructure.core.api.JsonCommand
+	 * )
+	 */
+	@Transactional
 	@Override
-	public CommandProcessingResult createCountryCurrency(JsonCommand command) {
-		
-		try{
-			
+	public CommandProcessingResult createCountryCurrency(
+			final JsonCommand command) {
+
+		try {
+
 			this.context.authenticatedUser();
 			this.fromApiJsonDeserializer.validateForCreate(command.json());
-			
-			 final CountryCurrency countryCurrency=CountryCurrency.fromJson(command);
-			
-		//	List<CountryCurrencyData> currencyDatas = this.countryCurrencyReadPlatformService.getTheCountryCurrencyDetaiils(countryCurrency.getCountry());
-			
-			/*for(CountryCurrencyData currencyData:currencyDatas){
-			     if(currencyData.getCurrency().equalsIgnoreCase(countryCurrency.getCurrency())){
-			    	 throw new DuplicateCurrencyConfigurationException(countryCurrency.getCountry());
-			     }
-				
-			}*/
+			final CountryCurrency countryCurrency = CountryCurrency
+					.fromJson(command);
 			this.countryCurrencyRepository.save(countryCurrency);
 			return new CommandProcessingResult(countryCurrency.getId());
-			
-		}catch(DataIntegrityViolationException dve){
-			handleDataIntegretyIssue(dve,command);
-			 return CommandProcessingResult.empty();
-			
+
+		} catch (DataIntegrityViolationException dve) {
+			handleDataIntegretyIssue(dve, command);
+			return new CommandProcessingResult(Long.valueOf(-1L));
+
 		}
-		
+
 	}
 
-	private void handleDataIntegretyIssue(DataIntegrityViolationException dve, JsonCommand command) {
+	private void handleDataIntegretyIssue(
+			final DataIntegrityViolationException dve, final JsonCommand command) {
 
-        Throwable realCause = dve.getMostSpecificCause();
-        if (realCause.getMessage().contains("country_key")) {
-            final String name = command.stringValueOfParameterNamed("country");
-            throw new PlatformDataIntegrityException("error.msg.currency.duplicate.configuration", "Country is already configured with'"
-                    + name + "'", "displayName", name);
-        }
+		final Throwable realCause = dve.getMostSpecificCause();
+		if (realCause.getMessage().contains("country_key")) {
+			final String name = command.stringValueOfParameterNamed("country");
+			throw new PlatformDataIntegrityException(
+					"error.msg.currency.duplicate.configuration",
+					"Country is already configured with'" + name + "'",
+					"displayName", name);
+		}
 
-       // logger.error(dve.getMessage(), dve);
-        throw new PlatformDataIntegrityException("error.msg.cund.unknown.data.integrity.issue",
-                "Unknown data integrity issue with resource: " + realCause.getMessage());
-    
-	    }
+		LOGGER.error(dve.getMessage(), dve);
+		throw new PlatformDataIntegrityException(
+				"error.msg.could.unknown.data.integrity.issue",
+				"Unknown data integrity issue with resource: "
+						+ realCause.getMessage());
 
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see #updateCountryCurrency(java.lang.Long,
+	 * org.mifosplatform.infrastructure.core.api.JsonCommand)
+	 */
+	@Transactional
 	@Override
-	public CommandProcessingResult updateCurrencyConfig(Long entityId,
-			JsonCommand command) {
-		try
-		{
-			    context.authenticatedUser();
-	            this.fromApiJsonDeserializer.validateForCreate(command.json());
-	            final CountryCurrency countryCurrency = retrieveCodeBy(entityId);
-                final Map<String, Object> changes = countryCurrency.update(command);
-         if (!changes.isEmpty()) {
-             this.countryCurrencyRepository.save(countryCurrency);
-         }
-         return new CommandProcessingResultBuilder() //
-         .withCommandId(command.commandId()) //
-         .withEntityId(entityId) //
-         .with(changes) //
-         .build();
-	} catch (DataIntegrityViolationException dve) {
-		handleDataIntegretyIssue( dve,command);
-		return new CommandProcessingResult(Long.valueOf(-1));
-	}
-		
+	public CommandProcessingResult updateCountryCurrency(final Long entityId,
+			final JsonCommand command) {
+		try {
+			this.context.authenticatedUser();
+			this.fromApiJsonDeserializer.validateForCreate(command.json());
+			final CountryCurrency countryCurrency = retrieveCodeById(entityId);
+			final Map<String, Object> changes = countryCurrency.update(command);
+			if (!changes.isEmpty()) {
+				this.countryCurrencyRepository.saveAndFlush(countryCurrency);
+			}
+			return new CommandProcessingResultBuilder() 
+					.withCommandId(command.commandId()) 
+					.withEntityId(entityId) 
+					.with(changes) 
+					.build();
+		} catch (DataIntegrityViolationException dve) {
+			handleDataIntegretyIssue(dve, command);
+			return new CommandProcessingResult(Long.valueOf(-1));
+		}
+
 	}
 
-	private CountryCurrency retrieveCodeBy(final Long serviceId) {
-	        final CountryCurrency countryCurrency = this.countryCurrencyRepository.findOne(serviceId);
-	        if (countryCurrency == null) { throw new CodeNotFoundException(serviceId.toString()); }
-	        return countryCurrency;
-	    }
-
+	/* (non-Javadoc)
+	 * @see #deleteCountryCurrency(java.lang.Long)
+	 */
+	@Transactional
 	@Override
-	public CommandProcessingResult deleteCountryCurrency(Long entityId) {
-		
+	public CommandProcessingResult deleteCountryCurrency(final Long entityId) {
+
+		this.context.authenticatedUser();
+		final CountryCurrency countryCurrency = retrieveCodeById(entityId);
+		countryCurrency.delete();
+		this.countryCurrencyRepository.save(countryCurrency);
+		return new CommandProcessingResultBuilder().withEntityId(entityId)
+				.build();
+	}
 	
-		 context.authenticatedUser();
-	        final CountryCurrency countryCurrency = retrieveCodeBy(entityId);
-	        countryCurrency.delete();
-			this.countryCurrencyRepository.save(countryCurrency);
-	        return new CommandProcessingResultBuilder().withEntityId(entityId).build();
-}
-}
+	private CountryCurrency retrieveCodeById(final Long currencyConfigId) {
+		final CountryCurrency countryCurrency = this.countryCurrencyRepository
+				.findOne(currencyConfigId);
+		if (countryCurrency == null) {
+			throw new DuplicateCurrencyConfigurationException(currencyConfigId);
+		}
+		return countryCurrency;
+	}
 
-
+}

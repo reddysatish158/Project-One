@@ -3,7 +3,7 @@ package org.mifosplatform.workflow.eventactionmapping.service;
 import java.util.List;
 import java.util.Map;
 
-import org.mifosplatform.billing.discountmaster.exceptions.DiscountMasterNotFoundException;
+import org.mifosplatform.billing.discountmaster.exception.DiscountMasterNotFoundException;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;

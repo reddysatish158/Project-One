@@ -7,16 +7,19 @@ import org.mifosplatform.billing.chargecode.data.ChargeCodeData;
 import org.mifosplatform.billing.chargecode.data.ChargeTypeData;
 import org.mifosplatform.billing.chargecode.data.DurationTypeData;
 
+/**
+ * @author hugo
+ *
+ */
 public interface ChargeCodeReadPlatformService {
 
-	
-	List<ChargeCodeData> getChargeCode();
-	
+	List<ChargeCodeData> retrieveAllChargeCodes();
+
 	List<ChargeTypeData> getChargeType();
-	
+
 	List<DurationTypeData> getDurationType();
-	
+
 	List<BillFrequencyCodeData> getBillFrequency();
-	
-	ChargeCodeData getChargeCode(Long chargeCodeId);
+
+	ChargeCodeData retrieveSingleChargeCodeDetails(Long chargeCodeId);
 }

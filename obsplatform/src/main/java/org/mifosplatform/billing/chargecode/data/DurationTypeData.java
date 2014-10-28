@@ -2,31 +2,32 @@ package org.mifosplatform.billing.chargecode.data;
 
 public class DurationTypeData {
 
-	
-	private String durationType;
 	private Long id;
-	
-	public DurationTypeData(){}
-	
-	public DurationTypeData(final String durationType,final Long id){
-		this.durationType = durationType;
+	private String durationTypeCode;
+
+	public DurationTypeData() {
+	}
+
+	public DurationTypeData(final Long id,final String durationTypeCode) {
+
 		this.id = id;
+		this.durationTypeCode = durationTypeCode;
 	}
-	
-	
-	public void setId(final Long id){
-		this.id = id;
-	}
-	
-	public void setDurationType(String durationType){
-		this.durationType = durationType;
-	}
-	
-	public String getDurationType(){
-		return this.durationType;
-	}
-	
-	public Long getId(){
+
+	public Long getId() {
 		return this.id;
 	}
+
+	public void setId(final Long id) {
+		this.id = id;
+	}
+
+	public void setDurationType(final String durationTypeCode) {
+		this.durationTypeCode = durationTypeCode;
+	}
+
+	public String getDurationTypeCode() {
+		return this.durationTypeCode;
+	}
+
 }

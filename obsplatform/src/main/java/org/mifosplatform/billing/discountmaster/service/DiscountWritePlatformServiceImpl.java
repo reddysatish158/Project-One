@@ -5,7 +5,7 @@ import java.util.Map;
 import org.hibernate.exception.ConstraintViolationException;
 import org.mifosplatform.billing.discountmaster.domain.DiscountMaster;
 import org.mifosplatform.billing.discountmaster.domain.DiscountMasterRepository;
-import org.mifosplatform.billing.discountmaster.exceptions.DiscountMasterNotFoundException;
+import org.mifosplatform.billing.discountmaster.exception.DiscountMasterNotFoundException;
 import org.mifosplatform.billing.discountmaster.serialization.DiscountCommandFromApiJsonDeserializer;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;

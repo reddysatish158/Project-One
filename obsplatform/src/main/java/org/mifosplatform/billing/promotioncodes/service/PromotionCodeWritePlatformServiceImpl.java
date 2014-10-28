@@ -118,7 +118,7 @@ public class PromotionCodeWritePlatformServiceImpl implements
 			if (dve.getCause() instanceof ConstraintViolationException) {
 				handleCodeDataIntegrityIssues(command, dve);
 			}
-			return new CommandProcessingResult(Long.valueOf(-1));
+			return new CommandProcessingResult(Long.valueOf(-1L));
 		}
 
 	}
