@@ -709,7 +709,7 @@ public class SynchronousCommandProcessingService implements
 		               } else if(wrapper.isUpdateEvent()) {
 		                handler = applicationContext.getBean("updateEventMasterCommandHandler",NewCommandSourceHandler.class);
 		               } else if(wrapper.isCloseEvent()) {
-		                handler = applicationContext.getBean("closeEventMasterCommandHandler",NewCommandSourceHandler.class);
+		                handler = applicationContext.getBean("deleteEventMasterCommandHandler",NewCommandSourceHandler.class);
 		               } else {
 		                throw new UnsupportedCommandException(wrapper.commandName());
 		               }
@@ -719,7 +719,7 @@ public class SynchronousCommandProcessingService implements
 	               } else if(wrapper.isUpdateEventPrice()) {
 	                handler = applicationContext.getBean("updateEventPriceCommandHandler",NewCommandSourceHandler.class);
 	               } else if(wrapper.isCloseEventPrice()) {
-	                handler = applicationContext.getBean("closeEventPriceCommandHandler",NewCommandSourceHandler.class);
+	                handler = applicationContext.getBean("deleteEventPriceCommandHandler",NewCommandSourceHandler.class);
 	               } else {
 	                throw new UnsupportedCommandException(wrapper.commandName());
 	               }

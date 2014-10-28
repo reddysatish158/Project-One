@@ -14,7 +14,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
-import org.mifosplatform.cms.eventpricing.data.EventPricingData;
+import org.mifosplatform.cms.eventprice.data.EventPriceData;
 import org.mifosplatform.cms.mediadetails.data.MediaAssetDetailsData;
 import org.mifosplatform.cms.mediadetails.data.MediaLocationData;
 import org.mifosplatform.cms.mediadetails.exception.NoMediaDeviceFoundException;
@@ -84,7 +84,7 @@ public class MediaAssestDetailsApiResource {
 			final List<String> directors=this.assetDetailsReadPlatformService.retrieveDirectors(assetData.getMediaId());
 			final List<String> actors=this.assetDetailsReadPlatformService.retrieveActors(assetData.getMediaId());
 			final List<String> country=this.assetDetailsReadPlatformService.retrieveCountry(assetData.getMediaId());
-			List<EventPricingData> eventPricingData=this.assetDetailsReadPlatformService.getEventPriceDetails(eventId,details.getClientType());
+			List<EventPriceData> eventPricingData=this.assetDetailsReadPlatformService.getEventPriceDetails(eventId,details.getClientType());
 			if(eventPricingData.size() ==0)
 			{
 				 eventPricingData=this.assetDetailsReadPlatformService.getEventPriceDetails(eventId,"ALL");

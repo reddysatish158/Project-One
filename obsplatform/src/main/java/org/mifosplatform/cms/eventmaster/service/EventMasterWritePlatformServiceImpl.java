@@ -31,21 +31,21 @@ import com.google.gson.JsonArray;
  * implements {@link EventMasterWritePlatformService}
  * 
  * @author pavani
- *
+ * @author Rakesh
  */
 @Service
 public class EventMasterWritePlatformServiceImpl implements
 		EventMasterWritePlatformService {
 	
-	private PlatformSecurityContext context;
-	private MediaAssetRepository assetRepository;
-	private EventMasterRepository eventMasterRepository;
-	private EventMasterFromApiJsonDeserializer apiJsonDeserializer;
-	private MediaAssetReadPlatformService assetReadPlatformService;
+	private final PlatformSecurityContext context;
+	private final MediaAssetRepository assetRepository;
+	private final EventMasterRepository eventMasterRepository;
+	private final EventMasterFromApiJsonDeserializer apiJsonDeserializer;
+	private final MediaAssetReadPlatformService assetReadPlatformService;
 	
 	@Autowired
-	public EventMasterWritePlatformServiceImpl (final PlatformSecurityContext context,final EventMasterRepository eventMasterRepository,
-	              							final EventMasterFromApiJsonDeserializer apiJsonDeserializer,final MediaAssetRepository assetRepository,
+	public EventMasterWritePlatformServiceImpl (final PlatformSecurityContext context, final EventMasterRepository eventMasterRepository, 
+	              							final EventMasterFromApiJsonDeserializer apiJsonDeserializer, final MediaAssetRepository assetRepository, 
 	              							final MediaAssetReadPlatformService assetReadPlatformService) {
 		
 		this.context = context;
@@ -57,25 +57,23 @@ public class EventMasterWritePlatformServiceImpl implements
 
 	@Transactional
 	@Override
-	public CommandProcessingResult createEventMaster(JsonCommand command) {
+	public CommandProcessingResult createEventMaster(final JsonCommand command) {
 		try {
 			this.context.authenticatedUser();
-			Long createdbyId = context.authenticatedUser().getId();
+			final Long createdbyId = context.authenticatedUser().getId();
 			this.apiJsonDeserializer.validateForCreate(command.json());
-			EventMaster eventMaster;
 			
-				eventMaster = EventMaster.fromJsom(command);
-					
+			final EventMaster eventMaster = EventMaster.fromJsom(command);		
 			final JsonArray array = command.arrayOfParameterNamed("mediaData").getAsJsonArray();
 			String[] media  = null;
 			media = new String[array.size()];
-			for(int i=0 ; i<array.size() ; i++) {
+			for(int i = 0 ; i < array.size() ; i++) {
 				media[i] = array.get(i).getAsString();
 			}
-			for(String mediaId : media) {
+			for(final String mediaId : media) {
 				final Long id = Long.valueOf(mediaId);
-				MediaAsset mediaAsset = this.assetRepository.findOne(id);
-				EventDetails detail = new EventDetails(mediaAsset.getId());
+				final MediaAsset mediaAsset = this.assetRepository.findOne(id);
+				final EventDetails detail = new EventDetails(mediaAsset.getId());
 				eventMaster.addMediaDetails(detail);
 			}
 			eventMaster.setCreatedbyId(createdbyId);
@@ -99,28 +97,25 @@ public class EventMasterWritePlatformServiceImpl implements
 			this.context.authenticatedUser();
 			this.apiJsonDeserializer.validateForCreate(command.json());
 			
-			EventMaster oldEvent = this.eventMasterRepository.findOne(command.entityId());
+			final EventMaster oldEvent = this.eventMasterRepository.findOne(command.entityId());
 			
-			Map<String, Object> changes;
+			final Map<String, Object> changes = oldEvent.updateEventDetails(command);
 			
-				changes = oldEvent.updateEventDetails(command);
-			
-			List<MediaAssetData> mediaData = this.assetReadPlatformService.retrieveAllmediaAssetdata();
-			
+			final List<MediaAssetData> mediaData = this.assetReadPlatformService.retrieveAllmediaAssetdata();
 			for(MediaAssetData data : mediaData) {
 				oldEvent.getEventDetails().clear();
 				final JsonArray array = command.arrayOfParameterNamed("mediaData").getAsJsonArray();
 				String[] media = null;
-				media  =new String[array.size()];
+				media  = new String[array.size()];
 				
-				for(int i=0;i<array.size();i++) {
+				for(int i = 0; i < array.size(); i++) {
 					media[i] = array.get(i).getAsString();
 				}
 				
 				for(String mediaId : media) {
 					final Long id = Long.valueOf(mediaId);
-					MediaAsset mediaAsset = this.assetRepository.findOne(id);
-					EventDetails detail = new EventDetails(mediaAsset.getId());
+					final MediaAsset mediaAsset = this.assetRepository.findOne(id);
+					final EventDetails detail = new EventDetails(mediaAsset.getId());
 					oldEvent.addMediaDetails(detail);
 				}
 			}
@@ -136,11 +131,11 @@ public class EventMasterWritePlatformServiceImpl implements
 		}
 	}
 	
-	public CommandProcessingResult deleteEventMaster(Long eventId) {
-		List<MediaAssetData> mediaAsset = this.assetReadPlatformService.retrieveAllmediaAssetdata();
-		EventMaster event = this.eventMasterRepository.findOne(eventId);
-		for(MediaAssetData data : mediaAsset) {
-			EventDetails details = new EventDetails(data.getMediaId());
+	public CommandProcessingResult deleteEventMaster(final Long eventId) {
+		final List<MediaAssetData> mediaAsset = this.assetReadPlatformService.retrieveAllmediaAssetdata();
+		final EventMaster event = this.eventMasterRepository.findOne(eventId);
+		for(final MediaAssetData data : mediaAsset) {
+			final EventDetails details = new EventDetails(data.getMediaId());
 			details.delete(event);
 		}
 		event.delete();

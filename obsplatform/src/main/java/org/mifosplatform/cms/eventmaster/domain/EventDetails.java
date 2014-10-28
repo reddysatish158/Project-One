@@ -18,6 +18,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  * @author pavani
  *
  */
+
 @Entity
 @Table(name = "b_event_detail")
 public class EventDetails extends AbstractPersistable<Long> {
@@ -31,34 +32,44 @@ public class EventDetails extends AbstractPersistable<Long> {
 	@JoinColumn(name = "event_id")
 	private EventMaster event;
 	
-	
-	/*@LazyCollection(LazyCollectionOption.FALSE)
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "eventDetails", orphanRemoval = true)
-	private List<EventOrderdetials> details = new ArrayList<EventOrderdetials>();
-	*/
-	
 	@Column(name = "media_id")
 	private Long mediaId;
 	
+	/**
+	 * @param mediaId
+	 * */
 	public EventDetails(final Long mediaId) {
 		this.mediaId = mediaId;
 		this.event = null;
 	}
 
-	public void update (EventMaster event){
+	/**
+	 * method
+	 * @param event
+	 * */
+	public void update (final EventMaster event){
 		this.event = event;
 	}
 	
-	public void delete(EventMaster event) { 
-		LocalDate date = new LocalDate();
-		this.event =event;
+	/**
+	 * method
+	 * @param event
+	 * */
+	public void delete(final EventMaster event) { 
+		final LocalDate date = new LocalDate();
+		this.event = event;
 		event.setEventEndDate(date.toDate());
 	}
 	
-	public EventDetails(EventMaster event) {
+	/**
+	 * Constructor
+	 * @param event
+	 * */
+	public EventDetails(final EventMaster event) {
 		this.event = event;
 	}
 	
+	/** Default Constructor */
 	public EventDetails() {
 		
 	}
@@ -73,7 +84,7 @@ public class EventDetails extends AbstractPersistable<Long> {
 	/**
 	 * @param mediaId the mediaId to set
 	 */
-	public void setMediaId(Long mediaId) {
+	public void setMediaId(final Long mediaId) {
 		this.mediaId = mediaId;
 	}
 
@@ -87,7 +98,7 @@ public class EventDetails extends AbstractPersistable<Long> {
 	/**
 	 * @param event the event to set
 	 */
-	public void setEvent(EventMaster event) {
+	public void setEvent(final EventMaster event) {
 		this.event = event;
 	}
 }

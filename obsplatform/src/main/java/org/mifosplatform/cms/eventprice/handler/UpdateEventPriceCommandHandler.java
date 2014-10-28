@@ -1,6 +1,9 @@
-package org.mifosplatform.cms.eventmaster.handler;
-import org.mifosplatform.cms.eventmaster.domain.EventMaster;
-import org.mifosplatform.cms.eventmaster.service.EventMasterWritePlatformService;
+/**
+ * 
+ */
+package org.mifosplatform.cms.eventprice.handler;
+
+import org.mifosplatform.cms.eventprice.service.EventPriceWritePlatformService;
 import org.mifosplatform.commands.handler.NewCommandSourceHandler;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
@@ -8,20 +11,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * {@link Service} Class for creating {@link EventMaster}
+ * {@link Service} Class for updating {@link EventPricing} Handler
  * implements {@link NewCommandSourceHandler}
  * 
  * @author pavani
  *
  */
 @Service
-public class CreateEventMasterCommandHandler implements NewCommandSourceHandler {
+public class UpdateEventPriceCommandHandler implements NewCommandSourceHandler {
 
 	@Autowired
-	private EventMasterWritePlatformService eventMasterWritePlatformService;
-
+	private EventPriceWritePlatformService eventPricingWritePlatformService;
+	
+	
 	@Override
 	public CommandProcessingResult processCommand(final JsonCommand command) {
-		return this.eventMasterWritePlatformService.createEventMaster(command);
+		
+		return this.eventPricingWritePlatformService.updateEventPrice(command);
 	}
+
 }
