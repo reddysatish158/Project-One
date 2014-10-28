@@ -71,13 +71,15 @@ public class DiscountReadPlatformServiceImpl implements
 		public DiscountMasterData mapRow(final ResultSet rs, final int rowNum)
 				throws SQLException {
 
-			Long id = rs.getLong("id");
-			String discountCode = rs.getString("discountCode");
-			String discountDescription = rs.getString("discountDescription");
-			String discountType = rs.getString("discountType");
-			BigDecimal discountRate = rs.getBigDecimal("discountRate");
-			LocalDate startDate = JdbcSupport.getLocalDate(rs, "startDate");
-			String discountStatus = rs.getString("discountStatus");
+			final Long id = rs.getLong("id");
+			final String discountCode = rs.getString("discountCode");
+			final String discountDescription = rs
+					.getString("discountDescription");
+			final String discountType = rs.getString("discountType");
+			final BigDecimal discountRate = rs.getBigDecimal("discountRate");
+			final LocalDate startDate = JdbcSupport.getLocalDate(rs,
+					"startDate");
+			final String discountStatus = rs.getString("discountStatus");
 			return new DiscountMasterData(id, discountCode,
 					discountDescription, discountType, discountRate, startDate,
 					discountStatus);
@@ -85,7 +87,9 @@ public class DiscountReadPlatformServiceImpl implements
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see #retrieveSingleDiscountDetail(java.lang.Long)
 	 */
 	@Override

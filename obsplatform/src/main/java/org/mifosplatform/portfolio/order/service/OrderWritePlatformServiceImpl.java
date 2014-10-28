@@ -16,11 +16,10 @@ import org.mifosplatform.billing.discountmaster.exceptions.DiscountMasterNotFoun
 import org.mifosplatform.billing.pricing.data.PriceData;
 import org.mifosplatform.billing.pricing.domain.Price;
 import org.mifosplatform.billing.pricing.domain.PriceRepository;
-import org.mifosplatform.billing.pricing.service.PriceReadPlatformService;
-import org.mifosplatform.billing.promotioncodes.domain.Promotion;
-import org.mifosplatform.billing.promotioncodes.domain.PromotionRepository;
+import org.mifosplatform.billing.promotioncodes.domain.PromotionCodeMaster;
+import org.mifosplatform.billing.promotioncodes.domain.PromotionCodeRepository;
+import org.mifosplatform.billing.promotioncodes.exception.PromotionCodeNotFoundException;
 import org.mifosplatform.cms.eventorder.service.PrepareRequestWriteplatformService;
-import org.mifosplatform.finance.billingorder.exceptions.NoPromotionFoundException;
 import org.mifosplatform.finance.billingorder.service.ReverseInvoice;
 import org.mifosplatform.finance.payments.api.PaymentsApiResource;
 import org.mifosplatform.infrastructure.codes.domain.CodeValue;
@@ -119,7 +118,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 	private final OrderRepository orderRepository;
 	private final PriceRepository  priceRepository;
 	private final ClientRepository clientRepository;
-	private final PromotionRepository promotionRepository;
+	private final PromotionCodeRepository promotionCodeRepository;
 	private final PaymentsApiResource paymentsApiResource;
 	private final CodeValueRepository codeValueRepository;
 	private final ChargeCodeRepository chargeCodeRepository;
@@ -166,7 +165,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 			final HardwareAssociationWriteplatformService associationWriteplatformService,final PrepareRequestReadplatformService prepareRequestReadplatformService,
 			final ProvisionServiceDetailsRepository provisionServiceDetailsRepository,final OrderReadPlatformService orderReadPlatformService,
 		    final ProcessRequestRepository processRequestRepository,final HardwareAssociationReadplatformService hardwareAssociationReadplatformService,
-		    final PaymentsApiResource paymentsApiResource,final PrepareRequsetRepository prepareRequsetRepository,final PromotionRepository promotionRepository,
+		    final PaymentsApiResource paymentsApiResource,final PrepareRequsetRepository prepareRequsetRepository,final PromotionCodeRepository promotionCodeRepository,
 		    final OrderDiscountRepository orderDiscountRepository,final AccountNumberGeneratorFactory accountIdentifierGeneratorFactory,
 		    final ClientRepository clientRepository,final ActionDetailsReadPlatformService actionDetailsReadPlatformService,
 		    final ActiondetailsWritePlatformService actiondetailsWritePlatformService,final OrderDetailsReadPlatformServices orderDetailsReadPlatformServices,
@@ -181,7 +180,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 		this.orderRepository = orderRepository;
 		this.clientRepository=clientRepository;
 		this.codeValueRepository=codeRepository;
-		this.promotionRepository=promotionRepository;
+		this.promotionCodeRepository=promotionCodeRepository;
 		this.paymentsApiResource=paymentsApiResource;
 		this.chargeCodeRepository=chargeCodeRepository;
 		this.OrderPriceRepository = OrderPriceRepository;
@@ -922,9 +921,9 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 			this.fromApiJsonDeserializer.validateForPromo(command.json());			
 			final Long promoId=command.longValueOfParameterNamed("promoId");
 			final LocalDate startDate=command.localDateValueOfParameterNamed("startDate");
-			Promotion promotion=this.promotionRepository.findOne(promoId);
+			PromotionCodeMaster promotion=this.promotionCodeRepository.findOne(promoId);
 				if(promotion == null){
-					throw new NoPromotionFoundException(promoId);
+					throw new PromotionCodeNotFoundException(promoId.toString());
 				}
 				Order order=this.orderRepository.findOne(command.entityId());
 				List<OrderDiscount> orderDiscounts=order.getOrderDiscount();

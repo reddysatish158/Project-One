@@ -10,7 +10,7 @@ import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
 
 /**
  * @author hugo
- *
+ * 
  */
 public class DiscountMasterData {
 	private Long id;
@@ -25,10 +25,9 @@ public class DiscountMasterData {
 	private Long discountMasterId;
 	private BigDecimal discountAmount;
 	private BigDecimal discountedChargeAmount;
-	private List<EnumOptionData> status;
+	private List<EnumOptionData> statusData;
 	private Collection<MCodeData> discountTypeData;
 	private String discountstatus;
-	
 
 	public DiscountMasterData(final Long id, final String discountCode,
 			final String discountDescription, final String discounType,
@@ -48,8 +47,8 @@ public class DiscountMasterData {
 
 	public DiscountMasterData(final Long id, final Long orderPriceId,
 			final Long orderDiscountId, final LocalDate discountStartDate,
-			final LocalDate discountEndDate, final String discountType, final BigDecimal discountRate,
-			final String isDeleted) {
+			final LocalDate discountEndDate, final String discountType,
+			final BigDecimal discountRate, final String isDeleted) {
 		this.id = id;
 		this.orderPriceId = orderPriceId;
 		this.discountMasterId = orderDiscountId;
@@ -62,13 +61,9 @@ public class DiscountMasterData {
 		this.discountedChargeAmount = BigDecimal.ZERO;
 	}
 
-	/**
-	 * @param status
-	 * @param discountTypeData
-	 */
-	public DiscountMasterData(final List<EnumOptionData> status,
+	public DiscountMasterData(final List<EnumOptionData> statusData,
 			final Collection<MCodeData> discountTypeData) {
-		this.status = status;
+		this.statusData = statusData;
 		this.discountTypeData = discountTypeData;
 
 	}
@@ -169,12 +164,12 @@ public class DiscountMasterData {
 		this.discountRate = discountRate;
 	}
 
-	public List<EnumOptionData> getStatus() {
-		return status;
+	public List<EnumOptionData> getStatusData() {
+		return statusData;
 	}
 
-	public void setStatus(final List<EnumOptionData> status) {
-		this.status = status;
+	public void setStatusData(final List<EnumOptionData> statusData) {
+		this.statusData = statusData;
 	}
 
 	public Collection<MCodeData> getDiscounTypeData() {
@@ -192,7 +187,5 @@ public class DiscountMasterData {
 	public void setDiscountstatus(final String discountstatus) {
 		this.discountstatus = discountstatus;
 	}
-
-
 
 }

@@ -2,8 +2,8 @@ package org.mifosplatform.billing.discountmaster.domain;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,6 +22,8 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @Entity
 @Table(name = "b_discount_master", uniqueConstraints = @UniqueConstraint(name = "discountcode", columnNames = { "discount_code" }))
 public class DiscountMaster extends AbstractPersistable<Long> {
+
+	private static final long serialVersionUID = 1L;
 
 	@Column(name = "discount_code")
 	private String discountCode;
@@ -64,45 +66,69 @@ public class DiscountMaster extends AbstractPersistable<Long> {
 	}
 
 	/**
-	 * @return discountCode
+	 * @return the discountCode
 	 */
 	public String getDiscountCode() {
 		return discountCode;
 	}
 
+	public void setDiscountCode(final String discountCode) {
+		this.discountCode = discountCode;
+	}
+
 	/**
-	 * @return discountDescription
+	 * @return the discountDescription
 	 */
 	public String getDiscountDescription() {
 		return discountDescription;
 	}
 
+	public void setDiscountDescription(final String discountDescription) {
+		this.discountDescription = discountDescription;
+	}
+
 	/**
-	 * @return discountType
+	 * @return the discountType
 	 */
 	public String getDiscountType() {
 		return discountType;
 	}
 
+	public void setDiscountType(final String discountType) {
+		this.discountType = discountType;
+	}
+
 	/**
-	 * @return startDate
+	 * @return the startDate
 	 */
 	public Date getStartDate() {
 		return startDate;
 	}
 
+	public void setStartDate(final Date startDate) {
+		this.startDate = startDate;
+	}
+
 	/**
-	 * @return discountRate
+	 * @return the discountRate
 	 */
 	public BigDecimal getDiscountRate() {
 		return discountRate;
 	}
 
+	public void setDiscountRate(final BigDecimal discountRate) {
+		this.discountRate = discountRate;
+	}
+
 	/**
-	 * @return discountStatus
+	 * @return the discountStatus
 	 */
 	public String getDiscountStatus() {
 		return discountStatus;
+	}
+
+	public void setDiscountStatus(final String discountStatus) {
+		this.discountStatus = discountStatus;
 	}
 
 	/**
@@ -131,7 +157,7 @@ public class DiscountMaster extends AbstractPersistable<Long> {
 	 * @return changes of discountmaster object
 	 */
 	public Map<String, Object> update(final JsonCommand command) {
-		final Map<String, Object> actualChanges = new LinkedHashMap<String, Object>(
+		final Map<String, Object> actualChanges = new ConcurrentHashMap<String, Object>(
 				1);
 		final String discountCodeParamName = "discountCode";
 		if (command.isChangeInStringParameterNamed(discountCodeParamName,

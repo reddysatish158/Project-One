@@ -1,14 +1,9 @@
-/*
-
-public class PromotionCodeWritePlatformServiceImpl {
-
-}
-*/
-
 package org.mifosplatform.billing.promotioncodes.service;
 
 import java.util.Map;
-import org.mifosplatform.billing.promotioncodes.domain.PromotionCode;
+
+import org.hibernate.exception.ConstraintViolationException;
+import org.mifosplatform.billing.promotioncodes.domain.PromotionCodeMaster;
 import org.mifosplatform.billing.promotioncodes.domain.PromotionCodeRepository;
 import org.mifosplatform.billing.promotioncodes.exception.PromotionCodeNotFoundException;
 import org.mifosplatform.billing.promotioncodes.serialization.PromotionCodeCommandFromApiJsonDeserializer;
@@ -22,105 +17,140 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
-
+/**
+ * @author hugo
+ * 
+ */
 @Service
-public class PromotionCodeWritePlatformServiceImpl implements PromotionCodeWritePlatformService{
-	
-	private final static Logger logger = LoggerFactory.getLogger(PromotionCodeWritePlatformServiceImpl.class);
-    private final PlatformSecurityContext context;
-	private final PromotionCodeCommandFromApiJsonDeserializer apiJsonDeserializer;
-	private final PromotionCodeRepository promotionMappingRepository;
-	
-@Autowired	
-public PromotionCodeWritePlatformServiceImpl(final PlatformSecurityContext context,PromotionCodeCommandFromApiJsonDeserializer apiJsonDeserializer,
-		final PromotionCodeRepository promotionMappingRepository)
-{
-	this.context=context;
-	this.apiJsonDeserializer=apiJsonDeserializer;
-	this.promotionMappingRepository=promotionMappingRepository;
-}
+public class PromotionCodeWritePlatformServiceImpl implements
+		PromotionCodeWritePlatformService {
 
+	private final static Logger LOGGER = LoggerFactory
+			.getLogger(PromotionCodeWritePlatformServiceImpl.class);
+	private final PlatformSecurityContext context;
+	private final PromotionCodeCommandFromApiJsonDeserializer apiJsonDeserializer;
+	private final PromotionCodeRepository promotionCodeRepository;
+
+	/**
+	 * @param context
+	 * @param apiJsonDeserializer
+	 * @param promotionMappingRepository
+	 */
+	@Autowired
+	public PromotionCodeWritePlatformServiceImpl(
+			final PlatformSecurityContext context,
+			PromotionCodeCommandFromApiJsonDeserializer apiJsonDeserializer,
+			final PromotionCodeRepository promotionMappingRepository) {
+		this.context = context;
+		this.apiJsonDeserializer = apiJsonDeserializer;
+		this.promotionCodeRepository = promotionMappingRepository;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * #createPromotionCode(org.mifosplatform.infrastructure.core.api.JsonCommand
+	 * )
+	 */
 	@Override
 	public CommandProcessingResult createPromotionCode(JsonCommand command) {
-       
-		try{
-			
+
+		try {
+
 			this.context.authenticatedUser();
 			this.apiJsonDeserializer.validateForCreate(command.json());
-			PromotionCode promotioncode=PromotionCode.fromJson(command);
-			
-			this.promotionMappingRepository.save(promotioncode);
+			PromotionCodeMaster promotioncode = PromotionCodeMaster
+					.fromJson(command);
+			this.promotionCodeRepository.save(promotioncode);
 			return new CommandProcessingResult(promotioncode.getId());
-			
-			
-		}catch(DataIntegrityViolationException dve){
+
+		} catch (DataIntegrityViolationException dve) {
 			handleCodeDataIntegrityIssues(command, dve);
-			return null;
+			return new CommandProcessingResult(Long.valueOf(-1));
 		}
-	
+
 	}
 
-	
-	private void handleCodeDataIntegrityIssues(JsonCommand command,
-			DataIntegrityViolationException dve) {
-		 Throwable realCause = dve.getMostSpecificCause();
-	        logger.error(dve.getMessage(), dve);
-	        throw new PlatformDataIntegrityException("error.msg.cund.unknown.data.integrity.issue",
-	                "Unknown data integrity issue with resource: " + realCause.getMessage());
-		
+	private void handleCodeDataIntegrityIssues(final JsonCommand command,
+			final DataIntegrityViolationException dve) {
+		final Throwable realCause = dve.getMostSpecificCause();
+		if (realCause.getMessage().contains("promotioncode")) {
+			final String name = command
+					.stringValueOfParameterNamed("promotionCode");
+			throw new PlatformDataIntegrityException(
+					"error.msg.promotionCode.duplicate.name",
+					"A promotion code with'" + name + "'already exists",
+					"displayName", name);
+		}
+		LOGGER.error(dve.getMessage(), dve);
+		throw new PlatformDataIntegrityException(
+				"error.msg.could.unknown.data.integrity.issue",
+				"Unknown data integrity issue with resource: "
+						+ realCause.getMessage());
+
 	}
 
-@Override
-	public CommandProcessingResult updatePromotionCode(Long id,JsonCommand command)
-	{
-        try{
-        	  
-        	this.context.authenticatedUser();
-        	//this.apiJsonDeserializer.validateForCreate(command.json());
-        	
-        	PromotionCode promotionCode=PromotionCoderetrieveById(id);
-        	final Map<String, Object> changes = promotionCode.update(command);  
-        	
-        	if(!changes.isEmpty()){
-        		this.promotionMappingRepository.save(promotionCode);
-        	}
-        	
-        	return new CommandProcessingResult(id);
-        	
-        }catch(DataIntegrityViolationException dve){
-        	handleCodeDataIntegrityIssues(command, dve);
-        	return null;        }
-		
-         
-}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see #updatePromotionCode(java.lang.Long,
+	 * org.mifosplatform.infrastructure.core.api.JsonCommand)
+	 */
+	@Override
+	public CommandProcessingResult updatePromotionCode(final Long id,
+			final JsonCommand command) {
 
-	private PromotionCode PromotionCoderetrieveById(Long id) {
-             
-		PromotionCode promotionCode=this.promotionMappingRepository.findOne(id);
-              if (promotionCode== null) { throw new PromotionCodeNotFoundException(id.toString()); }
-	          return promotionCode;	
+		try {
+
+			this.context.authenticatedUser();
+			PromotionCodeMaster promotionCode = PromotionCodeRetrieveById(id);
+			final Map<String, Object> changes = promotionCode
+					.updatePromotion(command);
+
+			if (!changes.isEmpty()) {
+				this.promotionCodeRepository.saveAndFlush(promotionCode);
+			}
+			return new CommandProcessingResult(id);
+
+		} catch (DataIntegrityViolationException dve) {
+
+			if (dve.getCause() instanceof ConstraintViolationException) {
+				handleCodeDataIntegrityIssues(command, dve);
+			}
+			return new CommandProcessingResult(Long.valueOf(-1));
+		}
+
 	}
-	
-	
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see #deletePromotionCode(java.lang.Long)
+	 */
 	@Override
 	public CommandProcessingResult deletePromotionCode(Long id) {
 
-     try{
-    	 this.context.authenticatedUser();
-    	 PromotionCode promotionCode=this.promotionMappingRepository.findOne(id);
-    	 
-    	 if(promotionCode==null){
-    		 throw new PromotionCodeNotFoundException(id.toString());
-    	 }
-    	 
-    	 promotionCode.delete();
-    	 this.promotionMappingRepository.save(promotionCode);
-    	 return new CommandProcessingResult(id);
-    	 
-    	 
-     }catch(Exception exception){
-    	 return null;
-     }
+		try {
+			this.context.authenticatedUser();
+			PromotionCodeMaster promotionCode = this
+					.PromotionCodeRetrieveById(id);
+			promotionCode.delete();
+			this.promotionCodeRepository.save(promotionCode);
+			return new CommandProcessingResult(id);
+
+		} catch (Exception exception) {
+			return null;
+		}
+	}
+
+	private PromotionCodeMaster PromotionCodeRetrieveById(Long id) {
+
+		PromotionCodeMaster promotionCode = this.promotionCodeRepository
+				.findOne(id);
+		if (promotionCode == null) {
+			throw new PromotionCodeNotFoundException(id.toString());
+		}
+		return promotionCode;
 	}
 }

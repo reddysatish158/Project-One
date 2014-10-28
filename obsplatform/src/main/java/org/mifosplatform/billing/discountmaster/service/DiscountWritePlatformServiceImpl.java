@@ -99,6 +99,7 @@ public class DiscountWritePlatformServiceImpl implements
 	@Override
 	public CommandProcessingResult updateDiscount(final Long entityId,
 			final JsonCommand command) {
+
 		try {
 
 			this.context.authenticatedUser();

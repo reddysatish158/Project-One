@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface PromotionCodeRepository extends
 
-JpaRepository<PromotionCode, Long>,
-JpaSpecificationExecutor<PromotionCode>{
+JpaRepository<PromotionCodeMaster, Long>,
+		JpaSpecificationExecutor<PromotionCodeMaster> {
 
 }

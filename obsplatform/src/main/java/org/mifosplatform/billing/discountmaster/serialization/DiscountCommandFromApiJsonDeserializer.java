@@ -66,10 +66,12 @@ public final class DiscountCommandFromApiJsonDeserializer {
 				"discountCode", element);
 		baseDataValidator.reset().parameter("discountCode").value(discountCode)
 				.notBlank();
+		
 		final LocalDate startDate = fromApiJsonHelper.extractLocalDateNamed(
 				"startDate", element);
 		baseDataValidator.reset().parameter("startDate").value(startDate)
 				.notBlank();
+		
 		final String discountDescription = fromApiJsonHelper
 				.extractStringNamed("discountDescription", element);
 		baseDataValidator.reset().parameter("discountDescription")
@@ -79,10 +81,12 @@ public final class DiscountCommandFromApiJsonDeserializer {
 				"discountType", element);
 		baseDataValidator.reset().parameter("discountType").value(discountType)
 				.notBlank();
+		
 		final Integer discountRate = fromApiJsonHelper
 				.extractIntegerWithLocaleNamed("discountRate", element);
 		baseDataValidator.reset().parameter("discountRate").value(discountRate)
 				.notNull();
+		
 		final String discountStatus = fromApiJsonHelper.extractStringNamed("discountStatus",
 				element);
 		baseDataValidator.reset().parameter("discountStatus").value(discountStatus).notBlank();
