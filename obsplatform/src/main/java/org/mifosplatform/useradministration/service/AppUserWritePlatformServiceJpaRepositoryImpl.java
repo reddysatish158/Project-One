@@ -30,6 +30,7 @@ import org.mifosplatform.useradministration.domain.RoleRepository;
 import org.mifosplatform.useradministration.domain.UserDomainService;
 import org.mifosplatform.useradministration.exception.RoleNotFoundException;
 import org.mifosplatform.useradministration.exception.UserNotFoundException;
+import org.mifosplatform.useradministration.serialization.UsersCommandFromApiJsonDeserializerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,7 @@ import org.springframework.util.ObjectUtils;
 @Service
 public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWritePlatformService {
 
-    private final static Logger logger = LoggerFactory.getLogger(AppUserWritePlatformServiceJpaRepositoryImpl.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(AppUserWritePlatformServiceJpaRepositoryImpl.class);
 
     private final PlatformSecurityContext context;
     private final UserDomainService userDomainService;
@@ -51,12 +52,12 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
     private final AppUserRepository appUserRepository;
     private final OfficeRepository officeRepository;
     private final RoleRepository roleRepository;
-    private final UserDataValidator fromApiJsonDeserializer;
+    private final UsersCommandFromApiJsonDeserializerHelper fromApiJsonDeserializer;
 
     @Autowired
     public AppUserWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final AppUserRepository appUserRepository,
             final UserDomainService userDomainService, final OfficeRepository officeRepository, final RoleRepository roleRepository,
-            final PlatformPasswordEncoder platformPasswordEncoder, final UserDataValidator fromApiJsonDeserializer) {
+            final PlatformPasswordEncoder platformPasswordEncoder, final UsersCommandFromApiJsonDeserializerHelper fromApiJsonDeserializer) {
         this.context = context;
         this.appUserRepository = appUserRepository;
         this.userDomainService = userDomainService;
@@ -206,7 +207,7 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
                     username);
         }
 
-        logger.error(dve.getMessage(), dve);
+        LOGGER.error(dve.getMessage(), dve);
         throw new PlatformDataIntegrityException("error.msg.unknown.data.integrity.issue", "Unknown data integrity issue with resource.");
     }
 }

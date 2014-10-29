@@ -69,13 +69,13 @@ public class PermissionReadPlatformServiceImpl implements PermissionReadPlatform
     private static final class PermissionUsageDataMapper implements RowMapper<PermissionData> {
 
         @Override
-        public PermissionData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
+        public PermissionData mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {
 
-            final String grouping = rs.getString("grouping");
-            final String code = rs.getString("code");
-            final String entityName = rs.getString("entityName");
-            final String actionName = rs.getString("actionName");
-            final Boolean selected = rs.getBoolean("selected");
+            final String grouping = resultSet.getString("grouping");
+            final String code = resultSet.getString("code");
+            final String entityName = resultSet.getString("entityName");
+            final String actionName = resultSet.getString("actionName");
+            final Boolean selected = resultSet.getBoolean("selected");
 
             return PermissionData.instance(grouping, code, entityName, actionName, selected);
         }
