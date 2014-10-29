@@ -1546,7 +1546,7 @@ public CommandWrapperBuilder createEpg() {
 	return this;
 }
 
-public CommandWrapperBuilder updateAsset(Long assetId) {
+public CommandWrapperBuilder updateMediaAsset(Long assetId) {
 	this.actionName="UPDATE";
 	this.entityName="MEDIAASSET";
 	this.entityId=assetId;
@@ -1554,7 +1554,7 @@ public CommandWrapperBuilder updateAsset(Long assetId) {
 	return this;
 }
 
-public CommandWrapperBuilder deleteAsset(Long assetId) {
+public CommandWrapperBuilder deleteMediaAsset(Long assetId) {
 	this.actionName="DELETE";
 	this.entityName="MEDIAASSET";
 	this.entityId=assetId;
@@ -2475,7 +2475,7 @@ public CommandWrapperBuilder updateSelfcarePassword() {
 	return this;
 }
 
-public CommandWrapperBuilder createMediaAssetLocationAttributes(Long assetId) {
+public CommandWrapperBuilder createMediaAssetLocationAttribute(Long assetId) {
 	this.actionName="CREATE";
 	this.entityName="MEDIAASSETLOCATIONATTRIBUTES";
 	this.entityId=assetId;

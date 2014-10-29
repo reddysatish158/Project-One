@@ -753,9 +753,9 @@ public class SynchronousCommandProcessingService implements
 					     if(wrapper.isCreateMediaAsset()) {
 							 handler = applicationContext.getBean("createMediaAssetCommandHandler",NewCommandSourceHandler.class);
 						 }else if(wrapper.isUpdateMediaAsset()) {
-							 handler = applicationContext.getBean("updateAssetCommandHandler",NewCommandSourceHandler.class);
+							 handler = applicationContext.getBean("updateMediaAssetCommandHandler",NewCommandSourceHandler.class);
 						 }else if(wrapper.isCloseMediaAsset()) {
-							 handler = applicationContext.getBean("deleteAssetCommandHandler",NewCommandSourceHandler.class);
+							 handler = applicationContext.getBean("deleteMediaAssetCommandHandler",NewCommandSourceHandler.class);
 						 }
 			} else if(wrapper.isBatch()){
 						if(wrapper.isCreate()){

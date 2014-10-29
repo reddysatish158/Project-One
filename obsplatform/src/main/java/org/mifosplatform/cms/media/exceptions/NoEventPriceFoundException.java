@@ -5,7 +5,12 @@ import org.mifosplatform.infrastructure.core.exception.AbstractPlatformDomainRul
 
 public class NoEventPriceFoundException extends AbstractPlatformDomainRuleException {
 
-    public NoEventPriceFoundException() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public NoEventPriceFoundException() {
         super("error.msg.event.price.not.found", "No event price found");
     }
     
