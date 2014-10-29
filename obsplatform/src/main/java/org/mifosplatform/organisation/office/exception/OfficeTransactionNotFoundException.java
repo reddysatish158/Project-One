@@ -12,7 +12,12 @@ import org.mifosplatform.infrastructure.core.exception.AbstractPlatformResourceN
  */
 public class OfficeTransactionNotFoundException extends AbstractPlatformResourceNotFoundException {
 
-    public OfficeTransactionNotFoundException(final Long id) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public OfficeTransactionNotFoundException(final Long id) {
         super("error.msg.officetransaction.id.invalid", "Office transaction with identifier " + id + " does not exist", id);
     }
 }

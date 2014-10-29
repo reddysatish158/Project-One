@@ -28,13 +28,12 @@ import com.google.gson.reflect.TypeToken;
 @Component
 public class OfficePaymentsCommandFromApiJsonDeserializer {
 
-
 	/**
 	 * The parameters supported for this command.
 	 */
 	private final Set<String> supportedParameters = new HashSet<String>(
 			Arrays.asList("paymentDate", "paymentCode","amountPaid","dateFormat",
-					"locale", "remarks","receiptNo","chequeNo","chequeDate","bankName","branchName"));
+					"locale", "remarks", "receiptNo", "chequeNo", "chequeDate", "bankName", "branchName"));
 	
 	private final FromJsonHelper fromApiJsonHelper;
 
@@ -43,7 +42,7 @@ public class OfficePaymentsCommandFromApiJsonDeserializer {
 		this.fromApiJsonHelper = fromApiJsonHelper;
 	}
 
-	public void validateForCreate(String json) {
+	public void validateForCreate(final String json) {
 
 		if (StringUtils.isBlank(json)) {
 			throw new InvalidJsonException();
@@ -51,8 +50,7 @@ public class OfficePaymentsCommandFromApiJsonDeserializer {
 
 		final Type typeOfMap = new TypeToken<Map<String, Object>>() {
 		}.getType();
-		fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json,
-				supportedParameters);
+		fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, supportedParameters);
 
 		final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
 		final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(
@@ -64,29 +62,32 @@ public class OfficePaymentsCommandFromApiJsonDeserializer {
 		final BigDecimal amountPaid = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("amountPaid", element);
 		
 		
-		String receiptNo = fromApiJsonHelper.extractStringNamed("receiptNo", element);
+		final String receiptNo = fromApiJsonHelper.extractStringNamed("receiptNo", element);
 		baseDataValidator.reset().parameter("receiptNo").value(receiptNo).notBlank().notExceedingLengthOf(50);
 		baseDataValidator.reset().parameter("paymentCode").value(paymentCode)
 		.notBlank().notExceedingLengthOf(100);
 		baseDataValidator.reset().parameter("amountPaid").value(amountPaid)
 		.notBlank().notExceedingLengthOf(100);
+		
 		if(fromApiJsonHelper.parameterExists("isChequeSelected", element)){
-			String isChequeSelected = fromApiJsonHelper.extractStringNamed("isChequeSelected", element);
-			if(isChequeSelected.equalsIgnoreCase("yes")){
+			final String isChequeSelected = fromApiJsonHelper.extractStringNamed("isChequeSelected", element);
+			
+			if("yes".equalsIgnoreCase(isChequeSelected)){
+				
 				if(fromApiJsonHelper.parameterExists("chequeNo", element)){
-					String chequeNo = fromApiJsonHelper.extractStringNamed("chequeNo", element);
+					final String chequeNo = fromApiJsonHelper.extractStringNamed("chequeNo", element);
 					baseDataValidator.reset().parameter("chequeNo").value(chequeNo).notBlank().notExceedingLengthOf(20);
 				}
 				if(fromApiJsonHelper.parameterExists("chequeDate", element)){
-					LocalDate chequeDate = fromApiJsonHelper.extractLocalDateNamed("chequeDate", element);
+					final LocalDate chequeDate = fromApiJsonHelper.extractLocalDateNamed("chequeDate", element);
 					baseDataValidator.reset().parameter("chequeDate").value(chequeDate).notBlank();
 				}
 				if(fromApiJsonHelper.parameterExists("bankName", element)){
-					String bankName = fromApiJsonHelper.extractStringNamed("bankName", element);
+					final String bankName = fromApiJsonHelper.extractStringNamed("bankName", element);
 					baseDataValidator.reset().parameter("bankName").value(bankName).notBlank().notExceedingLengthOf(100);
 				}
 				if(fromApiJsonHelper.parameterExists("branchName", element)){
-					String branchName = fromApiJsonHelper.extractStringNamed("branchName", element);
+					final String branchName = fromApiJsonHelper.extractStringNamed("branchName", element);
 					baseDataValidator.reset().parameter("branchName").value(branchName).notBlank().notExceedingLengthOf(100);
 				}
 			}
@@ -95,14 +96,12 @@ public class OfficePaymentsCommandFromApiJsonDeserializer {
 		throwExceptionIfValidationWarningsExist(dataValidationErrors);
 	}
 
-	private void throwExceptionIfValidationWarningsExist(
-			final List<ApiParameterError> dataValidationErrors) {
+	private void throwExceptionIfValidationWarningsExist(final List<ApiParameterError> dataValidationErrors) {
+		
 		if (!dataValidationErrors.isEmpty()) {
 			throw new PlatformApiDataValidationException(
 					"validation.msg.validation.errors.exist",
 					"Validation errors exist.", dataValidationErrors);
 		}
 	}
-
 }
-

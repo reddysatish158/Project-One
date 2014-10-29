@@ -20,7 +20,7 @@ public class CreateOfficeAdjustmentsCommandHandler implements 	NewCommandSourceH
 	    }
 	@Transactional
 	@Override
-	public CommandProcessingResult processCommand(JsonCommand command) {
+	public CommandProcessingResult processCommand(final JsonCommand command) {
 		return this.writePlatformService.createOfficeAdjustment(command);
 	}
 
