@@ -48,8 +48,8 @@ public final class RedemptionCommandFromApiJsonDeserializer {
 
         final JsonElement element = fromApiJsonHelper.parse(json);
 
-        final Integer clientId = fromApiJsonHelper.extractIntegerWithLocaleNamed("clientId", element);
-        baseDataValidator.reset().parameter("clientId").value(clientId).notBlank().integerGreaterThanZero().notExceedingLengthOf(100);
+        final String clientId = fromApiJsonHelper.extractStringNamed("clientId", element);
+        baseDataValidator.reset().parameter("clientId").value(clientId).notBlank().notExceedingLengthOf(100);
         
         final String pinNumber = fromApiJsonHelper.extractStringNamed("pinNumber", element);
         baseDataValidator.reset().parameter("pinNumber").value(pinNumber).notBlank();
