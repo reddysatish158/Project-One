@@ -27,8 +27,8 @@ import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformSer
 import org.mifosplatform.infrastructure.codes.domain.CodeValue;
 import org.mifosplatform.infrastructure.codes.domain.CodeValueRepository;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -96,7 +96,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     private final GroupsDetailsRepository groupsDetailsRepository;
     private final OrderReadPlatformService orderReadPlatformService;
     private final ClientReadPlatformService clientReadPlatformService;
-    private final GlobalConfigurationRepository configurationRepository;
+    private final ConfigurationRepository configurationRepository;
     private final ServiceParametersRepository serviceParametersRepository;
     private final AccountNumberGeneratorFactory accountIdentifierGeneratorFactory;
     private final ProvisioningWritePlatformService ProvisioningWritePlatformService;
@@ -118,7 +118,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             final OrderReadPlatformService orderReadPlatformService,final ProvisioningWritePlatformService  ProvisioningWritePlatformService,
             final GroupsDetailsRepository groupsDetailsRepository,final OrderRepository orderRepository,final PlanRepository planRepository,
             final PrepareRequestWriteplatformService prepareRequestWriteplatformService,final ClientReadPlatformService clientReadPlatformService,
-            final SelfCareRepository selfCareRepository,final GlobalConfigurationRepository configurationRepository,
+            final SelfCareRepository selfCareRepository,final ConfigurationRepository configurationRepository,
             final PortfolioCommandSourceWritePlatformService  portfolioCommandSourceWritePlatformService) {
     	
         this.context = context;
@@ -288,7 +288,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                 this.clientRepository.saveAndFlush(newClient);
             }
             
-            GlobalConfigurationProperty configuration=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_IS_SELFCAREUSER);
+            Configuration configuration=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_IS_SELFCAREUSER);
             
             if(configuration !=null && configuration.isEnabled()){
             	

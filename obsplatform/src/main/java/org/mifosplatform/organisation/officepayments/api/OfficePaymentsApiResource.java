@@ -39,7 +39,8 @@ public class OfficePaymentsApiResource {
 	private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(
 			Arrays.asList("id", "officeId", "paymentDate", "paymentCode",
 					"amountPaid", "statmentId", "externalId", "Remarks"));
-	private final String resourceNameForPermissions = "OFFICEPAYMENT";
+	
+	private static final String RESOURCENAMEFOR_PERMISSIONS = "OFFICEPAYMENT";
 	private final PlatformSecurityContext context;
 	private final PaymodeReadPlatformService readPlatformService;
 	private final DefaultToApiJsonSerializer<PaymentData> toApiJsonSerializer;
@@ -61,10 +62,11 @@ public class OfficePaymentsApiResource {
 	@Path("template")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrieveDetailsForPayments(@QueryParam("officeId") final Long officeId,@Context final UriInfo uriInfo) {
-		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		Collection<McodeData> data = this.readPlatformService.retrievemCodeDetails("Payment Mode");
-		PaymentData paymentData=new PaymentData(data);
+	public String retrieveDetailsForPayments(@QueryParam("officeId") final Long officeId, @Context final UriInfo uriInfo) {
+		
+		context.authenticatedUser().validateHasReadPermission(RESOURCENAMEFOR_PERMISSIONS);
+		final Collection<McodeData> data = this.readPlatformService.retrievemCodeDetails("Payment Mode");
+		final PaymentData paymentData=new PaymentData(data);
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 		return this.toApiJsonSerializer.serialize(settings, paymentData,RESPONSE_DATA_PARAMETERS);
 	}
@@ -73,9 +75,10 @@ public class OfficePaymentsApiResource {
 	@Path("{officeId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String createOfficePayment(@PathParam("officeId") final Long officeId,final String apiRequestBodyAsJson) {
+	public String createOfficePayment(@PathParam("officeId") final Long officeId, final String apiRequestBodyAsJson) {
 		final CommandWrapper commandRequest = new CommandWrapperBuilder().createOfficePayment(officeId).withJson(apiRequestBodyAsJson).build();
 		final CommandProcessingResult result = this.writePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 	}
+	
 }

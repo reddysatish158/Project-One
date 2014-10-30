@@ -1,14 +1,11 @@
 package org.mifosplatform.cms.media.domain;
 
-
-
-
 public enum MediaEnum {
 
 	 MOVIES("M", "CategoryType.movies"), //
 	 TV_SERIALS("TV", "CategoryType.tvserials"),
 	 COMING_SOON("CS", "CategoryType.tvserials"),
-	  INVALID("N", "CategoryType.invalid");
+	 INVALID("N", "CategoryType.invalid");
 
 
     private final String value;

@@ -2,7 +2,7 @@ package org.mifosplatform.cms.mediadetails.service;
 
 import java.util.List;
 
-import org.mifosplatform.cms.eventpricing.data.EventPricingData;
+import org.mifosplatform.cms.eventprice.data.EventPriceData;
 import org.mifosplatform.cms.mediadetails.data.MediaAssetDetailsData;
 import org.mifosplatform.cms.mediadetails.data.MediaAssetLocationDetails;
 import org.mifosplatform.cms.mediadetails.data.MediaLocationData;
@@ -28,6 +28,6 @@ public interface MediaAssetDetailsReadPlatformService {
 	
 	List<MediaAssetLocationDetails> retrieveMediaAssetLocationData(Long mediaId);
 
-	List<EventPricingData> getEventPriceDetails(Long eventId, String clientType);
+	List<EventPriceData> getEventPriceDetails(Long eventId, String clientType);
 
 }

@@ -79,7 +79,7 @@ public class RoleWritePlatformServiceJpaRepositoryImpl implements RoleWritePlatf
      */
     private void handleDataIntegrityIssues(final JsonCommand command, final DataIntegrityViolationException dve) {
 
-        Throwable realCause = dve.getMostSpecificCause();
+        final Throwable realCause = dve.getMostSpecificCause();
         if (realCause.getMessage().contains("unq_name")) {
 
             final String name = command.stringValueOfParameterNamed("name");
@@ -162,10 +162,10 @@ public class RoleWritePlatformServiceJpaRepositoryImpl implements RoleWritePlatf
                 .build();
     }
 
-    private Permission findPermissionByCode(Collection<Permission> allPermissions, String permissionCode) {
+    private Permission findPermissionByCode(final Collection<Permission> allPermissions, final String permissionCode) {
 
         if (allPermissions != null) {
-            for (Permission permission : allPermissions) {
+            for (final Permission permission : allPermissions) {
                 if (permission.hasCode(permissionCode)) { return permission; }
             }
         }

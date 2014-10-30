@@ -6,5 +6,10 @@
 package org.mifosplatform.useradministration.exception;
 
 public class PasswordMustBeDifferentException extends RuntimeException {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	// basic runtime exception
 }

@@ -12,7 +12,12 @@ import org.mifosplatform.infrastructure.core.exception.AbstractPlatformDomainRul
  */
 public class InvalidOfficeException extends AbstractPlatformDomainRuleException {
 
-    public InvalidOfficeException(final String entity, final String postFix, String defaultUserMessage, Object... defaultUserMessageArgs) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public InvalidOfficeException(final String entity, final String postFix, String defaultUserMessage, Object... defaultUserMessageArgs) {
         super("error.msg."+entity+"."+postFix+".invalid.office", defaultUserMessage, defaultUserMessageArgs);
     }
 }

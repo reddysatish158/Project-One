@@ -56,24 +56,24 @@ public class AppUserReadPlatformServiceImpl implements AppUserReadPlatformServic
     @Cacheable(value = "users", key = "T(org.mifosplatform.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.context.authenticatedUser().getOffice().getHierarchy())")
     public Collection<AppUserData> retrieveAllUsers() {
 
-        AppUser currentUser = context.authenticatedUser();
-        String hierarchy = currentUser.getOffice().getHierarchy();
-        String hierarchySearchString = hierarchy + "%";
+        final AppUser currentUser = context.authenticatedUser();
+        final String hierarchy = currentUser.getOffice().getHierarchy();
+        final String hierarchySearchString = hierarchy + "%";
 
-        AppUserMapper mapper = new AppUserMapper();
-        String sql = "select " + mapper.schema();
+        final AppUserMapper mapper = new AppUserMapper();
+        final String sql = "select " + mapper.schema();
 
         return this.jdbcTemplate.query(sql, mapper, new Object[] { hierarchySearchString });
     }
 
     @Override
     public Collection<AppUserData> retrieveSearchTemplate() {
-        AppUser currentUser = context.authenticatedUser();
-        String hierarchy = currentUser.getOffice().getHierarchy();
-        String hierarchySearchString = hierarchy + "%";
+        final AppUser currentUser = context.authenticatedUser();
+        final String hierarchy = currentUser.getOffice().getHierarchy();
+        final String hierarchySearchString = hierarchy + "%";
 
-        AppUserLookupMapper mapper = new AppUserLookupMapper();
-        String sql = "select " + mapper.schema();
+        final AppUserLookupMapper mapper = new AppUserLookupMapper();
+        final String sql = "select " + mapper.schema();
 
         return this.jdbcTemplate.query(sql, mapper, new Object[] { hierarchySearchString });
     }
@@ -90,16 +90,14 @@ public class AppUserReadPlatformServiceImpl implements AppUserReadPlatformServic
     @Override
     public AppUserData retrieveUser(final Long userId) {
 
-       // context.authenticatedUser();
-
         final AppUser user = this.appUserRepository.findOne(userId);
         if (user == null || user.isDeleted()) { throw new UserNotFoundException(userId); }
 
         Collection<RoleData> availableRoles = this.roleReadPlatformService.retrieveAll();
 
-        Collection<RoleData> selectedUserRoles = new ArrayList<RoleData>();
-        Set<Role> userRoles = user.getRoles();
-        for (Role role : userRoles) {
+        final Collection<RoleData> selectedUserRoles = new ArrayList<RoleData>();
+        final Set<Role> userRoles = user.getRoles();
+        for (final Role role : userRoles) {
             selectedUserRoles.add(role.toData());
         }
 
@@ -112,15 +110,15 @@ public class AppUserReadPlatformServiceImpl implements AppUserReadPlatformServic
     private static final class AppUserMapper implements RowMapper<AppUserData> {
 
         @Override
-        public AppUserData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
+        public AppUserData mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {
 
-            final Long id = rs.getLong("id");
-            final String username = rs.getString("username");
-            final String firstname = rs.getString("firstname");
-            final String lastname = rs.getString("lastname");
-            final String email = rs.getString("email");
-            final Long officeId = JdbcSupport.getLong(rs, "officeId");
-            final String officeName = rs.getString("officeName");
+            final Long id = resultSet.getLong("id");
+            final String username = resultSet.getString("username");
+            final String firstname = resultSet.getString("firstname");
+            final String lastname = resultSet.getString("lastname");
+            final String email = resultSet.getString("email");
+            final Long officeId = JdbcSupport.getLong(resultSet, "officeId");
+            final String officeName = resultSet.getString("officeName");
 
             return AppUserData.instance(id, username, email, officeId, officeName, firstname, lastname, null, null);
         }
@@ -136,10 +134,10 @@ public class AppUserReadPlatformServiceImpl implements AppUserReadPlatformServic
     private static final class AppUserLookupMapper implements RowMapper<AppUserData> {
 
         @Override
-        public AppUserData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
+        public AppUserData mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {
 
-            final Long id = rs.getLong("id");
-            final String username = rs.getString("username");
+            final Long id = resultSet.getLong("id");
+            final String username = resultSet.getString("username");
 
             return AppUserData.dropdown(id, username);
         }

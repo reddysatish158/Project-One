@@ -1,4 +1,5 @@
 package org.mifosplatform.cms.media.domain;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,10 +25,10 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @Table(name = "b_media_asset")
 public class MediaAsset extends  AbstractPersistable<Long> {
 
-	/*@Id
-	@GeneratedValue
-	@Column(name = "id")
-	private Long id;*/
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	@Column(name = "category_id")
 	private Long categoryId;
@@ -74,7 +75,6 @@ public class MediaAsset extends  AbstractPersistable<Long> {
 	@Column(name = "cp_share",  nullable = false)
 	private BigDecimal cpShareValue;
 
-	
 	@LazyCollection(LazyCollectionOption.FALSE)
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "mediaAsset", orphanRemoval = true)
 	private List<MediaassetAttributes> mediaassetAttributes = new ArrayList<MediaassetAttributes>();
@@ -86,19 +86,19 @@ public class MediaAsset extends  AbstractPersistable<Long> {
 	@Column(name = "is_deleted")
 	private char isDeleted = 'N';
 
-	 public  MediaAsset() {
+	public  MediaAsset() {
 		// TODO Auto-generated constructor stub
 	}
-	 public MediaAsset(String mediaTitle, String mediaType,Long mediaCategoryId, Date releaseDate,Long contentProvider,
-					   String status,BigDecimal cpShareValue) {
+	 public MediaAsset(final String mediaTitle, final String mediaType, final Long mediaCategoryId, final Date releaseDate, 
+			 final Long contentProvider, final String status, final BigDecimal cpShareValue) {
 		 
-		this.title=mediaTitle;
-		this.type=mediaType;
-		this.categoryId=mediaCategoryId;
-		this.releaseDate=releaseDate;
-		this.contentProvider=contentProvider;
-		this.status=status;
-		this.cpShareValue=cpShareValue;
+		this.title = mediaTitle;
+		this.type = mediaType;
+		this.categoryId = mediaCategoryId;
+		this.releaseDate = releaseDate;
+		this.contentProvider = contentProvider;
+		this.status = status;
+		this.cpShareValue = cpShareValue;
 
 	 }
 
@@ -171,7 +171,7 @@ public class MediaAsset extends  AbstractPersistable<Long> {
 		return cpShareValue;
 	}
 	
-	public static MediaAsset fromJson(JsonCommand command) {
+	public static MediaAsset fromJson(final JsonCommand command) {
 		
 		 final String mediaTitle = command.stringValueOfParameterNamed("mediaTitle");
 		 //final String mediaType = command.stringValueOfParameterNamed("mediatype");
@@ -190,29 +190,28 @@ public class MediaAsset extends  AbstractPersistable<Long> {
 		 final String rated=command.stringValueOfParameterNamed("rated");
 		 final BigDecimal rating=command.bigDecimalValueOfParameterNamed("mediaRating");*/
 		 
-		 return new MediaAsset(mediaTitle,null,mediaCategoryId,releaseDate.toDate(),
-					contentProvider,status,cpShareValue);
+		 return new MediaAsset(mediaTitle, null, mediaCategoryId, releaseDate.toDate(),
+					contentProvider, status, cpShareValue);
 	}
 
-	public void add(MediaassetAttributes attributes) {
+	public void add(final MediaassetAttributes attributes) {
 		attributes.update(this);
 		mediaassetAttributes.add(attributes);
 		
 	}
 
-	public void addMediaLocations(MediaassetLocation mediaassetLocation) {
+	public void addMediaLocations(final MediaassetLocation mediaassetLocation) {
            mediaassetLocation.update(this);
            this.mediaassetLocations.add(mediaassetLocation);
 	}
 
-	public java.util.Map<String, Object> updateAssetDetails(JsonCommand command) {
+	public java.util.Map<String, Object> updateAssetDetails(final JsonCommand command) {
 
 		final LinkedHashMap<String, Object> actualChanges = new LinkedHashMap<String, Object>(1);
 		
 		final String mediaTitle = "mediaTitle";
 		if (command.isChangeInStringParameterNamed(mediaTitle,this.title)) {
-			final String newValue = command
-					.stringValueOfParameterNamed("mediaTitle");
+			final String newValue = command.stringValueOfParameterNamed("mediaTitle");
 			actualChanges.put(title, newValue);
 			this.title = StringUtils.defaultIfEmpty(newValue, null);
 		}
@@ -224,35 +223,35 @@ public class MediaAsset extends  AbstractPersistable<Long> {
 			this.type = StringUtils.defaultIfEmpty(newValue, null);
 		}*/
 		final String status = "status";
-		if (command.isChangeInStringParameterNamed(status,
-				this.status)) {
-			final String newValue = command
-					.stringValueOfParameterNamed("status");
+		if (command.isChangeInStringParameterNamed(status, this.status)) {
+			final String newValue = command.stringValueOfParameterNamed("status");
 			actualChanges.put(status, newValue);
 			this.status = StringUtils.defaultIfEmpty(newValue, null);
 		}
+		
 		final String mediaCategoryId="catageoryId";
 		if(command.isChangeInLongParameterNamed(mediaCategoryId, this.categoryId)){
-			final Long newValue=command.longValueOfParameterNamed("catageoryId");
+			final Long newValue = command.longValueOfParameterNamed("catageoryId");
 			actualChanges.put(mediaCategoryId, newValue);
-			this.categoryId=newValue;
+			this.categoryId = newValue;
 		}
-		final String cpShareValue="cpShareValue";
+		
+		final String cpShareValue = "cpShareValue";
 		if(command.isChangeInBigDecimalParameterNamed(cpShareValue, this.cpShareValue)){
-			final BigDecimal newValue=command.bigDecimalValueOfParameterNamed("cpShareValue");
+			final BigDecimal newValue = command.bigDecimalValueOfParameterNamed("cpShareValue");
 			actualChanges.put(cpShareValue, newValue);
-			this.cpShareValue=newValue;
+			this.cpShareValue = newValue;
 		}
 		
 		final String contentProvider = "contentProvider";
-		if (command.isChangeInLongParameterNamed(contentProvider,this.contentProvider)) {
-			final Long newValue=command.longValueOfParameterNamed("contentProvider");
+		if (command.isChangeInLongParameterNamed(contentProvider, this.contentProvider)) {
+			final Long newValue = command.longValueOfParameterNamed("contentProvider");
 			actualChanges.put(contentProvider, newValue);
-			this.contentProvider =newValue ;
+			this.contentProvider = newValue ;
 		}
 		
 		final String releaseDate = "releaseDate";
-		if (command.isChangeInLocalDateParameterNamed(releaseDate,new LocalDate(this.releaseDate))) {
+		if (command.isChangeInLocalDateParameterNamed(releaseDate, new LocalDate(this.releaseDate))) {
 			 final LocalDate newValue = command.localDateValueOfParameterNamed("releaseDate");
 			actualChanges.put(releaseDate, newValue);
 			this.releaseDate = newValue.toDate();
@@ -320,17 +319,8 @@ public class MediaAsset extends  AbstractPersistable<Long> {
 	}
 
 	public void isDelete() {
-		if(this.isDeleted!= 'Y'){
-			this.isDeleted='Y';
+		if(this.isDeleted != 'Y'){
+			this.isDeleted ='Y';
 		}
-		
-	}
-
-	
-	 
-	 
-			
-	}
- 
-	
-	
+	}			
+}

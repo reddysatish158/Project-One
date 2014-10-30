@@ -1,6 +1,5 @@
 package org.mifosplatform.cms.eventmaster.domain;
 
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -11,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  * @author pavani
  *
  */
+
 public interface EventMasterRepository extends JpaRepository<EventMaster, Long>,
 JpaSpecificationExecutor<EventMaster>{
 

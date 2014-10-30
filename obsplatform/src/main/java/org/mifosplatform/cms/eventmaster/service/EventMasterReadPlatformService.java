@@ -15,7 +15,7 @@ import ch.qos.logback.core.status.Status;
  * Interface for {@link EventMaster} Read Service
  * 
  * @author pavani
- *
+ * @author Rakesh
  */
 public interface EventMasterReadPlatformService {
 
@@ -64,7 +64,13 @@ public interface EventMasterReadPlatformService {
 	 * @return
 	 */
 	List<EventDetailsData> retrieveEventDetailsData(Integer eventId);
-
+	
+	/**
+	 * Method for retrieving {@link EventDetails} {@link List}
+	 * 
+	 * @param eventId
+	 * @return
+	 */
 	List<EventMasterData> retrieveEventMasterDataForEventOrders();
 	
 }

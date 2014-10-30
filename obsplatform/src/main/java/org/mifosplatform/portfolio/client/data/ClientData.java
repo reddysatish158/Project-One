@@ -16,7 +16,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.joda.time.LocalDate;
 import org.mifosplatform.billing.selfcare.domain.SelfCare;
 import org.mifosplatform.infrastructure.codes.data.CodeValueData;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
 import org.mifosplatform.organisation.address.data.AddressData;
 import org.mifosplatform.organisation.office.data.OfficeData;
@@ -72,8 +72,8 @@ final public class ClientData implements Comparable<ClientData> {
 	private final String categoryType;
 	private AddressData addressTemplateData;
     private final List<String> hardwareDetails;
-    private GlobalConfigurationProperty configurationProperty;
-    private GlobalConfigurationProperty configurationPropertyforIos;
+    private Configuration configurationProperty;
+    private Configuration configurationPropertyforIos;
 	private  final String currency;
 
 	private final Collection<GroupData> groupNameDatas;
@@ -294,14 +294,14 @@ final public class ClientData implements Comparable<ClientData> {
 		
 	}
 
-	public GlobalConfigurationProperty getConfigurationProperty() {
+	public Configuration getConfigurationProperty() {
 		return configurationProperty;
 	}
 
-	public void setConfigurationProperty(GlobalConfigurationProperty configurationProperty) {
+	public void setConfigurationProperty(Configuration configurationProperty) {
 		this.configurationProperty = configurationProperty;
 	}
-	public void setConfigurationPropertyForIos(GlobalConfigurationProperty configurationPropertyforIos) {
+	public void setConfigurationPropertyForIos(Configuration configurationPropertyforIos) {
 		this.configurationPropertyforIos = configurationPropertyforIos;
 	}
 

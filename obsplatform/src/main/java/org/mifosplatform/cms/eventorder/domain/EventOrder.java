@@ -13,7 +13,7 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.joda.time.LocalDate;
 import org.mifosplatform.cms.eventmaster.domain.EventMaster;
-import org.mifosplatform.cms.eventpricing.domain.EventPricing;
+import org.mifosplatform.cms.eventprice.domain.EventPrice;
 import org.mifosplatform.cms.media.exceptions.NoEventPriceFoundException;
 import org.mifosplatform.cms.media.exceptions.NoPricesFoundException;
 import org.mifosplatform.cms.mediadevice.data.MediaDeviceData;
@@ -97,9 +97,9 @@ public class EventOrder extends AbstractAuditableCustom<AppUser, Long> {
 		 
 		 final Long eventPriceId=eventMaster.getEventPricings().get(0).getId();
 		 Double bookedPrice=null;
-		 List<EventPricing> eventPricings=eventMaster.getEventPricings();
+		 List<EventPrice> eventPricings=eventMaster.getEventPricings();
 		 
-		 for(EventPricing eventPricing:eventPricings){
+		 for(EventPrice eventPricing:eventPricings){
 			 if(eventPricing.getClientType()==clientType && eventPricing.getFormatType().equalsIgnoreCase(formatType)
 					 && eventPricing.getOptType().equalsIgnoreCase(optType)){
 				   bookedPrice=eventPricing.getPrice();

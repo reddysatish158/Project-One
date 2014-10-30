@@ -6,8 +6,8 @@ import java.util.Map;
 
 import org.mifosplatform.billing.discountmaster.exceptions.DiscountNotFoundException;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -44,7 +44,7 @@ public class OwnedHardwareWritePlatformServiceImp implements OwnedHardwareWriteP
 	private final OwnedHardwareFromApiJsonDeserializer apiJsonDeserializer;
 	private final OwnedHardwareReadPlatformService ownedHardwareReadPlatformService;
 	private final InventoryItemDetailsReadPlatformService inventoryItemDetailsReadPlatformService;
-	private final GlobalConfigurationRepository globalConfigurationRepository;
+	private final ConfigurationRepository globalConfigurationRepository;
 	private final HardwareAssociationWriteplatformService hardwareAssociationWriteplatformService;
 	private final HardwareAssociationReadplatformService associationReadplatformService;
 	private final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService;
@@ -57,7 +57,7 @@ public class OwnedHardwareWritePlatformServiceImp implements OwnedHardwareWriteP
 	@Autowired
 	public OwnedHardwareWritePlatformServiceImp(final OwnedHardwareJpaRepository ownedHardwareJpaRepository, final PlatformSecurityContext context,
 			final OwnedHardwareFromApiJsonDeserializer apiJsonDeserializer,final OwnedHardwareReadPlatformService ownedHardwareReadPlatformService,
-			final InventoryItemDetailsReadPlatformService inventoryItemDetailsReadPlatformService,final GlobalConfigurationRepository globalConfigurationRepository,
+			final InventoryItemDetailsReadPlatformService inventoryItemDetailsReadPlatformService,final ConfigurationRepository globalConfigurationRepository,
 			final HardwareAssociationWriteplatformService hardwareAssociationWriteplatformService,final HardwareAssociationReadplatformService hardwareAssociationReadplatformService,
 			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,final OrderReadPlatformService orderReadPlatformService,
 			final HardwareAssociationRepository associationRepository,final ProvisioningWritePlatformService provisioningWritePlatformService) {
@@ -105,7 +105,7 @@ public class OwnedHardwareWritePlatformServiceImp implements OwnedHardwareWriteP
 		this.ownedHardwareJpaRepository.save(ownedHardware);
 		
 		  //For Plan And HardWare Association
-		GlobalConfigurationProperty configurationProperty=this.globalConfigurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IMPLICIT_ASSOCIATION);
+		Configuration configurationProperty=this.globalConfigurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IMPLICIT_ASSOCIATION);
 		
 		if(configurationProperty.isEnabled()){
 			
@@ -146,7 +146,7 @@ public class OwnedHardwareWritePlatformServiceImp implements OwnedHardwareWriteP
 	private boolean checkforClientActiveDevices(Long clientId) {
 		
 		boolean isCheck=true;
-		GlobalConfigurationProperty configurationProperty=this.globalConfigurationRepository.findOneByName(ACTIVE_DEVICE);
+		Configuration configurationProperty=this.globalConfigurationRepository.findOneByName(ACTIVE_DEVICE);
 		
 		if(configurationProperty.isEnabled()){
 			int clientDevices=this.ownedHardwareReadPlatformService.retrieveClientActiveDevices(clientId);

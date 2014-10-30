@@ -40,34 +40,30 @@ public class OfficePayments extends AbstractAuditableCustom<AppUser, Long> {
 	private String remarks;
 	
 	@Column(name = "is_deleted")
-	private char isDeleted='N';
+	private char isDeleted = 'N';
 	
 	public OfficePayments(){
 		
 	}
 
 	public OfficePayments(final Long officeId, final BigDecimal amountPaid,final LocalDate paymentDate,
-							final String remarks, final Long paymodeId, String receiptNo) {
-
+							final String remarks, final Long paymodeId, final String receiptNo) {
 
 		this.officeId = officeId;
 		this.amountPaid = amountPaid;
 		this.paymentDate = paymentDate.toDate();
 		this.remarks = remarks;
 		this.paymodeId = paymodeId.intValue();
-		this.receiptNo=receiptNo;
-
+		this.receiptNo = receiptNo;
 	}
 	
-	public static OfficePayments fromJson(JsonCommand command){
+	public static OfficePayments fromJson(final JsonCommand command){
 		
-		final LocalDate paymentDate = command
-				.localDateValueOfParameterNamed("paymentDate");
-		final Long paymodeId = command.longValueOfParameterNamed("paymentCode");
-				
+		final LocalDate paymentDate = command.localDateValueOfParameterNamed("paymentDate");
+		final Long paymodeId = command.longValueOfParameterNamed("paymentCode");		
 		final BigDecimal amountPaid = command.bigDecimalValueOfParameterNamed("amountPaid");
 		final String remarks = command.stringValueOfParameterNamed("remarks");
-		final String receiptNo=command.stringValueOfParameterNamed("receiptNo");
+		final String receiptNo = command.stringValueOfParameterNamed("receiptNo");
 		
 		return new OfficePayments(command.entityId(), amountPaid, paymentDate, remarks, paymodeId, receiptNo);
 	}
@@ -75,7 +71,7 @@ public class OfficePayments extends AbstractAuditableCustom<AppUser, Long> {
 		return officeId;
 	}
 
-	public void setOfficeId(Long officeId) {
+	public void setOfficeId(final Long officeId) {
 		this.officeId = officeId;
 	}
 
@@ -83,7 +79,7 @@ public class OfficePayments extends AbstractAuditableCustom<AppUser, Long> {
 		return paymentDate;
 	}
 
-	public void setPaymentDate(Date paymentDate) {
+	public void setPaymentDate(final Date paymentDate) {
 		this.paymentDate = paymentDate;
 	}
 
@@ -91,7 +87,7 @@ public class OfficePayments extends AbstractAuditableCustom<AppUser, Long> {
 		return paymodeId;
 	}
 
-	public void setPaymodeId(int paymodeId) {
+	public void setPaymodeId(final int paymodeId) {
 		this.paymodeId = paymodeId;
 	}
 
@@ -99,7 +95,7 @@ public class OfficePayments extends AbstractAuditableCustom<AppUser, Long> {
 		return amountPaid;
 	}
 
-	public void setAmountPaid(BigDecimal amountPaid) {
+	public void setAmountPaid(final BigDecimal amountPaid) {
 		this.amountPaid = amountPaid;
 	}
 
@@ -107,7 +103,7 @@ public class OfficePayments extends AbstractAuditableCustom<AppUser, Long> {
 		return receiptNo;
 	}
 
-	public void setReceiptNo(String receiptNo) {
+	public void setReceiptNo(final String receiptNo) {
 		this.receiptNo = receiptNo;
 	}
 
@@ -115,7 +111,8 @@ public class OfficePayments extends AbstractAuditableCustom<AppUser, Long> {
 		return remarks;
 	}
 
-	public void setRemarks(String remarks) {
+	public void setRemarks(final String remarks) {
 		this.remarks = remarks;
 	}
+	
 }

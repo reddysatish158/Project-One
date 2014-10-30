@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-import org.mifosplatform.cms.eventpricing.data.EventPricingData;
+import org.mifosplatform.cms.eventprice.data.EventPriceData;
 import org.mifosplatform.cms.mediadetails.domain.MediaassetAttributes;
 import org.mifosplatform.cms.mediadetails.domain.MediaassetLocation;
 
@@ -35,14 +35,14 @@ public class MediaAssetDetailsData {
 	private final List<String> Director;
 	private final List<String> Actor;
 	private final List<String> countries;
-	private List<EventPricingData> priceDetails;
+	private List<EventPriceData> priceDetails;
 
 	public MediaAssetDetailsData(Long mediaId, String title, String type,
 			String classType, String overview, String subject, String image,
 			String duration, String contentProvider, String rated,
 			BigDecimal rating, int ratingCount, String location, String status,
 			Date releaseDate, List<String> genres, List<String> production, List<MediaLocationData> filmingLocation,
-			List<String> writers, List<String> directors, List<String> actors, List<String> country, List<EventPricingData> eventPricingData) {
+			List<String> writers, List<String> directors, List<String> actors, List<String> country, List<EventPriceData> eventPricingData) {
 		this.mediaId=mediaId;
 		this.title=title;
 		this.type=type;
