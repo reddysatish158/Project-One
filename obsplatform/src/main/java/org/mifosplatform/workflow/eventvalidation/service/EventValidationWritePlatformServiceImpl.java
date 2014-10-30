@@ -14,70 +14,67 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EventValidationWritePlatformServiceImpl implements EventValidationWritePlatformService{
-	
-	private final static Logger logger = LoggerFactory.getLogger(EventValidationWritePlatformServiceImpl.class);
-    private final PlatformSecurityContext context;
+public class EventValidationWritePlatformServiceImpl implements EventValidationWritePlatformService {
+
+	private final static Logger LOGGER = LoggerFactory.getLogger(EventValidationWritePlatformServiceImpl.class);
+	private final PlatformSecurityContext context;
 	private final EventValidationRepository eventValidationRepository;
-	
-@Autowired	
-public EventValidationWritePlatformServiceImpl(final PlatformSecurityContext context,
-		final EventValidationRepository eventValidationRepository)
-{
-	this.context=context;
-	this.eventValidationRepository=eventValidationRepository;
-}
+
+	@Autowired
+	public EventValidationWritePlatformServiceImpl(
+			final PlatformSecurityContext context,
+			final EventValidationRepository eventValidationRepository) {
+		this.context = context;
+		this.eventValidationRepository = eventValidationRepository;
+	}
 
 	@Override
 	public CommandProcessingResult createEventValidation(JsonCommand command) {
-       
-		try{
-			
+
+		try {
+
 			this.context.authenticatedUser();
-			/*this.apiJsonDeserializer.validateForCreate(command.json());*/
-			EventValidation eventValidation=EventValidation.fromJson(command);
-			
+			/* this.apiJsonDeserializer.validateForCreate(command.json()); */
+			final EventValidation eventValidation = EventValidation.fromJson(command);
+
 			this.eventValidationRepository.save(eventValidation);
 			return new CommandProcessingResult(eventValidation.getId());
-			
-		}catch(DataIntegrityViolationException dve){
+
+		} catch (DataIntegrityViolationException dve) {
 			handleCodeDataIntegrityIssues(command, dve);
 			return null;
 		}
-	
+
 	}
 
-	
 	private void handleCodeDataIntegrityIssues(JsonCommand command,
 			DataIntegrityViolationException dve) {
-		 Throwable realCause = dve.getMostSpecificCause();
-	        logger.error(dve.getMessage(), dve);
-	        throw new PlatformDataIntegrityException("error.msg.cund.unknown.data.integrity.issue",
-	                "Unknown data integrity issue with resource: " + realCause.getMessage());
-		
+		Throwable realCause = dve.getMostSpecificCause();
+		LOGGER.error(dve.getMessage(), dve);
+		throw new PlatformDataIntegrityException(
+				"error.msg.cund.unknown.data.integrity.issue",
+				"Unknown data integrity issue with resource: "
+						+ realCause.getMessage());
+
 	}
 
-		
 	@Override
 	public CommandProcessingResult deleteEventValidation(Long id) {
 
-     try{
-    	 this.context.authenticatedUser();
-    	 
-    	 EventValidation event = this.eventValidationRepository.findOne(id);
-    	 
-    	 if(event==null){
-    		 throw new EventValidationNotFoundException(id.toString());
-    	 }
-    	 
-    	 event.delete();
-    	 this.eventValidationRepository.save(event);
-    	 return new CommandProcessingResult(id);
-    	 
-    	 
-     }catch(Exception exception){
-    	 return null;
-     }
+		try {
+			
+			this.context.authenticatedUser();
+			final EventValidation event = this.eventValidationRepository.findOne(id);
+			
+			if (event == null) {
+				throw new EventValidationNotFoundException(id.toString());
+			}
+			event.delete();
+			this.eventValidationRepository.save(event);
+			return new CommandProcessingResult(id);
+
+		} catch (Exception exception) {
+			return null;
+		}
 	}
 }
-

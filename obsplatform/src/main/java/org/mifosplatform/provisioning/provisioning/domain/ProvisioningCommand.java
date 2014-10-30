@@ -41,7 +41,7 @@ public class ProvisioningCommand extends AbstractPersistable<Long> {
 		
 	}
 	
-	public ProvisioningCommand(String provisioningSystem,String commandName){
+	public ProvisioningCommand(final String provisioningSystem, final String commandName){
 		this.provisioningSystem=provisioningSystem;
 		this.commandName=commandName;
 	}
@@ -83,7 +83,7 @@ public class ProvisioningCommand extends AbstractPersistable<Long> {
 		 return new ProvisioningCommand(provisioningSystem,commandName);
 	}
 
-	public LinkedHashMap<String, Object> UpdateProvisioning(JsonCommand command) {
+	public LinkedHashMap<String, Object> updateProvisioning(JsonCommand command) {
 		final LinkedHashMap<String, Object> actualChanges = new LinkedHashMap<String, Object>(1);
 		
 		final String provisioningSystem = "provisioningSystem";

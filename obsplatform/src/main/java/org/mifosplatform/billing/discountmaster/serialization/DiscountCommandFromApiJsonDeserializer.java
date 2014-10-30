@@ -1,8 +1,6 @@
 package org.mifosplatform.billing.discountmaster.serialization;
 
-
 import java.lang.reflect.Type;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -29,68 +27,105 @@ import com.google.gson.reflect.TypeToken;
 @Component
 public final class DiscountCommandFromApiJsonDeserializer {
 
-    /**
-     * The parameters supported for this command.
-     */
-    private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("discountCode","discountDescription","discountType",
-    		"discountRate","startDate","status","locale","dateFormat"));
-    private final FromJsonHelper fromApiJsonHelper;
+	/**
+	 * The parameters supported for this command.
+	 */
+	private final Set<String> supportedParameters = new HashSet<String>(
+			Arrays.asList("discountCode", "discountDescription",
+					"discountType", "discountRate", "startDate", "discountStatus",
+					"locale", "dateFormat"));
+	private final FromJsonHelper fromApiJsonHelper;
 
-    @Autowired
-    public DiscountCommandFromApiJsonDeserializer(final FromJsonHelper fromApiJsonHelper) {
-        this.fromApiJsonHelper = fromApiJsonHelper;
-    }
+	@Autowired
+	public DiscountCommandFromApiJsonDeserializer(
+			final FromJsonHelper fromApiJsonHelper) {
+		this.fromApiJsonHelper = fromApiJsonHelper;
+	}
 
-    public void validateForCreate(final String json) {
-        if (StringUtils.isBlank(json)) { throw new InvalidJsonException(); }
+	/**
+	 * @param json
+	 * check validation for create discount
+	 */
+	public void validateForCreate(final String json) {
+		if (StringUtils.isBlank(json)) {
+			throw new InvalidJsonException();
+		}
 
-        final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
-        fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, supportedParameters);
+		final Type typeOfMap = new TypeToken<Map<String, Object>>() {
+		}.getType();
+		fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json,
+				supportedParameters);
 
-        final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
-        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("discount");
+		final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
+		final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(
+				dataValidationErrors).resource("discount");
 
-        final JsonElement element = fromApiJsonHelper.parse(json);
+		final JsonElement element = fromApiJsonHelper.parse(json);
 
-        final String discountCode = fromApiJsonHelper.extractStringNamed("discountCode", element);
-        baseDataValidator.reset().parameter("discountCode").value(discountCode).notBlank();
-        final LocalDate startDate = fromApiJsonHelper.extractLocalDateNamed("startDate", element);
-        baseDataValidator.reset().parameter("startDate").value(startDate).notBlank();
-        final String discountDescription = fromApiJsonHelper.extractStringNamed("discountDescription", element);
-        baseDataValidator.reset().parameter("discountDescription").value(discountDescription).notBlank();
-        
-        
-        	final String discountType=fromApiJsonHelper.extractStringNamed("discountType", element);
-        	baseDataValidator.reset().parameter("discountType").value(discountType).notBlank();
-        	final Integer discountRate=fromApiJsonHelper.extractIntegerWithLocaleNamed("discountRate", element);
-        	baseDataValidator.reset().parameter("discountRate").value(discountRate).notNull();
-        	final String status=fromApiJsonHelper.extractStringNamed("status", element);
-        	 baseDataValidator.reset().parameter("status").value(status).notBlank();
-        
-        throwExceptionIfValidationWarningsExist(dataValidationErrors);
-        
-    }
+		final String discountCode = fromApiJsonHelper.extractStringNamed(
+				"discountCode", element);
+		baseDataValidator.reset().parameter("discountCode").value(discountCode)
+				.notBlank();
+		
+		final LocalDate startDate = fromApiJsonHelper.extractLocalDateNamed(
+				"startDate", element);
+		baseDataValidator.reset().parameter("startDate").value(startDate)
+				.notBlank();
+		
+		final String discountDescription = fromApiJsonHelper
+				.extractStringNamed("discountDescription", element);
+		baseDataValidator.reset().parameter("discountDescription")
+				.value(discountDescription).notBlank();
 
-    public void validateForUpdate(final String json) {
-        if (StringUtils.isBlank(json)) { throw new InvalidJsonException(); }
+		final String discountType = fromApiJsonHelper.extractStringNamed(
+				"discountType", element);
+		baseDataValidator.reset().parameter("discountType").value(discountType)
+				.notBlank();
+		
+		final Integer discountRate = fromApiJsonHelper
+				.extractIntegerWithLocaleNamed("discountRate", element);
+		baseDataValidator.reset().parameter("discountRate").value(discountRate)
+				.notNull();
+		
+		final String discountStatus = fromApiJsonHelper.extractStringNamed("discountStatus",
+				element);
+		baseDataValidator.reset().parameter("discountStatus").value(discountStatus).notBlank();
 
-        final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
-        fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, supportedParameters);
+		throwExceptionIfValidationWarningsExist(dataValidationErrors);
 
-        final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
-        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("code");
+	}
 
-        final JsonElement element = fromApiJsonHelper.parse(json);
-        if (fromApiJsonHelper.parameterExists("name", element)) {
-            final String name = fromApiJsonHelper.extractStringNamed("name", element);
-            baseDataValidator.reset().parameter("name").value(name).notBlank().notExceedingLengthOf(100);
-        }
+	/*public void validateForUpdate(final String json) {
+		if (StringUtils.isBlank(json)) {
+			throw new InvalidJsonException();
+		}
 
-        throwExceptionIfValidationWarningsExist(dataValidationErrors);
-    }
+		final Type typeOfMap = new TypeToken<Map<String, Object>>() {
+		}.getType();
+		fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json,
+				supportedParameters);
 
-    private void throwExceptionIfValidationWarningsExist(final List<ApiParameterError> dataValidationErrors) {
-        if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist",
-                "Validation errors exist.", dataValidationErrors); }
-    }
+		final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
+		final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(
+				dataValidationErrors).resource("code");
+
+		final JsonElement element = fromApiJsonHelper.parse(json);
+		if (fromApiJsonHelper.parameterExists("name", element)) {
+			final String name = fromApiJsonHelper.extractStringNamed("name",
+					element);
+			baseDataValidator.reset().parameter("name").value(name).notBlank()
+					.notExceedingLengthOf(100);
+		}
+
+		throwExceptionIfValidationWarningsExist(dataValidationErrors);
+	}*/
+
+	private void throwExceptionIfValidationWarningsExist(
+			final List<ApiParameterError> dataValidationErrors) {
+		if (!dataValidationErrors.isEmpty()) {
+			throw new PlatformApiDataValidationException(
+					"validation.msg.validation.errors.exist",
+					"Validation errors exist.", dataValidationErrors);
+		}
+	}
 }

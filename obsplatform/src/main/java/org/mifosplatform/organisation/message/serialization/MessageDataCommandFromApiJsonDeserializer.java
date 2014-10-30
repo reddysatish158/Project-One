@@ -27,60 +27,50 @@ import com.google.gson.reflect.TypeToken;
 @Component
 public class MessageDataCommandFromApiJsonDeserializer {
 
-	
 	/**
 	 * The parameters supported for this command.
 	 */
-	
-	 private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("messageFrom","locale","query","status"));
-	  
-	    private final FromJsonHelper fromApiJsonHelper;
-	    
-	    @Autowired
-	    public MessageDataCommandFromApiJsonDeserializer(final FromJsonHelper fromApiJsonHelper) {
-	        this.fromApiJsonHelper = fromApiJsonHelper;
-	    }
-	    
-	    
-	    public void validateForCreate(String json) {
 
-			if (StringUtils.isBlank(json)) {
-				throw new InvalidJsonException();
-			}
+	private final Set<String> supportedParameters = new HashSet<String>(
+			Arrays.asList("messageFrom", "locale", "query", "status"));
 
-			final Type typeOfMap = new TypeToken<Map<String, Object>>() {
-			}.getType();
-			fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json,
-					supportedParameters);
+	private final FromJsonHelper fromApiJsonHelper;
 
-			final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
-			final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(
-					dataValidationErrors).resource("message");
+	@Autowired
+	public MessageDataCommandFromApiJsonDeserializer(final FromJsonHelper fromApiJsonHelper) {
+		this.fromApiJsonHelper = fromApiJsonHelper;
+	}
 
-			final JsonElement element = fromApiJsonHelper.parse(json);
-		
-			
-			final String status = fromApiJsonHelper.extractStringNamed("status", element);
-			final String messageFrom = fromApiJsonHelper.extractStringNamed("messageFrom", element);
+	public void validateForCreate(final String json) {
 
-		
-			
-			baseDataValidator.reset().parameter("status").value(status)
-			.notBlank().notExceedingLengthOf(1);
-			baseDataValidator.reset().parameter("messageFrom").value(messageFrom)
-			.notBlank().notExceedingLengthOf(100);
-			
-
-			throwExceptionIfValidationWarningsExist(dataValidationErrors);
+		if (StringUtils.isBlank(json)) {
+			throw new InvalidJsonException();
 		}
 
-		private void throwExceptionIfValidationWarningsExist(
-				final List<ApiParameterError> dataValidationErrors) {
-			if (!dataValidationErrors.isEmpty()) {
-				throw new PlatformApiDataValidationException(
-						"validation.msg.validation.errors.exist",
-						"Validation errors exist.", dataValidationErrors);
-			}
+		final Type typeOfMap = new TypeToken<Map<String, Object>>() {
+		}.getType();
+		
+		fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, supportedParameters);
+
+		final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
+		final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("message");
+
+		final JsonElement element = fromApiJsonHelper.parse(json);
+
+		final String status = fromApiJsonHelper.extractStringNamed("status",element);
+		baseDataValidator.reset().parameter("status").value(status).notBlank().notExceedingLengthOf(1);
+		
+		final String messageFrom = fromApiJsonHelper.extractStringNamed("messageFrom", element);
+		baseDataValidator.reset().parameter("messageFrom").value(messageFrom).notBlank().notExceedingLengthOf(100);
+
+		throwExceptionIfValidationWarningsExist(dataValidationErrors);
+	}
+
+	private void throwExceptionIfValidationWarningsExist(final List<ApiParameterError> dataValidationErrors) {
+		if (!dataValidationErrors.isEmpty()) {
+			throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist",
+					"Validation errors exist.", dataValidationErrors);
 		}
-	    
+	}
+
 }

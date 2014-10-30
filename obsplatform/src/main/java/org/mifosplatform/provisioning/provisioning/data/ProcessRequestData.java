@@ -13,8 +13,9 @@ public class ProcessRequestData {
 	private final String orderNo;
 	
 
-	public ProcessRequestData(Long id, Long clientId, Long orderId,String requestType, 
-			String hardwareId, String receiveMessage, String sentMessage, String isProcessed, String orderNo) {
+	public ProcessRequestData(final Long id, final Long clientId, final Long orderId,
+			final String requestType, final String hardwareId, final String receiveMessage, 
+			final String sentMessage, final String isProcessed, final String orderNo) {
 		this.id=id;
 		this.clientId=clientId;
 		this.orderId=orderId;

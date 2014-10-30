@@ -25,6 +25,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
+/**
+ * 
+ * @author ashokreddy
+ *
+ */
 @Service
 public class PaymentGatewayReadPlatformServiceImpl implements PaymentGatewayReadPlatformService {
 
@@ -33,33 +38,23 @@ public class PaymentGatewayReadPlatformServiceImpl implements PaymentGatewayRead
 	private final JdbcTemplate jdbcTemplate;
 	
 	@Autowired
-	public PaymentGatewayReadPlatformServiceImpl (final PlatformSecurityContext context,final TenantAwareRoutingDataSource dataSource) {
+	public PaymentGatewayReadPlatformServiceImpl (final PlatformSecurityContext context, 
+			final TenantAwareRoutingDataSource dataSource) {
 		this.context = context;
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 	
 	@Override
 	public Long retrieveClientIdForProvisioning(String serialNum) {
-		try{
+		try {
 			this.context.authenticatedUser();
-			//String serialNumber=null;
-			serialNum=serialNum.trim();
-			/*if(serialNum.charAt(0) == 'N' ||serialNum.charAt(0) == 'n'){
-=======
-			String serialNumber=null;
-			if(serialNum.charAt(0) == 'N' ||serialNum.charAt(0) == 'n'){
->>>>>>> obsplatform-1.01:mifosng-provider/src/main/java/org/mifosplatform/finance/paymentsgateway/service/PaymentGatewayReadPlatformServiceImpl.java
-				serialNumber=serialNum;
-			}else{
-				
-				serialNumber="N"+serialNum;
-<<<<<<< HEAD:mifosng-provider/src/main/java/org/mifosplatform/finance/paymentsgateway/service/PaymentGatewayReadPlatformServiceImpl.java
-			}*/
-		String sql = " select client_id as clientId from b_item_detail  " +
-				" where serial_no = ? or provisioning_serialno = ? and client_id is not null  limit 1";
-		
-		return jdbcTemplate.queryForLong(sql, new Object[] {serialNum,serialNum});
-		} catch(EmptyResultDataAccessException e){
+			serialNum = serialNum.trim();
+
+			final String sql = " select client_id as clientId from b_item_detail  "
+					+ " where serial_no = ? or provisioning_serialno = ? and client_id is not null  limit 1";
+
+			return jdbcTemplate.queryForLong(sql, new Object[] { serialNum, serialNum });
+		} catch (EmptyResultDataAccessException e) {
 			return null;
 		}
 	}
@@ -85,7 +80,6 @@ public class PaymentGatewayReadPlatformServiceImpl implements PaymentGatewayRead
 			Long paymentId = rs.getLong("paymentId");
 			String remarks = rs.getString("remarks");
 			
-			
 			return new PaymentGatewayData(id,serialNo,phoneNo,paymentDate,amountPaid,receiptNo,clientName,status,paymentId,remarks);
 		}
 
@@ -94,10 +88,10 @@ public class PaymentGatewayReadPlatformServiceImpl implements PaymentGatewayRead
 	@Override
 	public List<MediaEnumoptionData> retrieveTemplateData() {
 		this.context.authenticatedUser();
-		MediaEnumoptionData FINISHED = PaymentEnumClass.enumPaymentData(PaymentEnum.FINISHED);
-		MediaEnumoptionData INVALID = PaymentEnumClass.enumPaymentData(PaymentEnum.INVALID);
+		MediaEnumoptionData finished = PaymentEnumClass.enumPaymentData(PaymentEnum.FINISHED);
+		MediaEnumoptionData invalid = PaymentEnumClass.enumPaymentData(PaymentEnum.INVALID);
 		
-		List<MediaEnumoptionData> categotyType = Arrays.asList(FINISHED,INVALID);
+		List<MediaEnumoptionData> categotyType = Arrays.asList(finished,invalid);
 		return categotyType;
 	}
 
@@ -196,7 +190,7 @@ public class PaymentGatewayReadPlatformServiceImpl implements PaymentGatewayRead
 	}
 
 	@Override
-	public Long GetReceiptNoId(String receipt) {
+	public Long getReceiptNoId(final String receipt) {
 		try{
 			this.context.authenticatedUser();
 			String sql = "select a.id from b_payments a where  a.receipt_no like '"+receipt+"' ";

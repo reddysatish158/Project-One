@@ -5,9 +5,10 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface ChargeCodeRepository extends JpaRepository<ChargeCode, Long>,JpaSpecificationExecutor<ChargeCode>{
+public interface ChargeCodeRepository extends JpaRepository<ChargeCodeMaster, Long>,
+		JpaSpecificationExecutor<ChargeCodeMaster> {
 
-	@Query("from ChargeCode charge where charge.chargeCode =:chargeCode")
-	ChargeCode findOneByChargeCode(@Param("chargeCode")String chargeCode);
+	@Query("from ChargeCodeMaster charge where charge.chargeCode =:chargeCode")
+	ChargeCodeMaster findOneByChargeCode(@Param("chargeCode") String chargeCode);
 
 }

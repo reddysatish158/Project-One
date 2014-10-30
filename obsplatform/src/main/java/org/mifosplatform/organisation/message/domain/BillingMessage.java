@@ -9,7 +9,13 @@ import javax.persistence.Table;
 import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
 import org.mifosplatform.useradministration.domain.AppUser;
 
-
+/**
+ * Entity class
+ * 
+ * @author ashokreddy
+ *
+ */
+@SuppressWarnings("serial")
 @Entity
 @Table(name = "b_message_data")
 public class BillingMessage extends AbstractAuditableCustom<AppUser, Long> {
@@ -46,16 +52,14 @@ public class BillingMessage extends AbstractAuditableCustom<AppUser, Long> {
     @JoinColumn(name="msgtemplate_id")
     private BillingMessageTemplate billingMessageTemplate;
 	
-
-	
-	
 	public BillingMessage(){
 		//default-constructor
 	}
 
-
-	public BillingMessage(String header,String body,String footer,
-			String messageFrom,String messageTo,String subject,String status, BillingMessageTemplate billingMessageTemplate, char messageType, String attachment) {
+	public BillingMessage(final String header, final String body, final String footer,
+			final  String messageFrom, final String messageTo, final String subject,
+			final String status, final BillingMessageTemplate billingMessageTemplate, 
+			final char messageType, final String attachment) {
         
 		this.header=header;
 		this.body=body;
@@ -142,10 +146,8 @@ public class BillingMessage extends AbstractAuditableCustom<AppUser, Long> {
 		this.billingMessageTemplate = billingMessageTemplate;
 	}
 
-	public void updateStatus() {
-		
-		this.status="Y";
-		
+	public void updateStatus() {		
+		this.status="Y";	
 	}
 
 	public void setAttachment(String attachment) {

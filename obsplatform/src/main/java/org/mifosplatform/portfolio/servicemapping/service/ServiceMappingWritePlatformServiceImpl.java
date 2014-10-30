@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ServiceMappingWritePlatformServiceImpl implements ServiceMappingWritePlatformService{
 	
-private final static Logger logger = (Logger) LoggerFactory.getLogger(ServiceMappingWritePlatformServiceImpl.class);	
+	private static final Logger LOGGER = (Logger) LoggerFactory.getLogger(ServiceMappingWritePlatformServiceImpl.class);	
 	
 	private PlatformSecurityContext platformSecurityContext;
 	private ServiceMappingRepository serviceMappingRepository; 
@@ -30,7 +30,9 @@ private final static Logger logger = (Logger) LoggerFactory.getLogger(ServiceMap
 //	private ServiceMappingReadPlatformService serviceMappingReadPlatformService; 
 	
 	@Autowired
-	public ServiceMappingWritePlatformServiceImpl(final PlatformSecurityContext platformSecurityContext, final ServiceMappingRepository serviceMappingRepository, final ServiceMappingCommandFromApiJsonDeserializer serviceMappingCommandFromApiJsonDeserializer) {
+	public ServiceMappingWritePlatformServiceImpl(final PlatformSecurityContext platformSecurityContext, 
+			final ServiceMappingRepository serviceMappingRepository, 
+			final ServiceMappingCommandFromApiJsonDeserializer serviceMappingCommandFromApiJsonDeserializer) {
 		this.platformSecurityContext = platformSecurityContext;
 		this.serviceMappingRepository = serviceMappingRepository;
 		this.serviceMappingCommandFromApiJsonDeserializer = serviceMappingCommandFromApiJsonDeserializer;
@@ -44,7 +46,7 @@ private final static Logger logger = (Logger) LoggerFactory.getLogger(ServiceMap
 		try{
 			platformSecurityContext.authenticatedUser();
 			serviceMappingCommandFromApiJsonDeserializer.validateForCreate(command.json());
-			ServiceMapping serviceMapping = ServiceMapping.fromJson(command);
+			final ServiceMapping serviceMapping = ServiceMapping.fromJson(command);
 			serviceMappingRepository.save(serviceMapping);
 			return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(serviceMapping.getId()).build();
 		}catch(DataIntegrityViolationException dve){
@@ -54,53 +56,53 @@ private final static Logger logger = (Logger) LoggerFactory.getLogger(ServiceMap
 	}
 
 	@Override
-	public CommandProcessingResult updateServiceMapping(Long serviceMapId,JsonCommand command) {
-			try
-			{
-				
-				   this.platformSecurityContext.authenticatedUser();
-		            this.serviceMappingCommandFromApiJsonDeserializer.validateForCreate(command.json());
-		            final ServiceMapping  serviceMapping = retrieveServiceMappingById(serviceMapId);
-	 		        final Map<String, Object> changes = serviceMapping.update(command);
-	                this.serviceMappingRepository.save(serviceMapping);
+	public CommandProcessingResult updateServiceMapping(Long serviceMapId,
+			JsonCommand command) {
+		try {
 
-	             return new CommandProcessingResultBuilder() //
-	         .withCommandId(command.commandId()) //
-	         .withEntityId(serviceMapId) //
-	         .with(changes) //
-	         .build();
+			this.platformSecurityContext.authenticatedUser();
+			this.serviceMappingCommandFromApiJsonDeserializer.validateForCreate(command.json());
+			final ServiceMapping serviceMapping = retrieveServiceMappingById(serviceMapId);
+			final Map<String, Object> changes = serviceMapping.update(command);
+			this.serviceMappingRepository.save(serviceMapping);
+
+			return new CommandProcessingResultBuilder() //
+					.withCommandId(command.commandId()) //
+					.withEntityId(serviceMapId) //
+					.with(changes) //
+					.build();
 		} catch (DataIntegrityViolationException dve) {
-			 handleCodeDataIntegrityIssues(command, dve);
+			handleCodeDataIntegrityIssues(command, dve);
 			return new CommandProcessingResult(Long.valueOf(-1));
 		}
-		
+
+	}
+
+	private void handleCodeDataIntegrityIssues(JsonCommand command,
+			DataIntegrityViolationException dve) {
+
+		final Throwable realCause = dve.getMostSpecificCause();
+		if (realCause.getMessage().contains("service_code_key")) {
+			final String name = command.stringValueOfParameterNamed("serviceId");
+			throw new PlatformDataIntegrityException("error.msg.service.mapping.duplicate", "A code with name '" + name + "' already exists");
+			// throw new
+			// PlatformDataIntegrityException("error.msg.code.duplicate.name",
+			// "A code with name '" + name + "' already exists");
 		}
 
-	private void handleCodeDataIntegrityIssues(JsonCommand command,DataIntegrityViolationException dve) {
+		LOGGER.error(dve.getMessage(), dve);
+		throw new PlatformDataIntegrityException("error.msg.cund.unknown.data.integrity.issue",
+				"Unknown data integrity issue with resource: " + realCause.getMessage());
 
-
-		 Throwable realCause = dve.getMostSpecificCause();
-	        if (realCause.getMessage().contains("service_code_key")) {
-	            final String name = command.stringValueOfParameterNamed("serviceId");
-	            throw new PlatformDataIntegrityException("error.msg.service.mapping.duplicate", "A code with name '" + name + "' already exists");
-	            //throw new PlatformDataIntegrityException("error.msg.code.duplicate.name", "A code with name '" + name + "' already exists");
-	        }
-
-	        logger.error(dve.getMessage(), dve);
-	        throw new PlatformDataIntegrityException("error.msg.cund.unknown.data.integrity.issue",
-	                "Unknown data integrity issue with resource: " + realCause.getMessage());
-		
-	
-		
 	}
 
 	private ServiceMapping retrieveServiceMappingById(Long serviceMapId) {
-
-		
-			  final ServiceMapping serviceMapping = this.serviceMappingRepository.findOne(serviceMapId);
-		        if (serviceMapping == null) { throw new CodeNotFoundException(serviceMapId.toString()); }
-		        return serviceMapping;
+		final ServiceMapping serviceMapping = this.serviceMappingRepository.findOne(serviceMapId);
+		if (serviceMapping == null) {
+			throw new CodeNotFoundException(serviceMapId.toString());
 		}
+		return serviceMapping;
+	}
 	}
 
 

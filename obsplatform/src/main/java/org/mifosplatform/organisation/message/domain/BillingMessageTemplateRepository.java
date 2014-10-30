@@ -8,7 +8,11 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-
+/**
+ * 
+ * @author ashokreddy
+ *
+ */
 public interface BillingMessageTemplateRepository extends JpaRepository<BillingMessageTemplate, Long>, JpaSpecificationExecutor<BillingMessageTemplate> {
 	
 	/*@Query("from BillingMessageTemplate messageTemplate where messageTemplate.templateDescription =:templateDescription")

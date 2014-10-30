@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.joda.time.LocalDate;
 import org.mifosplatform.billing.chargecode.data.ChargesData;
-import org.mifosplatform.finance.data.DiscountMasterData;
+import org.mifosplatform.billing.discountmaster.data.DiscountMasterData;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
 
 public class ItemData {

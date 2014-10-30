@@ -33,93 +33,101 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-
+/**
+ * Mapping Hardware with Plan
+ */
 @Path("/hardwaremapping")
 @Component
 @Scope("singleton")
 public class HardwarePlanMappingApiResource {
 
-	private  final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(Arrays.asList("id", "planCode", "itemCode"));
-	 private final String resourceNameForPermissions = "PLANMAPPING";
-	  private final PlatformSecurityContext context;
-	    private final DefaultToApiJsonSerializer<HardwarePlanData> toApiJsonSerializer;
-	    private final ApiRequestParameterHelper apiRequestParameterHelper;
-	    private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
-	    private final HardwarePlanReadPlatformService HardwarePlanReadPlatformService;
-	    
-	    @Autowired
-	    public HardwarePlanMappingApiResource(final PlatformSecurityContext context, 
-	   final DefaultToApiJsonSerializer<HardwarePlanData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper,
-	   final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,final HardwarePlanReadPlatformService HardwarePlanReadPlatformService) {
-		        this.context = context;
-		        this.toApiJsonSerializer = toApiJsonSerializer;
-		        this.apiRequestParameterHelper = apiRequestParameterHelper;
-		        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
-		        this.HardwarePlanReadPlatformService=HardwarePlanReadPlatformService;
-		    }	
-	    
-	
+	private final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(Arrays.asList("id", "planCode", "itemCode"));
+	private final String resourceNameForPermissions = "PLANMAPPING";
+	private final PlatformSecurityContext context;
+	private final DefaultToApiJsonSerializer<HardwarePlanData> toApiJsonSerializer;
+	private final ApiRequestParameterHelper apiRequestParameterHelper;
+	private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
+	private final HardwarePlanReadPlatformService HardwarePlanReadPlatformService;
+
+	@Autowired
+	public HardwarePlanMappingApiResource(
+			final PlatformSecurityContext context,
+			final DefaultToApiJsonSerializer<HardwarePlanData> toApiJsonSerializer,
+			final ApiRequestParameterHelper apiRequestParameterHelper,
+			final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
+			final HardwarePlanReadPlatformService HardwarePlanReadPlatformService) {
+		this.context = context;
+		this.toApiJsonSerializer = toApiJsonSerializer;
+		this.apiRequestParameterHelper = apiRequestParameterHelper;
+		this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+		this.HardwarePlanReadPlatformService = HardwarePlanReadPlatformService;
+	}
+
 	@GET
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrieveAllPlans(@QueryParam("itemCode") final String itemCode,  @Context final UriInfo uriInfo) {
- 		 context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		List<HardwarePlanData> products = this.HardwarePlanReadPlatformService.retrievePlanData(itemCode);
+	public String retrieveAllPlans(@QueryParam("itemCode") final String itemCode,
+			@Context final UriInfo uriInfo) {
+		
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		final List<HardwarePlanData> products = this.HardwarePlanReadPlatformService.retrievePlanData(itemCode);
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 		return this.toApiJsonSerializer.serialize(settings, products, RESPONSE_DATA_PARAMETERS);
 	}
-	
 
 	@GET
 	@Path("template")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String retrievePlanTemplate(@Context final UriInfo uriInfo) {
-		 context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-     List<ItemData> itemsData = this.HardwarePlanReadPlatformService.retrieveItems();
-     List<PlanCodeData> plansData = this.HardwarePlanReadPlatformService.retrievePlans();
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		final List<ItemData> itemsData = this.HardwarePlanReadPlatformService.retrieveItems();
+		final List<PlanCodeData> plansData = this.HardwarePlanReadPlatformService.retrievePlans();
 
-     HardwarePlanData planData = new HardwarePlanData(itemsData, plansData);
+		final HardwarePlanData planData = new HardwarePlanData(itemsData, plansData);
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 		return this.toApiJsonSerializer.serialize(settings, planData, RESPONSE_DATA_PARAMETERS);
-	
+
 	}
-	
+
 	@POST
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String createPlan(final String apiRequestBodyAsJson) {
 
-        final CommandWrapper commandRequest=new CommandWrapperBuilder().createHardwarePlan().withJson(apiRequestBodyAsJson).build();
-		final CommandProcessingResult result=this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-		  return this.toApiJsonSerializer.serialize(result);
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().createHardwarePlan().withJson(apiRequestBodyAsJson).build();
+		final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+		return this.toApiJsonSerializer.serialize(result);
 	}
-	
+
 	@PUT
 	@Path("{planMapId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String updatePlanMapping(@PathParam("planMapId") final Long planMapId,final String apiRequestBodyAsJson) {
-		 final CommandWrapper commandRequest = new CommandWrapperBuilder().updatePlanMapping(planMapId).withJson(apiRequestBodyAsJson).build();
-		 final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-		  return this.toApiJsonSerializer.serialize(result);
+	public String updatePlanMapping(@PathParam("planMapId") final Long planMapId,
+			final String apiRequestBodyAsJson) {
+		
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().updatePlanMapping(planMapId)
+				.withJson(apiRequestBodyAsJson).build();
+		final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+		return this.toApiJsonSerializer.serialize(result);
 	}
-	
+
 	@GET
 	@Path("{planId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrievePlanDetails(@PathParam("planId") final Long planId,@Context final UriInfo uriInfo) {
-		
+	public String retrievePlanDetails(@PathParam("planId") final Long planId,
+			@Context final UriInfo uriInfo) {
+
 		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		HardwarePlanData singlePlandata = this.HardwarePlanReadPlatformService.retrieveSinglePlanData(planId);
-		List<ItemData> data = this.HardwarePlanReadPlatformService.retrieveItems();
-		List<PlanCodeData> planData = this.HardwarePlanReadPlatformService.retrievePlans();
-			singlePlandata.addData(data);
-			singlePlandata.addPlan(planData);
-			
-			final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-			return this.toApiJsonSerializer.serialize(settings, singlePlandata, RESPONSE_DATA_PARAMETERS);
+		final HardwarePlanData singlePlandata = this.HardwarePlanReadPlatformService.retrieveSinglePlanData(planId);
+		final List<ItemData> data = this.HardwarePlanReadPlatformService.retrieveItems();
+		final List<PlanCodeData> planData = this.HardwarePlanReadPlatformService.retrievePlans();
+		singlePlandata.addData(data);
+		singlePlandata.addPlan(planData);
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		return this.toApiJsonSerializer.serialize(settings, singlePlandata, RESPONSE_DATA_PARAMETERS);
 	}
-	
+
 }

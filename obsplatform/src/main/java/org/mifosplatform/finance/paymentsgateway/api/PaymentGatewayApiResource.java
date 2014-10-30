@@ -22,8 +22,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.io.FileUtils;
 import org.json.JSONException;
@@ -50,18 +50,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.gson.Gson;
 
 @Path("/paymentgateways")
 @Component
 @Scope("singleton")
+
+/**
+ * The class <code>PaymentGatewayApiResource</code> is developed for
+ * Third party PaymentGateway systems.
+ * Using the below API to Communicate OBS with Adapters/Third-Party servers. 
+ * 
+ * @author ashokreddy
+ *
+ */
 public class PaymentGatewayApiResource {
 	
 	/**
 	 * The set of parameters that are supported in response for {@link CodeData}
 	 */
-	private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(
+	private static final Set<String> RESPONSEPARAMETERS = new HashSet<String>(
 			Arrays.asList("id","paymentId", "serialNo", "paymentDate", "receiptNo","status","phoneNo","clientName","amountPaid","remarks"));
 	
 	private final String resourceNameForPermissions = "PAYMENTGATEWAY";
@@ -72,14 +80,19 @@ public class PaymentGatewayApiResource {
 	private final DefaultToApiJsonSerializer<PaymentGatewayData> toApiJsonSerializer;
 	private final PortfolioCommandSourceWritePlatformService writePlatformService;
 	private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
-	private final PaymentGatewayReadPlatformService paymentGatewayReadPlatformService;
+	private String returnMessage;
+	private String success;
+	private String errorDesc;
+	private String contentData;
+	private CommandProcessingResult result;
+	private JSONObject jsonData;
+	private Long errorCode;
 
 	@Autowired
 	public PaymentGatewayApiResource(final PlatformSecurityContext context,final PaymentGatewayReadPlatformService readPlatformService,
 			final DefaultToApiJsonSerializer<PaymentGatewayData> toApiJsonSerializer,final ApiRequestParameterHelper apiRequestParameterHelper,
 			final PortfolioCommandSourceWritePlatformService writePlatformService,
-			final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
-			final PaymentGatewayReadPlatformService paymentGatewayReadPlatformService) {
+			final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
 
 		this.toApiJsonSerializer = toApiJsonSerializer;
 		this.writePlatformService = writePlatformService;
@@ -87,66 +100,69 @@ public class PaymentGatewayApiResource {
 		this.readPlatformService=readPlatformService;
 		this.apiRequestParameterHelper=apiRequestParameterHelper;
 		this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
-		this.paymentGatewayReadPlatformService=paymentGatewayReadPlatformService;
 	}
 
+	/**
+	 * This method <code>onlinePayment</code> is 
+	 * used for the Both M-pesa & Tigo-pesa PaymentGateways to Pay the Money.
+	 * 
+	 * @param requestData
+	 * 			Containg input data in the Form of Xml/Soap . 
+	 * @return
+	 */
 	@POST
 	@Consumes({ MediaType.WILDCARD })
 	@Produces({ MediaType.APPLICATION_XML })
-	public String mpesaPayment(final String apiRequestBodyAsJson)  {
+	public String onlinePayment(final String requestData)  {
 		
-		 CommandProcessingResult result=null;
-		 JSONObject jsonData = null;
 	     try{
-			JSONObject xmlJSONObj = XML.toJSONObject(apiRequestBodyAsJson);
-			jsonData=this.ReturnJsonFromXml(xmlJSONObj);
+			final JSONObject xmlJSONObj = XML.toJSONObject(requestData);
+			jsonData=this.returnJsonFromXml(xmlJSONObj);
 			final CommandWrapper commandRequest = new CommandWrapperBuilder().createPaymentGateway().withJson(jsonData.toString()).build();
 			result = this.writePlatformService.logCommandSource(commandRequest);
-			String Success="SUCCESS";
-			String errorDesc="";
-			Long errorCode=0L;
-			String contentData="OBSTRANSACTIONID="+result.resourceId();
-			return this.returnToStalker(jsonData,Success,errorDesc,errorCode,contentData);
-			
+			success = "SUCCESS";
+			errorDesc = "";
+			errorCode = Long.valueOf(0);	
+			contentData = "OBSTRANSACTIONID=" + result.resourceId();	
+			return this.returnToStalker();	
 		}catch(ReceiptNoDuplicateException e){
-				String Success="DUPLICATE_TXN";
-				String errorDesc="DUPLICATE";
-				Long errorCode=1L;
-				String contentData="TXNID ALREADY EXIST";
-				return this.returnToStalker(jsonData,Success,errorDesc,errorCode,contentData);
+				success="DUPLICATE_TXN";
+				errorDesc="DUPLICATE";
+				errorCode=Long.valueOf(1);
+				contentData="TXNID ALREADY EXIST";
+				return this.returnToStalker();
 		} catch (JSONException e) {
 			    return e.getCause().toString();	 
 		} catch (PlatformDataIntegrityException e) {
-			
 		        return null;
 	    }   
 	}
 
-	private String returnToStalker(JSONObject jsonData, String success, String errorDesc, Long errorCode, String contentData) {
+	private String returnToStalker() {
 		
 		try {
-			String OBSPAYMENTTYPE = jsonData.getString("OBSPAYMENTTYPE");
+			final String obsPaymentType = jsonData.getString("OBSPAYMENTTYPE");
 		
-			String returnMessage = null;
-			if(OBSPAYMENTTYPE.equalsIgnoreCase("MPesa")){
+			
+			if(obsPaymentType.equalsIgnoreCase("MPesa")){
 				
-					     String Receipt=jsonData.getString("receipt");
+					     String receipt=jsonData.getString("receipt");
 						 StringBuilder builder = new StringBuilder();
 				            builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>")
 				                .append("<response>")
-				                .append("<receipt>"+Receipt)
+				                .append("<receipt>"+receipt)
 				                .append("</receipt>")
 				                .append("<result>"+success)
 				                .append("</result>")
 				                .append("</response>");
 				            returnMessage= builder.toString();
 					
-			}else if (OBSPAYMENTTYPE.equalsIgnoreCase("TigoPesa")) {
+			}else if (obsPaymentType.equalsIgnoreCase("TigoPesa")) {
 				
 					//String TYPE = jsonData.getString("TYPE");
-					String TXNID = jsonData.getString("TXNID");
-					String CUSTOMERREFERENCEID = jsonData.getString("CUSTOMERREFERENCEID");	
-					String MSISDN = jsonData.getString("MSISDN");
+					String txnId = jsonData.getString("TXNID");
+					String customerReferenceNumber = jsonData.getString("CUSTOMERREFERENCEID");	
+					String msisdn = jsonData.getString("MSISDN");
 					
 						 StringBuilder builder = new StringBuilder();
 				            builder.append("<?xml version=\"1.0\"?>")
@@ -154,9 +170,9 @@ public class PaymentGatewayApiResource {
 				                .append("<COMMAND>")
 				                .append("<TYPE>"+"SYNC_BILLPAY_RESPONSE")
 				                .append("</TYPE>")
-				                .append("<TXNID>"+TXNID)
+				                .append("<TXNID>"+txnId)
 				                .append("</TXNID>")
-				                .append("<REFID>"+CUSTOMERREFERENCEID)
+				                .append("<REFID>"+customerReferenceNumber)
 				                .append("</REFID>")
 				                .append("<RESULT>"+success)
 				                .append("</RESULT>")
@@ -164,7 +180,7 @@ public class PaymentGatewayApiResource {
 				                .append("</ERRORCODE>")
 				                .append("<ERRORDESC>"+errorDesc)
 				                .append("</ERRORDESC>")
-				                .append("<MSISDN>"+MSISDN)
+				                .append("<MSISDN>"+msisdn)
 				                .append("</MSISDN>")
 				                .append("<FLAG>"+"Y")
 				                .append("</FLAG>")
@@ -182,7 +198,7 @@ public class PaymentGatewayApiResource {
 		
 	}
 
-	public JSONObject ReturnJsonFromXml(JSONObject xmlJSONObj){		
+	public JSONObject returnJsonFromXml(JSONObject xmlJSONObj){		
 		try {
 			JSONObject element=null;
 			boolean b=xmlJSONObj.has("COMMAND");
@@ -235,7 +251,6 @@ public class PaymentGatewayApiResource {
 		
 		String fromDate = df.format(fDate);
 		String toDate = df.format(tDate);
-		Gson gson = new Gson();
 		
 		List<PaymentGatewayDownloadData> paymentData = readPlatformService.retriveDataForDownload(source,fromDate,toDate,status);
 		
@@ -324,7 +339,7 @@ public class PaymentGatewayApiResource {
 		List<MediaEnumoptionData> data=readPlatformService.retrieveTemplateData();
 		paymentData.setStatusData(data);
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-		return this.toApiJsonSerializer.serialize(settings, paymentData,RESPONSE_DATA_PARAMETERS);
+		return this.toApiJsonSerializer.serialize(settings, paymentData,RESPONSEPARAMETERS);
 
 	}
 	

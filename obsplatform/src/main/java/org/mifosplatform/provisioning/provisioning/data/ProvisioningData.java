@@ -35,16 +35,18 @@ public class ProvisioningData {
 	}
 	
 
-	public ProvisioningData(List<McodeData> provisioning,List<McodeData> commands) {
+	public ProvisioningData(final List<McodeData> provisioning, final List<McodeData> commands) {
 		
 		this.commands=commands;
 		this.provisioning=provisioning;		
 	}
 
 
-	public ProvisioningData(Collection<MCodeData> vlanDatas,List<IpPoolData> ipPoolDatas, 
-			List<OrderLineData> services,final List<ServiceParameterData> serviceDatas, 
-			List<ServiceParameterData> parameterDatas, Collection<GroupData> groupDatas) {
+	public ProvisioningData(final Collection<MCodeData> vlanDatas,
+			final List<IpPoolData> ipPoolDatas, 
+			final List<OrderLineData> services,final List<ServiceParameterData> serviceDatas, 
+			final List<ServiceParameterData> parameterDatas, 
+			final Collection<GroupData> groupDatas) {
 		
 		this.vlanDatas=vlanDatas;
 		this.services=services;

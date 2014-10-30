@@ -6,7 +6,11 @@ import javax.persistence.Table;
 
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
-
+/**
+ * 
+ * @author ashokreddy
+ *
+ */
 @SuppressWarnings("serial")
 @Entity
 @Table(name = "b_ippool_details")
@@ -37,7 +41,8 @@ public class IpPoolManagementDetail extends AbstractPersistable<Long>{
 		
 	}
 
-	public IpPoolManagementDetail(String ipAddress, char status, Long type, String notes,Long subnet) {
+	public IpPoolManagementDetail(final String ipAddress, final char status, 
+			final Long type, final String notes, final Long subnet) {
 		
 		this.ipAddress=ipAddress;
 		this.status=status;

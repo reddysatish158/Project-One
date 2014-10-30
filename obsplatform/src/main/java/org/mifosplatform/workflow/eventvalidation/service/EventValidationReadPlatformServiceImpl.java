@@ -13,47 +13,47 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EventValidationReadPlatformServiceImpl implements EventValidationReadPlatformService
-{
+public class EventValidationReadPlatformServiceImpl implements
+		EventValidationReadPlatformService {
 
 	private final JdbcTemplate jdbcTemplate;
 	private final PlatformSecurityContext context;
 
-
 	@Autowired
-	public EventValidationReadPlatformServiceImpl(final PlatformSecurityContext context,final TenantAwareRoutingDataSource dataSource) {
+	public EventValidationReadPlatformServiceImpl(
+			final PlatformSecurityContext context,
+			final TenantAwareRoutingDataSource dataSource) {
 		this.context = context;
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	@Override
 	public List<EventValidationData> retrieveAllEventValidation() {
-   
-	try{	
-		context.authenticatedUser();
-		EventValidationMapper mapper = new EventValidationMapper();
 
-		String sql = "select " + mapper.schema();
+		try {
+			context.authenticatedUser();
+			final EventValidationMapper mapper = new EventValidationMapper();
+			final String sql = "select " + mapper.schema();
 
-		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
-	}catch(EmptyResultDataAccessException accessException){
-		return null;
+			return this.jdbcTemplate.query(sql, mapper, new Object[] {});
+
+		} catch (EmptyResultDataAccessException accessException) {
+			return null;
+		}
+
 	}
 
-	}
-
-	private static final class EventValidationMapper implements RowMapper<EventValidationData> {
+	private static final class EventValidationMapper implements
+			RowMapper<EventValidationData> {
 
 		public String schema() {
-			return "be.id as id,be.event_name as eventName,be.process as process,be.pre_post as prePost," +
-				 " is_deleted as isDeleted from b_event_validation be order by be.is_deleted";
+			return "be.id as id,be.event_name as eventName,be.process as process,be.pre_post as prePost,"
+					+ " is_deleted as isDeleted from b_event_validation be order by be.is_deleted";
 
 		}
-	
 
 		@Override
-		public EventValidationData mapRow(final ResultSet rs,
-				@SuppressWarnings("unused") final int rowNum)
+		public EventValidationData mapRow(final ResultSet rs, final int rowNum)
 				throws SQLException {
 
 			Long id = rs.getLong("id");
@@ -61,10 +61,10 @@ public class EventValidationReadPlatformServiceImpl implements EventValidationRe
 			String process = rs.getString("process");
 			String prePost = rs.getString("prePost");
 			String isDeleted = rs.getString("isDeleted");
-			
-			return new EventValidationData(id, eventName,process,prePost,isDeleted);
+
+			return new EventValidationData(id, eventName, process, prePost,
+					isDeleted);
 		}
 	}
 
 }
-

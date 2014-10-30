@@ -1,5 +1,6 @@
 package org.mifosplatform.provisioning.entitlements.service;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -252,6 +253,87 @@ public class EntitlementReadPlatformServiceImpl implements
 					" left join b_item_master bim on (bid.item_master_id = bim.id) " +
 					" left join b_owned_hardware oh on (bprd.hardware_id =oh.provisioning_serial_number AND oh.is_deleted = 'N')" +
 					" WHERE bpr.is_processed = 'N'";
+		}
+
+	}
+
+	@Override
+	public List<EntitlementsData> getZebraOTTProcessingData(Long no,
+			String provisioningSystem) {
+
+		String sql = "";
+		ZebraOTTServicesMapper mapper = new ZebraOTTServicesMapper();
+
+		sql = "select " + mapper.schema();
+
+		if (provisioningSystem != null) {
+			sql = sql + " and bpr.provisioing_system = '" + provisioningSystem
+					+ "' ";
+		}
+
+		sql = sql + "group by bpr.id";
+		if (no != null) {
+			sql = sql + " limit " + no;
+		}
+
+		return jdbcTemplate.query(sql, mapper, new Object[] {});
+	}
+
+	protected static final class ZebraOTTServicesMapper implements
+			RowMapper<EntitlementsData> {
+
+		@Override
+		public EntitlementsData mapRow(final ResultSet rs, final int rowNum)
+				throws SQLException {
+
+			Long id = rs.getLong("id");
+			Long clientId = rs.getLong("clientId");
+			String accountNo = rs.getString("accountNo");
+			String firstName = rs.getString("firstName");
+			String lastName = rs.getString("lastName");
+			String email = rs.getString("email");
+			String phone = rs.getString("phone");
+			
+			String city = rs.getString("city");
+			String zip = rs.getString("zip");
+			String address = rs.getString("address");
+			
+			String provisioingSystem = rs.getString("provisioingSystem");
+			Long serviceId = rs.getLong("serviceId");
+			Long prdetailsId = rs.getLong("prdetailsId");
+			String product = rs.getString("sentMessage");
+			String macId = rs.getString("macId");
+			String requestType = rs.getString("requestType");
+			
+			Long zebraSubscriberId = rs.getLong("zebraSubscriberId");
+			BigDecimal itemPrice = rs.getBigDecimal("itemPrice");
+			Long itemId = rs.getLong("itemId");
+			String itemCode = rs.getString("itemCode");
+			String itemDescription = rs.getString("itemDescription");
+			
+			return new EntitlementsData(id,clientId,accountNo,firstName,lastName,email,phone,city,zip,
+					address,provisioingSystem,serviceId,prdetailsId,product,macId,requestType,zebraSubscriberId,
+					itemPrice,itemId,itemCode,itemDescription);
+		}
+
+		public String schema() {
+			
+			return " bpr.id as id, c.id as clientId, c.account_no as accountNo,c.firstname as firstName,"
+					+ " c.lastname as lastName,c.phone as phone,c.email as email,"
+					+ " bca.city as city,bca.zip as zip,bca.address_no as address,"
+					+ " bpr.provisioing_system AS provisioingSystem,bprd.service_id AS serviceId,"
+					+ " bprd.id AS prdetailsId,bprd.sent_message AS sentMessage,"
+					+ " bprd.hardware_id as macId,bprd.request_type AS requestType,"
+					+ " bim.id as itemId,bim.item_code as itemCode,bim.item_description as itemDescription,"
+					+ " bim.unit_price as itemPrice,bcu.zebra_subscriber_id as zebraSubscriberId"
+					+ " from m_client c"
+					+ " join b_process_request bpr on (c.id = bpr.client_id )"
+					+ " join b_process_request_detail bprd on (bpr.id = bprd.processrequest_id )"
+					+ " join b_client_address bca on (c.id=bca.client_id and address_key='PRIMARY')"
+					+ " left join b_clientuser bcu on (c.id = bcu.client_id)"
+					+ " left join b_item_detail bid on (bprd.hardware_id = bid.provisioning_serialno)"
+					+ " left join b_item_master bim on (bid.item_master_id = bim.id)"
+					+ " WHERE bpr.is_processed = 'N'" ;
 		}
 
 	}

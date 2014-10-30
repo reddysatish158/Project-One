@@ -8,17 +8,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ConfirmProvisioningDetailsCommandHandler implements NewCommandSourceHandler {
+public class ConfirmProvisioningDetailsCommandHandler implements
+		NewCommandSourceHandler {
 
-	 private final ProvisioningWritePlatformService writePlatformService;
+	private final ProvisioningWritePlatformService writePlatformService;
 
-	    @Autowired
-	    public ConfirmProvisioningDetailsCommandHandler(final ProvisioningWritePlatformService writePlatformService) {
-	        this.writePlatformService = writePlatformService;
-	    }
+	@Autowired
+	public ConfirmProvisioningDetailsCommandHandler(
+			final ProvisioningWritePlatformService writePlatformService) {
+		this.writePlatformService = writePlatformService;
+	}
 
-		@Override
-		public CommandProcessingResult processCommand(JsonCommand command) {
-	       return this.writePlatformService.confirmProvisioningDetails(command.entityId());
-		}
+	@Override
+	public CommandProcessingResult processCommand(JsonCommand command) {
+		return this.writePlatformService.confirmProvisioningDetails(command
+				.entityId());
+	}
 }

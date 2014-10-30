@@ -9,7 +9,6 @@ import org.mifosplatform.billing.discountmaster.service.DiscountWritePlatformSer
 import org.mifosplatform.commands.handler.NewCommandSourceHandler;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
-import org.mifosplatform.portfolio.plan.service.PlanWritePlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,17 +16,18 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class DeleteDiscountCommandHandler implements NewCommandSourceHandler {
 
-    private final DiscountWritePlatformService writePlatformService;
+	private final DiscountWritePlatformService writePlatformService;
 
-    @Autowired
-    public DeleteDiscountCommandHandler(final DiscountWritePlatformService writePlatformService) {
-        this.writePlatformService = writePlatformService;
-    }
+	@Autowired
+	public DeleteDiscountCommandHandler(
+			final DiscountWritePlatformService writePlatformService) {
+		this.writePlatformService = writePlatformService;
+	}
 
-    @Transactional
-    @Override
-    public CommandProcessingResult processCommand(final JsonCommand command) {
+	@Transactional
+	@Override
+	public CommandProcessingResult processCommand(final JsonCommand command) {
 
-        return this.writePlatformService.deleteDiscount(command.entityId());
-    }
+		return this.writePlatformService.deleteDiscount(command.entityId());
+	}
 }

@@ -9,20 +9,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class CreateChargeCodeCommandHandler implements NewCommandSourceHandler{
+public class CreateChargeCodeCommandHandler implements NewCommandSourceHandler {
 
 	private final ChargeCodeWritePlatformService chargeCodeWritePlatformService;
-	
+
 	@Autowired
-	public CreateChargeCodeCommandHandler(final ChargeCodeWritePlatformService chargeCodeWritePlatformService) {
+	public CreateChargeCodeCommandHandler(
+			final ChargeCodeWritePlatformService chargeCodeWritePlatformService) {
 		this.chargeCodeWritePlatformService = chargeCodeWritePlatformService;
 	}
 
 	@Transactional
 	@Override
-	public CommandProcessingResult processCommand(JsonCommand command) {
+	public CommandProcessingResult processCommand(final JsonCommand command) {
 		return chargeCodeWritePlatformService.createChargeCode(command);
 	}
-	
-	
+
 }

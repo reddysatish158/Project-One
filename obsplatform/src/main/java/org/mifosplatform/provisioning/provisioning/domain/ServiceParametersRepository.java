@@ -7,6 +7,9 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+/**
+ *
+ */
 public interface ServiceParametersRepository  extends JpaRepository<ServiceParameters, Long>, JpaSpecificationExecutor<ServiceParameters>{
 	
 	

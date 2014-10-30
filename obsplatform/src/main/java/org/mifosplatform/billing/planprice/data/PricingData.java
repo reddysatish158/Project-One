@@ -2,8 +2,10 @@ package org.mifosplatform.billing.planprice.data;
 import java.math.BigDecimal;
 import java.util.List;
 
+
+
+import org.mifosplatform.billing.discountmaster.data.DiscountMasterData;
 import org.mifosplatform.billing.chargecode.data.ChargeCodeData;
-import org.mifosplatform.finance.data.DiscountMasterData;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
 import org.mifosplatform.organisation.priceregion.data.PriceRegionData;
 import org.mifosplatform.portfolio.contract.data.SubscriptionData;

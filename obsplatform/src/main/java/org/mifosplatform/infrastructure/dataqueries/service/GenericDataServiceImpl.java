@@ -35,6 +35,9 @@ public class GenericDataServiceImpl implements GenericDataService {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see #fillGenericResultSet(java.lang.String)
+	 */
 	@Override
 	public GenericResultsetData fillGenericResultSet(final String sql) {
 
@@ -179,6 +182,9 @@ public class GenericDataServiceImpl implements GenericDataService {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see fillResultsetColumnHeaders(java.lang.String)
+	 */
 	@Override
 	public List<ResultsetColumnHeaderData> fillResultsetColumnHeaders(
 			final String datatable) {
@@ -248,8 +254,10 @@ public class GenericDataServiceImpl implements GenericDataService {
 		return columnHeaders;
 	}
 
-	/*
-	 * Candidate for using caching there to get allowed 'column values' from
+	/**
+	 * @param codeName
+	 * @return
+	 * caching there to get allowed 'column values' from
 	 * code/codevalue tables
 	 */
 	private List<ResultsetColumnValueData> retreiveColumnValues(

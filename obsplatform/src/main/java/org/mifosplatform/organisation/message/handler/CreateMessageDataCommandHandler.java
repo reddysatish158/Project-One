@@ -1,6 +1,5 @@
 package org.mifosplatform.organisation.message.handler;
 
-
 import org.mifosplatform.commands.handler.NewCommandSourceHandler;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
@@ -8,16 +7,18 @@ import org.mifosplatform.organisation.message.service.BillingMessageDataWritePla
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
-
+/**
+ * 
+ * @author ashokreddy
+ *
+ */
 @Service
 public class CreateMessageDataCommandHandler implements NewCommandSourceHandler{
 	
 	private final BillingMessageDataWritePlatformService billingmessageDataWritePlatformService;
 	
 	@Autowired
-	public CreateMessageDataCommandHandler(
-			final BillingMessageDataWritePlatformService billingmessageDataWritePlatformService)
+	public CreateMessageDataCommandHandler(final BillingMessageDataWritePlatformService billingmessageDataWritePlatformService)
 	{
 	this.billingmessageDataWritePlatformService =billingmessageDataWritePlatformService;
 	}

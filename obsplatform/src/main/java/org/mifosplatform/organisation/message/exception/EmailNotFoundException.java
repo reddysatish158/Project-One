@@ -10,10 +10,16 @@ import org.mifosplatform.infrastructure.core.exception.AbstractPlatformResourceN
 /**
  * A {@link RuntimeException} thrown when a code is not found.
  */
+@SuppressWarnings("serial")
 public class EmailNotFoundException extends AbstractPlatformResourceNotFoundException {
 
-    public EmailNotFoundException(final Long id) {
-        super("error.msg.email.not.found", "User with this id"+id+"not exist",id);
+	/**
+	 * 
+	 * @param clientid
+	 * 			id of the Client
+	 */
+    public EmailNotFoundException(final Long clientid) {
+        super("error.msg.email.not.found", "User with this id" + clientid + "not exist", clientid);
         
     }
 

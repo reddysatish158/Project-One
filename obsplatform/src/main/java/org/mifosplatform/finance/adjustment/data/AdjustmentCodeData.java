@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.joda.time.LocalDate;
-import org.mifosplatform.billing.discountmaster.commands.DiscountValues;
+import org.mifosplatform.billing.discountmaster.data.DiscountValues;
 
 public class AdjustmentCodeData {
 

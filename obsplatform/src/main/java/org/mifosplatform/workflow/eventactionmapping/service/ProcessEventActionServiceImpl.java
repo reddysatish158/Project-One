@@ -57,7 +57,7 @@ public class ProcessEventActionServiceImpl implements ProcessEventActionService 
 	
 	@Override
 	@Transactional
-	public void ProcessEventActions(EventActionData eventActionData) {
+	public void processEventActions(EventActionData eventActionData) {
 		
 		EventAction eventAction=this.eventActionRepository.findOne(eventActionData.getId());
 		try{
@@ -106,12 +106,13 @@ public class ProcessEventActionServiceImpl implements ProcessEventActionService 
 			}else if(eventActionData.getActionName().equalsIgnoreCase(EventActionConstants.ACTION_SEND_PROVISION)){
 
 				try{
-					List<HardwareAssociationData> associationDatas= this.hardwareAssociationReadplatformService.retrieveClientAllocatedHardwareDetails(eventActionData.getClientId());
+					final List<HardwareAssociationData> associationDatas= this.hardwareAssociationReadplatformService.retrieveClientAllocatedHardwareDetails(eventActionData.getClientId());
+					
 					if(!associationDatas.isEmpty()){
 						Long none=Long.valueOf(0);
-						ProcessRequest processRequest=new ProcessRequest(none,eventActionData.getClientId(),none,ProvisioningApiConstants.PROV_BEENIUS,
+						final ProcessRequest processRequest=new ProcessRequest(none,eventActionData.getClientId(),none,ProvisioningApiConstants.PROV_BEENIUS,
 													ProvisioningApiConstants.REQUEST_TERMINATE,'N','N');
-						ProcessRequestDetails processRequestDetails=new ProcessRequestDetails(none,none,null,"success",associationDatas.get(0).getProvSerialNum(), 
+						final ProcessRequestDetails processRequestDetails=new ProcessRequestDetails(none,none,null,"success",associationDatas.get(0).getProvSerialNum(), 
 																	new Date(), null, new Date(),null,'N', ProvisioningApiConstants.REQUEST_TERMINATE,null);
 						processRequest.add(processRequestDetails);
 						this.processRequestRepository.save(processRequest);

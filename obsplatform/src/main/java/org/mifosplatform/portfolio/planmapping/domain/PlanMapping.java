@@ -11,6 +11,7 @@ import org.apache.commons.lang.StringUtils;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
+@SuppressWarnings("serial")
 @Entity
 @Table(name = "b_prov_plan_details")
 public class PlanMapping extends AbstractPersistable<Long> {
@@ -34,7 +35,8 @@ public class PlanMapping extends AbstractPersistable<Long> {
 
 	}
 
-	public PlanMapping(Long planId, String planIdentification, String status,String image) {
+	public PlanMapping(final Long planId, final String planIdentification,
+			final String status, final String image) {
 		this.planId = planId;
 		this.planIdentification = planIdentification;
 		this.status = status;

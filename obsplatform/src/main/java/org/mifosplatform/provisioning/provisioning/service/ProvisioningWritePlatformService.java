@@ -15,13 +15,17 @@ public interface ProvisioningWritePlatformService {
 
 	CommandProcessingResult deleteProvisioningSystem(JsonCommand command);
 
-	CommandProcessingResult createNewProvisioningSystem(JsonCommand command,Long entityId);
-	
+	CommandProcessingResult createNewProvisioningSystem(JsonCommand command,
+			Long entityId);
+
 	CommandProcessingResult updateProvisioningDetails(Long entityId);
 
-	void updateHardwareDetails(Long clientId, String serialNumber,String oldSerialnumber, String provSerilaNum, String oldHardware);
+	void updateHardwareDetails(Long clientId, String serialNumber,
+			String oldSerialnumber, String provSerilaNum, String oldHardware);
 
-	void postOrderDetailsForProvisioning(Order order, String planName, String reqType, Long prepareId,String groupName, String serialNo, Long orderId);
+	void postOrderDetailsForProvisioning(Order order, String planName,
+			String reqType, Long prepareId, String groupName, String serialNo,
+			Long orderId);
 
 	CommandProcessingResult updateIpDetails(Long entityId, JsonCommand command);
 
@@ -30,8 +34,5 @@ public interface ProvisioningWritePlatformService {
 	String runAdapterCommands(String apiRequestBodyAsJson);
 
 	List<ProvisionAdapter> gettingLogInformation(String apiRequestBodyAsJson);
-
-	
-
 
 }

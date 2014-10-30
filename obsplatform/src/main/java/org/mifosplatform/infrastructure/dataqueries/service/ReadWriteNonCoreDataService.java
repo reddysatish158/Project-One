@@ -1,8 +1,3 @@
-/**
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this file,
- * You can obtain one at http://mozilla.org/MPL/2.0/.
- */
 package org.mifosplatform.infrastructure.dataqueries.service;
 
 import java.util.List;
@@ -13,67 +8,57 @@ import org.mifosplatform.infrastructure.dataqueries.data.DatatableData;
 import org.mifosplatform.infrastructure.dataqueries.data.GenericResultsetData;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+/**
+ * @author hugo
+ * 
+ */
 public interface ReadWriteNonCoreDataService {
 
-    /*List<DatatableData> retrieveDatatableNames(String appTable);
+	List<DatatableData> retrieveDatatableNames(String appTable);
 
-    @PreAuthorize(value = "hasAnyRole('ALL_FUNCTIONS', 'REGISTER_DATATABLE')")
-    void registerDatatable(String datatable, String appTable);
+	DatatableData retrieveSingleDatatable(String datatable);
 
-    @PreAuthorize(value = "hasAnyRole('ALL_FUNCTIONS', 'DEREGISTER_DATATABLE')")
-    void deregisterDatatable(String datatable);
+	@PreAuthorize(value = "hasAnyRole('ALL_FUNCTIONS', 'REGISTER_DATATABLE')")
+	void registerDatatable(JsonCommand command);
 
-    GenericResultsetData retrieveDataTableGenericResultSet(String datatable, Long appTableId, String order, Long id);
+	@PreAuthorize(value = "hasAnyRole('ALL_FUNCTIONS', 'REGISTER_DATATABLE')")
+	void registerDatatable(String dataTableName, String applicationTableName);
 
-    CommandProcessingResult createNewDatatableEntry(String datatable, Long appTableId, JsonCommand command);
+	@PreAuthorize(value = "hasAnyRole('ALL_FUNCTIONS', 'REGISTER_DATATABLE')")
+	void registerDatatable(JsonCommand command, String permissionTable);
 
-    CommandProcessingResult updateDatatableEntryOneToOne(String datatable, Long appTableId, JsonCommand command);
+	@PreAuthorize(value = "hasAnyRole('ALL_FUNCTIONS', 'DEREGISTER_DATATABLE')")
+	void deregisterDatatable(String datatable);
 
-    CommandProcessingResult updateDatatableEntryOneToMany(String datatable, Long appTableId, Long datatableId, JsonCommand command);
+	GenericResultsetData retrieveDataTableGenericResultSet(String datatable,
+			Long appTableId, String order, Long id);
 
-    CommandProcessingResult deleteDatatableEntries(String datatable, Long appTableId);
+	CommandProcessingResult createDatatable(JsonCommand command);
 
-    CommandProcessingResult deleteDatatableEntry(String datatable, Long appTableId, Long datatableId);*/
+	void updateDatatable(String datatableName, JsonCommand command);
 
-	    List<DatatableData> retrieveDatatableNames(String appTable);
+	void deleteDatatable(String datatableName);
 
-	    DatatableData retrieveDatatable(String datatable);
+	CommandProcessingResult createNewDatatableEntry(String datatable,
+			Long appTableId, JsonCommand command);
 
-	    @PreAuthorize(value = "hasAnyRole('ALL_FUNCTIONS', 'REGISTER_DATATABLE')")
-	    void registerDatatable(JsonCommand command);
+	CommandProcessingResult createPPIEntry(String datatable, Long appTableId,
+			JsonCommand command);
 
-	    @PreAuthorize(value = "hasAnyRole('ALL_FUNCTIONS', 'REGISTER_DATATABLE')")
-	    void registerDatatable(String dataTableName, String applicationTableName);
+	CommandProcessingResult updateDatatableEntryOneToOne(String datatable,
+			Long appTableId, JsonCommand command);
 
-	    @PreAuthorize(value = "hasAnyRole('ALL_FUNCTIONS', 'REGISTER_DATATABLE')")
-	    void registerDatatable(JsonCommand command, String permissionTable);
+	CommandProcessingResult updateDatatableEntryOneToMany(String datatable,
+			Long appTableId, Long datatableId, JsonCommand command);
 
-	    @PreAuthorize(value = "hasAnyRole('ALL_FUNCTIONS', 'DEREGISTER_DATATABLE')")
-	    void deregisterDatatable(String datatable);
+	CommandProcessingResult deleteDatatableEntries(String datatable,
+			Long appTableId);
 
-	    GenericResultsetData retrieveDataTableGenericResultSet(String datatable, Long appTableId, String order, Long id);
+	CommandProcessingResult deleteDatatableEntry(String datatable,
+			Long appTableId, Long datatableId);
 
-	    CommandProcessingResult createDatatable(JsonCommand command);
+	String getTableName(String Url);
 
-	    void updateDatatable(String datatableName, JsonCommand command);
+	String getDataTableName(String Url);
 
-	    void deleteDatatable(String datatableName);
-
-	    CommandProcessingResult createNewDatatableEntry(String datatable, Long appTableId, JsonCommand command);
-
-	    CommandProcessingResult createPPIEntry(String datatable, Long appTableId, JsonCommand command);
-
-	    CommandProcessingResult updateDatatableEntryOneToOne(String datatable, Long appTableId, JsonCommand command);
-
-	    CommandProcessingResult updateDatatableEntryOneToMany(String datatable, Long appTableId, Long datatableId, JsonCommand command);
-
-	    CommandProcessingResult deleteDatatableEntries(String datatable, Long appTableId);
-
-	    CommandProcessingResult deleteDatatableEntry(String datatable, Long appTableId, Long datatableId);
-
-	    String getTableName(String Url);
-
-	    String getDataTableName(String Url);
-
-	}
-
+}

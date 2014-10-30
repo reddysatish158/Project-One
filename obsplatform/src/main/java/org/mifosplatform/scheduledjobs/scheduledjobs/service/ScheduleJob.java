@@ -12,7 +12,7 @@ import org.mifosplatform.finance.billingorder.service.BillingOrderReadPlatformSe
 import org.mifosplatform.finance.billingorder.service.GenerateBill;
 import org.mifosplatform.finance.clientbalance.domain.ClientBalance;
 import org.mifosplatform.finance.clientbalance.domain.ClientBalanceRepository;
-import org.mifosplatform.finance.data.DiscountMasterData;
+import org.mifosplatform.billing.discountmaster.data.DiscountMasterData;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
 import org.mifosplatform.portfolio.contract.data.SubscriptionData;

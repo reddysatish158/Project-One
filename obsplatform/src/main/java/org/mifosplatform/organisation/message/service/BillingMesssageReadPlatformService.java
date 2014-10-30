@@ -3,33 +3,31 @@ package org.mifosplatform.organisation.message.service;
 import java.io.IOException;
 import java.util.List;
 
-import org.mifosplatform.infrastructure.core.api.JsonCommand;
-import org.mifosplatform.organisation.message.data.BillingMessageData;
 import org.mifosplatform.organisation.message.data.BillingMessageDataForProcessing;
+import org.mifosplatform.organisation.message.data.BillingMessageTemplateData;
 
+/**
+ * 
+ * @author ashokreddy
+ *
+ */
 public interface BillingMesssageReadPlatformService {
-	
-BillingMessageData retrieveMessageTemplate(Long id);
 
-List<BillingMessageData> retrieveAllMessageTemplates();
+	BillingMessageTemplateData retrieveMessageTemplate(Long messageTemplateId);
 
-List<BillingMessageData> retrieveAllMessageTemplateParams();
+	List<BillingMessageTemplateData> retrieveAllMessageTemplateParams();
 
+	List<BillingMessageTemplateData> retrieveMessageParams(Long entityId);
 
-List<BillingMessageData> retrieveMessageParams(Long entityId);
+	List<BillingMessageTemplateData> retrieveData(Long command, String json,
+			BillingMessageTemplateData templateData,
+			List<BillingMessageTemplateData> messageparam,
+			BillingMesssageReadPlatformService billingMesssageReadPlatformService);
 
-List<BillingMessageData> retrieveData(Long command,String json, BillingMessageData templateData, List<BillingMessageData> messageparam,
-		                   BillingMesssageReadPlatformService billingMesssageReadPlatformService);
+	List<BillingMessageDataForProcessing> retrieveMessageDataForProcessing();
 
-List<BillingMessageDataForProcessing> retrieveMessageDataForProcessing();
+	BillingMessageTemplateData retrieveTemplate();
 
-BillingMessageData retrieveTemplate();
-
-Long retrieveClientId(String hardwareId) throws IOException;
-
-
-
-
-
+	Long retrieveClientId(String hardwareId) throws IOException;
 
 }

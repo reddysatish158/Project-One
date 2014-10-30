@@ -21,14 +21,17 @@ import org.springframework.stereotype.Component;
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 
+/**
+ * 
+ * @author ashokreddy
+ *
+ */
 @Component
 public class PaymentGatewayCommandFromApiJsonDeserializer {
 
-	
 	/**
 	 * The parameters supported for this command.
 	 */
-	 
 	private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("amount","timestamp", "msisdn","name", 
 				"service", "receipt", "reference","transaction","dateFormat","locale","remarks","status","CUSTOMERREFERENCEID",
 				"TXNID","COMPANYNAME","STATUS","AMOUNT","MSISDN","TYPE","OBSPAYMENTTYPE"));
@@ -40,7 +43,7 @@ public class PaymentGatewayCommandFromApiJsonDeserializer {
         this.fromApiJsonHelper = fromApiJsonHelper;
     }
 
-    public void validateForCreate(String json) {
+    public void validateForCreate(final String json) {
 
 		if (StringUtils.isBlank(json)) {
 			throw new InvalidJsonException();
@@ -48,12 +51,10 @@ public class PaymentGatewayCommandFromApiJsonDeserializer {
 
 		final Type typeOfMap = new TypeToken<Map<String, Object>>() {
 		}.getType();
-		fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json,
-				supportedParameters);
+		fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, supportedParameters);
 
 		final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
-		final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(
-				dataValidationErrors).resource("paymentgateway");
+		final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("paymentgateway");
 
 		final JsonElement element = fromApiJsonHelper.parse(json);
 	
@@ -92,7 +93,7 @@ public class PaymentGatewayCommandFromApiJsonDeserializer {
 		}
 	}
 
-	public void validateForUpdate(String json) {
+	public void validateForUpdate(final String json) {
 
 		if (StringUtils.isBlank(json)) {
 			throw new InvalidJsonException();
@@ -100,8 +101,7 @@ public class PaymentGatewayCommandFromApiJsonDeserializer {
 
 		final Type typeOfMap = new TypeToken<Map<String, Object>>() {
 		}.getType();
-		fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json,
-				supportedParameters);
+		fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, supportedParameters);
 
 		final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
 		final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(

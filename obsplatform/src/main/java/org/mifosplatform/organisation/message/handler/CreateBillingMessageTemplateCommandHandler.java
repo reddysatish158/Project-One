@@ -8,22 +8,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * 
+ * @author ashokreddy
+ *
+ */
 @Service
 public class CreateBillingMessageTemplateCommandHandler implements NewCommandSourceHandler {
-	
-private final BillingMessageTemplateWritePlatformService billingMessageTemplateWritePlatformService;
-	
+
+	private final BillingMessageTemplateWritePlatformService billingMessageTemplateWritePlatformService;
+
 	@Autowired
 	public CreateBillingMessageTemplateCommandHandler(
-			final BillingMessageTemplateWritePlatformService billingMessageTemplateWritePlatformService)
-	{
-	this.billingMessageTemplateWritePlatformService =billingMessageTemplateWritePlatformService;
+			final BillingMessageTemplateWritePlatformService billingMessageTemplateWritePlatformService) {
+		this.billingMessageTemplateWritePlatformService = billingMessageTemplateWritePlatformService;
 	}
 
-	 @Transactional
+	@Transactional
 	public CommandProcessingResult processCommand(JsonCommand command) {
 		// TODO Auto-generated method stub
 		return this.billingMessageTemplateWritePlatformService.addMessageTemplate(command);
 	}
-	
+
 }

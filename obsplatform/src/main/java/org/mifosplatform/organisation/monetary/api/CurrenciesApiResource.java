@@ -37,53 +37,49 @@ import org.springframework.stereotype.Component;
 @Scope("singleton")
 public class CurrenciesApiResource {
 
-    private final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(Arrays.asList("selectedCurrencyOptions", "currencyOptions"));
+	private final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(
+			Arrays.asList("selectedCurrencyOptions", "currencyOptions"));
 
-    private final String resourceNameForPermissions = "CURRENCY";
+	private final String resourceNameForPermissions = "CURRENCY";
 
-    private final PlatformSecurityContext context;
-    private final OrganisationCurrencyReadPlatformService readPlatformService;
-    private final DefaultToApiJsonSerializer<ApplicationCurrencyConfigurationData> toApiJsonSerializer;
-    private final ApiRequestParameterHelper apiRequestParameterHelper;
-    private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
+	private final PlatformSecurityContext context;
+	private final OrganisationCurrencyReadPlatformService readPlatformService;
+	private final DefaultToApiJsonSerializer<ApplicationCurrencyConfigurationData> toApiJsonSerializer;
+	private final ApiRequestParameterHelper apiRequestParameterHelper;
+	private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 
-    @Autowired
-    public CurrenciesApiResource(final PlatformSecurityContext context, final OrganisationCurrencyReadPlatformService readPlatformService,
-            final DefaultToApiJsonSerializer<ApplicationCurrencyConfigurationData> toApiJsonSerializer,
-            final ApiRequestParameterHelper apiRequestParameterHelper,
-            final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
-        this.context = context;
-        this.readPlatformService = readPlatformService;
-        this.toApiJsonSerializer = toApiJsonSerializer;
-        this.apiRequestParameterHelper = apiRequestParameterHelper;
-        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
-    }
+	@Autowired
+	public CurrenciesApiResource(
+			final PlatformSecurityContext context,
+			final OrganisationCurrencyReadPlatformService readPlatformService,
+			final DefaultToApiJsonSerializer<ApplicationCurrencyConfigurationData> toApiJsonSerializer,
+			final ApiRequestParameterHelper apiRequestParameterHelper,
+			final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
+		this.context = context;
+		this.readPlatformService = readPlatformService;
+		this.toApiJsonSerializer = toApiJsonSerializer;
+		this.apiRequestParameterHelper = apiRequestParameterHelper;
+		this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+	}
 
-    @GET
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
-    public String retrieveCurrencies(@Context final UriInfo uriInfo) {
+	@GET
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String retrieveCurrencies(@Context final UriInfo uriInfo) {
 
-        context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		final ApplicationCurrencyConfigurationData configurationData = this.readPlatformService.retrieveCurrencyConfiguration();
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		return this.toApiJsonSerializer.serialize(settings, configurationData, RESPONSE_DATA_PARAMETERS);
+	}
 
-        final ApplicationCurrencyConfigurationData configurationData = this.readPlatformService.retrieveCurrencyConfiguration();
-
-        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-        return this.toApiJsonSerializer.serialize(settings, configurationData, RESPONSE_DATA_PARAMETERS);
-    }
-
-    @PUT
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
-    public String updateCurrencies(final String apiRequestBodyAsJson) {
-
-        final CommandWrapper commandRequest = new CommandWrapperBuilder() //
-                .updateCurrencies() //
-                .withJson(apiRequestBodyAsJson) //
-                .build();
-
-        final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
-        return this.toApiJsonSerializer.serialize(result);
-    }
+	@PUT
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String updateCurrencies(final String apiRequestBodyAsJson) {
+		
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().updateCurrency().withJson(apiRequestBodyAsJson).build();
+		final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+		return this.toApiJsonSerializer.serialize(result);
+	}
 }
