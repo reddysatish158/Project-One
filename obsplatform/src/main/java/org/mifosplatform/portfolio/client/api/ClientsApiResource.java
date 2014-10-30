@@ -30,8 +30,8 @@ import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.ApiRequestParameterHelper;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
@@ -68,7 +68,7 @@ public class ClientsApiResource {
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final AddressReadPlatformService addressReadPlatformService;
     private final AllocationReadPlatformService allocationReadPlatformService;
-    private final GlobalConfigurationRepository configurationRepository;
+    private final ConfigurationRepository configurationRepository;
     private final SelfCareRepository selfCareRepository;
 
     @Autowired
@@ -76,7 +76,7 @@ public class ClientsApiResource {
             final OfficeReadPlatformService officeReadPlatformService, final ToApiJsonSerializer<ClientData> toApiJsonSerializer,
             final ApiRequestParameterHelper apiRequestParameterHelper,AddressReadPlatformService addressReadPlatformService,
             final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,final AllocationReadPlatformService allocationReadPlatformService,
-            final GlobalConfigurationRepository configurationRepository,final MediaDeviceReadPlatformService deviceReadPlatformService, 
+            final ConfigurationRepository configurationRepository,final MediaDeviceReadPlatformService deviceReadPlatformService, 
             final SelfCareRepository selfCareRepository) {
         this.context = context;
         this.clientReadPlatformService = readPlatformService;
@@ -103,7 +103,7 @@ public class ClientsApiResource {
         	
         clientData = this.clientReadPlatformService.retrieveAllClosureReasons(ClientApiConstants.CLIENT_CLOSURE_REASON);
         }
-        GlobalConfigurationProperty configurationProperty=this.configurationRepository.findOneByName("LOGIN");
+        Configuration configurationProperty=this.configurationRepository.findOneByName("LOGIN");
         clientData.setConfigurationProperty(configurationProperty);
         clientData=handleAddressTemplateData(clientData);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -147,7 +147,7 @@ public class ClientsApiResource {
         context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_RESOURCE_NAME);
 
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-        GlobalConfigurationProperty configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_BALANCE_CHECK);
+        Configuration configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_BALANCE_CHECK);
         ClientData clientData = this.clientReadPlatformService.retrieveOne(clientId);
         String balanceCheck="N";
         if(configurationProperty.isEnabled()){
@@ -168,9 +168,9 @@ public class ClientsApiResource {
         
         SelfCare selfcare = this.selfCareRepository.findOneByClientId(clientId);
         clientData.setSelfcare(selfcare);
-        GlobalConfigurationProperty paypalconfigurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_PAYPAL_CHECK);
+        Configuration paypalconfigurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_PAYPAL_CHECK);
         clientData.setConfigurationProperty(paypalconfigurationProperty);
-        GlobalConfigurationProperty paypalconfigurationPropertyForIos=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_PAYPAL_CHECK_IOS);
+        Configuration paypalconfigurationPropertyForIos=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_PAYPAL_CHECK_IOS);
         clientData.setConfigurationPropertyForIos(paypalconfigurationPropertyForIos);
         
         return this.toApiJsonSerializer.serialize(settings, clientData, ClientApiConstants.CLIENT_RESPONSE_DATA_PARAMETERS);

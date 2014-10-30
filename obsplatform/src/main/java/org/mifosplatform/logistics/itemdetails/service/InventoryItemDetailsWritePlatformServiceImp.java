@@ -7,8 +7,8 @@ import java.util.Map;
 import org.hibernate.exception.ConstraintViolationException;
 import org.joda.time.LocalDate;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -75,7 +75,7 @@ public class InventoryItemDetailsWritePlatformServiceImp implements InventoryIte
 	private InventoryItemDetailsReadPlatformService inventoryItemDetailsReadPlatformService;
 	private OneTimeSaleRepository oneTimeSaleRepository;
 	private InventoryTransactionHistoryJpaRepository inventoryTransactionHistoryJpaRepository;
-	private GlobalConfigurationRepository configurationRepository;
+	private ConfigurationRepository configurationRepository;
 	private HardwareAssociationReadplatformService associationReadplatformService;
 	private HardwareAssociationWriteplatformService associationWriteplatformService;
 	private final ItemRepository itemRepository;
@@ -93,7 +93,7 @@ public class InventoryItemDetailsWritePlatformServiceImp implements InventoryIte
 			final InventoryItemDetailsAllocationRepository inventoryItemDetailsAllocationRepository,final OneTimeSaleReadPlatformService oneTimeSaleReadPlatformService, 
 			final OneTimeSaleRepository oneTimeSaleRepository,final InventoryItemDetailsRepository inventoryItemDetailsRepository,final FromJsonHelper fromJsonHelper, 
 			final UploadStatusRepository uploadStatusRepository,final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,
-			final InventoryTransactionHistoryJpaRepository inventoryTransactionHistoryJpaRepository,final GlobalConfigurationRepository  configurationRepository,
+			final InventoryTransactionHistoryJpaRepository inventoryTransactionHistoryJpaRepository,final ConfigurationRepository  configurationRepository,
 			final HardwareAssociationReadplatformService associationReadplatformService,final HardwareAssociationWriteplatformService associationWriteplatformService,
 			final ItemRepository itemRepository,final OrderReadPlatformService orderReadPlatformService,final ProvisioningWritePlatformService provisioningWritePlatformService) 
 	{
@@ -319,7 +319,7 @@ public class InventoryItemDetailsWritePlatformServiceImp implements InventoryIte
 						i++;
 						
 						  //For Plan And HardWare Association
-						GlobalConfigurationProperty configurationProperty=this.configurationRepository.findOneByName(CONFIG_PROPERTY);
+						Configuration configurationProperty=this.configurationRepository.findOneByName(CONFIG_PROPERTY);
 						
 						if(configurationProperty.isEnabled()){
 							configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);

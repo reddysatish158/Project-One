@@ -51,7 +51,7 @@ public class CommandWrapperBuilder {
 		return this;
 	}
 
-	public CommandWrapperBuilder updateGlobalConfiguration(Long configId) {
+	public CommandWrapperBuilder updateConfiguration(Long configId) {
 		this.actionName = "UPDATE";
 		this.entityName = "CONFIGURATION";
 		this.entityId = configId;
@@ -2121,7 +2121,7 @@ public CommandWrapperBuilder confirnProvisiongDetails(Long processrequestId) {
     return this;
 }
 
-public CommandWrapperBuilder createGlobalConfiguration() {
+public CommandWrapperBuilder createSmtpConfiguration() {
 	this.actionName = "CREATE";
 	this.entityName = "SMTPCONFIGURATION";
 	//this.entityId=configId;

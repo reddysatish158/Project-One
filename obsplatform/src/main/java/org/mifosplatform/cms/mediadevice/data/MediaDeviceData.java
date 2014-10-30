@@ -3,7 +3,7 @@ package org.mifosplatform.cms.mediadevice.data;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
 
 public class MediaDeviceData {
 	
@@ -15,9 +15,9 @@ public class MediaDeviceData {
 	private BigDecimal balanceAmount;
 	private boolean balanceCheck;
 	private List<MediaDeviceData> data;
-	private GlobalConfigurationProperty paypalConfigData;
+	private Configuration paypalConfigData;
     private String currency;
-	private GlobalConfigurationProperty paypalConfigDataForIos;
+	private Configuration paypalConfigDataForIos;
 	
 	
 	public MediaDeviceData(Long deviceId, Long clientId, String clientType, Long clientTypeId, BigDecimal balanceAmount, String currency) {
@@ -86,10 +86,10 @@ public class MediaDeviceData {
 		this.balanceCheck =isCheck;
 	}
 
-	public void setPaypalConfigData(GlobalConfigurationProperty paypalConfigData) {
+	public void setPaypalConfigData(Configuration paypalConfigData) {
 		this.paypalConfigData = paypalConfigData;
 	}
-	public void setPaypalConfigDataForIos(GlobalConfigurationProperty paypalConfigDataForIos) {
+	public void setPaypalConfigDataForIos(Configuration paypalConfigDataForIos) {
 		this.paypalConfigDataForIos =paypalConfigDataForIos;
 		
 		

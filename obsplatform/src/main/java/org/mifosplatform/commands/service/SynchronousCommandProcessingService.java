@@ -122,10 +122,10 @@ public class SynchronousCommandProcessingService implements
 
 		if (wrapper.isConfigurationResource()) {
 			 if(wrapper.isCreate()){
-				handler = applicationContext.getBean("createGlobalConfigurationCommandHandler",NewCommandSourceHandler.class);
+				handler = applicationContext.getBean("createSmtpConfigurationCommandHandler", NewCommandSourceHandler.class);
 			 }
 			else if(wrapper.isUpdateOperation()){
-				handler = applicationContext.getBean("updateGlobalConfigurationCommandHandler",NewCommandSourceHandler.class);
+				handler = applicationContext.getBean("updateConfigurationCommandHandler", NewCommandSourceHandler.class);
 			}
 		} else if (wrapper.isDatatableResource()) {
 			if (wrapper.isCreateDatatable()) {

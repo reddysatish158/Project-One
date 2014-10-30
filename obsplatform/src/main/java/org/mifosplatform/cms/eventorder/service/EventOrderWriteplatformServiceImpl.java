@@ -23,8 +23,8 @@ import org.mifosplatform.cms.mediadevice.service.MediaDeviceReadPlatformService;
 import org.mifosplatform.finance.clientbalance.data.ClientBalanceData;
 import org.mifosplatform.finance.clientbalance.service.ClientBalanceReadPlatformService;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -59,7 +59,7 @@ public class EventOrderWriteplatformServiceImpl implements EventOrderWriteplatfo
 	private final EventMasterRepository eventMasterRepository;
 	private final EventDetailsRepository eventDetailsRepository;
 	private final EventPriceRepository eventPricingRepository;
-	private final GlobalConfigurationRepository configurationRepository; 
+	private final ConfigurationRepository configurationRepository; 
 	private final MediaDeviceReadPlatformService deviceReadPlatformService;
 	private final EventOrderReadplatformServie eventOrderReadplatformServie;
 	private final ClientBalanceReadPlatformService balanceReadPlatformService;
@@ -77,7 +77,7 @@ public class EventOrderWriteplatformServiceImpl implements EventOrderWriteplatfo
 			final MediaDeviceReadPlatformService deviceReadPlatformService,final ClientBalanceReadPlatformService balanceReadPlatformService,
 			final EventDetailsRepository eventDetailsRepository,final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,
 			final ActionDetailsReadPlatformService actionDetailsReadPlatformService,final ActiondetailsWritePlatformService actiondetailsWritePlatformService,
-			final OrderDetailsReadPlatformServices orderDetailsReadPlatformServices,final GlobalConfigurationRepository configurationRepository,
+			final OrderDetailsReadPlatformServices orderDetailsReadPlatformServices,final ConfigurationRepository configurationRepository,
 			final ClientRepository clientRepository) {
 		
 		this.context = context;
@@ -112,7 +112,7 @@ public class EventOrderWriteplatformServiceImpl implements EventOrderWriteplatfo
 		try {
 			String response = "";
 			this.context.authenticatedUser();
-			GlobalConfigurationProperty configuration=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIR_PROPERTY_REGISTRATION_DEVICE);
+			Configuration configuration=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIR_PROPERTY_REGISTRATION_DEVICE);
 			this.apiJsonDeserializer.validateForCreate(command.json(),configuration.isEnabled());
 			final Long eventId = command.longValueOfParameterNamed("eventId");
 			final String deviceId = command.stringValueOfParameterNamed("deviceId");

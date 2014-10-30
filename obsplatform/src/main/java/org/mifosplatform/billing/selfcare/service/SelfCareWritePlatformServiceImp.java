@@ -15,8 +15,8 @@ import org.mifosplatform.billing.selfcare.exception.SelfCareAlreadyVerifiedExcep
 import org.mifosplatform.billing.selfcare.exception.SelfCareEmailIdDuplicateException;
 import org.mifosplatform.billing.selfcare.exception.SelfCareTemporaryGeneratedKeyNotFoundException;
 import org.mifosplatform.billing.selfcare.exception.SelfcareEmailIdNotFoundException;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -54,13 +54,13 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 	private SelfCareCommandFromApiJsonDeserializer selfCareCommandFromApiJsonDeserializer;
 	private TransactionHistoryWritePlatformService transactionHistoryWritePlatformService;
 	private final static Logger logger = (Logger) LoggerFactory.getLogger(SelfCareWritePlatformServiceImp.class);
-	private final GlobalConfigurationRepository globalConfigurationRepository; 
+	private final ConfigurationRepository globalConfigurationRepository; 
 	@Autowired
 	public SelfCareWritePlatformServiceImp(final PlatformSecurityContext context, final SelfCareRepository selfCareRepository, 
 		    final SelfCareCommandFromApiJsonDeserializer selfCareCommandFromApiJsonDeserializer,final SelfCareReadPlatformService selfCareReadPlatformService, 
 			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,final SelfCareTemporaryRepository selfCareTemporaryRepository,
 			final BillingMessageTemplateRepository billingMessageTemplateRepository,final MessagePlatformEmailService messagePlatformEmailService,
-			ClientRepository clientRepository,final LoginHistoryRepository loginHistoryRepository,final GlobalConfigurationRepository globalConfigurationRepository) {
+			ClientRepository clientRepository,final LoginHistoryRepository loginHistoryRepository,final ConfigurationRepository globalConfigurationRepository) {
 		
 		this.context = context;
 		this.selfCareRepository = selfCareRepository;

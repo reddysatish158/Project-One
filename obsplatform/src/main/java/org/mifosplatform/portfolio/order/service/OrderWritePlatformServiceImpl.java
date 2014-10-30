@@ -29,8 +29,8 @@ import org.mifosplatform.infrastructure.codes.exception.CodeNotFoundException;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.EnumDomainService;
 import org.mifosplatform.infrastructure.configuration.domain.EnumDomainServiceRepository;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -135,7 +135,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 	private final PrepareRequsetRepository prepareRequsetRepository;
 	private final PaymentFollowupRepository paymentFollowupRepository;
 	private final HardwareAssociationRepository associationRepository;
-	private final GlobalConfigurationRepository configurationRepository;
+	private final ConfigurationRepository configurationRepository;
 	private final EnumDomainServiceRepository enumDomainServiceRepository;
 	private final AllocationReadPlatformService allocationReadPlatformService; 
 	private final OrderCommandFromApiJsonDeserializer fromApiJsonDeserializer;
@@ -162,7 +162,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 			final SubscriptionRepository subscriptionRepository,final OrderCommandFromApiJsonDeserializer fromApiJsonDeserializer,final ReverseInvoice reverseInvoice,
 			final PrepareRequestWriteplatformService prepareRequestWriteplatformService,final DiscountMasterRepository discountMasterRepository,
 			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,final OrderHistoryRepository orderHistoryRepository,
-			final  GlobalConfigurationRepository configurationRepository,final AllocationReadPlatformService allocationReadPlatformService,
+			final  ConfigurationRepository configurationRepository,final AllocationReadPlatformService allocationReadPlatformService,
 			final HardwareAssociationWriteplatformService associationWriteplatformService,final PrepareRequestReadplatformService prepareRequestReadplatformService,
 			final ProvisionServiceDetailsRepository provisionServiceDetailsRepository,final OrderReadPlatformService orderReadPlatformService,
 		    final ProcessRequestRepository processRequestRepository,final HardwareAssociationReadplatformService hardwareAssociationReadplatformService,
@@ -341,7 +341,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 						}
 
 						//For Plan And HardWare Association
-						GlobalConfigurationProperty configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY);
+						Configuration configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY);
 							if(configurationProperty.isEnabled()){
 								configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
 									if(plan.isHardwareReq() == 'Y'){
@@ -477,7 +477,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 				LocalDate disconnectionDate=command.localDateValueOfParameterNamed("disconnectionDate");
 				LocalDate currentDate = new LocalDate();
 				currentDate.toDate();
-				GlobalConfigurationProperty configurationProperty = this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_DISCONNECT);
+				Configuration configurationProperty = this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_DISCONNECT);
 				List<OrderPrice> orderPrices=order.getPrice();
 					for(OrderPrice price:orderPrices){
 						price.updateDates(disconnectionDate);
@@ -789,7 +789,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 					throw new NoOrdersFoundException(command.entityId());
 				}
 				if (requstStatus != null && plan!=null) {
-					GlobalConfigurationProperty configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
+					Configuration configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
 					AllocationDetailsData detailsData = this.allocationReadPlatformService.getTheHardwareItemDetails(command.entityId(),configurationProperty.getValue());
 					/*ProcessRequest processRequest = new ProcessRequest(order.getClientId(),
 						order.getId(),plan.getProvisionSystem(), 'N', null, requstStatus,new Long(0));*/
@@ -846,9 +846,9 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 			Date invoicetillDate=order.getPrice().get(0).getInvoiceTillDate();
 			this.orderRepository.save(order);
 			//Plan oldPlan=this.planRepository.findOne(order.getPlanId());
-			GlobalConfigurationProperty property = this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_CHANGE_PLAN_ALIGN_DATES);
+			Configuration property = this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_CHANGE_PLAN_ALIGN_DATES);
 			if(!property.isEnabled()){
-			GlobalConfigurationProperty dcConfiguration= this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_DISCONNECT);
+			Configuration dcConfiguration= this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_DISCONNECT);
 				if(dcConfiguration.isEnabled()){
 					//if(oldPlan.getBillRule() !=400 && oldPlan.getBillRule() !=300){ 
 						this.reverseInvoice.reverseInvoiceServices(order.getId(), order.getClientId(),new LocalDate());
