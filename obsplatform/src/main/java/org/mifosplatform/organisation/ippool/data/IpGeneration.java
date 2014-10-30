@@ -11,8 +11,8 @@ public class IpGeneration {
 
     private static final String IP_ADDRESS = "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})";
     private static final String SLASH_FORMAT = IP_ADDRESS + "/(\\d{1,3})";
-    private static final Pattern addressPattern = Pattern.compile(IP_ADDRESS);
-    private static final Pattern cidrPattern = Pattern.compile(SLASH_FORMAT);
+    private static final Pattern ADDRESSPATTEREN = Pattern.compile(IP_ADDRESS);
+    private static final Pattern CIDRPATTEREN = Pattern.compile(SLASH_FORMAT);
     private static final int NBITS = 32;
     private IpPoolManagementReadPlatformService ipPoolManagementReadPlatformService;
 
@@ -270,7 +270,7 @@ public class IpGeneration {
      * Initialize the internal fields from the supplied CIDR mask
      */
     private void calculate(String mask) {
-        Matcher matcher = cidrPattern.matcher(mask);
+        Matcher matcher = CIDRPATTEREN.matcher(mask);
 
         if (matcher.matches()) {
             address = matchAddress(matcher);
@@ -295,7 +295,7 @@ public class IpGeneration {
      * Convert a dotted decimal format address to a packed integer format
      */
     private int toInteger(String address) {
-        Matcher matcher = addressPattern.matcher(address);
+        Matcher matcher = ADDRESSPATTEREN.matcher(address);
         if (matcher.matches()) {
             return matchAddress(matcher);
         } else {

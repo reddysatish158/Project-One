@@ -10,12 +10,14 @@ import org.mifosplatform.infrastructure.core.exception.AbstractPlatformResourceN
 /**
  * A {@link RuntimeException} thrown when a code is not found.
  */
-public class EventActionMappingNotFoundException extends AbstractPlatformResourceNotFoundException {
+@SuppressWarnings("serial")
+public class EventActionMappingNotFoundException extends
+		AbstractPlatformResourceNotFoundException {
 
-    public EventActionMappingNotFoundException(final String id) {
-        super("error.msg.eventaction.not.found", "EventAction with this id"+id+"not exist",id);
-        
-    }
+	public EventActionMappingNotFoundException(final String id) {
+		super("error.msg.eventaction.not.found", "EventAction with this id"
+				+ id + "not exist", id);
 
-   
+	}
+
 }

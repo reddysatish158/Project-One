@@ -8,6 +8,7 @@ package org.mifosplatform.organisation.hardwareplanmapping.handler;
 import org.mifosplatform.commands.handler.NewCommandSourceHandler;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
+import org.mifosplatform.organisation.hardwareplanmapping.service.HardwarePlanWritePlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,17 +16,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UpdatePlanMappingCommandHandler implements NewCommandSourceHandler {
 
-    private final HardwarePlanWritePlatformService writePlatformService;
+	private final HardwarePlanWritePlatformService writePlatformService;
 
-    @Autowired
-    public UpdatePlanMappingCommandHandler(final HardwarePlanWritePlatformService writePlatformService) {
-        this.writePlatformService = writePlatformService;
-    }
+	@Autowired
+	public UpdatePlanMappingCommandHandler(final HardwarePlanWritePlatformService writePlatformService) {
+		this.writePlatformService = writePlatformService;
+	}
 
-    @Transactional
-    @Override
-    public CommandProcessingResult processCommand(final JsonCommand command) {
+	@Transactional
+	@Override
+	public CommandProcessingResult processCommand(final JsonCommand command) {
 
-        return this.writePlatformService.updatePlanMapping(command.entityId(), command);
-    }
+		return this.writePlatformService.updatePlanMapping(command.entityId(), command);
+	}
 }

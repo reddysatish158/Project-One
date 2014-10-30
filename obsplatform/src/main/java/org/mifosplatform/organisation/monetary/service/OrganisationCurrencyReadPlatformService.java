@@ -9,6 +9,6 @@ import org.mifosplatform.organisation.monetary.data.ApplicationCurrencyConfigura
 
 public interface OrganisationCurrencyReadPlatformService {
 
-    ApplicationCurrencyConfigurationData retrieveCurrencyConfiguration();
+	ApplicationCurrencyConfigurationData retrieveCurrencyConfiguration();
 
 }

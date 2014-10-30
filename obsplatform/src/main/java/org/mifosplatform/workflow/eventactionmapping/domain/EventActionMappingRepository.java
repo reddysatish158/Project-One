@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface EventActionMappingRepository extends
 
 JpaRepository<EventActionMapping, Long>,
-JpaSpecificationExecutor<EventActionMapping>{
+		JpaSpecificationExecutor<EventActionMapping> {
 
 }

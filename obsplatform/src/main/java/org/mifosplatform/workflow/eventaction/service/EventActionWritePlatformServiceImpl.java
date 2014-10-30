@@ -20,7 +20,7 @@ import org.mifosplatform.finance.billingorder.api.BillingOrderApiResourse;
 import org.mifosplatform.organisation.message.domain.BillingMessage;
 import org.mifosplatform.organisation.message.domain.BillingMessageTemplate;
 import org.mifosplatform.organisation.message.domain.BillingMessageTemplateRepository;
-import org.mifosplatform.organisation.message.domain.MessageDataRepository;
+import org.mifosplatform.organisation.message.domain.BillingMessageRepository;
 import org.mifosplatform.organisation.message.exception.EmailNotFoundException;
 import org.mifosplatform.portfolio.association.data.AssociationData;
 import org.mifosplatform.portfolio.association.exception.HardwareDetailsNotFoundException;
@@ -56,7 +56,7 @@ public class EventActionWritePlatformServiceImpl implements ActiondetailsWritePl
 	private final EventOrderRepository eventOrderRepository;
 	private final EventMasterRepository eventMasterRepository;
 	private final EventActionRepository eventActionRepository;
-	private final MessageDataRepository messageDataRepository;
+	private final BillingMessageRepository messageDataRepository;
 	private final AppUserReadPlatformService readPlatformService;
 	private final BillingOrderApiResourse billingOrderApiResourse;
 	private final ProcessRequestRepository processRequestRepository;
@@ -71,7 +71,7 @@ public class EventActionWritePlatformServiceImpl implements ActiondetailsWritePl
 	public EventActionWritePlatformServiceImpl(final ActionDetailsReadPlatformService actionDetailsReadPlatformService,final EventActionRepository eventActionRepository,
 			final HardwareAssociationReadplatformService hardwareAssociationReadplatformService,final ContractPeriodReadPlatformService contractPeriodReadPlatformService,
 			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,final OrderRepository orderRepository,final TicketMasterRepository repository,
-			final BillingOrderApiResourse billingOrderApiResourse,final MessageDataRepository messageDataRepository,final ClientRepository clientRepository,
+			final BillingOrderApiResourse billingOrderApiResourse,final BillingMessageRepository messageDataRepository,final ClientRepository clientRepository,
 			final BillingMessageTemplateRepository messageTemplateRepository,final EventMasterRepository eventMasterRepository,final EventOrderRepository eventOrderRepository,
 			final TicketMasterReadPlatformService ticketMasterReadPlatformService,final AppUserReadPlatformService readPlatformService,
 			final ProcessRequestRepository processRequestRepository)

@@ -10,12 +10,12 @@ import org.mifosplatform.infrastructure.core.exception.AbstractPlatformResourceN
 /**
  * A {@link RuntimeException} thrown when a code is not found.
  */
+@SuppressWarnings("serial")
 public class EventValidationNotFoundException extends AbstractPlatformResourceNotFoundException {
 
-    public EventValidationNotFoundException(final String id) {
-        super("error.msg.eventvalidation.not.found", "EventValidation with this id"+id+"not exist",id);
-        
-    }
+	public EventValidationNotFoundException(final String id) {
+		super("error.msg.eventvalidation.not.found", "EventValidation with this id" + id + "not exist", id);
 
-   
+	}
+
 }

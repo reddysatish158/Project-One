@@ -16,7 +16,11 @@ import org.mifosplatform.infrastructure.core.api.JsonCommand;
 
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
-
+/**
+ * 
+ * @author ashokreddy
+ *
+ */
 @SuppressWarnings("serial")
 @Entity
 @Table(name = "b_paymentgateway")
@@ -69,8 +73,9 @@ public class PaymentGateway extends AbstractPersistable<Long> {
 		
 	}
 	
-	public PaymentGateway(String deviceId, String partyId,Date paymentDate, BigDecimal amountPaid, 
-			      String receiptNo,String source, String details) {
+	public PaymentGateway(final String deviceId, final String partyId, final Date paymentDate,
+			final BigDecimal amountPaid, final String receiptNo,
+			final String source, final String details) {
 		
 		this.deviceId=deviceId;
 		this.partyId=partyId;
@@ -81,8 +86,9 @@ public class PaymentGateway extends AbstractPersistable<Long> {
 		this.details=details;
 	}
 
-	public PaymentGateway(String deviceId, String transactionId,BigDecimal amountPaid, String phoneNo, 
-			String type,String tStatus, String details, Date date, String source) {
+	public PaymentGateway(final String deviceId, final String transactionId,
+			final BigDecimal amountPaid, final String phoneNo, final String type,
+			 final String tStatus, final String details, final Date date, final String source) {
 		this.deviceId=deviceId;
 		this.partyId=phoneNo;
 		this.paymentDate=date;
@@ -94,27 +100,23 @@ public class PaymentGateway extends AbstractPersistable<Long> {
 		this.tStatus=tStatus;
 	}
 
-	public Map<String, Object> fromJson(JsonCommand command) {
+	public Map<String, Object> fromJson(final JsonCommand command) {
 		 
 		final Map<String, Object> actualChanges = new LinkedHashMap<String, Object>(1);
 		 final String remarks = "remarks";
 		 if (command.isChangeInStringParameterNamed(remarks,this.remarks)) {
-				final String newValue = command
-						.stringValueOfParameterNamed("remarks");
+				final String newValue = command.stringValueOfParameterNamed("remarks");
 				actualChanges.put(remarks, newValue);
 				this.remarks = StringUtils.defaultIfEmpty(newValue, null);
 		 }
 		 final String status = "status";
 			if (command.isChangeInStringParameterNamed(status,
 					this.status)) {
-				final String newValue = command
-						.stringValueOfParameterNamed("status");
+				final String newValue = command.stringValueOfParameterNamed("status");
 				actualChanges.put(status, newValue);
 				this.status = StringUtils.defaultIfEmpty(newValue, null);
 			}
-			return actualChanges;
-		 
-		 
+			return actualChanges;	 
 		 
 	}
 
@@ -173,11 +175,5 @@ public class PaymentGateway extends AbstractPersistable<Long> {
 	public boolean isAuto() {
 		return isAuto;
 	}
-
-	
-	
-	
-	
-	
 
 }

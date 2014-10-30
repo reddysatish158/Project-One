@@ -1,6 +1,12 @@
 package org.mifosplatform.organisation.message.data;
 
-
+/**
+ * The class <code>BillingMessageDataForProcessing</code> 
+ * is a Bean class.
+ * 
+ * @author ashokreddy
+ *
+ */
 public class BillingMessageDataForProcessing {
 
 	
@@ -16,9 +22,10 @@ public class BillingMessageDataForProcessing {
 
 	
 	
-	public BillingMessageDataForProcessing(Long id, String messageto,
-			String messagefrom, String subject, String header, String body,
-			String footer,char messageType,String attachment) {
+	public BillingMessageDataForProcessing(final Long id, final String messageto,
+			final String messagefrom, final String subject, final String header, 
+			final String body, final String footer,final char messageType,
+			final String attachment) {
 
 		// TODO Auto-generated constructor stub
 		this.id=id;

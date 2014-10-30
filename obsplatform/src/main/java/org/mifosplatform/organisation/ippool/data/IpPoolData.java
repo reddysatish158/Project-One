@@ -5,6 +5,11 @@ import java.util.List;
 
 import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
 
+/**
+ * 
+ * @author ashokreddy
+ *
+ */
 public class IpPoolData {
 	
 	private  Long id;
@@ -13,45 +18,44 @@ public class IpPoolData {
 	private Collection<MCodeData> codeValueDatas;
 	private List<IpPoolManagementData> ipPoolManagementData;
 
-	public IpPoolData(Long id, String poolName, String ipaddress) {
-
+	public IpPoolData(final Long id, final String poolName, final String ipaddress) {
 		this.id=id;
 		this.poolName=poolName;
 		this.ipAddress=ipaddress;
 		
 	}
 
-	public IpPoolData(Collection<MCodeData> codeValueDatas) {
+	public IpPoolData(final Collection<MCodeData> codeValueDatas) {
 		this.codeValueDatas=codeValueDatas;
 	}
 
-	public IpPoolData(Collection<MCodeData> codeValueDatas,
-			List<IpPoolManagementData> ipPoolManagementData) {
+	public IpPoolData(final Collection<MCodeData> codeValueDatas,
+			final List<IpPoolManagementData> ipPoolManagementData) {
 		
 		this.codeValueDatas = codeValueDatas;
 		this.ipPoolManagementData = ipPoolManagementData;
 	}
 
-/*=======
-	private final Long poolId;
-	private final String ipAddress;
-	
-
-	public IpPoolData(Long id, Long poolId, String ipaddress) {
-		
-		this.id=id;
-		this.poolId=poolId;
-		this.ipAddress=ipaddress;
-		
-	}
 	public Long getId() {
 		return id;
 	}
-	public Long getPoolId() {
-		return poolId;
+
+	public String getPoolName() {
+		return poolName;
 	}
+
 	public String getIpAddress() {
 		return ipAddress;
 	}
->>>>>>> obsplatform-1.01*/
+
+	public Collection<MCodeData> getCodeValueDatas() {
+		return codeValueDatas;
+	}
+
+	public List<IpPoolManagementData> getIpPoolManagementData() {
+		return ipPoolManagementData;
+	}
+	
+	
+	
 }

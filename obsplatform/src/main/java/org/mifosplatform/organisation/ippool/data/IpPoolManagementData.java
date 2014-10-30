@@ -2,6 +2,11 @@ package org.mifosplatform.organisation.ippool.data;
 
 import java.util.List;
 
+/**
+ * 
+ * @author ashokreddy
+ *
+ */
 public class IpPoolManagementData {
 	
 	private Long id;
@@ -16,8 +21,9 @@ public class IpPoolManagementData {
 	private String typeCodeValue;
 	private Long subNet;
 	
-	public IpPoolManagementData(Long id, String ipAddress, String poolName,
-			String status, Long clientId, String clientName, String notes, Long type, String typeCodeValue, Long subNet) {
+	public IpPoolManagementData(final Long id, final String ipAddress, final String poolName,
+			final String status, final Long clientId, final String clientName, 
+			final String notes, final Long type, final String typeCodeValue, final Long subNet) {
 		
 		this.id=id;
 		this.ipAddress=ipAddress;
@@ -70,5 +76,18 @@ public class IpPoolManagementData {
 	public List<String> getIpAddressData() {
 		return ipAddressData;
 	}
+
+	public Long getType() {
+		return type;
+	}
+
+	public String getTypeCodeValue() {
+		return typeCodeValue;
+	}
+
+	public Long getSubNet() {
+		return subNet;
+	}
+	
 	
 }

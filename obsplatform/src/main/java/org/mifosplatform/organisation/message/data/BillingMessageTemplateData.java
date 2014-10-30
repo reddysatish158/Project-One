@@ -1,71 +1,140 @@
 package org.mifosplatform.organisation.message.data;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.mifosplatform.portfolio.plan.data.ServiceData;
+import org.mifosplatform.infrastructure.core.data.MediaEnumoptionData;
 
+/**
+ * The class <code>BillingMessageData</code> is 
+ * a Bean class.
+ *  
+ * @author ashokreddy
+ *
+ */
 public class BillingMessageTemplateData {
-	/*CREATE TABLE `b_message_template` (
-			  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-			  `template_description` varchar(20) NOT NULL,
-			  `subject` varchar(120) NOT NULL,
-			  `header` varchar(255) NOT NULL,
-			  `body` TEXT NOT NULL,  
-			  `footer` varchar(255) DEFAULT NULL,  
-			  `createdby_id` bigint(20) DEFAULT NULL,
-			  `created_date` datetime DEFAULT NULL,
-			  PRIMARY KEY (`id`)
-			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-			
-			`msgtemplate_id` bigint(20) NOT NULL,
-  `parameter_name` varchar(120) NOT NULL,
-  `sequence_no` bigint(20) NOT NULL,
-			
-*/
-private final Long  id;
-private final String templateDescription;
-private final  String subject;
-private final String header;
-private final String body;
-private final String footer;
-private  final List<BillingMessageParamData> billingMessageParamData;
+	
+	private String templateDescription;
+	private String subject;
+	private String header;
+	private String body;
+	private String footer;
+	private String parameter;
+	private ArrayList<String> messageColumndata;
+	private Long clientId;
+	private Long id;
+	private String messageParameters;
+	private List<BillingMessageTemplateData> messageParams;
+	private List<MediaEnumoptionData> messageTypes;
+	private long deleteButtonId;
+	private char messageType;
+	
+
+	
+	public BillingMessageTemplateData(final Long id, final String templateDescription, 
+			final String subject, final String header, final String body, 
+			final String footer, final String messageParameters, final char messageType){
+		
+		// TODO Auto-generated constructor stub
+		this.id=id;
+		this.templateDescription=templateDescription;
+		this.subject=subject;
+		this.header=header;
+		this.body=body;
+		this.footer=footer;
+		this.messageParameters=messageParameters;
+		this.messageType=messageType;
+		
+	}
+	
+	public String getMessageParameters(){
+		return this.messageParameters;
+	}
+	
+	public Long getId(){
+		return id;
+	}
 
 
+	public BillingMessageTemplateData(Long messageTemplateId,String parameterName) {
+		this.deleteButtonId=messageTemplateId;
+		// TODO Auto-generated constructor stub
+		this.parameter=parameterName;
+	}
 
+	public BillingMessageTemplateData(ArrayList<String> rowdata) {
+		// TODO Auto-generated constructor stub
+		this.messageColumndata=rowdata;
+	}
 
-public List<BillingMessageParamData> getBillingMessageParamData() {
-	return billingMessageParamData;
-}
+	public ArrayList<String> getMessageColumndata() {
+		return messageColumndata;
+	}
 
+	public BillingMessageTemplateData(Long commandId) {
+		// TODO Auto-generated constructor stub
+		this.clientId=commandId;
+	}
+	public Long getClientId(){
+		return clientId;
+	}
 
-public BillingMessageTemplateData(Long  id,String templateDescription,String subject,String header,String body,String footer,List<BillingMessageParamData> billingMessageParamData)
-{
-	this.id=id;
-	this.templateDescription=templateDescription;
-	this.subject=subject;
-	this.header=header;
-	this.body=body;
-	this.footer=footer;
-	this.billingMessageParamData=billingMessageParamData;
+	public String getParameter() {
+		return parameter;
+	}
 
-}
-public Long getId() {
-	return id;
-}
-public String getTemplateDescription() {
-	return templateDescription;
-}
-public String getSubject() {
-	return subject;
-}
-public String getHeader() {
-	return header;
-}
-public String getBody() {
-	return body;
-}
-public String getFooter() {
-	return footer;
-}
- 
+	public String getTemplateDescription() {
+		return templateDescription;
+	}
+
+	public String getSubject() {
+		return subject;
+	}
+
+	public String getHeader() {
+		return header;
+	}
+
+	public String getBody() {
+		return body;
+	}
+
+	public String getFooter() {
+		return footer;
+	}
+
+	public void setMessageParams(List<BillingMessageTemplateData> messageParams) {
+	this.messageParams=messageParams;
+		
+	}
+
+	public List<MediaEnumoptionData> getMessageTypes() {
+		return messageTypes;
+	}
+
+	public void setMessageType(List<MediaEnumoptionData> messageTypes) {
+		this.messageTypes = messageTypes;
+	}
+	
+	public BillingMessageTemplateData(){
+		
+	}
+
+	public char getMessageType() {
+		return messageType;
+	}
+
+	public void setMessageType(char messageType) {
+		this.messageType = messageType;
+	}
+
+	public List<BillingMessageTemplateData> getMessageParams() {
+		return messageParams;
+	}
+
+	public long getDeleteButtonId() {
+		return deleteButtonId;
+	}
+	
+	
 }

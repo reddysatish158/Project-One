@@ -6,7 +6,8 @@ public class ProvisioningCommandParameterData {
 	private String commandParam;
 	private String paramType;
 	
-	public ProvisioningCommandParameterData(Long id, String commandParam,String paramType){
+	public ProvisioningCommandParameterData(final Long id, String commandParam,
+			final String paramType){
 		this.id=id;
 		this.commandParam=commandParam;
 		this.paramType=paramType;

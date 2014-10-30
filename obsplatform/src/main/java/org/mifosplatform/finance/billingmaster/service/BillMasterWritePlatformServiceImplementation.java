@@ -30,7 +30,7 @@ import org.mifosplatform.organisation.groupsDetails.domain.GroupsDetailsReposito
 import org.mifosplatform.organisation.message.domain.BillingMessage;
 import org.mifosplatform.organisation.message.domain.BillingMessageTemplate;
 import org.mifosplatform.organisation.message.domain.BillingMessageTemplateRepository;
-import org.mifosplatform.organisation.message.domain.MessageDataRepository;
+import org.mifosplatform.organisation.message.domain.BillingMessageRepository;
 import org.mifosplatform.portfolio.client.domain.Client;
 import org.mifosplatform.portfolio.client.domain.ClientRepository;
 import org.mifosplatform.portfolio.transactionhistory.service.TransactionHistoryWritePlatformService;
@@ -54,7 +54,7 @@ public class BillMasterWritePlatformServiceImplementation implements
 	    private final BillMasterCommandFromApiJsonDeserializer  apiJsonDeserializer;
 	    private final ClientRepository clientRepository;
 	    private final GroupsDetailsRepository groupsDetailsRepository;
-	    private final MessageDataRepository messageDataRepository;
+	    private final BillingMessageRepository messageDataRepository;
 	    private final BillingMessageTemplateRepository messageTemplateRepository;
 		private final BillDetailRepository billDetailRepository;
 		private final BillingOrderRepository billingOrderRepository;
@@ -70,7 +70,7 @@ public class BillMasterWritePlatformServiceImplementation implements
 				final BillMasterReadPlatformService billMasterReadPlatformService,final BillWritePlatformService billWritePlatformService,
 				final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,
 				final BillMasterCommandFromApiJsonDeserializer apiJsonDeserializer,final ClientRepository clientRepository,
-				final GroupsDetailsRepository groupsDetailsRepository,final MessageDataRepository messageDataRepository,
+				final GroupsDetailsRepository groupsDetailsRepository,final BillingMessageRepository messageDataRepository,
 				final BillingMessageTemplateRepository messageTemplateRepository,final BillDetailRepository billDetailRepository,
 				final BillingOrderRepository billingOrderRepository,InvoiceTaxRepository invoiceTaxRepository,
 		        final InvoiceRepository invoiceRepository, final PaymentRepository paymentRepository,

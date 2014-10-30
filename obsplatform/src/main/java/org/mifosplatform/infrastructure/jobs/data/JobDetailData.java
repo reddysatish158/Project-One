@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import org.mifosplatform.organisation.message.data.BillingMessageData;
+import org.mifosplatform.organisation.message.data.BillingMessageTemplateData;
 import org.mifosplatform.portfolio.plan.data.SystemData;
 import org.mifosplatform.scheduledjobs.scheduledjobs.data.JobParameterData;
 import org.mifosplatform.scheduledjobs.scheduledjobs.data.ScheduleJobData;
@@ -45,7 +45,7 @@ public class JobDetailData {
     private  List<ScheduleJobData> queryData;
     
     @SuppressWarnings("unused")
-    private   Collection<BillingMessageData> billingMessageDatas;
+    private   Collection<BillingMessageTemplateData> billingMessageDatas;
 
 	private JobParameterData jobparameters;
 
@@ -117,7 +117,7 @@ public class JobDetailData {
 		
 	}
 
-	public void setMessageData(Collection<BillingMessageData> templateData) {
+	public void setMessageData(Collection<BillingMessageTemplateData> templateData) {
 		
 		this.billingMessageDatas=templateData;
 		

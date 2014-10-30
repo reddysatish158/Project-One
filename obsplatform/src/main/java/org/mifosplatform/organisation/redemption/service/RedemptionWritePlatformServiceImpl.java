@@ -13,11 +13,11 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
-import org.mifosplatform.organisation.randomgenerator.domain.RandomGenerator;
-import org.mifosplatform.organisation.randomgenerator.domain.RandomGeneratorDetails;
-import org.mifosplatform.organisation.randomgenerator.domain.RandomGeneratorDetailsRepository;
 import org.mifosplatform.organisation.redemption.exception.PinNumberNotFoundException;
 import org.mifosplatform.organisation.redemption.serialization.RedemptionCommandFromApiJsonDeserializer;
+import org.mifosplatform.organisation.voucher.domain.Voucher;
+import org.mifosplatform.organisation.voucher.domain.VoucherDetails;
+import org.mifosplatform.organisation.voucher.domain.VoucherDetailsRepository;
 import org.mifosplatform.portfolio.client.domain.Client;
 import org.mifosplatform.portfolio.client.domain.ClientRepository;
 import org.mifosplatform.portfolio.client.exception.ClientNotFoundException;
@@ -42,7 +42,7 @@ public class RedemptionWritePlatformServiceImpl implements
 	private final static Logger logger = LoggerFactory.getLogger(RedemptionWritePlatformServiceImpl.class);
 	private final PlatformSecurityContext context;
 	private final FromJsonHelper fromJsonHelper;
-	private final RandomGeneratorDetailsRepository randomGeneratorDetailsRepository;
+	private final VoucherDetailsRepository voucherDetailsRepository;
 	private final ClientRepository clientRepository;
 	private final AdjustmentWritePlatformService adjustmentWritePlatformService;
 	private final OrderWritePlatformService orderWritePlatformService;
@@ -52,7 +52,7 @@ public class RedemptionWritePlatformServiceImpl implements
 	private final OrderRepository orderRepository;
 	
 	@Autowired
-	public RedemptionWritePlatformServiceImpl(final PlatformSecurityContext context,final RandomGeneratorDetailsRepository randomGeneratorDetailsRepository,
+	public RedemptionWritePlatformServiceImpl(final PlatformSecurityContext context,final VoucherDetailsRepository voucherDetailsRepository,
 		final ClientRepository clientRepository,final AdjustmentWritePlatformService adjustmentWritePlatformService,final FromJsonHelper fromJsonHelper,
 		final OrderWritePlatformService orderWritePlatformService,final ContractPeriodReadPlatformService contractPeriodReadPlatformService,
 		final RedemptionReadPlatformService redemptionReadPlatformService,final OrderRepository orderRepository,final RedemptionCommandFromApiJsonDeserializer apiJsonDeserializer) {
@@ -65,7 +65,7 @@ public class RedemptionWritePlatformServiceImpl implements
 		this.orderWritePlatformService = orderWritePlatformService;
 		this.redemptionReadPlatformService=redemptionReadPlatformService;
 		this.adjustmentWritePlatformService = adjustmentWritePlatformService;
-		this.randomGeneratorDetailsRepository = randomGeneratorDetailsRepository;
+		this.voucherDetailsRepository = voucherDetailsRepository;
 		this.contractPeriodReadPlatformService = contractPeriodReadPlatformService;
 		
 	}
@@ -79,8 +79,8 @@ public class RedemptionWritePlatformServiceImpl implements
 			final Long clientId = command.longValueOfParameterNamed("clientId");
 			final String pinNum=command.stringValueOfParameterNamed("pinNumber");
 			this.clientObjectRetrieveById(clientId);
-			 RandomGeneratorDetails randomGeneratorDetails = retrieveRandomDetailsByPinNo(pinNum);
-			 RandomGenerator randomGenerator = randomGeneratorDetails.getRandomGenerator();
+			 VoucherDetails randomGeneratorDetails = retrieveRandomDetailsByPinNo(pinNum);
+			 Voucher randomGenerator = randomGeneratorDetails.getVoucher();
 			 String pinType = randomGenerator.getPinType();
 			 
 			 if(pinType.equalsIgnoreCase("VALUE")){
@@ -132,7 +132,7 @@ public class RedemptionWritePlatformServiceImpl implements
 			 
 			 
 			 randomGeneratorDetails.setClientId(clientId);
-			 this.randomGeneratorDetailsRepository.save(randomGeneratorDetails);
+			 this.voucherDetailsRepository.save(randomGeneratorDetails);
 			 
 			 return new CommandProcessingResult(clientId);
 	    }catch(DataIntegrityViolationException dve){
@@ -142,9 +142,9 @@ public class RedemptionWritePlatformServiceImpl implements
 		
 	}
 	
-	private RandomGeneratorDetails retrieveRandomDetailsByPinNo(String pinNumber) {
+	private VoucherDetails retrieveRandomDetailsByPinNo(String pinNumber) {
 		
-			RandomGeneratorDetails randomDetails = this.randomGeneratorDetailsRepository.findOneByPinNumber(pinNumber);
+			VoucherDetails randomDetails = this.voucherDetailsRepository.findOneByPinNumber(pinNumber);
 			if(randomDetails == null){throw new PinNumberNotFoundException(pinNumber);}
 		return randomDetails;
 	}

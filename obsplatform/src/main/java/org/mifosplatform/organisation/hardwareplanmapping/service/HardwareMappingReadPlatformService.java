@@ -6,6 +6,7 @@ import org.mifosplatform.organisation.hardwareplanmapping.data.HardwareMappingDe
 
 public interface HardwareMappingReadPlatformService {
 
-	List<HardwareMappingDetailsData> getPlanDetailsByItemCode(String itemCode, Long clientId);
+	List<HardwareMappingDetailsData> getPlanDetailsByItemCode(String itemCode,
+			Long clientId);
 
 }

@@ -2,9 +2,20 @@ package org.mifosplatform.organisation.message.service;
 
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 
+/**
+ * 
+ * @author ashokreddy
+ *
+ */
 public interface BillingMessageDataWritePlatformService {
 
-	CommandProcessingResult createMessageData(Long command, String string);
+	/** 
+	 * 
+	 * @param command
+	 * @param json
+	 * @return
+	 */
+	CommandProcessingResult createMessageData(final Long command, final String json);
 	
 	
 	

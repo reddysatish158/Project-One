@@ -23,85 +23,92 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * 
+ * @author ashokreddy
+ * 
+ */
 @Service
-public class IpPoolManagementWritePlatformServiceImpl implements IpPoolManagementWritePlatformService{
-	
-	private final PlatformSecurityContext context; 
+public class IpPoolManagementWritePlatformServiceImpl implements
+		IpPoolManagementWritePlatformService {
+
+	private final PlatformSecurityContext context;
 	private final IpPoolManagementCommandFromApiJsonDeserializer apiJsonDeserializer;
 	private final IpPoolManagementJpaRepository ipPoolManagementJpaRepository;
 	private final IpPoolManagementReadPlatformService ipPoolManagementReadPlatformService;
 	private final GlobalConfigurationRepository globalConfigurationRepository;
 
-	
-	
 	@Autowired
-	public IpPoolManagementWritePlatformServiceImpl(final PlatformSecurityContext context,
-			final IpPoolManagementJpaRepository ipPoolManagementJpaRepository,final IpPoolManagementCommandFromApiJsonDeserializer apiJsonDeserializer,
-			final IpPoolManagementReadPlatformService ipPoolManagementReadPlatformService,final GlobalConfigurationRepository globalConfigurationRepository) {	
-		
+	public IpPoolManagementWritePlatformServiceImpl(
+			final PlatformSecurityContext context,
+			final IpPoolManagementJpaRepository ipPoolManagementJpaRepository,
+			final IpPoolManagementCommandFromApiJsonDeserializer apiJsonDeserializer,
+			final IpPoolManagementReadPlatformService ipPoolManagementReadPlatformService,
+			final GlobalConfigurationRepository globalConfigurationRepository) {
+
 		this.context = context;
-		this.apiJsonDeserializer=apiJsonDeserializer;
-		this.ipPoolManagementJpaRepository=ipPoolManagementJpaRepository;
-		this.ipPoolManagementReadPlatformService=ipPoolManagementReadPlatformService;
-		this.globalConfigurationRepository=globalConfigurationRepository;
-		
+		this.apiJsonDeserializer = apiJsonDeserializer;
+		this.ipPoolManagementJpaRepository = ipPoolManagementJpaRepository;
+		this.ipPoolManagementReadPlatformService = ipPoolManagementReadPlatformService;
+		this.globalConfigurationRepository = globalConfigurationRepository;
+
 	}
 
 	@Transactional
 	@Override
 	public CommandProcessingResult createIpPoolManagement(JsonCommand command) {
 
-		
 		try {
 			context.authenticatedUser();
 			this.apiJsonDeserializer.validateForCreate(command.json());
-			String ipAddress=command.stringValueOfParameterNamed("ipAddress");
-			Long subnet=command.longValueOfParameterNamed("subnet");
-			String notes=command.stringValueOfParameterNamed("notes");
-			Long type=command.longValueOfParameterNamed("type");
-			Map<String,Object> generatedIPPoolID=new HashedMap();
+			String ipAddress = command.stringValueOfParameterNamed("ipAddress");
+			Long subnet = command.longValueOfParameterNamed("subnet");
+			String notes = command.stringValueOfParameterNamed("notes");
+			Long type = command.longValueOfParameterNamed("type");
+			Map<String, Object> generatedIPPoolID = new HashedMap();
 
-			if(subnet !=null){
-				String ipData=ipAddress+"/"+subnet;
-				IpGeneration util=new IpGeneration(ipData,this.ipPoolManagementReadPlatformService);
+			if (subnet != null) {
+				
+				String ipData = ipAddress + "/" + subnet;
+				IpGeneration util = new IpGeneration(ipData, this.ipPoolManagementReadPlatformService);
 				GlobalConfigurationProperty configuration = globalConfigurationRepository.findOneByName("include-network-broadcast-ip");
 				util.setInclusiveHostCount(configuration.getValue().equalsIgnoreCase("true"));
-				String[] data=util.getInfo().getAllAddresses();
-					for(int i=0;i<data.length;i++){
-						int j=i+1;
-						IpPoolManagementDetail ipPoolManagementDetail= new IpPoolManagementDetail(data[i],'I',type,notes,subnet);
-						this.ipPoolManagementJpaRepository.save(ipPoolManagementDetail);
-						generatedIPPoolID.put(String.valueOf(j), ipPoolManagementDetail.getId());
-					}
-			}else{
-				String i="1";
-				IpPoolManagementDetail ipPoolManagementDetail= new IpPoolManagementDetail(ipAddress,'I',type,notes,null);
+				String[] data = util.getInfo().getAllAddresses();
+				for (int i = 0; i < data.length; i++) {
+					int j = i + 1;
+					IpPoolManagementDetail ipPoolManagementDetail = new IpPoolManagementDetail(data[i], 'I', type, notes, subnet);
+					this.ipPoolManagementJpaRepository.save(ipPoolManagementDetail);
+					generatedIPPoolID.put(String.valueOf(j), ipPoolManagementDetail.getId());
+				}
+			} else {
+				String i = "1";
+				IpPoolManagementDetail ipPoolManagementDetail = new IpPoolManagementDetail(ipAddress, 'I', type, notes, null);
 				this.ipPoolManagementJpaRepository.save(ipPoolManagementDetail);
 				generatedIPPoolID.put(i, ipPoolManagementDetail.getId());
 			}
 			return new CommandProcessingResultBuilder().with(generatedIPPoolID).build();
-		
-		}catch(DataIntegrityViolationException dve){
+
+		} catch (DataIntegrityViolationException dve) {
 			Throwable realCause = dve.getMostSpecificCause();
-				if (realCause.getMessage().contains("unique_ip")) {
-					final String name = command.stringValueOfParameterNamed("unique_ip");
-					throw new PlatformDataIntegrityException("error.msg.code.duplicate.name", "A code with name '" + name + "' already exists");
-			   }else if (realCause.getMessage().contains("ip_address")) {
-				   final String name = command.stringValueOfParameterNamed("ip_address");
-				   	throw new PlatformDataIntegrityException("error.msg.code.duplicate.name", "A code with name '" + name + "' already exists");
-			   }
-			    	return new CommandProcessingResult(new Long(1));
+			if (realCause.getMessage().contains("unique_ip")) {
+				final String name = command.stringValueOfParameterNamed("unique_ip");
+				throw new PlatformDataIntegrityException("error.msg.code.duplicate.name", "A code with name '" + name + "' already exists");
+			} else if (realCause.getMessage().contains("ip_address")) {
+				final String name = command.stringValueOfParameterNamed("ip_address");
+				throw new PlatformDataIntegrityException("error.msg.code.duplicate.name", "A code with name '" + name + "' already exists");
 			}
+			return new CommandProcessingResult(new Long(1));
+		}
 	}
 
 	@Transactional
 	@Override
 	public CommandProcessingResult editIpPoolManagement(JsonCommand command) {
-		
+
 		try {
 			context.authenticatedUser();
 			this.apiJsonDeserializer.validateForUpdate(command.json());
-		
+
 			String ipAddress = command.stringValueOfParameterNamed("ipAddress");
 			String statusType = command.stringValueOfParameterNamed("statusType");
 			String notes = command.stringValueOfParameterNamed("notes");
@@ -109,59 +116,58 @@ public class IpPoolManagementWritePlatformServiceImpl implements IpPoolManagemen
 			Long type = command.longValueOfParameterNamed("type");
 			Long subNet = command.longValueOfParameterNamed("subnet");
 			String ipRange = command.stringValueOfParameterNamed("ipRange");
-			
-			if(ipRange.length() >0){
-			String maxRangeIp = ipAddress.replaceAll(ipAddress.substring(Math.max(ipAddress.length()-2, 0)), ipRange);
-			//check given ip range is incremental way or not
-			if(ipAddress.compareTo(maxRangeIp)>0){
-				throw new PlatformDataIntegrityException("error.msg.ipaddress.give.incremental.iprange", "please select incremental iprange address", "ipRange");
-			}
-			List<IpPoolManagementDetail> IpPoolManagementDetails=this.ipPoolManagementJpaRepository.findBetweenIpAddresses(ipAddress,maxRangeIp);
-		   for(IpPoolManagementDetail ipPoolDetail:IpPoolManagementDetails)
-		    {
-			   ipPoolDetail.setStatus(statusType.trim().charAt(0));
-			   ipPoolDetail.setNotes(notes);
-			   ipPoolDetail.setIpPoolDescription(poolDescription);
-			   ipPoolDetail.setType(type);
-			   ipPoolDetail.setSubnet(subNet);
-			   this.ipPoolManagementJpaRepository.save(ipPoolDetail);
-		     }
-			}else{
-			 IpPoolManagementDetail  ipPoolManagementDetail = this.ipPoolManagementJpaRepository.findOne(command.entityId());
-			 ipPoolManagementDetail.setStatus(statusType.trim().charAt(0));
-			 ipPoolManagementDetail.setNotes(notes);
-			 ipPoolManagementDetail.setIpPoolDescription(poolDescription);
-			 ipPoolManagementDetail.setType(type);
-			 ipPoolManagementDetail.setSubnet(subNet);
-			 this.ipPoolManagementJpaRepository.save(ipPoolManagementDetail);
+
+			if (ipRange.length() > 0) {
+				String maxRangeIp = ipAddress.replaceAll(ipAddress.substring(Math.max(ipAddress.length() - 2, 0)), ipRange);
+				// check given ip range is incremental way or not
+				if (ipAddress.compareTo(maxRangeIp) > 0) {
+					throw new PlatformDataIntegrityException("error.msg.ipaddress.give.incremental.iprange", "please select incremental iprange address", "ipRange");
+				}
+				List<IpPoolManagementDetail> IpPoolManagementDetails = this.ipPoolManagementJpaRepository.findBetweenIpAddresses(ipAddress, maxRangeIp);
+				for (IpPoolManagementDetail ipPoolDetail : IpPoolManagementDetails) {
+					ipPoolDetail.setStatus(statusType.trim().charAt(0));
+					ipPoolDetail.setNotes(notes);
+					ipPoolDetail.setIpPoolDescription(poolDescription);
+					ipPoolDetail.setType(type);
+					ipPoolDetail.setSubnet(subNet);
+					this.ipPoolManagementJpaRepository.save(ipPoolDetail);
+				}
+			} else {
+				IpPoolManagementDetail ipPoolManagementDetail = this.ipPoolManagementJpaRepository.findOne(command.entityId());
+				ipPoolManagementDetail.setStatus(statusType.trim().charAt(0));
+				ipPoolManagementDetail.setNotes(notes);
+				ipPoolManagementDetail.setIpPoolDescription(poolDescription);
+				ipPoolManagementDetail.setType(type);
+				ipPoolManagementDetail.setSubnet(subNet);
+				this.ipPoolManagementJpaRepository.save(ipPoolManagementDetail);
 			}
 			return new CommandProcessingResult(command.entityId());
-			
+
 		} catch (DataIntegrityViolationException dve) {
 			return CommandProcessingResult.empty();
-		} 
+		}
 
 	}
 
 	@Override
 	public CommandProcessingResult updateIpStatus(Long entityId) {
-		
-		try{
-			
+
+		try {
+
 			this.context.authenticatedUser();
-			IpPoolManagementDetail ipPoolManagementDetail=this.ipPoolManagementJpaRepository.findOne(entityId);
-			
-			if(ipPoolManagementDetail == null){
-				throw  new IpAddresNotAvailableException(entityId.toString());
+			IpPoolManagementDetail ipPoolManagementDetail = this.ipPoolManagementJpaRepository.findOne(entityId);
+
+			if (ipPoolManagementDetail == null) {
+				throw new IpAddresNotAvailableException(entityId.toString());
 			}
-			  InetAddress inet = InetAddress.getByName(ipPoolManagementDetail.getIpAddress());
-			  boolean status = inet.isReachable(5000);
-			  if(status){
-				  return new CommandProcessingResult("ACTIVE");
-			  }else{
-				  return new CommandProcessingResult("DeACTIVE");
-			  }
-		}catch (Exception e) {
+			InetAddress inet = InetAddress.getByName(ipPoolManagementDetail.getIpAddress());
+			boolean status = inet.isReachable(5000);
+			if (status) {
+				return new CommandProcessingResult("ACTIVE");
+			} else {
+				return new CommandProcessingResult("DeACTIVE");
+			}
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return CommandProcessingResult.empty();
@@ -170,77 +176,77 @@ public class IpPoolManagementWritePlatformServiceImpl implements IpPoolManagemen
 
 	@Override
 	public CommandProcessingResult updateIpDescription(JsonCommand command) {
-		
+
 		context.authenticatedUser();
 		this.apiJsonDeserializer.validateForUpdateDecription(command.json());
-			Map<String,Object> generatedIPPoolID=new HashedMap();
-			String search = command.stringValueOfParameterNamed("ipAndSubnet");
-			IpGeneration ipGeneration = new IpGeneration(search,this.ipPoolManagementReadPlatformService);
-			GlobalConfigurationProperty configuration = globalConfigurationRepository.findOneByName("include-network-broadcast-ip");
-			ipGeneration.setInclusiveHostCount(configuration.getValue().equalsIgnoreCase("true"));
-			String[] data = ipGeneration.getInfo().getsubnetAddresses();
-			String ipPoolDescription=ipGeneration.getInfo().getNetmask();
-			
-				for(int i=0;i<data.length;i++){
-					int j=i+1;
-					IpPoolManagementData ipPoolManagementData=this.ipPoolManagementReadPlatformService.retrieveIdByIpAddress(data[i]);
-					IpPoolManagementDetail ipPoolManagementDetail = this.ipPoolManagementJpaRepository.findOne(ipPoolManagementData.getId());
-					ipPoolManagementDetail.setIpPoolDescription(ipPoolDescription); // netMask id
-					this.ipPoolManagementJpaRepository.save(ipPoolManagementDetail);
-					generatedIPPoolID.put(String.valueOf(j), ipPoolManagementDetail.getId());
-				}
-				return new CommandProcessingResultBuilder().with(generatedIPPoolID).build();
+		Map<String, Object> generatedIPPoolID = new HashedMap();
+		String search = command.stringValueOfParameterNamed("ipAndSubnet");
+		IpGeneration ipGeneration = new IpGeneration(search, this.ipPoolManagementReadPlatformService);
+		GlobalConfigurationProperty configuration = globalConfigurationRepository.findOneByName("include-network-broadcast-ip");
+		ipGeneration.setInclusiveHostCount(configuration.getValue().equalsIgnoreCase("true"));
+		String[] data = ipGeneration.getInfo().getsubnetAddresses();
+		String ipPoolDescription = ipGeneration.getInfo().getNetmask();
+
+		for (int i = 0; i < data.length; i++) {
+			int j = i + 1;
+			IpPoolManagementData ipPoolManagementData = this.ipPoolManagementReadPlatformService.retrieveIdByIpAddress(data[i]);
+			IpPoolManagementDetail ipPoolManagementDetail = this.ipPoolManagementJpaRepository.findOne(ipPoolManagementData.getId());
+			ipPoolManagementDetail.setIpPoolDescription(ipPoolDescription); // netMask
+																			// id
+			this.ipPoolManagementJpaRepository.save(ipPoolManagementDetail);
+			generatedIPPoolID.put(String.valueOf(j), ipPoolManagementDetail.getId());
+		}
+		return new CommandProcessingResultBuilder().with(generatedIPPoolID).build();
 	}
 
 	@Override
 	public CommandProcessingResult updateIpAddressStatus(JsonCommand command) {
-		
-		try{
-		
-				String[] ipAddressArray=null;
-			 		final String ipValue=command.stringValueOfParameterNamed("ipAddress");
-			 		final String status=command.stringValueOfParameterNamed("status");
-			 		IpPoolManagementDetail ipPoolManagementDetail= this.ipPoolManagementJpaRepository.findAllocatedIpAddressData(ipValue);
-			 		
-			 		if(ipPoolManagementDetail != null){
-			 			ipPoolManagementDetail.setStatus(status.trim().charAt(0));
-			 			ipPoolManagementDetail.setClientId(null);
-			 			this.ipPoolManagementJpaRepository.save(ipPoolManagementDetail);
-			 		}
-			 	
-			/*if(ipValue.contains("/")){
-			    IpGeneration ipGeneration=new IpGeneration(ipValue,this.ipPoolManagementReadPlatformService);
-				 ipAddressArray=ipGeneration.getInfo().getsubnetAddresses();
-				          
-				        for(int i=0;i<ipAddressArray.length;i++){
-				    	    IpPoolManagementDetail ipPoolManagementDetail= this.ipPoolManagementJpaRepository.findAllocatedIpAddressData(ipAddressArray[i]);
-					  
-				    	    	if(ipPoolManagementDetail != null){
-				    	    		ipPoolManagementDetail.setStatus(status.charAt(0));
-				    	    		ipPoolManagementDetail.setClientId(null);
-				    	    		this.ipPoolManagementJpaRepository.save(ipPoolManagementDetail);
-				    	    	}
-				        }
-			}else{
-					
-				JSONArray ipAddresses = new  JSONArray(ipValue);
-  	            	for(int i=0;i<ipAddresses.length();i++){
-  	            		IpPoolManagementDetail ipPoolManagementDetail= this.ipPoolManagementJpaRepository.findAllocatedIpAddressData(ipAddresses.getString(i));
-  	            			if(ipPoolManagementDetail != null){
-  	            				ipPoolManagementDetail.setStatus(status.charAt(0));
-  	            				ipPoolManagementDetail.setClientId(null);
-  	            				this.ipPoolManagementJpaRepository.save(ipPoolManagementDetail);
-  	            			}
-  	            	}
-			}*/
-		    
+
+		try {
+
+			String[] ipAddressArray = null;
+			final String ipValue = command.stringValueOfParameterNamed("ipAddress");
+			final String status = command.stringValueOfParameterNamed("status");
+			IpPoolManagementDetail ipPoolManagementDetail = this.ipPoolManagementJpaRepository.findAllocatedIpAddressData(ipValue);
+
+			if (ipPoolManagementDetail != null) {
+				ipPoolManagementDetail.setStatus(status.trim().charAt(0));
+				ipPoolManagementDetail.setClientId(null);
+				this.ipPoolManagementJpaRepository.save(ipPoolManagementDetail);
+			}
+
+			/*
+			 * if(ipValue.contains("/")){ IpGeneration ipGeneration=new
+			 * IpGeneration(ipValue,this.ipPoolManagementReadPlatformService);
+			 * ipAddressArray=ipGeneration.getInfo().getsubnetAddresses();
+			 * 
+			 * for(int i=0;i<ipAddressArray.length;i++){ IpPoolManagementDetail
+			 * ipPoolManagementDetail=
+			 * this.ipPoolManagementJpaRepository.findAllocatedIpAddressData
+			 * (ipAddressArray[i]);
+			 * 
+			 * if(ipPoolManagementDetail != null){
+			 * ipPoolManagementDetail.setStatus(status.charAt(0));
+			 * ipPoolManagementDetail.setClientId(null);
+			 * this.ipPoolManagementJpaRepository.save(ipPoolManagementDetail);
+			 * } } }else{
+			 * 
+			 * JSONArray ipAddresses = new JSONArray(ipValue); for(int
+			 * i=0;i<ipAddresses.length();i++){ IpPoolManagementDetail
+			 * ipPoolManagementDetail=
+			 * this.ipPoolManagementJpaRepository.findAllocatedIpAddressData
+			 * (ipAddresses.getString(i)); if(ipPoolManagementDetail != null){
+			 * ipPoolManagementDetail.setStatus(status.charAt(0));
+			 * ipPoolManagementDetail.setClientId(null);
+			 * this.ipPoolManagementJpaRepository.save(ipPoolManagementDetail);
+			 * } } }
+			 */
+
 			return new CommandProcessingResult(1l);
-		}catch(DataIntegrityViolationException exception){
-		 exception.printStackTrace();
-		 return null;
+		} catch (DataIntegrityViolationException exception) {
+			exception.printStackTrace();
+			return null;
 		}
 	}
-	
-	
 
 }

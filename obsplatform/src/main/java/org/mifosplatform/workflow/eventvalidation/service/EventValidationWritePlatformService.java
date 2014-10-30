@@ -9,5 +9,4 @@ public interface EventValidationWritePlatformService {
 
 	CommandProcessingResult deleteEventValidation(Long entityId);
 
-
 }

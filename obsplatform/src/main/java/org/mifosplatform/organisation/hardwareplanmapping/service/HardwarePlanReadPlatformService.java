@@ -1,4 +1,3 @@
-
 package org.mifosplatform.organisation.hardwareplanmapping.service;
 
 import java.util.List;
@@ -9,7 +8,7 @@ import org.mifosplatform.organisation.hardwareplanmapping.data.HardwarePlanData;
 import org.mifosplatform.portfolio.plan.data.PlanCodeData;
 
 public interface HardwarePlanReadPlatformService {
-	
+
 	List<HardwarePlanData> retrievePlanData(String itemCode);
 
 	List<ItemData> retrieveItems();
@@ -19,5 +18,7 @@ public interface HardwarePlanReadPlatformService {
 	HardwarePlanData retrieveSinglePlanData(Long planId);
 
 	List<HardwarePlanData> retrieveItems(String itemCode);
-	List<HardwareMappingDetailsData> getPlanDetailsByItemCode(String itemCode, Long clientId);
+
+	List<HardwareMappingDetailsData> getPlanDetailsByItemCode(String itemCode,
+			Long clientId);
 }

@@ -1,10 +1,7 @@
 package org.mifosplatform.organisation.ippool.api;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -22,6 +19,7 @@ import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.mifosplatform.crm.clientprospect.service.SearchSqlQuery;
+import org.mifosplatform.infrastructure.codes.data.CodeData;
 import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
 import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
@@ -43,10 +41,20 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("singleton")
 
+/**
+ * The class <code>IpPoolManagementApiResource</code> is developed for
+ * Creating ip address using subnet and mask bit. 
+ * 
+ * @author ashokreddy
+ *
+ */
 public class IpPoolManagementApiResource {
 
-	private static final Set<String> IPPOOL_DATA_PARAMETERS = new HashSet<String>(Arrays.asList("id", "ipPoolDescription",
-			"ipAddress","subnet","clientId","clientName","status","codeValueDatas"));
+	/**
+	 * The set of parameters that are supported in response for {@link CodeData}
+	 *//*
+	private static final Set<String> RESPONSE_PARAMETERS = new HashSet<String>(Arrays.asList("id", "ipPoolDescription",
+			"ipAddress","subnet","clientId","clientName","status","codeValueDatas"));*/
 	
 	private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 	private final PlatformSecurityContext context;
@@ -74,16 +82,30 @@ public class IpPoolManagementApiResource {
 		this.globalConfigurationRepository=globalConfigurationRepository;
 	}
 	
+	/**
+	 * This method <code>createIppoolManagement</code> is 
+	 * Used for Creating a Ippool with Netmask.
+	 * 
+	 * @param requestData
+	 * 			Containg input data in the Form of JsonObject.
+	 * @return
+	 */
 	@POST
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public String createCode(final String apiRequestBodyAsJson) {
+    public String createIppoolManagement(final String requestData) {
 		
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().createIpPoolManagement().withJson(apiRequestBodyAsJson).build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().createIpPoolManagement().withJson(requestData).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
         return this.toApiJsonSerializer.serialize(result);
     } 
 	
+	/**
+	 * This method <code>retrieveAllIpPoolData</code> is 
+	 * Used for retrieving all ip address.
+	 * 
+	 * @return
+	 */
 	@GET
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
@@ -107,11 +129,20 @@ public class IpPoolManagementApiResource {
 
 	}
 	
+	/**
+	 * This method <code>retrieveTemplate</code> 
+	 * used for Retrieving the all mandatory/necessary data
+	 * For creating a Ippooling.
+	 * 
+	 * @param uriInfo
+	 * 			Containing Url information 
+	 * @return
+	 */
 	@GET
 	@Path("template")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrieveTemplateDataforIppool(@Context final UriInfo uriInfo) {
+	public String retrieveTemplate(@Context final UriInfo uriInfo) {
 		
 		this.context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
 		Collection<MCodeData> codeValueDatas=this.codeReadPlatformService.getCodeValue("IP Type");
@@ -137,9 +168,9 @@ public class IpPoolManagementApiResource {
 	@Path("{id}")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public String editIpPool(@PathParam("id") final Long id,final String apiRequestBodyAsJson) {
+    public String editIpPool(@PathParam("id") final Long id,final String requestData) {
 		
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateIpPoolManagement(id).withJson(apiRequestBodyAsJson).build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateIpPoolManagement(id).withJson(requestData).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
         return this.toApiJsonSerializer.serialize(result);
     } 
@@ -160,9 +191,9 @@ public class IpPoolManagementApiResource {
 	@Path("ping/{id}")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public String gatStatusOfIP(@PathParam("id") final Long id,final String apiRequestBodyAsJson) {
+    public String gatStatusOfIP(@PathParam("id") final Long id,final String requestData) {
 		
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateIpStatus(id).withJson(apiRequestBodyAsJson).build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateIpStatus(id).withJson(requestData).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
         return this.toApiJsonSerializer.serialize(result);
     } 
@@ -170,9 +201,9 @@ public class IpPoolManagementApiResource {
 	@PUT
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public String updateNetMaskAsDescription(final String apiRequestBodyAsJson) {
+    public String updateNetMaskAsDescription(final String requestData) {
 		
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateIpPoolDescription().withJson(apiRequestBodyAsJson).build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateIpDescription().withJson(requestData).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
         return this.toApiJsonSerializer.serialize(result);
     } 
@@ -181,9 +212,9 @@ public class IpPoolManagementApiResource {
 	@Path("updatestatus")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public String updateIpStatus(final String apiRequestBodyAsJson) {
+    public String updateIpStatus(final String requestData) {
 		
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateIpStatus().withJson(apiRequestBodyAsJson).build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateIpAddressStatus().withJson(requestData).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
         return this.toApiJsonSerializer.serialize(result);
     } 
@@ -195,9 +226,9 @@ public class IpPoolManagementApiResource {
 	public String retrieveSingleIpPoolDetails(@Context final UriInfo uriInfo,@PathParam("poolId") final Long poolId) {
 		
 		this.context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		Collection<MCodeData> codeValueDatas=this.codeReadPlatformService.getCodeValue("IP Type");
-		List<IpPoolManagementData> ipPoolManagementDatas = ipPoolManagementReadPlatformService.retrieveSingleIpPoolDetails(poolId);
-		IpPoolData singleIpPoolData=new IpPoolData(codeValueDatas,ipPoolManagementDatas);
+		final Collection<MCodeData> codeValueDatas=this.codeReadPlatformService.getCodeValue("IP Type");
+		final List<IpPoolManagementData> ipPoolManagementDatas = ipPoolManagementReadPlatformService.retrieveSingleIpPoolDetails(poolId);
+		final IpPoolData singleIpPoolData=new IpPoolData(codeValueDatas,ipPoolManagementDatas);
 		return this.toApiJsonSerializer.serialize(singleIpPoolData);
 	}
 }

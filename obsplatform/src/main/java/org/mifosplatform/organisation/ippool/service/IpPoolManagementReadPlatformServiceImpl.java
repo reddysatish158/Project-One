@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.mifosplatform.billing.pricing.service.PriceReadPlatformService;
 import org.mifosplatform.crm.clientprospect.service.SearchSqlQuery;
 import org.mifosplatform.infrastructure.core.service.Page;
 import org.mifosplatform.infrastructure.core.service.PaginationHelper;
@@ -18,15 +17,18 @@ import org.mifosplatform.infrastructure.dataqueries.service.ReadReportingService
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.organisation.ippool.data.IpPoolData;
 import org.mifosplatform.organisation.ippool.data.IpPoolManagementData;
-import org.mifosplatform.organisation.ippool.domain.IpPoolManagementDetail;
 import org.mifosplatform.organisation.ippool.exception.IpAddresNotAvailableException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
-//String serviceDescription = rs.getString("service_description");
-// TODO Auto-generated method stub
+
+/**
+ * 
+ * @author ashokreddy
+ *
+ */
 @Service
 public class IpPoolManagementReadPlatformServiceImpl implements IpPoolManagementReadPlatformService {
 
@@ -36,10 +38,10 @@ public class IpPoolManagementReadPlatformServiceImpl implements IpPoolManagement
 	private final ReadReportingService readReportingService;
 	private final PaginationHelper<IpPoolManagementData> paginationHelper = new PaginationHelper<IpPoolManagementData>(); 
 	
-
 	@Autowired
-	public IpPoolManagementReadPlatformServiceImpl(final PlatformSecurityContext context,final PriceReadPlatformService priceReadPlatformService,
-			final TenantAwareRoutingDataSource dataSource,final ReadReportingService readReportingService) {
+	public IpPoolManagementReadPlatformServiceImpl(final PlatformSecurityContext context,
+			final TenantAwareRoutingDataSource dataSource,
+			final ReadReportingService readReportingService) {
 		
 		this.context = context;
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
@@ -48,44 +50,42 @@ public class IpPoolManagementReadPlatformServiceImpl implements IpPoolManagement
 
 	@Override
 	public List<IpPoolData> getUnallocatedIpAddressDetailds() {
+
+		final Map<String, String> queryParams = new HashMap<String, String>();
+		final List<IpPoolData> ipPoolDatas = new ArrayList<IpPoolData>();
+
+		final GenericResultsetData resultsetData = this.readReportingService.retrieveGenericResultset("IP_ADDRESS", "parameter", queryParams);
 		
-		Map<String, String> queryParams=new HashMap<String, String>();
-		   List<IpPoolData> ipPoolDatas=new ArrayList<IpPoolData>();
-		  
-		   
-		final GenericResultsetData resultsetData=this.readReportingService.retrieveGenericResultset("IP_ADDRESS", "parameter", queryParams);
-		   List<ResultsetRowData> datas = resultsetData.getData();
-		   List<String> row;
-		    Integer rSize;
-		   for (int i = 0; i < datas.size(); i++) {
-               row = datas.get(i).getRow();
-               rSize = row.size();
-               for (int j = 0; j < rSize-1; j++) {
+		List<ResultsetRowData> datas = resultsetData.getData();
+		List<String> row;
+		Integer rSize;
+		for (int i = 0; i < datas.size(); i++) {
+			row = datas.get(i).getRow();
+			rSize = row.size();
+			for (int j = 0; j < rSize - 1; j++) {
 
-            	   String  id=datas.get(i).getRow().get(j);
-            	   j++;
-            	   String poolName=datas.get(i).getRow().get(j);
-            	   j++;
-            	   String ipAddress=datas.get(i).getRow().get(j);
-            	   j=j++;
-				   ipPoolDatas.add(new IpPoolData(new Long(id), poolName, ipAddress));
-               }
-           }
-		   
-		   
-		   return ipPoolDatas;
-	/*
+				String id = datas.get(i).getRow().get(j);
+				j++;
+				String poolName = datas.get(i).getRow().get(j);
+				j++;
+				String ipAddress = datas.get(i).getRow().get(j);
+				j = j++;
+				ipPoolDatas.add(new IpPoolData(Long.valueOf(id), poolName, ipAddress));
+			}
+		}
 
-		context.authenticatedUser();
-		ProvisioningMapper mapper = new ProvisioningMapper();
+		return ipPoolDatas;
+		/*
+		 * 
+		 * context.authenticatedUser(); ProvisioningMapper mapper = new
+		 * ProvisioningMapper();
+		 * 
+		 * String sql = "select " + mapper.schema();
+		 * 
+		 * return this.jdbcTemplate.query(sql, mapper, new Object[] {});
+		 */}
 
-		String sql = "select " + mapper.schema();
-
-		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
-
-	*/}
-
-	private static final class ProvisioningMapper implements RowMapper<IpPoolData> {
+	/*private static final class ProvisioningMapper implements RowMapper<IpPoolData> {
 
 		public String schema() {
 			return " pd.id as id,pd.pool_name as poolName,pd.ip_address as ipaddress  from b_ippool_details pd where status='F'";
@@ -102,7 +102,7 @@ public class IpPoolManagementReadPlatformServiceImpl implements IpPoolManagement
 			return new IpPoolData(id,poolName,ipaddress);
 
 		}
-	}
+	}*/
 
 	
 
@@ -134,7 +134,7 @@ public class IpPoolManagementReadPlatformServiceImpl implements IpPoolManagement
 			
 			Long id=rs.getLong("id");
 			String poolName=rs.getString("poolName");
-			Long ClientId=rs.getLong("ClientId");
+			Long clientId=rs.getLong("ClientId");
 			String clientName=rs.getString("ClientName");
 			String ipAddress=rs.getString("ipAddress");	
 			String status=rs.getString("status");
@@ -142,7 +142,7 @@ public class IpPoolManagementReadPlatformServiceImpl implements IpPoolManagement
 			Long type=rs.getLong("type");
 			String typeCodeValue=rs.getString("typeValue");
 			Long subNet=rs.getLong("subNet");
-			return new IpPoolManagementData(id, ipAddress, poolName,status, ClientId, clientName, notes,type,typeCodeValue,subNet);
+			return new IpPoolManagementData(id, ipAddress, poolName,status, clientId, clientName, notes,type,typeCodeValue,subNet);
 		}
 	}
 

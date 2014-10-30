@@ -7,8 +7,11 @@ package org.mifosplatform.organisation.message.service;
 
 import org.mifosplatform.organisation.message.data.BillingMessageDataForProcessing;
 
-
-
+/**
+ * 
+ * @author ashokreddy
+ *
+ */
 public interface MessagePlatformEmailService {
 
     String sendToUserEmail(BillingMessageDataForProcessing emailDetail);

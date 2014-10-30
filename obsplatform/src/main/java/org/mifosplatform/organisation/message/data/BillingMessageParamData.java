@@ -1,23 +1,26 @@
 package org.mifosplatform.organisation.message.data;
 
 /**
- * @author avinash
+ * The class <code>BillingMessageDataForProcessing</code> 
+ * is a Bean class.
+ * 
+ * @author ashokreddy
  *
  */
 public class BillingMessageParamData {
-	
-	
+
 	private final Long id;
 	private final Long msgTemplateId;
 	private final String parameterName;
 	private final Long sequenceNo;
-	
-	public BillingMessageParamData(final Long id,final Long msgTemplateId,final String parameterName,final Long sequenceNo)
-	{
-		this.id=id;
-		this.msgTemplateId=msgTemplateId;
-		this.parameterName=parameterName;
-		this.sequenceNo=sequenceNo;
+
+	public BillingMessageParamData(final Long id, final Long msgTemplateId,
+			final String parameterName, final Long sequenceNo) {
+
+		this.id = id;
+		this.msgTemplateId = msgTemplateId;
+		this.parameterName = parameterName;
+		this.sequenceNo = sequenceNo;
 	}
 
 	public Long getId() {
@@ -35,7 +38,5 @@ public class BillingMessageParamData {
 	public Long getSequenceNo() {
 		return sequenceNo;
 	}
-	
-	
 
 }

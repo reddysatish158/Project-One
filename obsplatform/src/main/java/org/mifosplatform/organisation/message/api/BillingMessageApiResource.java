@@ -21,33 +21,44 @@ import javax.ws.rs.core.UriInfo;
 import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
+import org.mifosplatform.infrastructure.codes.data.CodeData;
 import org.mifosplatform.infrastructure.core.api.ApiRequestParameterHelper;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
-import org.mifosplatform.infrastructure.core.data.MediaEnumoptionData;
 import org.mifosplatform.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.mifosplatform.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
-import org.mifosplatform.organisation.message.data.BillingMessageData;
-import org.mifosplatform.organisation.message.data.EnumMessageType;
+import org.mifosplatform.organisation.message.data.BillingMessageTemplateData;
 import org.mifosplatform.organisation.message.service.BillingMesssageReadPlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-
+/**
+ * The class <code>BillingMessageApiResource</code> is 
+ * developed for Creating Message Template, which is 
+ * useful in Emails Preparation. 
+ * 
+ * For More info see in the OBS Documentation.
+ * 
+ * @author ashokreddy
+ *
+ */
 
 @Path("/messages")
 @Component
 @Scope("singleton")
 public class BillingMessageApiResource {
 	
-	private final Set<String> MESSAGE_DATA_PARAMETERS = new HashSet<String>(Arrays.asList("id", "templateDescription", 
+	/**
+	 * The set of parameters that are supported in response for {@link CodeData}
+	 */
+	private final Set<String> RESPONSE_PARAMETERS = new HashSet<String>(Arrays.asList("id", "templateDescription", 
 			"subject", "header", "body","footer","messageParams","deleteButtonId"));
 	
-	 private final String resourceNameForPermissions = "MESSAGE";
+	private final String resourceNameForPermissions = "MESSAGE";
 	
 	private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
-	private final DefaultToApiJsonSerializer<BillingMessageData> toApiJsonSerializer;
+	private final DefaultToApiJsonSerializer<BillingMessageTemplateData> toApiJsonSerializer;
 	private final BillingMesssageReadPlatformService billingMesssageReadPlatformService;
 	private final PlatformSecurityContext context;
 	private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -56,67 +67,101 @@ public class BillingMessageApiResource {
 	
 	
 	@Autowired
-	public BillingMessageApiResource(final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,DefaultToApiJsonSerializer<BillingMessageData> toApiJsonSerializer
-			,BillingMesssageReadPlatformService billingMesssageReadPlatformService,PlatformSecurityContext context
-			,ApiRequestParameterHelper apiRequestParameterHelper)
-	{
-		this.commandsSourceWritePlatformService=commandsSourceWritePlatformService;
-		this.toApiJsonSerializer=toApiJsonSerializer;
-		this.context=context;
-		this.apiRequestParameterHelper=apiRequestParameterHelper;
-		this.billingMesssageReadPlatformService=billingMesssageReadPlatformService;
-		
+	public BillingMessageApiResource(
+			final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
+			final DefaultToApiJsonSerializer<BillingMessageTemplateData> toApiJsonSerializer,
+			final BillingMesssageReadPlatformService billingMesssageReadPlatformService,
+			final PlatformSecurityContext context,
+			final ApiRequestParameterHelper apiRequestParameterHelper) {
+
+		this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+		this.toApiJsonSerializer = toApiJsonSerializer;
+		this.context = context;
+		this.apiRequestParameterHelper = apiRequestParameterHelper;
+		this.billingMesssageReadPlatformService = billingMesssageReadPlatformService;
+
 	}
-	
+
+	/**
+	 * This method <code>createMessageTemplate</code> is 
+	 * used For Creating Unique Message Templates.
+	 * 
+	 * For More Info see in the OBS Documentation.
+	 * 
+	 * @param requestData
+	 * 			Containg input data in the Form of JsonObject.
+	 * @return
+	 */
 	@POST
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public String createCode(final String apiRequestBodyAsJson) {
+    public String createMessageTemplate(final String requestData) {
 		
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().createBillingMessage().withJson(apiRequestBodyAsJson).build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().createBillingMessage().withJson(requestData).build();
 
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 
         return this.toApiJsonSerializer.serialize(result);
     } 
 	
+	/**
+	 * This method <code>createMessage</code> used for
+	 * Creating Email or OSD(on-screen data/message) Messages.
+	 * with the Message Template and requestData.
+	 *
+	 * For More Info see in the OBS Documentation.
+	 * 
+	 * @param messageId
+	 * 			id of the MessageTemplate
+	 * @param requestData
+	 * 			Containg input data in the Form of JsonObject.
+	 * @return
+	 */
 	@POST
 	@Path("{messageId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String addData(@PathParam("messageId") final Long messageId,final String apiRequestBodyAsJson) {
-		
-		 final CommandWrapper commandRequest = new CommandWrapperBuilder().createMessageData(messageId).withJson(apiRequestBodyAsJson).build();
+	public String createMessage(@PathParam("messageId") final Long messageId, final String requestData) {
 
-	        final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().createMessageData(messageId).withJson(requestData).build();
 
-	        return this.toApiJsonSerializer.serialize(result);
+		final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+
+		return this.toApiJsonSerializer.serialize(result);
 	}
 	
-	
+	/**
+	 * This method <code>retrieveMessageTemplates</code> 
+	 * used for Retrieving the All Message Templates Data 
+	 * with it's Parameters.
+	 * 
+	 * @param uriInfo
+	 * 			Containing Url information
+	 * @return
+	 */	
 	@GET
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	 public String retrieveAllMessageTemplate(@Context final UriInfo uriInfo) {
+	 public String retrieveMessageTemplates(@Context final UriInfo uriInfo) {
 		
         context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-        final Collection<BillingMessageData> templateData = this.billingMesssageReadPlatformService.retrieveAllMessageTemplates();
+        
+        final Collection<BillingMessageTemplateData> templateData = this.billingMesssageReadPlatformService.retrieveAllMessageTemplateParams(); 
+        
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-        return this.toApiJsonSerializer.serialize(settings, templateData, MESSAGE_DATA_PARAMETERS);
+        
+        return this.toApiJsonSerializer.serialize(settings, templateData, RESPONSE_PARAMETERS);
     }
 	
-	@GET
-	@Path("data")
-	@Consumes({ MediaType.APPLICATION_JSON })
-	@Produces({ MediaType.APPLICATION_JSON })
-	 public String retrieveTemplatedata(@Context final UriInfo uriInfo) {
-		
-        context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-        final Collection<BillingMessageData> templateData = this.billingMesssageReadPlatformService.retrieveAllMessageTemplateParams(); 
-        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-        return this.toApiJsonSerializer.serialize(settings, templateData, MESSAGE_DATA_PARAMETERS);
-    }
-	
+	/**
+	 * This method <code>retrieveTemplate</code> 
+	 * used for Retrieving the all mandatory/necessary data
+	 * For creating a Message Template. like MessageType etc..
+	 * 
+	 * @param uriInfo
+	 * 			Containing Url information
+	 * @return
+	 */
 	@GET
 	@Path("template")
 	@Consumes({ MediaType.APPLICATION_JSON })
@@ -124,47 +169,90 @@ public class BillingMessageApiResource {
 	 public String retrieveTemplate(@Context final UriInfo uriInfo) {
 		
         context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-        final BillingMessageData messageType=this.billingMesssageReadPlatformService.retrieveTemplate();
+        
+        final BillingMessageTemplateData messageType=this.billingMesssageReadPlatformService.retrieveTemplate();
+        
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-       return this.toApiJsonSerializer.serialize(settings, messageType, MESSAGE_DATA_PARAMETERS);
+        
+        return this.toApiJsonSerializer.serialize(settings, messageType, RESPONSE_PARAMETERS);
     }
 	
+	/**
+	 * This method <code>retrieveMessageTemplate</code> 
+	 * used for Retrieving the Particular Message Template 
+	 * with it's Parameters.
+	 * 
+	 * @param messageId
+	 * 			id of the MessageTemplate
+	 * @param uriInfo
+	 * 			Containing Url information
+	 * @return
+	 */
 	@GET
 	@Path("{messageId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-    public String retrieveSingleMessageTemplate(@PathParam("messageId") final Long messageId,@Context final UriInfo uriInfo) {
+	public String retrieveMessageTemplate(@PathParam("messageId") final Long messageId, @Context final UriInfo uriInfo) {
+
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+
+		final List<BillingMessageTemplateData> messageParams = this.billingMesssageReadPlatformService.retrieveMessageParams(messageId);
 		
-        context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-        final BillingMessageData templateData = this.billingMesssageReadPlatformService.retrieveMessageTemplate(messageId);
-        List<BillingMessageData> messageParams=this.billingMesssageReadPlatformService.retrieveMessageParams(messageId);
-        final BillingMessageData messageType=this.billingMesssageReadPlatformService.retrieveTemplate();
-                  templateData.setMessageParams(messageParams);
-                  templateData.setMessageType(messageType.getMessageTypes());
-        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-        return this.toApiJsonSerializer.serialize(settings, templateData, MESSAGE_DATA_PARAMETERS);
-	
+		final BillingMessageTemplateData messageType = this.billingMesssageReadPlatformService.retrieveTemplate();
+		
+		final BillingMessageTemplateData templateData = this.billingMesssageReadPlatformService.retrieveMessageTemplate(messageId);
+		templateData.setMessageParams(messageParams);
+		templateData.setMessageType(messageType.getMessageTypes());
+		
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		
+		return this.toApiJsonSerializer.serialize(settings, templateData,RESPONSE_PARAMETERS);
 	}
 	
+	/**
+	 * This method <code>updateMessageTemplate</code> used for
+	 * Updating/edit the Existing Message Template.
+	 *
+	 * For More Info see in the OBS Documentation.
+	 * 
+	 * @param messageId
+	 * 			id of the MessageTemplate
+	 * @param requestData
+	 * 			Containg input data in the Form of JsonObject.
+	 * @return
+	 */
 	@PUT
 	@Path("{messageId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String templateEditData(@PathParam("messageId") final Long messageId,final String apiRequestBodyAsJson) {
-		
-		 final CommandWrapper commandRequest = new CommandWrapperBuilder().updateMessageData(messageId).withJson(apiRequestBodyAsJson).build();
+	public String updateMessageTemplate(@PathParam("messageId") final Long messageId, final String requestData) {
 
-	        final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().updateBillingMessage(messageId).withJson(requestData).build();
 
-	        return this.toApiJsonSerializer.serialize(result);
+		final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+
+		return this.toApiJsonSerializer.serialize(result);
 	}
 	
+	/**
+	 * This method <code>deleteMessageTemplate</code> used for
+	 * delete the Existing Message Template.
+	 * 
+	 * Note: Delete Message Template means changing the
+	 * status of the Message Template 'N' to 'Y' Only.
+	 *  
+	 * @param messageId
+	 * 			id of the MessageTemplate
+	 * @return
+	 */
 	@DELETE
 	@Path("{messageId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String deleteEventPricing(@PathParam("messageId") final Long messageId) {
-		final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteMessageData(messageId).build();
+	public String deleteMessageTemplate(@PathParam("messageId") final Long messageId) {
+		
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteBillingMessage(messageId).build();
+		
 		final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 		
 		return this.toApiJsonSerializer.serialize(result);

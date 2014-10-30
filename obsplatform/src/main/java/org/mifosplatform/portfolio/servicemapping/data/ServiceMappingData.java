@@ -45,8 +45,9 @@ public class ServiceMappingData {
 	private Collection<McodeData> subCategories;
 	
 
-	public ServiceMappingData(Long id, String serviceCode, String serviceIndentification,String status,
-				String image,String category,String subCategory) {
+	public ServiceMappingData(final Long id, final String serviceCode, 
+			final String serviceIndentification, final String status,
+			final String image, final String category, final String subCategory) {
 		
 		this.id=id;
 		this.serviceCode=serviceCode;
@@ -57,8 +58,11 @@ public class ServiceMappingData {
 		this.subCategory=subCategory;
 	}
 	
-	public ServiceMappingData( List<ServiceMappingData> serviceMappingData,	List<ServiceCodeData> serviceCodeData, List<EnumOptionData> status, 
-			Collection<ReportParameterData> serviceParameters, Collection<McodeData> categories, Collection<McodeData> subCategories) {
+	public ServiceMappingData( final List<ServiceMappingData> serviceMappingData,	
+			final List<ServiceCodeData> serviceCodeData, 
+			final List<EnumOptionData> status, 
+			final Collection<ReportParameterData> serviceParameters, 
+			final Collection<McodeData> categories, final Collection<McodeData> subCategories) {
 
 		this.serviceMappingData=serviceMappingData;
 		this.serviceCodeData=serviceCodeData;
@@ -133,8 +137,6 @@ public class ServiceMappingData {
 	public void setImage(String image) {
 		this.image = image;
 	}
-
-
 
 	public void setStatusData(List<EnumOptionData> status) {
 		this.statusData=status;

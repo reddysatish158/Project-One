@@ -5,8 +5,6 @@
  */
 package org.mifosplatform.commands.service;
 
-import javax.ws.rs.core.Response.ResponseBuilder;
-
 import org.mifosplatform.commands.domain.CommandWrapper;
 
 public class CommandWrapperBuilder {
@@ -231,7 +229,7 @@ public class CommandWrapperBuilder {
 		return this;
 	}
 
-	public CommandWrapperBuilder updateCurrencies() {
+	public CommandWrapperBuilder updateCurrency() {
 		this.actionName = "UPDATE";
 		this.entityName = "CURRENCY";
 		this.href = "/currencies";
@@ -1440,7 +1438,7 @@ public CommandWrapperBuilder createMessageData(Long clientId) {
 	return this;
 }
 
-public CommandWrapperBuilder updateMessageData(Long clientId) {
+public CommandWrapperBuilder updateBillingMessage(Long clientId) {
 	this.actionName = "UPDATE";
 	this.entityName = "BILLINGMESSAGE";
 	this.entityId = clientId;
@@ -1462,7 +1460,7 @@ public CommandWrapperBuilder createSchedule(){
 	return this;
 }
 
-public CommandWrapperBuilder deleteMessageData(Long messageId) {
+public CommandWrapperBuilder deleteBillingMessage(Long messageId) {
 	
 	// TODO Auto-generated method stub
 	this.actionName = "DELETE";
@@ -1663,11 +1661,11 @@ public CommandWrapperBuilder createSupplier() {
 	 return this;
 	}
 
-public CommandWrapperBuilder createRandomGenerator() 
+public CommandWrapperBuilder createVoucherGroup() 
   {
 	 this.actionName = "CREATE";
-	 this.entityName = "RANDAMGENERATOR"; 
-	 this.href = "/randomgenerators";
+	 this.entityName = "VOUCHER"; 
+	 this.href = "/vouchers";
 	 return this;
 	 
   }
@@ -2231,11 +2229,11 @@ public CommandWrapperBuilder updateClientTaxExemption(Long clientId) {
 	return this;
 }
 
-public CommandWrapperBuilder processRandomGeneraror(Long batchId) {
+public CommandWrapperBuilder generateVoucherPin(Long batchId) {
 	this.actionName = "PROCESS";
-	this.entityName = "RANDAMGENERATOR";
+	this.entityName = "VOUCHER";
 	this.entityId = batchId;
-	this.href = "/randomgenerators/" + batchId;
+	this.href = "/vouchers/" + batchId;
 	return this;
 }
 
@@ -2363,7 +2361,7 @@ public CommandWrapperBuilder registerDBDatatable(final String datatable, final S
     }
  }
  
- public CommandWrapperBuilder updateIpPoolDescription() {
+ public CommandWrapperBuilder updateIpDescription() {
 		
 		this.actionName = "UPDATE";
 	    this.entityName = "IPDESCRIPTION";
@@ -2409,7 +2407,7 @@ public CommandWrapperBuilder createClientParent(Long clientId) {
 	this.href = "/parentclient/" +clientId;
 	return this;
   }
-public CommandWrapperBuilder updateIpStatus() {
+public CommandWrapperBuilder updateIpAddressStatus() {
 	this.actionName = "UPDATEIPSTATUS";
 	this.entityName = "IPPOOLMANAGEMENT";
 	this.href = "itemdetails/editgrn";

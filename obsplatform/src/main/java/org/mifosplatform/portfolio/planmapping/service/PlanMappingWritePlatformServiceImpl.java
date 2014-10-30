@@ -15,6 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+/**
+ * 
+ * @author ashokreddy
+ *
+ */
 @Service
 public class PlanMappingWritePlatformServiceImpl implements PlanMappingWritePlatformService {
 	
@@ -39,7 +44,7 @@ public class PlanMappingWritePlatformServiceImpl implements PlanMappingWritePlat
 		try {
 			this.context.authenticatedUser();
 			this.fromApiJsonDeserializer.validateForCreate(command.json());
-			PlanMapping planMapping = PlanMapping.fromJson(command);
+			final PlanMapping planMapping = PlanMapping.fromJson(command);
 			this.planMappingRepository.save(planMapping);
 			return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(planMapping.getId()).build(); 		
 		} catch (DataIntegrityViolationException dve) {
@@ -72,27 +77,36 @@ public class PlanMappingWritePlatformServiceImpl implements PlanMappingWritePlat
 	        return planMapping;
 	}
 
-	private void handleCodeDataIntegrityIssues(JsonCommand command,DataIntegrityViolationException dve) {
+	private void handleCodeDataIntegrityIssues(JsonCommand command,
+			DataIntegrityViolationException dve) {
 
+		final Throwable realCause = dve.getMostSpecificCause();
+		if (realCause.getMessage().contains("plan_id_key")) {
+			final String name = command.stringValueOfParameterNamed("planId");
+			throw new PlatformDataIntegrityException(
+					"error.msg.service.mapping.duplicate", "A code with name '"
+							+ name + "' already exists");
+			// throw new
+			// PlatformDataIntegrityException("error.msg.code.duplicate.name",
+			// "A code with name '" + name + "' already exists");
+		}
 
-		 Throwable realCause = dve.getMostSpecificCause();
-	        if (realCause.getMessage().contains("plan_id_key")) {
-	            final String name = command.stringValueOfParameterNamed("planId");
-	            throw new PlatformDataIntegrityException("error.msg.service.mapping.duplicate", "A code with name '" + name + "' already exists");
-	            //throw new PlatformDataIntegrityException("error.msg.code.duplicate.name", "A code with name '" + name + "' already exists");
-	        }
-	        
-	        if (realCause.getMessage().contains("plan_identification_key")) {
-	            final String name = command.stringValueOfParameterNamed("planIdentification");
-	            throw new PlatformDataIntegrityException("error.msg.service.mapping.duplicate", "A code with name '" + name + "' already exists");
-	            //throw new PlatformDataIntegrityException("error.msg.code.duplicate.name", "A code with name '" + name + "' already exists");
-	        }
-	        
-	        throw new PlatformDataIntegrityException("error.msg.cund.unknown.data.integrity.issue",
-	                "Unknown data integrity issue with resource: " + realCause.getMessage());
-		
-	
-		
+		if (realCause.getMessage().contains("plan_identification_key")) {
+			final String name = command
+					.stringValueOfParameterNamed("planIdentification");
+			throw new PlatformDataIntegrityException(
+					"error.msg.service.mapping.duplicate", "A code with name '"
+							+ name + "' already exists");
+			// throw new
+			// PlatformDataIntegrityException("error.msg.code.duplicate.name",
+			// "A code with name '" + name + "' already exists");
+		}
+
+		throw new PlatformDataIntegrityException(
+				"error.msg.cund.unknown.data.integrity.issue",
+				"Unknown data integrity issue with resource: "
+						+ realCause.getMessage());
+
 	}
 
 }

@@ -13,6 +13,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
+/**
+ * 
+ * @author ashokreddy
+ *
+ */
 @Service
 public class PlanMappingReadPlatformServiceImpl implements PlanMappingReadPlatformService {
 	
@@ -30,8 +35,8 @@ public class PlanMappingReadPlatformServiceImpl implements PlanMappingReadPlatfo
 	@Override
 	public PlanMappingData getPlanMapping(Long planMappingId) {
 
-		PlanMappingMapper rowMapper = new PlanMappingMapper();
-		String sql = "select " + rowMapper.schema() + " and ps.id = ?";
+		final PlanMappingMapper rowMapper = new PlanMappingMapper();
+		final String sql = "select " + rowMapper.schema() + " and ps.id = ?";
 		return jdbcTemplate.queryForObject(sql, rowMapper, new Object[] { planMappingId });
 	}
 	
@@ -60,8 +65,8 @@ public class PlanMappingReadPlatformServiceImpl implements PlanMappingReadPlatfo
 	
 	@Override
 	public List<PlanMappingData> getPlanMapping() {
-		PlanMappingMapper mapper = new PlanMappingMapper();
-		String sql = "Select " + mapper.schema() + " ORDER BY ps.id";
+		final PlanMappingMapper mapper = new PlanMappingMapper();
+		final String sql = "Select " + mapper.schema() + " ORDER BY ps.id";
 		return this.jdbcTemplate.query(sql, mapper,new Object[] {});
 	}
 	
@@ -88,9 +93,9 @@ public class PlanMappingReadPlatformServiceImpl implements PlanMappingReadPlatfo
 	@Override
 	public List<PlanCodeData> getPlanCode() {
 
-		planCodeDataMapper rowMapper = new planCodeDataMapper();
+		final planCodeDataMapper rowMapper = new planCodeDataMapper();
 
-		String sql = "select " + rowMapper.schema();
+		final String sql = "select " + rowMapper.schema();
 
 		return jdbcTemplate.query(sql, rowMapper);
 	}

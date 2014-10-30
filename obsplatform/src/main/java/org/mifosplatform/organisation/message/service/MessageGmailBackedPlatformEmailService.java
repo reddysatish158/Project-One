@@ -17,7 +17,6 @@ import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 import javax.mail.BodyPart;
 import javax.mail.Message;
-import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
@@ -26,7 +25,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.mail.DefaultAuthenticator;
@@ -39,14 +37,19 @@ import org.mifosplatform.infrastructure.configuration.domain.GlobalConfiguration
 import org.mifosplatform.infrastructure.configuration.exception.GlobalConfigurationPropertyNotFoundException;
 import org.mifosplatform.organisation.message.data.BillingMessageDataForProcessing;
 import org.mifosplatform.organisation.message.domain.BillingMessage;
-import org.mifosplatform.organisation.message.domain.MessageDataRepository;
+import org.mifosplatform.organisation.message.domain.BillingMessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * 
+ * @author ashokreddy
+ *
+ */
 @Service
 public class MessageGmailBackedPlatformEmailService implements MessagePlatformEmailService {
 	
-	private final MessageDataRepository messageDataRepository;
+	private final BillingMessageRepository messageDataRepository;
 	private final GlobalConfigurationRepository repository;
 	private String authuser;
 	private String encodedPassword;
@@ -58,13 +61,13 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 	private GlobalConfigurationProperty configuration;
 	
 	@Autowired
-	public MessageGmailBackedPlatformEmailService(MessageDataRepository messageDataRepository,final GlobalConfigurationRepository repository) {
+	public MessageGmailBackedPlatformEmailService(BillingMessageRepository messageDataRepository,final GlobalConfigurationRepository repository) {
 
 		this.messageDataRepository = messageDataRepository;
 		this.repository=repository;
 	}
 	
-	public void SmtpDataProcessing() {
+	public void smtpDataProcessing() {
 		try {
 			
 			 configuration = repository.findOneByName("SMTP");
@@ -92,7 +95,7 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 	@Override
 	public String sendToUserEmail(BillingMessageDataForProcessing emailDetail) {
 		
-		SmtpDataProcessing();
+		smtpDataProcessing();
 		if(configuration != null){
 			
 			 //1) get the session object      
@@ -231,7 +234,7 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 	@Override
 	public String createEmail(String pdfFileName, String emailId) {
 		
-		SmtpDataProcessing();
+		smtpDataProcessing();
 
 		if(configuration != null){
 			
@@ -272,8 +275,9 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 				Transport.send(message);
 			    System.out.println("Done");
 			    return "Success";
-		    } catch (MessagingException e) {
-			      throw new RuntimeException(e);
+		    } catch (Exception e) {
+		    	System.out.println("Sending Failed");
+		    	return "Email sending Failed";
 			}		
 		}else{			
 			throw new GlobalConfigurationPropertyNotFoundException("SMTP GlobalConfiguration Property Not Found"); 		
@@ -287,7 +291,7 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 	public String sendGeneralMessage(String emailId, String body ,String subject) {
 
 		
-		SmtpDataProcessing();
+		smtpDataProcessing();
 		
 		if(configuration != null){
 			
@@ -341,7 +345,7 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 	public String sendTicketMessage(BillingMessageDataForProcessing emailDetail) {
 
 		
-		SmtpDataProcessing();
+		smtpDataProcessing();
 		
 		if(configuration != null){
 			
