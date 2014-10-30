@@ -1,8 +1,4 @@
-package org.mifosplatform.organisation.groupsDetails.api;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+package org.mifosplatform.organisation.groupsdetails.api;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -21,12 +17,11 @@ import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformSer
 import org.mifosplatform.crm.clientprospect.service.SearchSqlQuery;
 import org.mifosplatform.infrastructure.core.api.ApiRequestParameterHelper;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
-import org.mifosplatform.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.mifosplatform.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.mifosplatform.infrastructure.core.service.Page;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
-import org.mifosplatform.organisation.groupsDetails.data.GroupsDetailsData;
-import org.mifosplatform.organisation.groupsDetails.service.GroupsDetailsReadPlatformService;
+import org.mifosplatform.organisation.groupsdetails.data.GroupsDetailsData;
+import org.mifosplatform.organisation.groupsdetails.service.GroupsDetailsReadPlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -37,10 +32,8 @@ import org.springframework.stereotype.Component;
 @Scope("singleton")
 public class GroupsDetailsApiResource {
 	
-	private final Set<String> RESPONSE_DATA_GROUPS_DETAILS_PARAMETERS = new HashSet<String>(Arrays.asList("id","groupName","groupAddress","countNo","attr1","attr2","attr3","attr4"));
-	private final String resourceNameForPermission = "GROUPS";
+	private final String resourceNameForPermission = "GROUPSDETAILS";
 	private final PlatformSecurityContext context;
-	private final ApiRequestParameterHelper apiRequestParameterHelper;
 	private final DefaultToApiJsonSerializer<GroupsDetailsData> toApiJsonSerializer;
 	private final GroupsDetailsReadPlatformService groupsDetailsReadPlatformService; 
 	private final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService;
@@ -52,7 +45,6 @@ public class GroupsDetailsApiResource {
 		
 		this.context = context;
 		this.toApiJsonSerializer = toApiJsonSerializer;
-		this.apiRequestParameterHelper = apiRequestParameterHelper;
 		this.groupsDetailsReadPlatformService = groupsDetailsReadPlatformService;
 		this.commandSourceWritePlatformService = commandSourceWritePlatformService;
 	}
@@ -66,7 +58,6 @@ public class GroupsDetailsApiResource {
 		context.authenticatedUser().validateHasReadPermission(resourceNameForPermission);
 		final SearchSqlQuery searchGroupsDetails =SearchSqlQuery.forSearch(sqlSearch, offset, limit);
 		final Page<GroupsDetailsData> groupsData = this.groupsDetailsReadPlatformService.retrieveAllGroupsData(searchGroupsDetails);
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 		return this.toApiJsonSerializer.serialize(groupsData);
 		
 	}
@@ -74,7 +65,7 @@ public class GroupsDetailsApiResource {
 	@POST
 	@Consumes({MediaType.APPLICATION_JSON})
 	@Produces({MediaType.APPLICATION_JSON})
-	public String addGroupDetails(final String jsonRequestBody){
+	public String createGroupsDetails(final String jsonRequestBody){
 		
 		final CommandWrapper commandRequest = new CommandWrapperBuilder().createGroupsDetails().withJson(jsonRequestBody).build();
 		final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
@@ -85,9 +76,9 @@ public class GroupsDetailsApiResource {
 	@Path("provision/{prepareRequestId}")
 	@Consumes({MediaType.APPLICATION_JSON})
 	@Produces({MediaType.APPLICATION_JSON})
-	public String postProvisionDetails(@PathParam("prepareRequestId") final Long prepareRequestId,final String jsonRequestBody){
+	public String addGroupsDetailsProvision(@PathParam("prepareRequestId") final Long prepareRequestId,final String jsonRequestBody){
 		
-		final CommandWrapper commandRequest = new CommandWrapperBuilder().createprovisioningDetails(prepareRequestId).withJson(jsonRequestBody).build();
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().createGroupsDetailsProvision(prepareRequestId).withJson(jsonRequestBody).build();
 		final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 	}

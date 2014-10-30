@@ -15,6 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+
+/**
+ * Class to Create {@link Redemption}
+ * 
+ * @author Raghu Chiluka
+ *
+ */
 @Path("/redemption")
 @Component
 @Scope("singleton")
@@ -23,29 +30,23 @@ public class RedemptionApiResource {
 	/**
 	 * The set of parameters that are supported in response for {@link CodeData}
 	 */
-	/*private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(
-			Arrays.asList("id", "pinId", "pinNo", "serialNo","clientId"));
-	
-	private final String resourceNameForPermissions = "REDEMPTION";*/
 
-	//private final PlatformSecurityContext context;
-	//private final ApiRequestParameterHelper apiRequestParameterHelper;
-	private final PortfolioCommandSourceWritePlatformService writePlatformService;
+	private final PortfolioCommandSourceWritePlatformService portfolioCommandSourceWritePlatformService;
 	
 	@Autowired
-	public RedemptionApiResource(final PortfolioCommandSourceWritePlatformService writePlatformService){
-		//this.context = context;
-		//this.apiRequestParameterHelper = apiRequestParameterHelper;
-		this.writePlatformService = writePlatformService;
+	public RedemptionApiResource(final PortfolioCommandSourceWritePlatformService portfolioCommandSourceWritePlatformService){
+		this.portfolioCommandSourceWritePlatformService = portfolioCommandSourceWritePlatformService;
 	}
 	
+	/**
+	 * Defining Post Method for Creating Redemption
+	 */
 	@POST
-	//@Path("clientId/{clientId}/{pinNumber}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String createRedemption(final String apiRequestBodyAsJson) {
-		final CommandWrapper commandRequest = new CommandWrapperBuilder().createRedemption().withJson(apiRequestBodyAsJson).build();
-		this.writePlatformService.logCommandSource(commandRequest);
+	public String createRedemption(final String apiReqBodyAsJson) {
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().createRedemption().withJson(apiReqBodyAsJson).build();
+		this.portfolioCommandSourceWritePlatformService.logCommandSource(commandRequest);
 		return null;
 		
 	}

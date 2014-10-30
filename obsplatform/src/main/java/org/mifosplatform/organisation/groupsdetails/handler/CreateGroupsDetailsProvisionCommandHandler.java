@@ -1,28 +1,28 @@
-package org.mifosplatform.organisation.groupsDetails.handler;
+package org.mifosplatform.organisation.groupsdetails.handler;
 
 import org.mifosplatform.commands.handler.NewCommandSourceHandler;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
-import org.mifosplatform.organisation.groupsDetails.service.GroupsDetailsWritePlatformService;
+import org.mifosplatform.organisation.groupsdetails.service.GroupsDetailsWritePlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class CreateGroupDetailsProvisionCommandHandler implements NewCommandSourceHandler{
+public class CreateGroupsDetailsProvisionCommandHandler implements NewCommandSourceHandler{
 
 private final GroupsDetailsWritePlatformService groupsDetailsWritePlatformService;
 	
 	@Autowired
-	public CreateGroupDetailsProvisionCommandHandler(final GroupsDetailsWritePlatformService groupsDetailsWritePlatformService){
+	public CreateGroupsDetailsProvisionCommandHandler(final GroupsDetailsWritePlatformService groupsDetailsWritePlatformService){
 		this.groupsDetailsWritePlatformService = groupsDetailsWritePlatformService;
 	}
 	
 	@Transactional
 	@Override
-	public CommandProcessingResult processCommand(JsonCommand command) {
+	public CommandProcessingResult processCommand(final JsonCommand command) {
 		
-		return this.groupsDetailsWritePlatformService.addProvision(command);
+		return this.groupsDetailsWritePlatformService.createGroupsDetailsProvision(command);
 	}
 
 }

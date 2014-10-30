@@ -1,4 +1,4 @@
-package org.mifosplatform.organisation.address.service;
+package org.mifosplatform.organisation.address.domain;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -17,6 +17,11 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @Table(name="b_state",uniqueConstraints=@UniqueConstraint( name="state_code",columnNames ={ "state_code" }))
 public class State extends AbstractPersistable<Long>{
 
+/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 @Column(name="state_code")
 private String stateCode;
 
@@ -34,7 +39,7 @@ public State(){
 	
 }
 
-public State(String entityCode, String entityName, Long parentEntityId) {
+public State(final String entityCode, final String entityName, final Long parentEntityId) {
 	  this.stateCode=entityCode;
 	  this.stateName=entityName;
 	  this.parentCode=parentEntityId;
@@ -43,13 +48,13 @@ public State(String entityCode, String entityName, Long parentEntityId) {
 	}
 
 
-public static State fromJson(JsonCommand command) {
+public static State fromJson(final JsonCommand command) {
 	 final String cityCode = command.stringValueOfParameterNamed("entityCode");
 	    final String cityName = command.stringValueOfParameterNamed("entityName");
 	    final Long parentEntityId = command.longValueOfParameterNamed("parentEntityId");
 	     return new State(cityCode,cityName, parentEntityId);
 }
-public Map<String, Object> update(JsonCommand command) {
+public Map<String, Object> update(final JsonCommand command) {
 	final Map<String, Object> actualChanges = new LinkedHashMap<String, Object>(1);
 	final String stateCodeParamName="entityCode";
 	if (command.isChangeInStringParameterNamed(stateCodeParamName,this.stateCode)){

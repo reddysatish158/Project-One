@@ -29,7 +29,7 @@ public final class ServiceCommandFromApiJsonDeserializer {
     /**
      * The parameters supported for this command.
      */
-    private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("serviceCode","serviceDescription","serviceType",
+    private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("serviceCode","serviceDescription",
     		"serviceUnitType","serviceType","status","isOptional","isAutoProvision"));
     private final FromJsonHelper fromApiJsonHelper;
 
