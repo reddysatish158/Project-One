@@ -3,7 +3,7 @@ package org.mifosplatform.portfolio.order.data;
 
 
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
-import org.mifosplatform.portfolio.plan.domain.StatusTypeEnum;
+import org.mifosplatform.portfolio.order.domain.StatusTypeEnum;
 import org.mifosplatform.portfolio.plan.domain.VolumeTypeEnum;
 
 public class VolumeTypeEnumaration {

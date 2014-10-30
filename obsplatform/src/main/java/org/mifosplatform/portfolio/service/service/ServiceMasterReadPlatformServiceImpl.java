@@ -8,6 +8,7 @@ import java.util.List;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
+import org.mifosplatform.portfolio.plan.data.ServiceData;
 import org.mifosplatform.portfolio.service.data.ServiceMasterData;
 import org.mifosplatform.portfolio.service.data.ServiceMasterOptionsData;
 import org.mifosplatform.portfolio.service.data.ServiceStatusEnumaration;
@@ -32,9 +33,11 @@ public class ServiceMasterReadPlatformServiceImpl implements  ServiceMasterReadP
 
 	@Override
 	public Collection<ServiceMasterData> retrieveAllServiceMasterData() {
+		
 		this.context.authenticatedUser();
 
 		ServiceMasterMapper mapper = new ServiceMasterMapper();
+		
 		String sql = "select " + mapper.schema();
 
 		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
@@ -107,28 +110,26 @@ public class ServiceMasterReadPlatformServiceImpl implements  ServiceMasterReadP
 
 	}
 
-	/*private static final class ServicesMapper implements RowMapper<ServiceMasterOptionsData> {
-
-		@Override
-		public ServiceMasterOptionsData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum)
-				throws SQLException {
-			Long id=rs.getLong("id");
-			String serviceCode = rs.getString("serviceCode");
-			String serviceDescription=rs.getString("serviceDescription");
-			String serviceType=rs.getString("serviceType");
-
-
-			return new ServiceMasterOptionsData(id,serviceCode,serviceDescription,serviceType, serviceType, serviceType, serviceType);
-
-		}
-
+	private static final class ServiceDetailsMapper implements RowMapper<ServiceData> {
 
 		public String schema() {
-			return "d.id AS id,d.service_code AS serviceCode,d.service_description AS serviceDescription,d.service_type AS serviceType," +
-					"d.service_unittype as serviceUnitType,d.status as status,d.is_optional as isOptional FROM b_service d";
-		}
-}*/
+			return "da.id as id, da.service_code as service_code, da.service_description as service_description "
+					+ " from b_service da where da.is_deleted='n' ";
 
+		}
+
+		@Override
+		public ServiceData mapRow(final ResultSet rs,
+				@SuppressWarnings("unused") final int rowNum)
+				throws SQLException {
+
+			Long id = rs.getLong("id");
+			String serviceCode = rs.getString("service_code");
+			String serviceDescription = rs.getString("service_description");
+			return new ServiceData(id,null,null,null,serviceCode, serviceDescription,null,null,null,null);
+
+		}
+	}
 	@Override
 	public List<EnumOptionData> retrieveServicesTypes() {
 		
@@ -152,4 +153,18 @@ public class ServiceMasterReadPlatformServiceImpl implements  ServiceMasterReadP
 		List<EnumOptionData> categotyType = Arrays.asList(onOff,scheme,quantity);
 			return categotyType;
 	}
+
+	@Override
+	public List<ServiceData> retrieveAllServices() {
+
+
+		context.authenticatedUser();
+		ServiceDetailsMapper mapper = new ServiceDetailsMapper();
+
+		String sql = "select " + mapper.schema();
+
+		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
+
+	
+}
 }

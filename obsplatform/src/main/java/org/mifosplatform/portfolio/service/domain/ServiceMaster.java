@@ -10,6 +10,7 @@ import javax.persistence.UniqueConstraint;
 
 import org.apache.commons.lang.StringUtils;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
+import org.mifosplatform.portfolio.plan.data.ServiceData;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 @Entity
@@ -162,6 +163,11 @@ public static ServiceMaster fromJson(final JsonCommand command) {
 			this.serviceCode=this.serviceCode+"_"+this.getId();
 			isDeleted="y";
 		}
+	}
+
+
+	public ServiceData todata() {
+		return new ServiceData(getId(),null,null,null,this.serviceCode,this.serviceDescription,null,null,null,null);
 	}
 
 

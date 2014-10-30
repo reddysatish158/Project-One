@@ -25,7 +25,6 @@ import org.mifosplatform.cms.media.data.MediaassetAttribute;
 import org.mifosplatform.cms.media.data.MediaassetAttributeData;
 import org.mifosplatform.cms.media.service.MediaAssetReadPlatformService;
 import org.mifosplatform.cms.mediadetails.data.MediaLocationData;
-import org.mifosplatform.cms.mediadevice.data.MediaDeviceData;
 import org.mifosplatform.cms.mediadevice.service.MediaDeviceReadPlatformService;
 import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
@@ -309,7 +308,7 @@ public class MediaAssestApiResource {
 	@Path("locationAttributes/{assetId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String InsertMediaLocationsAndAttributes(@PathParam("assetId") final Long assetId,final String apiRequestBodyAsJson) {
+	public String insertMediaLocationsAndAttributes(@PathParam("assetId") final Long assetId,final String apiRequestBodyAsJson) {
 
 	   final CommandWrapper commandRequest=new CommandWrapperBuilder().createMediaAssetLocationAttributes(assetId).withJson(apiRequestBodyAsJson).build();
 	   final CommandProcessingResult result=this.commandsSourceWritePlatformService.logCommandSource(commandRequest);

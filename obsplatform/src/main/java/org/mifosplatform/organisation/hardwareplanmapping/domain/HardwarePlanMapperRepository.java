@@ -7,5 +7,9 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface HardwarePlanMapperRepository  extends
 JpaRepository<HardwarePlanMapper, Long>,
 JpaSpecificationExecutor<HardwarePlanMapper>{
+	
+	HardwarePlanMapper findOneByPlanCode(String planCode);
+	
+	HardwarePlanMapper findOneByItemCode(String itemCode);
 
 }

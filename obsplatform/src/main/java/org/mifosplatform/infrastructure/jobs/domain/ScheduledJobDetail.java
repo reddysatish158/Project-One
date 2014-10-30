@@ -88,22 +88,6 @@ public class ScheduledJobDetail extends AbstractPersistable<Long> {
 
     }
 
-    public ScheduledJobDetail(String jobName, String displayName,String cronExpression, boolean activeSchedular) {
-                       
-    	this.jobName=jobName;
-        this.jobDisplayName=displayName;
-        this.cronExpression=cronExpression;
-        this.activeSchedular =activeSchedular;
-        this.createTime=new Date();
-        this.taskPriority=5;
-        this.jobKey=jobName+"jobDetaildefault _ DEFAULT";
-        this.updatesAllowed=true;
-        this.schedulerGroup=0;
-        this.triggerMisfired=false;
-        this.createdBy=null;
-    
-    }
-
 	public String getJobName() {
         return this.jobName;
     }
@@ -202,16 +186,7 @@ public class ScheduledJobDetail extends AbstractPersistable<Long> {
     public void updateTriggerMisfired(final boolean triggerMisfired) {
         this.triggerMisfired = triggerMisfired;
     }
-
 	
-	public static ScheduledJobDetail fromJson(JsonCommand command) {
-		final String jobName = command.stringValueOfParameterNamed(SchedulerJobApiConstants.schedulerJobParamName);
-	    final String displayName = command.stringValueOfParameterNamed(SchedulerJobApiConstants.displayNameParamName);
-	    final String cronExpression = command.stringValueOfParameterNamed(SchedulerJobApiConstants.cronExpressionParamName);
-	    final boolean newValue = command.booleanPrimitiveValueOfParameterNamed(SchedulerJobApiConstants.jobActiveStatusParamName);
-	    
-	return new ScheduledJobDetail(jobName,displayName,cronExpression,newValue);
-	}
 
 	public void updateJobParamters(JsonCommand command, Long id) {
 	

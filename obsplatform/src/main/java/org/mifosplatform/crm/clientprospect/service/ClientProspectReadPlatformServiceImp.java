@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import org.mifosplatform.billing.pricing.service.PriceReadPlatformService;
+import org.mifosplatform.billing.planprice.service.PriceReadPlatformService;
 import org.mifosplatform.crm.clientprospect.data.ClientProspectData;
 import org.mifosplatform.crm.clientprospect.data.ProspectDetailAssignedToData;
 import org.mifosplatform.crm.clientprospect.data.ProspectDetailData;

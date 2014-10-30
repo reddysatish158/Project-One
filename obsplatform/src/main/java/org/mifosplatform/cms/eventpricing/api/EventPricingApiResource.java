@@ -18,7 +18,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
-import org.mifosplatform.billing.pricing.service.PriceReadPlatformService;
+import org.mifosplatform.billing.discountmaster.service.DiscountReadPlatformService;
+import org.mifosplatform.billing.planprice.service.PriceReadPlatformService;
 import org.mifosplatform.cms.eventmaster.data.EventDetailsData;
 import org.mifosplatform.cms.eventmaster.service.EventMasterReadPlatformService;
 import org.mifosplatform.cms.eventpricing.data.ClientTypeData;
@@ -59,17 +60,16 @@ public class EventPricingApiResource {
 	private ApiRequestParameterHelper apiRequestParameterHelper;
 	private DefaultToApiJsonSerializer<EventPricingData> apiJsonSerializer;
 	private PriceReadPlatformService priceReadPlatformService;
+	private final DiscountReadPlatformService discountReadPlatformService;
 	private PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService;
 	
 	@Autowired
-	public EventPricingApiResource(final EventMasterReadPlatformService eventMasterReadPlatformService,
-								   final MediaAssetDetailsReadPlatformService assetReadPlatformService,
-								   final EventPricingReadPlatformService eventPricingReadService,
-								   final ApiRequestParameterHelper apiRequestParameterHelper,
-								   final DefaultToApiJsonSerializer<EventPricingData> apiJsonSerializer,
-								   final PriceReadPlatformService priceReadPlatformService,
-								   final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService,
-								   final PlatformSecurityContext context) {
+	public EventPricingApiResource(final EventMasterReadPlatformService eventMasterReadPlatformService,final MediaAssetDetailsReadPlatformService assetReadPlatformService,
+								   final EventPricingReadPlatformService eventPricingReadService,final ApiRequestParameterHelper apiRequestParameterHelper,
+								   final DefaultToApiJsonSerializer<EventPricingData> apiJsonSerializer,final PriceReadPlatformService priceReadPlatformService,
+								   final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService,final PlatformSecurityContext context,
+								   final DiscountReadPlatformService discountReadPlatformService) {
+		
 		this.eventMasterReadPlatformService = eventMasterReadPlatformService;
 		this.assetDetailsReadPlatformService = assetReadPlatformService;
 		this.eventPricingReadService = eventPricingReadService;
@@ -77,6 +77,7 @@ public class EventPricingApiResource {
 		this.apiJsonSerializer = apiJsonSerializer;
 		this.priceReadPlatformService = priceReadPlatformService;
 		this.commandSourceWritePlatformService = commandSourceWritePlatformService;
+		this.discountReadPlatformService=discountReadPlatformService;
 		this.context = context;
 	}
 
@@ -108,7 +109,7 @@ public class EventPricingApiResource {
 		List<EventDetailsData> details = this.eventMasterReadPlatformService.retrieveEventDetailsData(eventId.intValue());
 		List<ClientTypeData> clientType = this.eventPricingReadService.clientType();
 		List<MediaAssetLocationDetails> format = this.assetDetailsReadPlatformService.retrieveMediaAssetLocationData(details.get(0).getMediaId());
-		List<DiscountMasterData> discountdata = this.priceReadPlatformService.retrieveDiscountDetails();
+		List<DiscountMasterData> discountdata = this.discountReadPlatformService.retrieveAllDiscounts();
  		EventPricingData pricingData = new EventPricingData(optType,format,discountdata,clientType,eventId);
 		return pricingData;
 	}
@@ -172,7 +173,7 @@ public class EventPricingApiResource {
 		List<EventDetailsData> details = this.eventMasterReadPlatformService.retrieveEventDetailsData(eventPricing.getEventId().intValue());
 		List<ClientTypeData> clientType = this.eventPricingReadService.clientType();
 		List<MediaAssetLocationDetails> format = this.assetDetailsReadPlatformService.retrieveMediaAssetLocationData(details.get(0).getMediaId());
-		List<DiscountMasterData> discountdata = this.priceReadPlatformService.retrieveDiscountDetails();
+		List<DiscountMasterData> discountdata = this.discountReadPlatformService.retrieveAllDiscounts();
 		eventPricing.setClientTypes(clientType);
 		eventPricing.setOptTypes(optType);
 		eventPricing.setFormat(format);

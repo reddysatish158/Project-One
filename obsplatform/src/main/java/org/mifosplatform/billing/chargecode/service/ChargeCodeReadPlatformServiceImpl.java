@@ -89,7 +89,7 @@ public class ChargeCodeReadPlatformServiceImpl implements
 		}
 	}
 	
-	public List<ChargeCodeData> getChargeCode() {
+	public List<ChargeCodeData> getChargeCodes() {
 		ChargeCodeMapper mapper = new ChargeCodeMapper();
 		String sql = "Select " + mapper.schema();
 		return this.jdbcTemplate.query(sql, mapper,new Object[] {});

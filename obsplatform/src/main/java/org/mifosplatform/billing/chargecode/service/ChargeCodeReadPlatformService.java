@@ -10,7 +10,7 @@ import org.mifosplatform.billing.chargecode.data.DurationTypeData;
 public interface ChargeCodeReadPlatformService {
 
 	
-	List<ChargeCodeData> getChargeCode();
+	List<ChargeCodeData> getChargeCodes();
 	
 	List<ChargeTypeData> getChargeType();
 	

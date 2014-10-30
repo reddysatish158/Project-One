@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -13,10 +14,9 @@ import org.mifosplatform.billing.chargecode.domain.ChargeCodeRepository;
 import org.mifosplatform.billing.discountmaster.domain.DiscountMaster;
 import org.mifosplatform.billing.discountmaster.domain.DiscountMasterRepository;
 import org.mifosplatform.billing.discountmaster.exceptions.DiscountMasterNoRecordsFoundException;
-import org.mifosplatform.billing.pricing.data.PriceData;
-import org.mifosplatform.billing.pricing.domain.Price;
-import org.mifosplatform.billing.pricing.domain.PriceRepository;
-import org.mifosplatform.billing.pricing.service.PriceReadPlatformService;
+import org.mifosplatform.billing.planprice.data.PriceData;
+import org.mifosplatform.billing.planprice.domain.Price;
+import org.mifosplatform.billing.planprice.domain.PriceRepository;
 import org.mifosplatform.billing.promotioncodes.domain.Promotion;
 import org.mifosplatform.billing.promotioncodes.domain.PromotionRepository;
 import org.mifosplatform.cms.eventorder.service.PrepareRequestWriteplatformService;
@@ -68,6 +68,8 @@ import org.mifosplatform.portfolio.order.domain.OrderPriceRepository;
 import org.mifosplatform.portfolio.order.domain.OrderRepository;
 import org.mifosplatform.portfolio.order.domain.PaymentFollowup;
 import org.mifosplatform.portfolio.order.domain.PaymentFollowupRepository;
+import org.mifosplatform.portfolio.order.domain.StatusTypeEnum;
+import org.mifosplatform.portfolio.order.domain.UserActionStatusTypeEnum;
 import org.mifosplatform.portfolio.order.exceptions.NoOrdersFoundException;
 import org.mifosplatform.portfolio.order.exceptions.NoRegionalPriceFound;
 import org.mifosplatform.portfolio.order.exceptions.OrderNotFoundException;
@@ -77,8 +79,6 @@ import org.mifosplatform.portfolio.plan.data.ServiceData;
 import org.mifosplatform.portfolio.plan.domain.Plan;
 import org.mifosplatform.portfolio.plan.domain.PlanDetails;
 import org.mifosplatform.portfolio.plan.domain.PlanRepository;
-import org.mifosplatform.portfolio.plan.domain.StatusTypeEnum;
-import org.mifosplatform.portfolio.plan.domain.UserActionStatusTypeEnum;
 import org.mifosplatform.portfolio.service.domain.ProvisionServiceDetails;
 import org.mifosplatform.portfolio.service.domain.ProvisionServiceDetailsRepository;
 import org.mifosplatform.portfolio.service.domain.ServiceMaster;
@@ -282,7 +282,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 				}
 				
 				//	If serviceId Not Exist
-				OrderPrice price = new OrderPrice(data.getServiceId(),data.getChargeCode(), data.getCharging_variant(),data.getPrice(), 
+				OrderPrice price = new OrderPrice(data.getServiceId(),data.getChargeCode(), data.getChargingVariant(),data.getPrice(), 
 						null, data.getChagreType(),
 			    data.getChargeDuration(), data.getDurationType(),billstartDate.toDate(), billEndDate,data.isTaxInclusive());
 				order.addOrderDeatils(price);
@@ -319,9 +319,9 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 							order.updateOrderNum(orderNoGenerator.generate());
 							this.orderRepository.save(order);
 							
-							List<PlanDetails> planDetails=plan.getDetails();
+							Set<PlanDetails> planDetails=plan.getDetails();
 							
-							ServiceMaster service=this.serviceMasterRepository.findOneByServiceCode(planDetails.get(0).getServiceCode());
+							ServiceMaster service=this.serviceMasterRepository.findOneByServiceCode(planDetails.iterator().next().getServiceCode());
 							
                               Long commandId=Long.valueOf(0);
 							if(service != null && service.isAuto() == 'Y'){

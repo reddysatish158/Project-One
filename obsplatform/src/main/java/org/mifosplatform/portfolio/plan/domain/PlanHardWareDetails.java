@@ -28,17 +28,9 @@ public class PlanHardWareDetails{
 	@Column(name = "is_hw_required")
 	private char isHardWareReq='N';
 	
-	
-    
-
-	
 	public PlanHardWareDetails() {
 		// TODO Auto-generated constructor stub
 	}
-
-
-
-
 
 	public PlanHardWareDetails(Long planId, char isHardWareReq, String hardWareType, String planCode) {
 		this.planId=planId;

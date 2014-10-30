@@ -17,8 +17,6 @@ import org.joda.time.LocalDate;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
 import org.mifosplatform.portfolio.order.data.OrderStatusEnumaration;
-import org.mifosplatform.portfolio.plan.domain.StatusTypeEnum;
-import org.mifosplatform.portfolio.plan.domain.UserActionStatusTypeEnum;
 import org.mifosplatform.useradministration.domain.AppUser;
 
 @Entity

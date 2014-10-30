@@ -2522,6 +2522,15 @@ public CommandWrapperBuilder deleteChildFromParentClient(Long clientId) {
 	return this;
   }
 
+public CommandWrapperBuilder updateUploadFile(Long uploadStatusId) {
+	
+	this.actionName = "PROCESS";
+	this.entityName = "DATAUPLOADS";
+	this.entityId = uploadStatusId;
+	this.href = "/dataupload/" +clientId;
+	return this;
+}
+
 }
 
 
