@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -39,11 +38,11 @@ import org.mifosplatform.infrastructure.jobs.service.JobName;
 import org.mifosplatform.infrastructure.jobs.service.JobRegisterService;
 import org.mifosplatform.infrastructure.jobs.service.SchedulerJobRunnerReadService;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
+import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
+import org.mifosplatform.organisation.mcodevalues.service.MCodeReadPlatformService;
 import org.mifosplatform.organisation.message.data.BillingMessageData;
 import org.mifosplatform.organisation.message.service.BillingMesssageReadPlatformService;
 import org.mifosplatform.portfolio.group.service.SearchParameters;
-import org.mifosplatform.portfolio.plan.data.SystemData;
-import org.mifosplatform.portfolio.plan.service.PlanReadPlatformService;
 import org.mifosplatform.provisioning.processscheduledjobs.service.SheduleJobReadPlatformService;
 import org.mifosplatform.scheduledjobs.scheduledjobs.data.JobParameterData;
 import org.mifosplatform.scheduledjobs.scheduledjobs.data.ScheduleJobData;
@@ -60,20 +59,20 @@ public class SchedulerJobApiResource {
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final ToApiJsonSerializer<JobDetailData> toApiJsonSerializer;
     private final ToApiJsonSerializer<JobDetailHistoryData> jobHistoryToApiJsonSerializer;
-    private final ToApiJsonSerializer<ScheduleJobData> serializer;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final SheduleJobReadPlatformService sheduleJobReadPlatformService;
     private final BillingMesssageReadPlatformService billingMesssageReadPlatformService;
-    private final PlanReadPlatformService planReadPlatformService;
+    private final MCodeReadPlatformService  mCodeReadPlatformService;
+    private final ScheduledJobRunHistoryRepository scheduledJobRunHistoryRepository;
     private final PlatformSecurityContext context;
 
     @Autowired
     public SchedulerJobApiResource(final SchedulerJobRunnerReadService schedulerJobRunnerReadService,final JobRegisterService jobRegisterService,
     		final ToApiJsonSerializer<JobDetailData> toApiJsonSerializer,final ApiRequestParameterHelper apiRequestParameterHelper,
-    		final ToApiJsonSerializer<ScheduleJobData> serializer,final ToApiJsonSerializer<JobDetailHistoryData> jobHistoryToApiJsonSerializer,
+    		final ToApiJsonSerializer<JobDetailHistoryData> jobHistoryToApiJsonSerializer,
     		final SheduleJobReadPlatformService sheduleJobReadPlatformService,final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
-    		final BillingMesssageReadPlatformService billingMesssageReadPlatformService,final PlanReadPlatformService planReadPlatformService,
-    		final PlatformSecurityContext context) {
+    		final BillingMesssageReadPlatformService billingMesssageReadPlatformService,final MCodeReadPlatformService mCodeReadPlatformService,
+    		final PlatformSecurityContext context,final ScheduledJobRunHistoryRepository scheduledJobRunHistoryRepository) {
     	
         this.schedulerJobRunnerReadService = schedulerJobRunnerReadService;
         this.jobRegisterService = jobRegisterService;
@@ -81,27 +80,13 @@ public class SchedulerJobApiResource {
         this.jobHistoryToApiJsonSerializer = jobHistoryToApiJsonSerializer;
         this.apiRequestParameterHelper = apiRequestParameterHelper;
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
-        this.serializer=serializer;
         this.sheduleJobReadPlatformService=sheduleJobReadPlatformService;
         this.billingMesssageReadPlatformService=billingMesssageReadPlatformService;
-        this.planReadPlatformService=planReadPlatformService;
+        this.mCodeReadPlatformService=mCodeReadPlatformService;
         this.context = context;
+        this.scheduledJobRunHistoryRepository=scheduledJobRunHistoryRepository;
     }
     
-    @Autowired
-	private ScheduledJobRunHistoryRepository scheduledJobRunHistoryRepository;
-    
-    
-    @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
-    public String addNewJob(final String apiRequestBodyAsJson) { 
-    	
-    	final CommandWrapper commandRequest=new CommandWrapperBuilder().addNewJob().withJson(apiRequestBodyAsJson).build();
-	   final CommandProcessingResult result=this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-	  return this.toApiJsonSerializer.serialize(result);
-	  
-    }
 
     @GET
     @Consumes({ MediaType.APPLICATION_JSON })
@@ -123,17 +108,7 @@ public class SchedulerJobApiResource {
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, jobDetailData, SchedulerJobApiConstants.JOB_DETAIL_RESPONSE_DATA_PARAMETERS);
     }
-    @GET
-    @Path("template")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
-    public String retrieveTemplateData(@Context final UriInfo uriInfo) {
-    	context.authenticatedUser().validateHasReadPermission(resourceNameForPermission);
-         List<ScheduleJobData> jobDetailData = this.schedulerJobRunnerReadService.retrieveJobDetails();
-        ScheduleJobData jobData=new ScheduleJobData(jobDetailData);
-        final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-        return this.serializer.serialize(settings, jobData, SchedulerJobApiConstants.JOB_DETAIL_RESPONSE_DATA_PARAMETERS);
-    }
+    
     @GET
     @Path("{" + SchedulerJobApiConstants.JOB_ID + "}/" + SchedulerJobApiConstants.JOB_RUN_HISTORY)
     @Consumes({ MediaType.APPLICATION_JSON })
@@ -141,6 +116,7 @@ public class SchedulerJobApiResource {
     public String retrieveHistory(@Context final UriInfo uriInfo, @PathParam(SchedulerJobApiConstants.JOB_ID) final Long jobId,
             @QueryParam("offset") final Integer offset, @QueryParam("limit") final Integer limit,
             @QueryParam("orderBy") final String orderBy, @QueryParam("sortOrder") final String sortOrder) {
+    	
     	context.authenticatedUser().validateHasReadPermission(resourceNameForPermission);
         final SearchParameters searchParameters = SearchParameters.forPagination(offset, limit, orderBy, sortOrder);
         Page<JobDetailHistoryData> jobhistoryDetailData = this.schedulerJobRunnerReadService.retrieveJobHistory(jobId, searchParameters);
@@ -162,7 +138,7 @@ public class SchedulerJobApiResource {
 			filelocation.mkdirs();
 		}
 		for (JobName status : JobName.values()) {
-			String name=status.toString();
+			final String name=status.toString();
 			file = new File(fileUploadLocation+ File.separator + name);			
 			if(!file.isDirectory()){
 				file.mkdirs();
@@ -189,7 +165,7 @@ public class SchedulerJobApiResource {
     	context.authenticatedUser().validateHasReadPermission(resourceNameForPermission);
     	JobDetailData jobDetailData = this.schedulerJobRunnerReadService.retrieveOne(jobId);
         JobParameterData data=this.sheduleJobReadPlatformService.getJobParameters(jobDetailData.getDisplayName());
-        List<SystemData> provisionSysData = this.planReadPlatformService.retrieveSystemData();
+        Collection<MCodeData> provisionSysData = this.mCodeReadPlatformService.getCodeValue("Provisioning");
         jobDetailData=handleTemplateData(jobDetailData);
         
            jobDetailData.setJobParameters(data);
@@ -252,17 +228,6 @@ public class SchedulerJobApiResource {
     private boolean is(final String commandParam, final String commandValue) {
         return StringUtils.isNotBlank(commandParam) && commandParam.trim().equalsIgnoreCase(commandValue);
     }
-    
-    @DELETE
-	@Path("{jobId}")
-	@Consumes({MediaType.APPLICATION_JSON})
-	@Produces({MediaType.APPLICATION_JSON})
-	public String deleteSingleJob(@PathParam("jobId") final Long jobId) {
-	 final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteJob(jobId).build();
-     final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-     return this.toApiJsonSerializer.serialize(result);
-
-	} 
     
     @GET
 	@Path("printlog/{id}")

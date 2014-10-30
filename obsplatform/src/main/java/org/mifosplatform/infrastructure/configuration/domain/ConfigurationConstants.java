@@ -39,5 +39,9 @@ public class ConfigurationConstants {
 	public final static String CONFIG_PROPERTY_IS_PAYPAL_CHECK_IOS="Is_Paypal_For_Ios";
 	public static final String CONFIG_PROPERTY_IS_ACTIVE_VIEWERS = "Active Viewers";
 	
+	//Constants
+	public static final char CONST_IS_Y = 'Y';
+	public static final char CONST_IS_N = 'N';
+	
 	
 }

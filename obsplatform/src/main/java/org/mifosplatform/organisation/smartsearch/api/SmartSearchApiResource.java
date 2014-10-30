@@ -5,10 +5,7 @@
  */
 package org.mifosplatform.organisation.smartsearch.api;
 
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -20,7 +17,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import org.mifosplatform.accounting.journalentry.api.DateParam;
-import org.mifosplatform.infrastructure.core.api.ApiRequestParameterHelper;
 import org.mifosplatform.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.mifosplatform.infrastructure.core.service.Page;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
@@ -35,23 +31,19 @@ import org.springframework.stereotype.Component;
 @Scope("singleton")
 public class SmartSearchApiResource {
 
-    private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(Arrays.asList("id", "clientId", "clientName",
-            "paymentDate","paymentType","receiptNo","amount"));
+  
 
     private final String resourceNameForPermission = "SMARTSEARCH";
-
     private final SmartSearchReadplatformService smartSearchReadplatformService;
     private final DefaultToApiJsonSerializer<SmartSearchData> apiJsonSerializerService;
-    private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final PlatformSecurityContext context;
     
 
     @Autowired
     public SmartSearchApiResource(final PlatformSecurityContext context,final SmartSearchReadplatformService smartSearchReadplatformService,
-            final DefaultToApiJsonSerializer<SmartSearchData> toApiJsonSerializer,final ApiRequestParameterHelper apiRequestParameterHelper) {
+            final DefaultToApiJsonSerializer<SmartSearchData> toApiJsonSerializer) {
     	
         this.context = context;
-        this.apiRequestParameterHelper = apiRequestParameterHelper;
         this.smartSearchReadplatformService=smartSearchReadplatformService;
         this.apiJsonSerializerService = toApiJsonSerializer;
         

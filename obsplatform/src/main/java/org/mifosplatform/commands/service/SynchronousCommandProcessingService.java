@@ -677,9 +677,9 @@ public class SynchronousCommandProcessingService implements
 				if(wrapper.isCreate()){
 					handler = applicationContext.getBean("createInventoryItemAllocationCommandHandler",NewCommandSourceHandler.class);
 				}
-			}else if (wrapper.isUploadStatusResource()) {
-	        	if (wrapper.isCreate()) {
-					handler = applicationContext.getBean("uploadStatusWritePlatformService", NewCommandSourceHandler.class);
+			}else if (wrapper.isDataUploadResource()) {
+	        	if (wrapper.isProcess()) {
+					handler = applicationContext.getBean("processDataUploadCommandHandler", NewCommandSourceHandler.class);
 				}	
 	        } else if (wrapper.isChargeCodeResource()) {
 	        	if(wrapper.isCreate()){
@@ -1146,7 +1146,9 @@ public class SynchronousCommandProcessingService implements
 		        	if(wrapper.isLocationAttributeMediaAsset()) {
 						 handler = applicationContext.getBean("createMediaAssetLocationAttributeCommandHandler",NewCommandSourceHandler.class);
 					 }
-            }
+            }else {
+            	throw new UnsupportedCommandException(wrapper.commandName());
+		     }
 	       return handler;
 	}
 }

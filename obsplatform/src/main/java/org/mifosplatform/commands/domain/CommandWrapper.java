@@ -565,8 +565,8 @@ public class CommandWrapper {
 	public boolean isAllocateHardwareResource(){
 		return this.entityName.equalsIgnoreCase("ALLOCATION");
 	}
-	public boolean isUploadStatusResource() {
-		return this.entityName.equalsIgnoreCase("UPLOADSTATUS");
+	public boolean isDataUploadResource() {
+		return this.entityName.equalsIgnoreCase("DATAUPLOADS");
 	}
 	 public boolean isTicketResource() {
 	    	return this.entityName.equalsIgnoreCase("TICKET");
@@ -1199,5 +1199,9 @@ public class CommandWrapper {
 		}
 		public boolean isLocationAttributeMediaAsset() {
 			return this.actionName.equalsIgnoreCase("CREATE") && this.entityName.equalsIgnoreCase("MEDIAASSETLOCATIONATTRIBUTES");
+		}
+
+		public boolean isProcess() {
+			return this.actionName.equalsIgnoreCase("PROCESS") && this.entityName.equalsIgnoreCase("DATAUPLOADS");
 		}
 }

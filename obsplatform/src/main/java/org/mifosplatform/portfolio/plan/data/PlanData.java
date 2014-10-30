@@ -1,9 +1,11 @@
 package org.mifosplatform.portfolio.plan.data;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.joda.time.LocalDate;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
+import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
 import org.mifosplatform.portfolio.contract.data.SubscriptionData;
 
 public class PlanData {
@@ -12,13 +14,13 @@ public class PlanData {
 	private  Long billRule;
 	private  String planCode;
 	private  String planDescription;
-	private LocalDate startDate;
+	private  LocalDate startDate;
 	private  LocalDate endDate;
 	private  Long status;
-	private EnumOptionData planstatus;
+	private  EnumOptionData planstatus;
 	private  String serviceDescription;
-	private  List<ServiceData> services;
-	private  List<ServiceData> selectedServices;
+	private  Collection<ServiceData> services;
+	private  Collection<ServiceData> selectedServices;
 	private List<String> contractPeriods;
 	private List<SubscriptionData> subscriptiondata;
 	private List<BillRuleData> billRuleDatas;
@@ -26,7 +28,7 @@ public class PlanData {
 	private  String contractPeriod;
 	private PlanData datas;
 	private long statusname;
-	private List<SystemData> provisionSysData;
+	private Collection<MCodeData> provisionSysData;
 	private String provisionSystem;
 	private String isPrepaid;
 	private String allowTopup;
@@ -36,11 +38,13 @@ public class PlanData {
 	private String unitType;
 	private Long contractId;
 	private Boolean isActive=false;
-	private Integer planCount = 0;
+	//private Integer planCount = 0;
 	private List<PlanData> data = null;
+	private int planCount;
 	
-	public PlanData(List<ServiceData> data, List<BillRuleData> billData,List<SubscriptionData> contractPeriod, List<EnumOptionData> status,
-			PlanData datas, List<ServiceData> selectedservice,List<SystemData> provisionSysData, List<EnumOptionData> volumeType) {
+	public PlanData(Collection<ServiceData> data, List<BillRuleData> billData,List<SubscriptionData> contractPeriod, List<EnumOptionData> status,
+			PlanData datas, Collection<ServiceData> selectedservice,Collection<MCodeData> provisionSysData, List<EnumOptionData> volumeType) {
+	
 		if(datas!=null){
 		this.id = datas.getId();
 		this.planCode = datas.getplanCode();
@@ -69,15 +73,15 @@ public class PlanData {
 		this.serviceDescription = null;
 		
 		this.datas = datas;
-		this.datas = null;
+		//this.datas = null;
 		this.volumeTypes=volumeType;
 
 	}
 
 	
 	public PlanData(Long id, String planCode, LocalDate startDate,LocalDate endDate, Long bill_rule, String contractPeriod,
-			long status, String planDescription, long status1,String provisionSys,EnumOptionData enumstatus, String isPrepaid,
-			String allowTopup, String volume, String units, String unitType, List<ServiceData> services, Long contractId, String isHwReq) {
+			long status, String planDescription,String provisionSys,EnumOptionData enumstatus, String isPrepaid,
+			String allowTopup, String volume, String units, String unitType, Collection<ServiceData> services, Long contractId, String isHwReq) {
 
 		this.id = id;
 		this.planCode = planCode;
@@ -87,12 +91,11 @@ public class PlanData {
 		this.billRule = bill_rule;
 		this.endDate = endDate;
 		this.planDescription = planDescription;
-		this.services = null;
+		//this.services = null;
 		this.billRuleDatas = null;
 		this.contractPeriod = contractPeriod;
         this.provisionSystem=provisionSys;  
 		this.selectedServices = null;
-		this.statusname = status1;
 		this.planstatus = enumstatus;
 		this.isPrepaid=isPrepaid;
 		this.allowTopup=allowTopup;
@@ -149,7 +152,7 @@ public class PlanData {
 		return datas;
 	}
 
-	public List<ServiceData> getSelectedServices() {
+	public Collection<ServiceData> getSelectedServices() {
 		return selectedServices;
 	}
 
@@ -197,7 +200,7 @@ public class PlanData {
 		return status;
 	}
 
-	public List<ServiceData> getServicedata() {
+	public Collection<ServiceData> getServicedata() {
 		return services;
 	}
 
@@ -245,7 +248,7 @@ public class PlanData {
 	/**
 	 * @return the services
 	 */
-	public List<ServiceData> getServices() {
+	public Collection<ServiceData> getServices() {
 		return services;
 	}
 
@@ -269,7 +272,7 @@ public class PlanData {
 	/**
 	 * @return the provisionSysData
 	 */
-	public List<SystemData> getProvisionSysData() {
+	public Collection<MCodeData> getProvisionSysData() {
 		return provisionSysData;
 	}
 
@@ -330,25 +333,17 @@ public class PlanData {
 	}
 
 
-	/**
-	 * @return the planCount
-	 */
-	public Integer getPlanCount() {
-		return planCount;
-	}
-
-
-	/**
-	 * @param planCount the planCount to set
-	 */
-	public void setPlanCount(Integer planCount) {
-		this.planCount = planCount;
-	}
 
 
 	public void setSeriveces(List<ServiceData> services) {
 		
 		this.selectedServices=services;
+	}
+
+
+	public void setPlanCount(int size) {
+		this.planCount=size;
+		
 	}
 	
 	

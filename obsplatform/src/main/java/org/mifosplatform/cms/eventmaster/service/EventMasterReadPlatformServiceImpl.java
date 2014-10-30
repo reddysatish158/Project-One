@@ -19,7 +19,7 @@ import org.mifosplatform.infrastructure.core.data.EnumOptionData;
 import org.mifosplatform.infrastructure.core.domain.JdbcSupport;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
 import org.mifosplatform.portfolio.order.data.OrderStatusEnumaration;
-import org.mifosplatform.portfolio.plan.domain.StatusTypeEnum;
+import org.mifosplatform.portfolio.order.domain.StatusTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
