@@ -12,7 +12,12 @@ import org.mifosplatform.infrastructure.core.exception.AbstractPlatformDomainRul
  */
 public class CannotUpdateOfficeWithParentOfficeSameAsSelf extends AbstractPlatformDomainRuleException {
 
-    public CannotUpdateOfficeWithParentOfficeSameAsSelf(final Long officeId, final Long parentId) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public CannotUpdateOfficeWithParentOfficeSameAsSelf(final Long officeId, final Long parentId) {
         super("error.msg.office.parentId.same.as.id", "Cannot update office with parent same as self.", officeId, parentId);
     }
 }

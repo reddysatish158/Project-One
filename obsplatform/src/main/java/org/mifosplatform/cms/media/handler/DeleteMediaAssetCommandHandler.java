@@ -9,20 +9,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class DeleteAssetCommandHandler  implements NewCommandSourceHandler{
+public class DeleteMediaAssetCommandHandler  implements NewCommandSourceHandler{
 
 	private final MediaAssetWritePlatformService writePlatformService;
 
     @Autowired
-    public DeleteAssetCommandHandler(final MediaAssetWritePlatformService writePlatformService) {
+    public DeleteMediaAssetCommandHandler(final MediaAssetWritePlatformService writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 	
     @Transactional
 	@Override
-	public CommandProcessingResult processCommand(JsonCommand command) {
+	public CommandProcessingResult processCommand(final JsonCommand command) {
 		
-		 return this.writePlatformService.deleteAsset(command);
+		 return this.writePlatformService.deleteMediaAsset(command);
 	}
 
 }

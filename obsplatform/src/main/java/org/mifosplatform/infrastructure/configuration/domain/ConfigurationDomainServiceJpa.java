@@ -9,7 +9,7 @@ import org.apache.commons.lang.StringUtils;
 import org.mifosplatform.infrastructure.cache.domain.CacheType;
 import org.mifosplatform.infrastructure.cache.domain.PlatformCache;
 import org.mifosplatform.infrastructure.cache.domain.PlatformCacheRepository;
-import org.mifosplatform.infrastructure.configuration.exception.GlobalConfigurationPropertyNotFoundException;
+import org.mifosplatform.infrastructure.configuration.exception.ConfigurationPropertyNotFoundException;
 import org.mifosplatform.useradministration.domain.Permission;
 import org.mifosplatform.useradministration.domain.PermissionRepository;
 import org.mifosplatform.useradministration.exception.PermissionNotFoundException;
@@ -21,15 +21,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class ConfigurationDomainServiceJpa implements ConfigurationDomainService {
 
     private final PermissionRepository permissionRepository;
-    private final GlobalConfigurationRepository globalConfigurationRepository;
+    private final ConfigurationRepository globalConfigurationRepository;
     private final PlatformCacheRepository cacheTypeRepository;
 
     @Autowired
-    public ConfigurationDomainServiceJpa(final PermissionRepository permissionRepository,final GlobalConfigurationRepository globalConfigurationRepository,
+    public ConfigurationDomainServiceJpa(final PermissionRepository permissionRepository, final ConfigurationRepository globalConfigurationRepository,
     		  final PlatformCacheRepository cacheTypeRepository) {
         this.permissionRepository = permissionRepository;
         this.globalConfigurationRepository = globalConfigurationRepository;
-        this.cacheTypeRepository=cacheTypeRepository;
+        this.cacheTypeRepository = cacheTypeRepository;
     }
 
     @Override
@@ -40,8 +40,8 @@ public class ConfigurationDomainServiceJpa implements ConfigurationDomainService
         if (thisTask == null) { throw new PermissionNotFoundException(taskPermissionCode); }
 
         final String makerCheckerConfigurationProperty = "maker-checker";
-        final GlobalConfigurationProperty property = this.globalConfigurationRepository.findOneByName(makerCheckerConfigurationProperty);
-        if (property == null) { throw new GlobalConfigurationPropertyNotFoundException(makerCheckerConfigurationProperty); }
+        final Configuration property = this.globalConfigurationRepository.findOneByName(makerCheckerConfigurationProperty);
+        if (property == null) { throw new ConfigurationPropertyNotFoundException(makerCheckerConfigurationProperty); }
 
         return thisTask.hasMakerCheckerEnabled() && property.isEnabled();
     }
@@ -64,7 +64,7 @@ public class ConfigurationDomainServiceJpa implements ConfigurationDomainService
     @Override
     public boolean isConstraintApproachEnabledForDatatables() {
         final String propertyName = "constraint_approach_for_datatables";
-        final GlobalConfigurationProperty property = this.globalConfigurationRepository.findOneByName(propertyName);
+        final Configuration property = this.globalConfigurationRepository.findOneByName(propertyName);
         return property.isEnabled();
     }
     

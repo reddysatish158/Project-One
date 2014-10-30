@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.mifosplatform.cms.eventpricing.domain;
+package org.mifosplatform.cms.eventprice.domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -13,8 +13,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  * @author pavani
  *
  */
-public interface EventPricingRepository extends
-		JpaRepository<EventPricing, Long>,
-		JpaSpecificationExecutor<EventPricing> {
+public interface EventPriceRepository extends
+		JpaRepository<EventPrice, Long>,
+		JpaSpecificationExecutor<EventPrice> {
 
 }

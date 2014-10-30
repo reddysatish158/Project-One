@@ -1,13 +1,12 @@
 /**
  * 
  */
-package org.mifosplatform.cms.eventpricing.service;
+package org.mifosplatform.cms.eventprice.service;
 
 import java.util.List;
 
-import org.mifosplatform.cms.eventpricing.data.ClientTypeData;
-import org.mifosplatform.cms.eventpricing.data.EventPricingData;
-import org.mifosplatform.cms.eventpricing.domain.EventPricing;
+import org.mifosplatform.cms.eventprice.data.ClientTypeData;
+import org.mifosplatform.cms.eventprice.data.EventPriceData;
 
 /**
  * Interface for {@link EventPricing} Read Service
@@ -15,7 +14,7 @@ import org.mifosplatform.cms.eventpricing.domain.EventPricing;
  * @author pavani
  *
  */
-public interface EventPricingReadPlatformService {
+public interface EventPriceReadPlatformService {
 
 	
 	/**
@@ -24,7 +23,7 @@ public interface EventPricingReadPlatformService {
 	 * @param eventId
 	 * @return
 	 */
-	List<EventPricingData> retrieventPriceData(Long eventId);
+	List<EventPriceData> retrieventPriceData(Long eventId);
 	
 	/**
 	 * Method for Retrieving {@link ClientTypeData}
@@ -39,6 +38,6 @@ public interface EventPricingReadPlatformService {
 	 * @param eventPriceId
 	 * @return
 	 */
-	EventPricingData  retrieventPriceDetails(Long eventPriceId);
+	EventPriceData  retrieventPriceDetails(Long eventPriceId);
 
 }

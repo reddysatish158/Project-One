@@ -53,11 +53,11 @@ public class RoleReadPlatformServiceImpl implements RoleReadPlatformService {
     protected static final class RoleMapper implements RowMapper<RoleData> {
 
         @Override
-        public RoleData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
+        public RoleData mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {
 
-            final Long id = JdbcSupport.getLong(rs, "id");
-            final String name = rs.getString("name");
-            final String description = rs.getString("description");
+            final Long id = JdbcSupport.getLong(resultSet, "id");
+            final String name = resultSet.getString("name");
+            final String description = resultSet.getString("description");
 
             return new RoleData(id, name, description);
         }

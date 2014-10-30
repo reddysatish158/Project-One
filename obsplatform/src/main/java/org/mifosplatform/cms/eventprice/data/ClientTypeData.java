@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.mifosplatform.cms.eventpricing.data;
+package org.mifosplatform.cms.eventprice.data;
 
 /**
  * Class for Client Type
@@ -14,7 +14,7 @@ public class ClientTypeData {
 	private Long id;
 	private String type;
 	
-	public ClientTypeData(final Long id, String type) {
+	public ClientTypeData(final Long id, final String type) {
 		this.id = id;
 		this.type = type;
 	}
@@ -29,7 +29,7 @@ public class ClientTypeData {
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(Long id) {
+	public void setId(final Long id) {
 		this.id = id;
 	}
 
@@ -43,7 +43,7 @@ public class ClientTypeData {
 	/**
 	 * @param type the type to set
 	 */
-	public void setType(String type) {
+	public void setType(final String type) {
 		this.type = type;
 	}
 

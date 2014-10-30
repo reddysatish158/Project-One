@@ -1,10 +1,9 @@
 /**
  * 
  */
-package org.mifosplatform.cms.eventpricing.handler;
+package org.mifosplatform.cms.eventprice.handler;
 
-import org.mifosplatform.cms.eventpricing.domain.EventPricing;
-import org.mifosplatform.cms.eventpricing.service.EventPricingWritePlatformService;
+import org.mifosplatform.cms.eventprice.service.EventPriceWritePlatformService;
 import org.mifosplatform.commands.handler.NewCommandSourceHandler;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
@@ -19,14 +18,15 @@ import org.springframework.stereotype.Service;
  *
  */
 @Service
-public class CloseEventPriceCommandHandler implements NewCommandSourceHandler {
+public class DeleteEventPriceCommandHandler implements NewCommandSourceHandler {
 	
 	@Autowired
-	private EventPricingWritePlatformService eventPricingWritePlatformService;
+	private EventPriceWritePlatformService eventPricingWritePlatformService;
 	
 	@Override
-	public CommandProcessingResult processCommand(JsonCommand command) {
-		return this.eventPricingWritePlatformService.deleteEventPricing(command);
+	public CommandProcessingResult processCommand(final JsonCommand command) {
+		
+		return this.eventPricingWritePlatformService.deleteEventPrice(command);
 	}
 
 }

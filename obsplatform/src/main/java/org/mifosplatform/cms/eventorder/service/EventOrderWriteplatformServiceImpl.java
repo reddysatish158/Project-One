@@ -10,8 +10,8 @@ import org.mifosplatform.cms.eventmaster.domain.EventMasterRepository;
 import org.mifosplatform.cms.eventorder.domain.EventOrder;
 import org.mifosplatform.cms.eventorder.domain.EventOrderRepository;
 import org.mifosplatform.cms.eventorder.domain.EventOrderdetials;
-import org.mifosplatform.cms.eventpricing.domain.EventPricing;
-import org.mifosplatform.cms.eventpricing.domain.EventPricingRepository;
+import org.mifosplatform.cms.eventprice.domain.EventPrice;
+import org.mifosplatform.cms.eventprice.domain.EventPriceRepository;
 import org.mifosplatform.cms.media.domain.MediaAsset;
 import org.mifosplatform.cms.media.exceptions.NoEventMasterFoundException;
 import org.mifosplatform.cms.media.exceptions.NoMoviesFoundException;
@@ -23,8 +23,8 @@ import org.mifosplatform.cms.mediadevice.service.MediaDeviceReadPlatformService;
 import org.mifosplatform.finance.clientbalance.data.ClientBalanceData;
 import org.mifosplatform.finance.clientbalance.service.ClientBalanceReadPlatformService;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -58,8 +58,8 @@ public class EventOrderWriteplatformServiceImpl implements EventOrderWriteplatfo
 	private final EventOrderRepository eventOrderRepository;
 	private final EventMasterRepository eventMasterRepository;
 	private final EventDetailsRepository eventDetailsRepository;
-	private final EventPricingRepository eventPricingRepository;
-	private final GlobalConfigurationRepository configurationRepository; 
+	private final EventPriceRepository eventPricingRepository;
+	private final ConfigurationRepository configurationRepository; 
 	private final MediaDeviceReadPlatformService deviceReadPlatformService;
 	private final EventOrderReadplatformServie eventOrderReadplatformServie;
 	private final ClientBalanceReadPlatformService balanceReadPlatformService;
@@ -73,11 +73,11 @@ public class EventOrderWriteplatformServiceImpl implements EventOrderWriteplatfo
 	public EventOrderWriteplatformServiceImpl(final PlatformSecurityContext context,final EventOrderRepository eventOrderRepository,
 			final EventOrderCommandFromApiJsonDeserializer apiJsonDeserializer,final EventOrderReadplatformServie eventOrderReadplatformServie,
 			final InvoiceOneTimeSale invoiceOneTimeSale,final OneTimeSaleReadPlatformService oneTimeSaleReadPlatformService,
-			final EventMasterRepository eventMasterRepository,final MediaAssetRepository mediaAssetRepository,final EventPricingRepository eventPricingRepository,
+			final EventMasterRepository eventMasterRepository,final MediaAssetRepository mediaAssetRepository,final EventPriceRepository eventPricingRepository,
 			final MediaDeviceReadPlatformService deviceReadPlatformService,final ClientBalanceReadPlatformService balanceReadPlatformService,
 			final EventDetailsRepository eventDetailsRepository,final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,
 			final ActionDetailsReadPlatformService actionDetailsReadPlatformService,final ActiondetailsWritePlatformService actiondetailsWritePlatformService,
-			final OrderDetailsReadPlatformServices orderDetailsReadPlatformServices,final GlobalConfigurationRepository configurationRepository,
+			final OrderDetailsReadPlatformServices orderDetailsReadPlatformServices,final ConfigurationRepository configurationRepository,
 			final ClientRepository clientRepository) {
 		
 		this.context = context;
@@ -112,7 +112,7 @@ public class EventOrderWriteplatformServiceImpl implements EventOrderWriteplatfo
 		try {
 			String response = "";
 			this.context.authenticatedUser();
-			GlobalConfigurationProperty configuration=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIR_PROPERTY_REGISTRATION_DEVICE);
+			Configuration configuration=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIR_PROPERTY_REGISTRATION_DEVICE);
 			this.apiJsonDeserializer.validateForCreate(command.json(),configuration.isEnabled());
 			final Long eventId = command.longValueOfParameterNamed("eventId");
 			final String deviceId = command.stringValueOfParameterNamed("deviceId");
@@ -205,7 +205,7 @@ public class EventOrderWriteplatformServiceImpl implements EventOrderWriteplatfo
 		
 			Long id = eventOrderReadplatformServie.getCurrentRow(command.stringValueOfParameterNamed("formatType"), 
 						command.stringValueOfParameterNamed("optType"), command.longValueOfParameterNamed("clientId"));
-			EventPricing eventPricing = eventPricingRepository.findOne(id);
+			EventPrice eventPricing = eventPricingRepository.findOne(id);
 			eventPricing.setPrice(Double.valueOf(command.stringValueOfParameterNamed("price")));
 			eventPricingRepository.save(eventPricing);
 			return new CommandProcessingResultBuilder().withResourceIdAsString(eventPricing.getPrice().toString()).build();

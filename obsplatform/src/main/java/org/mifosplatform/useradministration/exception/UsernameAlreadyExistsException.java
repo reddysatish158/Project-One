@@ -3,11 +3,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+
 package org.mifosplatform.useradministration.exception;
 
 public class UsernameAlreadyExistsException extends RuntimeException {
 
-    public UsernameAlreadyExistsException(final Throwable e) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public UsernameAlreadyExistsException(final Throwable e) {
         super(e);
     }
 }

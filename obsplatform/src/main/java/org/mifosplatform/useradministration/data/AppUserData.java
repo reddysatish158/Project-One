@@ -27,7 +27,8 @@ public class AppUserData {
     private final Collection<RoleData> availableRoles;
     private final Collection<RoleData> selectedRoles;
 
-    public static AppUserData template(AppUserData user, Collection<OfficeData> officesForDropdown) {
+    public static AppUserData template(final AppUserData user, final Collection<OfficeData> officesForDropdown) {
+    	
         return new AppUserData(user.id, user.username, user.email, user.officeId, user.officeName, user.firstname, user.lastname,
                 user.availableRoles, user.selectedRoles, officesForDropdown);
     }
@@ -46,7 +47,7 @@ public class AppUserData {
         return new AppUserData(id, username, email, officeId, officeName, firstname, lastname, availableRoles, selectedRoles, null);
     }
 
-    private AppUserData(final Long id, final String username, final String email, final Long officeId, final String officeName,
+    public AppUserData(final Long id, final String username, final String email, final Long officeId, final String officeName,
             final String firstname, final String lastname, final Collection<RoleData> availableRoles,
             final Collection<RoleData> selectedRoles, final Collection<OfficeData> allowedOffices) {
         this.id = id;

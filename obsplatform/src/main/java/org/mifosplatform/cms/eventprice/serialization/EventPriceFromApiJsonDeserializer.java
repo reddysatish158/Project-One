@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.mifosplatform.cms.eventpricing.serialization;
+package org.mifosplatform.cms.eventprice.serialization;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.mifosplatform.cms.eventpricing.domain.EventPricing;
 import org.mifosplatform.infrastructure.core.data.ApiParameterError;
 import org.mifosplatform.infrastructure.core.data.DataValidatorBuilder;
 import org.mifosplatform.infrastructure.core.exception.InvalidJsonException;
@@ -32,13 +31,13 @@ import com.google.gson.reflect.TypeToken;
  *
  */
 @Component
-public class EventPricingFromApiJsonDeserializer {
+public class EventPriceFromApiJsonDeserializer {
 
 	private final FromJsonHelper fromApiJsonHelper;
-	private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("clientType","discountId","eventId","formatType","locale","optType","price"));
+	private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("clientType", "discountId", "eventId", "formatType", "locale", "optType", "price"));
 	
 	@Autowired
-	public EventPricingFromApiJsonDeserializer(final FromJsonHelper fromApiJsonHelper) {
+	public EventPriceFromApiJsonDeserializer(final FromJsonHelper fromApiJsonHelper) {
 		this.fromApiJsonHelper = fromApiJsonHelper;
 	}
 	
@@ -55,7 +54,7 @@ public class EventPricingFromApiJsonDeserializer {
         
         final BigDecimal price = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("price", element);
         baseDataValidator.reset().parameter("priority").value(price).notBlank().notExceedingLengthOf(100);
-
+        
         final Long clientType=fromApiJsonHelper.extractLongNamed("clientType", element);
         baseDataValidator.reset().parameter("clientType").value(clientType).notNull();
         

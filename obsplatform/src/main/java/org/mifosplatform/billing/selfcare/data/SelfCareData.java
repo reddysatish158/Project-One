@@ -6,7 +6,7 @@ import org.mifosplatform.crm.ticketmaster.data.TicketMasterData;
 import org.mifosplatform.finance.clientbalance.data.ClientBalanceData;
 import org.mifosplatform.finance.financialtransaction.data.FinancialTransactionsData;
 import org.mifosplatform.finance.payments.data.PaymentData;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
 import org.mifosplatform.organisation.address.data.AddressData;
 import org.mifosplatform.portfolio.client.data.ClientData;
 import org.mifosplatform.portfolio.order.data.OrderData;
@@ -28,9 +28,9 @@ private Long clientId;
 	private List<FinancialTransactionsData> statementsData;
 	private List<PaymentData> paymentsData;
 	private List<TicketMasterData> ticketMastersData;
-	private GlobalConfigurationProperty paypalConfigData;
+	private Configuration paypalConfigData;
 	private String authPin;
-	private GlobalConfigurationProperty paypalConfigDataForIos;
+	private Configuration paypalConfigDataForIos;
 	private Long loginHistoryId; 
 
 	public SelfCareData(Long clientId, String email) {
@@ -136,17 +136,17 @@ private Long clientId;
 
 
 
-	public GlobalConfigurationProperty getPaypalConfigData() {
+	public Configuration getPaypalConfigData() {
 		return paypalConfigData;
 	}
 
 
 
-	public void setPaypalConfigData(GlobalConfigurationProperty paypalConfigData) {
+	public void setPaypalConfigData(Configuration paypalConfigData) {
 		this.paypalConfigData = paypalConfigData;
 	}
 
-	public void setPaypalConfigDataForIos(GlobalConfigurationProperty paypalConfigDataForIos) {
+	public void setPaypalConfigDataForIos(Configuration paypalConfigDataForIos) {
 		this.paypalConfigDataForIos =paypalConfigDataForIos;
 		
 	}

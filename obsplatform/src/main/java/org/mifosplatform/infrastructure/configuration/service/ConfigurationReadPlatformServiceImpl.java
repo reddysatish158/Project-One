@@ -9,8 +9,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.mifosplatform.infrastructure.configuration.data.GlobalConfigurationData;
-import org.mifosplatform.infrastructure.configuration.data.GlobalConfigurationPropertyData;
+import org.mifosplatform.infrastructure.configuration.data.ConfigurationData;
+import org.mifosplatform.infrastructure.configuration.data.ConfigurationPropertyData;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,49 +24,49 @@ public class ConfigurationReadPlatformServiceImpl implements ConfigurationReadPl
 
     private final JdbcTemplate jdbcTemplate;
     private final PlatformSecurityContext context;
-    private final RowMapper<GlobalConfigurationPropertyData> rm;
+    private final RowMapper<ConfigurationPropertyData> rowMap;
 
     @Autowired
     public ConfigurationReadPlatformServiceImpl(final PlatformSecurityContext context, final TenantAwareRoutingDataSource dataSource) {
         this.context = context;
         this.jdbcTemplate = new JdbcTemplate(dataSource);
 
-        rm = new GlobalConfigurationRowMapper();
+        rowMap = new GlobalConfigurationRowMapper();
     }
 
     @Override
-    public GlobalConfigurationData retrieveGlobalConfiguration() {
+    public ConfigurationData retrieveGlobalConfiguration() {
 
         context.authenticatedUser();
 
         final String sql = "SELECT c.id as id, c.name, c.enabled, c.value FROM c_configuration c order by c.id";
-        final List<GlobalConfigurationPropertyData> globalConfiguration = this.jdbcTemplate.query(sql, rm, new Object[] {});
+        final List<ConfigurationPropertyData> globalConfiguration = this.jdbcTemplate.query(sql, rowMap , new Object[] {});
 
-        return new GlobalConfigurationData(globalConfiguration);
+        return new ConfigurationData(globalConfiguration);
     }
 
-    private static final class GlobalConfigurationRowMapper implements RowMapper<GlobalConfigurationPropertyData> {
+    private static final class GlobalConfigurationRowMapper implements RowMapper<ConfigurationPropertyData> {
 
         @Override
-        public GlobalConfigurationPropertyData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
+        public ConfigurationPropertyData mapRow(final ResultSet rs, final int rowNum) throws SQLException {
 
             final String name = rs.getString("name");
             final boolean enabled = rs.getBoolean("enabled");
-            final String value=rs.getString("value");
-            final Long id=rs.getLong("id");
+            final String value = rs.getString("value");
+            final Long id = rs.getLong("id");
 
-            return new GlobalConfigurationPropertyData(id,name, enabled,value);
+            return new ConfigurationPropertyData(id,name, enabled,value);
         }
     }
 
     @Transactional
     @Override
-    public GlobalConfigurationPropertyData retrieveGlobalConfiguration(Long configId) {
+    public ConfigurationPropertyData retrieveGlobalConfiguration(final Long configId) {
 
         this.context.authenticatedUser();
         
         final String sql = "SELECT c.id as id,c.id, c.name, c.enabled, c.value FROM c_configuration c where c.id=? order by c.id";
-        final GlobalConfigurationPropertyData globalConfiguration = this.jdbcTemplate.queryForObject(sql, this.rm, new Object[] {configId});
+        final ConfigurationPropertyData globalConfiguration = this.jdbcTemplate.queryForObject(sql, this.rowMap , new Object[] {configId});
 
         return globalConfiguration;
     }

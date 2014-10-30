@@ -12,22 +12,22 @@ import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.domain.EmailDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class GmailBackedPlatformEmailService implements PlatformEmailService {
-	 private final GlobalConfigurationRepository repository;
+	 private final ConfigurationRepository repository;
 	 String mailId;
      String encodedPassword;
      String decodePassword;
      String hostName;
      String starttlsValue;
      @Autowired
-     public GmailBackedPlatformEmailService(final GlobalConfigurationRepository repository) {
+     public GmailBackedPlatformEmailService(final ConfigurationRepository repository) {
          this.repository = repository;
      }
     @Override
@@ -45,7 +45,7 @@ public class GmailBackedPlatformEmailService implements PlatformEmailService {
         String authpwd ="kirankiran"; //"openbs@13";
 
 =======*/
-        GlobalConfigurationProperty configuration=repository.findOneByName("SMTP");
+        Configuration configuration=repository.findOneByName("SMTP");
         String value= configuration.getValue();
        
         try {

@@ -1,16 +1,15 @@
 /**
  * 
  */
-package org.mifosplatform.cms.eventpricing.service;
+package org.mifosplatform.cms.eventprice.service;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.mifosplatform.cms.eventpricing.data.ClientTypeData;
-import org.mifosplatform.cms.eventpricing.data.EventPricingData;
-import org.mifosplatform.cms.eventpricing.domain.EventPricing;
+import org.mifosplatform.cms.eventprice.data.ClientTypeData;
+import org.mifosplatform.cms.eventprice.data.EventPriceData;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -20,26 +19,24 @@ import org.springframework.stereotype.Service;
 
 /**
  * {@link Service} Class for {@link EventPricing} Read Service
- * implements {@link EventPricingWritePlatformService}
+ * implements {@link EventPriceWritePlatformService}
  * 
  * @author pavani
  *
  */
 @Service
-public class EventPricingReadPlatformServiceImpl implements 
-		EventPricingReadPlatformService {
+public class EventPriceReadPlatformServiceImpl implements 
+		EventPriceReadPlatformService {
 
 	private final JdbcTemplate jdbcTemplate;
 	
 	@Autowired
-	public EventPricingReadPlatformServiceImpl(final TenantAwareRoutingDataSource dataSource) {
+	public EventPriceReadPlatformServiceImpl(final TenantAwareRoutingDataSource dataSource) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
-	/* (non-Javadoc)
-	 * @see org.mifosplatform.billing.eventpricing.service.EventPricingService#priceData()
-	 */
+	
 	@Override
-	public List<EventPricingData> retrieventPriceData(Long eventId) {
+	public List<EventPriceData> retrieventPriceData(final Long eventId) {
 		try {
 			final EventPricingMapper eventPricingMapper = new EventPricingMapper();
 			final String sql = "SELECT " + eventPricingMapper.eventPricingSchema() + " where event_id = ? and is_deleted = 'n'";
@@ -50,7 +47,7 @@ public class EventPricingReadPlatformServiceImpl implements
 	}
 	
 	@Override
-	public EventPricingData retrieventPriceDetails(Long eventPriceId) {
+	public EventPriceData retrieventPriceDetails(final Long eventPriceId) {
 		try {
 			final EventPricingMapper eventPricingMapper = new EventPricingMapper();
 			final String sql = "SELECT " + eventPricingMapper.eventPricingSchema() + " where ep.id = ? and is_deleted = 'n'";
@@ -60,7 +57,7 @@ public class EventPricingReadPlatformServiceImpl implements
 		}
 	}
 	
-	private static final class EventPricingMapper implements RowMapper<EventPricingData>  {
+	private static final class EventPricingMapper implements RowMapper<EventPriceData>  {
 		
 		public String eventPricingSchema() {
 			return " ep.id AS id,em.id AS eventId,em.event_name AS eventName,ep.format_type AS formatType,ep.opt_type AS optType, ep.client_typeid as clientTypeId,"
@@ -71,20 +68,20 @@ public class EventPricingReadPlatformServiceImpl implements
 				   " inner join b_event_master em ON em.id = ep.event_id";
 		}
 		@Override
-		public EventPricingData mapRow(final ResultSet rs, final int rowNum) throws SQLException {
+		public EventPriceData mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {
 			
-			final Long id = rs.getLong("id");
-			final Long eventId = rs.getLong("eventId");
-			final String eventName  = rs.getString("eventName");
-			final String formatType = rs.getString("formatType");
-			final String optType = rs.getString("optType");
-			final Long clientTypeId = rs.getLong("clientTypeId");
-			final Long discountId = rs.getLong("discountId");
-			final String discount = rs.getString("discount");
-			final BigDecimal price = rs.getBigDecimal("price");
-			final String clientType = rs.getString("clientType");
+			final Long id = resultSet.getLong("id");
+			final Long eventId = resultSet.getLong("eventId");
+			final String eventName  = resultSet.getString("eventName");
+			final String formatType = resultSet.getString("formatType");
+			final String optType = resultSet.getString("optType");
+			final Long clientTypeId = resultSet.getLong("clientTypeId");
+			final Long discountId = resultSet.getLong("discountId");
+			final String discount = resultSet.getString("discount");
+			final BigDecimal price = resultSet.getBigDecimal("price");
+			final String clientType = resultSet.getString("clientType");
 			
-			return new EventPricingData(id, eventName, formatType, optType, clientTypeId, discount, price,eventId,clientType,discountId);
+			return new EventPriceData(id, eventName, formatType, optType, clientTypeId, discount, price,eventId,clientType,discountId);
 		}
 		
 	}
@@ -107,10 +104,10 @@ private static final class ClientTypeMapper implements RowMapper<ClientTypeData>
 					+ " inner join m_code mc on mc.id = mcv.code_id " ;
 		}
 		@Override
-		public ClientTypeData mapRow(final ResultSet rs, final int rowNum) throws SQLException {
+		public ClientTypeData mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {
 			
-			final Long id = rs.getLong("id");
-			final String type= rs.getString("type");
+			final Long id = resultSet.getLong("id");
+			final String type= resultSet.getString("type");
 			return new ClientTypeData(id,type);
 		}
 		

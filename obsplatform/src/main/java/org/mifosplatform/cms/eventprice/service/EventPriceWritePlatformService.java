@@ -1,6 +1,5 @@
-package org.mifosplatform.cms.eventpricing.service;
+package org.mifosplatform.cms.eventprice.service;
 
-import org.mifosplatform.cms.eventpricing.domain.EventPricing;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 
@@ -10,7 +9,7 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
  * @author pavani
  *
  */
-public interface EventPricingWritePlatformService {
+public interface EventPriceWritePlatformService {
 
 	/**
 	 * Method for Creating {@link EventPricing}
@@ -18,7 +17,7 @@ public interface EventPricingWritePlatformService {
 	 * @param command
 	 * @return
 	 */
-	CommandProcessingResult createEventPricing(JsonCommand command);
+	CommandProcessingResult createEventPrice(JsonCommand command);
 	
 	/**
 	 * Method for Updating {@link EventPricing}
@@ -26,7 +25,7 @@ public interface EventPricingWritePlatformService {
 	 * @param command
 	 * @return
 	 */
-	CommandProcessingResult updateEventPricing(JsonCommand command);
+	CommandProcessingResult updateEventPrice(JsonCommand command);
 	
 	/**
 	 * Method for Deleting EventPricing
@@ -34,6 +33,6 @@ public interface EventPricingWritePlatformService {
 	 * @param command
 	 * @return
 	 */
-	CommandProcessingResult deleteEventPricing(JsonCommand command);
+	CommandProcessingResult deleteEventPrice(JsonCommand command);
 	
 }

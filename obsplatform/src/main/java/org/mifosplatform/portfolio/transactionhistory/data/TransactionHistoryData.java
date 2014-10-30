@@ -22,7 +22,7 @@ public class TransactionHistoryData {
 		private LocalDate transactionDate;
 		private String history;
 		private String user;
-
+		private String resourceId;
 
 		public TransactionHistoryData() {
 			
@@ -35,11 +35,12 @@ public class TransactionHistoryData {
 			this.history = history;
 		}
 		
-		public TransactionHistoryData(final Long id, final Long clientId, final String transactionType, final LocalDate transactionDate, final String history, String user){
+		public TransactionHistoryData(final Long id, final Long clientId, final String transactionType, final LocalDate transactionDate, final String resourceId, final String history, String user){
 			this.id = id;
 			this.clientId = clientId;
 			this.transactionType = transactionType;
 			this.transactionDate = transactionDate;
+			this.resourceId=resourceId;
 			this.history = history;
 			this.user=user;
 		}

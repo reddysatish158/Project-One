@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.mifosplatform.cms.eventpricing.service;
+package org.mifosplatform.cms.eventprice.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,10 +9,10 @@ import java.util.List;
 import org.mifosplatform.billing.planprice.exceptions.DuplicatEventPrice;
 import org.mifosplatform.cms.eventmaster.domain.EventMaster;
 import org.mifosplatform.cms.eventmaster.domain.EventMasterRepository;
-import org.mifosplatform.cms.eventpricing.data.EventPricingData;
-import org.mifosplatform.cms.eventpricing.domain.EventPricing;
-import org.mifosplatform.cms.eventpricing.domain.EventPricingRepository;
-import org.mifosplatform.cms.eventpricing.serialization.EventPricingFromApiJsonDeserializer;
+import org.mifosplatform.cms.eventprice.data.EventPriceData;
+import org.mifosplatform.cms.eventprice.domain.EventPrice;
+import org.mifosplatform.cms.eventprice.domain.EventPriceRepository;
+import org.mifosplatform.cms.eventprice.serialization.EventPriceFromApiJsonDeserializer;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.ApiParameterError;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
@@ -28,29 +28,29 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * {@link Service} Class for {@link EventPricing} Write Service
- * implements {@link EventPricingWritePlatformService}
+ * implements {@link EventPriceWritePlatformService}
  * 
  * @author pavani
  *
  */
 @Service
-public class EventPricingWritePlatformServiceImpl implements
-		EventPricingWritePlatformService {
+public class EventPriceWritePlatformServiceImpl implements
+		EventPriceWritePlatformService {
 
-	private PlatformSecurityContext context;
-	private EventPricingFromApiJsonDeserializer apiJsonDeserializer;
-	private EventPricingRepository eventPricingRepository;
-	private EventPricingReadPlatformService eventPricingReadPlatformService;
+	private final PlatformSecurityContext context;
+	private final EventPriceFromApiJsonDeserializer apiJsonDeserializer;
+	private final EventPriceRepository eventPricingRepository;
+	private final EventPriceReadPlatformService eventPricingReadPlatformService;
 	private final EventMasterRepository eventMasterRepository;
 	final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
 	final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("eventPricing");
 	
 	
 	@Autowired
-	public EventPricingWritePlatformServiceImpl(PlatformSecurityContext context,
-												EventPricingFromApiJsonDeserializer apiJsonDeserializer,
-												EventPricingRepository eventPricingRepository,final EventMasterRepository eventMasterRepository, 
-												EventPricingReadPlatformService eventPricingReadPlatformService) {
+	public EventPriceWritePlatformServiceImpl(final PlatformSecurityContext context,
+			final EventPriceFromApiJsonDeserializer apiJsonDeserializer,
+			final EventPriceRepository eventPricingRepository,final EventMasterRepository eventMasterRepository, 
+			final EventPriceReadPlatformService eventPricingReadPlatformService) {
 		this.context = context;
 		this.apiJsonDeserializer = apiJsonDeserializer;
 		this.eventPricingRepository = eventPricingRepository;
@@ -61,15 +61,15 @@ public class EventPricingWritePlatformServiceImpl implements
 
 	@Transactional
 	@Override
-	public CommandProcessingResult createEventPricing(JsonCommand command) {
+	public CommandProcessingResult createEventPrice(final JsonCommand command) {
 		try {
 			this.context.authenticatedUser();
 			this.apiJsonDeserializer.validateForCreate(command.json());
-			Long eventId = command.longValueOfParameterNamed("eventId");
-			EventMaster eventMaster=this.eventMasterRepository.findOne(eventId);
-			final EventPricing eventPricing = EventPricing.fromJson(command,eventMaster);
-			List<EventPricingData> eventDetails  = this.eventPricingReadPlatformService.retrieventPriceData(command.entityId());
-				for (EventPricingData eventDetail:eventDetails){
+			final Long eventId = command.longValueOfParameterNamed("eventId");
+			final EventMaster eventMaster=this.eventMasterRepository.findOne(eventId);
+			final EventPrice eventPricing = EventPrice.fromJson(command,eventMaster);
+			final List<EventPriceData> eventDetails  = this.eventPricingReadPlatformService.retrieventPriceData(command.entityId());
+				for (final EventPriceData eventDetail:eventDetails){
 					
 					if(eventPricing.getFormatType().equalsIgnoreCase(eventDetail.getFormatType()) &&
 				   	   eventPricing.getClientType() == eventDetail.getClientType() &&
@@ -85,13 +85,13 @@ public class EventPricingWritePlatformServiceImpl implements
 	}
 	
 	
-	public CommandProcessingResult updateEventPricing(JsonCommand command) {
+	public CommandProcessingResult updateEventPrice(final JsonCommand command) {
 		try{
 			this.apiJsonDeserializer.validateForCreate(command.json());
-			EventPricing eventPrice = this.eventPricingRepository.findOne(command.entityId());
-			EventMaster eventMaster=eventPrice.getEventId();
-			EventPricing newEventPricing = EventPricing.fromJson(command,eventMaster);
-			eventPrice = (EventPricing) UpdateCompareUtil.compare(eventPrice, newEventPricing);
+			EventPrice eventPrice = this.eventPricingRepository.findOne(command.entityId());
+			final EventMaster eventMaster=eventPrice.getEventId();
+			final EventPrice newEventPricing = EventPrice.fromJson(command,eventMaster);
+			eventPrice = (EventPrice) UpdateCompareUtil.compare(eventPrice, newEventPricing);
 			this.eventPricingRepository.save(eventPrice);
 			return new CommandProcessingResultBuilder().withEntityId(eventPrice.getId()).withCommandId(command.commandId()).build();
 		} catch(DataIntegrityViolationException dev) {
@@ -101,9 +101,9 @@ public class EventPricingWritePlatformServiceImpl implements
 	
 	@Transactional
 	@Override
-	public CommandProcessingResult deleteEventPricing(JsonCommand command) {
+	public CommandProcessingResult deleteEventPrice(final JsonCommand command) {
 		try{
-			EventPricing eventPricing = this.eventPricingRepository.findOne(command.entityId());
+			final EventPrice eventPricing = this.eventPricingRepository.findOne(command.entityId());
 			eventPricing.setIsDeleted('y');
 			this.eventPricingRepository.save(eventPricing);
 			return new CommandProcessingResultBuilder().withEntityId(eventPricing.getId()).build();
@@ -112,7 +112,8 @@ public class EventPricingWritePlatformServiceImpl implements
 		}
 	}
 
-	private void throwExceptionIfValidationWarningsExist(List<ApiParameterError> dataValidationErrors) {
+	@SuppressWarnings("unused")
+	private void throwExceptionIfValidationWarningsExist(final List<ApiParameterError> dataValidationErrors) {
          throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist",
                 "Event Price Already Exists.", dataValidationErrors);
     }

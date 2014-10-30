@@ -30,7 +30,6 @@ public class MediaAssetReadPlatformServiceImpl implements MediaAssetReadPlatform
 	private final PlatformSecurityContext context;
 	private final JdbcTemplate jdbcTemplate;
 	
-	
 	@Autowired
 	public MediaAssetReadPlatformServiceImpl(final PlatformSecurityContext context,
 			final TenantAwareRoutingDataSource dataSource) {
@@ -39,20 +38,16 @@ public class MediaAssetReadPlatformServiceImpl implements MediaAssetReadPlatform
 
 	}
 
-
 	@Override
-	public List<MediaAssetData> retrievemediaAssetdata(Long pageNo,String clientType) {
+	public List<MediaAssetData> retrievemediaAssetdata(final Long pageNo, final String clientType) {
 		
-		AllMediaAssestDataMapper mediaAssestDataMapper = new AllMediaAssestDataMapper();
+		final AllMediaAssestDataMapper mediaAssestDataMapper = new AllMediaAssestDataMapper();
 		String sql = null;
-		if(clientType !=null ){
-			
-			sql="select " + mediaAssestDataMapper.mediaAssestDataSchema()+" where m.clientType ='"+clientType+"' LIMIT ?, 10" ;	
+		if(clientType != null ){
+			sql="select " + mediaAssestDataMapper.mediaAssestDataSchema()+" where m.clientType ='" + clientType + "' LIMIT ?, 10" ;	
 		}else{
-			sql="select " + mediaAssestDataMapper.mediaAssestDataSchema()+" LIMIT ?, 10" ;
+			sql="select " + mediaAssestDataMapper.mediaAssestDataSchema() + " LIMIT ?, 10" ;
 		}
-		//
-		
 		return this.jdbcTemplate.query(sql, mediaAssestDataMapper,new Object[] {"", pageNo });
 
 	}
@@ -60,20 +55,18 @@ public class MediaAssetReadPlatformServiceImpl implements MediaAssetReadPlatform
 	private static final class AllMediaAssestDataMapper implements RowMapper<MediaAssetData> {
 
 		@Override
-		public MediaAssetData mapRow(ResultSet rs, int rowNum)
+		public MediaAssetData mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {
+			final Long mediaId = resultSet.getLong("mediaId");
+			final String mediaTitle = resultSet.getString("title");
+			final String mediaImage = resultSet.getString("image");
+			final BigDecimal rating = resultSet.getBigDecimal("rating");
+			final Long eventId = resultSet.getLong("eventId");
+			final String assetTag = resultSet.getString("assetTag");
+			final String quality = resultSet.getString("quality");
+			final String optType = resultSet.getString("optType");
+			final BigDecimal price = resultSet.getBigDecimal("price");
 
-				throws SQLException {
-			Long mediaId = rs.getLong("mediaId");
-			String mediaTitle = rs.getString("title");
-			String mediaImage = rs.getString("image");
-			BigDecimal rating = rs.getBigDecimal("rating");
-			Long eventId=rs.getLong("eventId");
-			String assetTag=rs.getString("assetTag");
-			String quality=rs.getString("quality");
-			String optType=rs.getString("optType");
-			BigDecimal price=rs.getBigDecimal("price");
-
-			return new MediaAssetData(mediaId,mediaTitle,mediaImage,rating,eventId,assetTag,quality,optType,price);
+			return new MediaAssetData(mediaId, mediaTitle, mediaImage, rating, eventId, assetTag, quality, optType, price);
 		}
 		public String mediaAssestDataSchema() {
 
@@ -84,17 +77,15 @@ public class MediaAssetReadPlatformServiceImpl implements MediaAssetReadPlatform
 	private static final class MediaAssestDataMapper implements RowMapper<MediaAssetData> {
 
 		@Override
-		public MediaAssetData mapRow(ResultSet rs, int rowNum)
+		public MediaAssetData mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {
+			final Long mediaId = resultSet.getLong("mediaId");
+			final String mediaTitle = resultSet.getString("title");
+			final String mediaImage = resultSet.getString("image");
+			final BigDecimal rating = resultSet.getBigDecimal("rating");
+			final Long eventId = resultSet.getLong("eventId");
+			final String assetTag = resultSet.getString("assetTag");
 
-				throws SQLException {
-			Long mediaId = rs.getLong("mediaId");
-			String mediaTitle = rs.getString("title");
-			String mediaImage = rs.getString("image");
-			BigDecimal rating = rs.getBigDecimal("rating");
-			Long eventId=rs.getLong("eventId");
-			String assetTag=rs.getString("assetTag");
-
-			return new MediaAssetData(mediaId,mediaTitle,mediaImage,rating,eventId,assetTag,null,null,null);
+			return new MediaAssetData(mediaId, mediaTitle, mediaImage, rating, eventId, assetTag, null, null, null);
 		}
 		public String mediaAssestDataSchema() {
 
@@ -103,10 +94,7 @@ public class MediaAssetReadPlatformServiceImpl implements MediaAssetReadPlatform
 		/*public String mediaAssestDataSchemaforCommingMovice() {
 
 			return "m.id AS mediaId, m.title AS title,m.image AS image,m.rating AS rating,0 as eventId,assetTag  FROM b_media_asset m ";
-
-
 		}
-		
 		
 		public String mediaAssestDataSchemaforWatchedMovies() {
 
@@ -123,288 +111,246 @@ public class MediaAssetReadPlatformServiceImpl implements MediaAssetReadPlatform
 	}
 
 		@Override
-		public List<MediaAssetData> retrievemediaAssetdatabyNewRealease(Long pageNo) {
-			MediaAssestDataMapper mediaAssestDataMapper = new MediaAssestDataMapper();
+		public List<MediaAssetData> retrievemediaAssetdatabyNewRealease(final Long pageNo) {
+			final MediaAssestDataMapper mediaAssestDataMapper = new MediaAssestDataMapper();
 			String sql = "select *, ? as assetTag from mvNewRelease_vw  LIMIT ?, 10" ;
-			return this.jdbcTemplate.query(sql, mediaAssestDataMapper,new Object[] { "N",pageNo });
-     }
-		 
-
-		@Override
-		public List<MediaAssetData> retrievemediaAssetdatabyRating(Long pageNo) {
-			MediaAssestDataMapper mediaAssestDataMapper = new MediaAssestDataMapper();
-			String sql = "select *,? as assetTag from mvHighRate_vw  LIMIT ?, 10" ;
-			return this.jdbcTemplate.query(sql, mediaAssestDataMapper,new Object[] { "R",pageNo });
+			return this.jdbcTemplate.query(sql, mediaAssestDataMapper, new Object[] { "N",pageNo });
 		}
-
+		 
+		@Override
+		public List<MediaAssetData> retrievemediaAssetdatabyRating(final Long pageNo) {
+			final MediaAssestDataMapper mediaAssestDataMapper = new MediaAssestDataMapper();
+			String sql = "select *,? as assetTag from mvHighRate_vw  LIMIT ?, 10" ;
+			return this.jdbcTemplate.query(sql, mediaAssestDataMapper, new Object[] { "R",pageNo });
+		}
 
 		@Override
 		public List<MediaAssetData> retrieveAllmediaAssetdata() {
-			MediaAssestDataMapper mediaAssestDataMapper = new MediaAssestDataMapper();
-			String sql = "select " + mediaAssestDataMapper.mediaAssestDataSchema();
-			return this.jdbcTemplate.query(sql, mediaAssestDataMapper,new Object[] { "As" });
+			final  MediaAssestDataMapper mediaAssestDataMapper = new MediaAssestDataMapper();
+			final String sql = "select " + mediaAssestDataMapper.mediaAssestDataSchema();
+			return this.jdbcTemplate.query(sql, mediaAssestDataMapper, new Object[] { "As" });
 		}
 
 		@Override
-		public Long retrieveNoofPages( String query) {
-			NOOfPages pages = new NOOfPages();
-			String sql = "select " + pages.mediaAssestDataSchemaForPages(query) ;
-			return this.jdbcTemplate.queryForObject(sql, pages,new Object[] { });
-     }
+		public Long retrieveNoofPages(final String query) {
+			final NOOfPages pages = new NOOfPages();
+			final String sql = "select " + pages.mediaAssestDataSchemaForPages(query) ;
+			return this.jdbcTemplate.queryForObject(sql, pages, new Object[] { });
+		}
 		private static final class NOOfPages implements	RowMapper<Long> {
 
-	public Long mapRow(ResultSet rs, int rowNum) throws SQLException {
-		Long noOfpages = rs.getLong("no_ofpages");
-
-		return noOfpages;
-	}
-	public String mediaAssestDataSchemaForPages(String query) {
-		return " ceil(count(0)/10) as no_ofpages from ("+query+")a";
-	}
+			public Long mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {
+				 
+				return resultSet.getLong("no_ofpages");
+			}
+			
+			public String mediaAssestDataSchemaForPages(final String query) {
+				return " ceil(count(0)/10) as no_ofpages from (" + query + ")a";
+			}
 		}
 
-		
 		@Override
-		public MediaAssetData retrievemediaAsset(Long id) {
+		public MediaAssetData retrievemediaAsset(final Long id) {
 			try{
-			AssestDataMapper mapper = new AssestDataMapper();
-			String sql = "Select " + mapper.scheme() + "  m.id=?";
-			return this.jdbcTemplate.queryForObject(sql, mapper,new Object[]{ id });
+				final AssestDataMapper mapper = new AssestDataMapper();
+				final String sql = "Select " + mapper.scheme() + "  m.id=?";
+				return this.jdbcTemplate.queryForObject(sql, mapper, new Object[]{ id });
 			}catch(EmptyResultDataAccessException accessException){
 				return null;
 			}
 		} 
 		
 		@Override
-		public List<MediaAssetData> retrievemediaAssetdatabyDiscountedMovies(Long pageNo) {
-			MediaAssestDataMapper mediaAssestDataMapper = new MediaAssestDataMapper();
+		public List<MediaAssetData> retrievemediaAssetdatabyDiscountedMovies(final Long pageNo) {
+			final MediaAssestDataMapper mediaAssestDataMapper = new MediaAssestDataMapper();
 			String sql = "select *, ? as assetTag from mvDiscount_vw  LIMIT ?, 10 ";
-			return this.jdbcTemplate.query(sql, mediaAssestDataMapper,new Object[] { "D",pageNo });
-}
-
+			return this.jdbcTemplate.query(sql, mediaAssestDataMapper, new Object[] { "D",pageNo });
+		}
 
 		@Override
-		public List<MediaAssetData> retrievemediaAssetdatabyPromotionalMovies(Long pageNo) {
-			MediaAssestDataMapper mediaAssestDataMapper = new MediaAssestDataMapper();
+		public List<MediaAssetData> retrievemediaAssetdatabyPromotionalMovies(final Long pageNo) {
+			final MediaAssestDataMapper mediaAssestDataMapper = new MediaAssestDataMapper();
 			String sql = "select *,? as assetTag from mvPromotion_vw LIMIT ?, 10"; 
-			return this.jdbcTemplate.query(sql, mediaAssestDataMapper,new Object[] {"P", pageNo });
-}
-
+			return this.jdbcTemplate.query(sql, mediaAssestDataMapper, new Object[] {"P", pageNo });
+		}
 
 		@Override
-		public List<MediaAssetData> retrievemediaAssetdatabyComingSoonMovies(Long pageNo) {
-			MediaAssestDataMapper mediaAssestDataMapper = new MediaAssestDataMapper();
+		public List<MediaAssetData> retrievemediaAssetdatabyComingSoonMovies(final Long pageNo) {
+			final MediaAssestDataMapper mediaAssestDataMapper = new MediaAssestDataMapper();
 			String sql = "select  *,? as assetTag from mvComing_vw LIMIT ?, 10;";
-			return this.jdbcTemplate.query(sql, mediaAssestDataMapper,new Object[] {"C",pageNo });
+			return this.jdbcTemplate.query(sql, mediaAssestDataMapper, new Object[] {"C",pageNo });
 		}
 
-
 		@Override
-		public List<MediaAssetData> retrievemediaAssetdatabyMostWatchedMovies(Long pageNo) {
-			MediaAssestDataMapper mediaAssestDataMapper = new MediaAssestDataMapper();
+		public List<MediaAssetData> retrievemediaAssetdatabyMostWatchedMovies(final Long pageNo) {
+			final MediaAssestDataMapper mediaAssestDataMapper = new MediaAssestDataMapper();
 			String sql = "select *,? as assetTag  from mvWatched_vw Limit ?,10 "; 
-			return this.jdbcTemplate.query(sql, mediaAssestDataMapper,new Object[] { "W",pageNo });
+			return this.jdbcTemplate.query(sql, mediaAssestDataMapper, new Object[] { "W",pageNo });
 		}
 
 		@Override
-		public List<MediaAssetData> retrievemediaAssetdatabySearching(Long pageNo, String filterType) {
-			MediaAssestDataMapper mediaAssestDataMapper = new MediaAssestDataMapper();
-			String sql = "select " + mediaAssestDataMapper.mediaAssestDataSchema()+"  where upper(m.title) like upper('%"+filterType+"%')  GROUP BY m.mediaId  having  media_count = 1  LIMIT ?, 10" ;
-			return this.jdbcTemplate.query(sql, mediaAssestDataMapper,new Object[] {"A", pageNo });
+		public List<MediaAssetData> retrievemediaAssetdatabySearching(final Long pageNo, final String filterType) {
+			final MediaAssestDataMapper mediaAssestDataMapper = new MediaAssestDataMapper();
+			final String sql = "select " + mediaAssestDataMapper.mediaAssestDataSchema()+"  where upper(m.title) like upper('%"+filterType+"%')  GROUP BY m.mediaId  having  media_count = 1  LIMIT ?, 10" ;
+			return this.jdbcTemplate.query(sql, mediaAssestDataMapper, new Object[] {"A", pageNo });
 
 		}
-
 
 		@Override
 		public List<MediaAssetData> retrieveAllAssetdata() {
-			MediaDataMapper mediaAssestDataMapper = new MediaDataMapper();
-			String sql = "select " + mediaAssestDataMapper.mediaAssestDataSchema() ;
+			final MediaDataMapper mediaAssestDataMapper = new MediaDataMapper();
+			final String sql = "select " + mediaAssestDataMapper.mediaAssestDataSchema() ;
 			return this.jdbcTemplate.query(sql, mediaAssestDataMapper,new Object[] {});
 
 		}
 
-
 		@Override
 		public List<MediaAssetData> retrieveAllMediaTemplatedata() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
-
 		@Override
 		public List<MediaassetAttribute> retrieveMediaAttributes() {
-			MediaAttributeMapper mapper=new MediaAttributeMapper();
-			String sql="select "+mapper.scheme() +" m.code_name='MediaAttribute'";
-			return this.jdbcTemplate.query(sql, mapper,new Object[] {});
+			final MediaAttributeMapper mapper=new MediaAttributeMapper();
+			final String sql="select " + mapper.scheme() + " m.code_name='MediaAttribute'";
+			return this.jdbcTemplate.query(sql, mapper, new Object[] {});
 		}
 		
+		private static final class MediaAttributeMapper implements RowMapper<MediaassetAttribute> {
+
+			@Override
+			public MediaassetAttribute mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {
+				final Long mediaId = resultSet.getLong("id");
+				final String mediaName = resultSet.getString("codeValue");
 		
-		private static final class MediaAttributeMapper implements
-		RowMapper<MediaassetAttribute> {
-
-	@Override
-	public MediaassetAttribute mapRow(ResultSet rs, int rowNum)
-
-			throws SQLException {
-		Long mediaId = rs.getLong("id");
-		String mediaName = rs.getString("codeValue");
-		
-		return new MediaassetAttribute(mediaId,mediaName);
-	}
-	public String scheme() {
-
-		return " mc.id as id,mc.code_value as codeValue FROM m_code_value mc,m_code m where mc.code_id=m.id and ";
-
-
-	}
-
+				return new MediaassetAttribute(mediaId, mediaName);
+			}
+			public String scheme() {
+				return " mc.id as id,mc.code_value as codeValue FROM m_code_value mc,m_code m where mc.code_id=m.id and ";
+			}
 		}
 		
-		
-		private static final class MediaDataMapper implements
-		RowMapper<MediaAssetData> {
+		private static final class MediaDataMapper implements RowMapper<MediaAssetData> {
 
-	@Override
-	public MediaAssetData mapRow(ResultSet rs, int rowNum)
-
-			throws SQLException {
-		Long mediaId = rs.getLong("id");
-		String mediaTitle = rs.getString("mediaTitle");
-		String status=rs.getString("status");
-		String EventCategory=rs.getString("EventCategory");
-		String mediaCategory=rs.getString("mediaCategory");
-		String contentProviderValue=rs.getString("contentProviderValue");
-		BigDecimal share=rs.getBigDecimal("share");
-		LocalDate releaseDate=JdbcSupport.getLocalDate(rs,"releaseDate");
-		//BigDecimal rating=rs.getBigDecimal("rating");
-		
-		return new MediaAssetData(mediaId,mediaTitle,status,releaseDate,share,EventCategory,mediaCategory,contentProviderValue);
-	}
-	public String mediaAssestDataSchema() {
-		/*return " m.id AS id,  m.title AS mediaTitle,m.status AS status,m.release_date as releaseDate,m.rating as rating"
-				+" FROM b_media_asset m where m.is_deleted='N'";*/
-		 return " m.id AS id,m.title AS mediaTitle,m.status AS status,"+
-				"(select code_value from m_code_value v where v.id=m.type) as EventCategory,"+
-				"(select code_value from m_code_value v where v.id=m.category_id) as mediaCategory,"+
-				"(select code_value from m_code_value v where v.id=m.content_provider) as contentProviderValue,"+
-				"m.cp_share as share,m.release_date as releaseDate FROM b_media_asset m where m.is_deleted='N'";
-	}
-	
-
+			@Override
+			public MediaAssetData mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {
+				final Long mediaId = resultSet.getLong("id");
+				final String mediaTitle = resultSet.getString("mediaTitle");
+				final String status = resultSet.getString("status");
+				final String EventCategory = resultSet.getString("EventCategory");
+				final String mediaCategory = resultSet.getString("mediaCategory");
+				final String contentProviderValue = resultSet.getString("contentProviderValue");
+				final BigDecimal share = resultSet.getBigDecimal("share");
+				final LocalDate releaseDate = JdbcSupport.getLocalDate(resultSet,"releaseDate");
+				
+				return new MediaAssetData(mediaId, mediaTitle, status, releaseDate, share, EventCategory, mediaCategory, contentProviderValue);
+			}
+			
+			public String mediaAssestDataSchema() {
+				
+				return " m.id AS id,m.title AS mediaTitle,m.status AS status,"+
+					"(select code_value from m_code_value v where v.id=m.type) as EventCategory,"+
+					"(select code_value from m_code_value v where v.id=m.category_id) as mediaCategory,"+
+					"(select code_value from m_code_value v where v.id=m.content_provider) as contentProviderValue,"+
+					"m.cp_share as share,m.release_date as releaseDate FROM b_media_asset m where m.is_deleted='N'";
+			}
 		}
 
 		@Override
 		public List<MediaassetAttribute> retrieveMediaFormatType() {
-			MediaAttributeMapper mapper=new MediaAttributeMapper();
-			String sql="select "+mapper.scheme() +" m.code_name='MediaFormat'";
-			return this.jdbcTemplate.query(sql, mapper,new Object[] {});
+			final MediaAttributeMapper mapper = new MediaAttributeMapper();
+			final String sql = "select " + mapper.scheme() +" m.code_name='MediaFormat'";
+			return this.jdbcTemplate.query(sql, mapper, new Object[] {});
 		}
-		private static final class AssestDataMapper implements
-		RowMapper<MediaAssetData> {
+		
+		private static final class AssestDataMapper implements RowMapper<MediaAssetData> {
 
-	@Override
-	public MediaAssetData mapRow(ResultSet rs, int rowNum)
+			@Override
+			public MediaAssetData mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {
+				final Long mediaId = resultSet.getLong("id");
+				final String mediatitle = resultSet.getString("title");
+				final String type = resultSet.getString("type");
+				final String genre = resultSet.getString("genre");
+				final Long catageoryId = resultSet.getLong("catageoryId");
+				final LocalDate releaseDate = JdbcSupport.getLocalDate(resultSet ,"releaseDate");
+				final String subject = resultSet.getString("subject");
+				final String overview = resultSet.getString("overview");
+				final String image = resultSet.getString("image");
+				final Long contentProvider = resultSet.getLong("contentProvider");
+				final String rated = resultSet.getString("rated");
+				final BigDecimal rating = resultSet.getBigDecimal("rating");
+				final Long ratingCount = resultSet.getLong("ratingCount");
+				final String status = resultSet.getString("status");
+				final String duration = resultSet.getString("duration");
+				final BigDecimal cpShareValue = resultSet.getBigDecimal("cpShareValue");
 
-			throws SQLException {
-		final Long mediaId = rs.getLong("id");
-		final String mediatitle = rs.getString("title");
-		final String type = rs.getString("type");
-		final String genre = rs.getString("genre");
-		final Long catageoryId = rs.getLong("catageoryId");
-		final LocalDate releaseDate = JdbcSupport.getLocalDate(rs,"releaseDate");
-		final String subject = rs.getString("subject");
-		final String overview = rs.getString("overview");
-		final String image = rs.getString("image");
-		final Long contentProvider = rs.getLong("contentProvider");
-		final String rated=rs.getString("rated");
-		final BigDecimal rating=rs.getBigDecimal("rating");
-		final Long ratingCount=rs.getLong("ratingCount");
-		final String status=rs.getString("status");
-		final String duration=rs.getString("duration");
-		final BigDecimal cpShareValue=rs.getBigDecimal("cpShareValue");
+				return new MediaAssetData(mediaId, mediatitle, type, genre, catageoryId, releaseDate, subject, overview, image, contentProvider, 
+						rated, rating, ratingCount, status, duration, cpShareValue);
+			}
+			public String scheme() {
 
-		return new MediaAssetData(mediaId,mediatitle,type,genre,catageoryId,releaseDate,subject,overview,image,contentProvider,
-				rated,rating,ratingCount,status,duration,cpShareValue);
-	}
-	public String scheme() {
-
-		return " m.id as id,m.title as title,m.type as type,m.category_id as catageoryId,m.genre as genre,m.release_date as releaseDate,"
-			  +"m.overview as overview,m.subject as subject,m.image as image,m.content_provider as contentProvider,m.rated as rated, "
-			 +"m.rating as rating,m.rating_count as ratingCount,m.status as status,m.duration as duration,m.cp_share as cpShareValue FROM b_media_asset m where m.is_deleted='N' and ";
-
-
-	}
-
+				return " m.id as id,m.title as title,m.type as type,m.category_id as catageoryId,m.genre as genre,m.release_date as releaseDate,"
+						+"m.overview as overview,m.subject as subject,m.image as image,m.content_provider as contentProvider,m.rated as rated, "
+						+"m.rating as rating,m.rating_count as ratingCount,m.status as status,m.duration as duration,m.cp_share as cpShareValue FROM b_media_asset m where m.is_deleted='N' and ";
+			}
 		}
 
 		@Override
 		public List<MediaEnumoptionData> retrieveMediaTypeData() {
-			MediaEnumoptionData movies = MediaTypeEnumaration.enumOptionData(MediaEnum.MOVIES);
-            MediaEnumoptionData tvSerails=MediaTypeEnumaration.enumOptionData(MediaEnum.TV_SERIALS);
-            MediaEnumoptionData comingSoon=MediaTypeEnumaration.enumOptionData(MediaEnum.COMING_SOON);
+			final MediaEnumoptionData movies = MediaTypeEnumaration.enumOptionData(MediaEnum.MOVIES);
+			final MediaEnumoptionData tvSerails = MediaTypeEnumaration.enumOptionData(MediaEnum.TV_SERIALS);
+			final MediaEnumoptionData comingSoon = MediaTypeEnumaration.enumOptionData(MediaEnum.COMING_SOON);
             
-			List<MediaEnumoptionData> categotyType = Arrays.asList(movies,tvSerails,comingSoon);
+			final List<MediaEnumoptionData> categotyType = Arrays.asList(movies, tvSerails, comingSoon);
 				return categotyType;
 		}
 
 		@Override
 		public List<McodeData> retrieveMedaiCategory() {
 			context.authenticatedUser();
-
-			SystemDataMapper mapper = new SystemDataMapper();
-
-			String sql = "select " + mapper.schema();
-
+			final SystemDataMapper mapper = new SystemDataMapper();
+			final String sql = "select " + mapper.schema();
 			return this.jdbcTemplate.query(sql, mapper, new Object[] { "Asset Category" });
 		}
 
 		private static final class SystemDataMapper implements RowMapper<McodeData> {
 
 			public String schema() {
-
-
 				return " mc.id as id,mc.code_value as codeValue from m_code m,m_code_value mc where m.id = mc.code_id and m.code_name=? ";
-
 			}
-
+			
 			@Override
-			public McodeData mapRow(ResultSet rs, int rowNum) throws SQLException {
+			public McodeData mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {
 				
-				Long id=rs.getLong("id");
-				String codeValue = rs.getString("codeValue");
-				return new McodeData(id,codeValue);
-				
+				final Long id = resultSet.getLong("id");
+				final String codeValue = resultSet.getString("codeValue");
+				return new McodeData(id, codeValue);
 			}
-
 		}
 
 		@Override
 		public List<McodeData> retrieveLanguageCategeories() {
 			context.authenticatedUser();
-
-			SystemDataMapper mapper = new SystemDataMapper();
-
-			String sql = "select " + mapper.schema();
+			final SystemDataMapper mapper = new SystemDataMapper();
+			final String sql = "select " + mapper.schema();
 
 			return this.jdbcTemplate.query(sql, mapper, new Object[] { "Asset language" });
 		}
 
-
 		@Override
-		public List<MediaassetAttributeData> retrieveMediaassetAttributesData(
-				Long mediaId) {
+		public List<MediaassetAttributeData> retrieveMediaassetAttributesData(final Long mediaId) {
+			
 			try{
-				MediaassetAttributesDataMapper mapper=new MediaassetAttributesDataMapper();			
-			    String sql="select "+mapper.scheme() +mediaId;
-			    return this.jdbcTemplate.query(sql, mapper,new Object[] {});
+				final MediaassetAttributesDataMapper mapper=new MediaassetAttributesDataMapper();			
+				final String sql="select " + mapper.scheme() + mediaId;
+			    return this.jdbcTemplate.query(sql, mapper, new Object[] {});
 		     
 			    }catch (final EmptyResultDataAccessException e) {
 					return null;
 				}
 		}
-private static final class MediaassetAttributesDataMapper implements RowMapper<MediaassetAttributeData> {
+		private static final class MediaassetAttributesDataMapper implements RowMapper<MediaassetAttributeData> {
 
-			
 			public String scheme() {
 				return " ma.id as id,ma.attribute_type as attributeType,ma.attribute_name as attributeName,ma.attribute_value as attributeValue," +
 						"ma.attribute_nickname as attributeNickname,ma.attribute_image as attributeImage from b_mediaasset_attributes ma " +
@@ -412,66 +358,54 @@ private static final class MediaassetAttributesDataMapper implements RowMapper<M
 			}
 			
 			@Override
-			public MediaassetAttributeData mapRow(ResultSet rs, int rowNum)
-					throws SQLException {
-				// TODO Auto-generated method stub
-				Long id=rs.getLong("id");
-				String attributeType=rs.getString("attributeType");
-				Long attributeName=rs.getLong("attributeName");
-				String attributeValue=rs.getString("attributeValue");
-				String attributeNickname=rs.getString("attributeNickname");
-				String attributeImage=rs.getString("attributeImage");
+			public MediaassetAttributeData mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {
+				final Long id = resultSet.getLong("id");
+				final String attributeType = resultSet.getString("attributeType");
+				final Long attributeName = resultSet.getLong("attributeName");
+				final String attributeValue = resultSet.getString("attributeValue");
+				final String attributeNickname = resultSet.getString("attributeNickname");
+				final String attributeImage = resultSet.getString("attributeImage");
 				
-				return new MediaassetAttributeData(attributeType,attributeName,attributeValue,attributeNickname,attributeImage,id);
+				return new MediaassetAttributeData(attributeType, attributeName, attributeValue, attributeNickname, attributeImage, id);
 			}
-			
-			
 		}
 
-	
-
 		@Override
-		public List<MediaLocationData> retrievemediaAssetLocationdata(
-				Long mediaId) {
+		public List<MediaLocationData> retrievemediaAssetLocationdata(final Long mediaId) {
 			try{
-				MediaLocationDataMapper mapper=new MediaLocationDataMapper();			
-		    	String sql="select "+mapper.scheme() +mediaId;
-		    	return this.jdbcTemplate.query(sql, mapper,new Object[] {});
+				final MediaLocationDataMapper mapper = new MediaLocationDataMapper();			
+				final String sql = "select " + mapper.scheme() + mediaId;
+		    	return this.jdbcTemplate.query(sql, mapper, new Object[] {});
 			
 			}catch (final EmptyResultDataAccessException e) {
 			    return null;
 			}
-		
 		}
 		
-private static final class MediaLocationDataMapper implements RowMapper<MediaLocationData> {
+		private static final class MediaLocationDataMapper implements RowMapper<MediaLocationData> {
 
-			
 			public String scheme() {
 				return " ml.id as id,ml.language_id as languageId,ml.format_type as formatType,ml.location as location from " +
 						"b_mediaasset_location ml where ml.media_id= ";
 			}
 			
 			@Override
-			public MediaLocationData mapRow(ResultSet rs, int rowNum)
+			public MediaLocationData mapRow(final ResultSet resultSet, final int rowNum)
 					throws SQLException {
-				// TODO Auto-generated method stub
-				Long id=rs.getLong("id");
-				Long languageId=rs.getLong("languageId");
-				String formatType=rs.getString("formatType");
-				String location=rs.getString("location");
 				
-				return new MediaLocationData(languageId,formatType,location);
+				final Long languageId = resultSet.getLong("languageId");
+				final String formatType = resultSet.getString("formatType");
+				final String location = resultSet.getString("location");
+				
+				return new MediaLocationData(languageId, formatType, location);
 			}
-			
 		}
 
      @Override
       public List<McodeData> retrieveContentProviders() {
 	         context.authenticatedUser();
-	           SystemDataMapper mapper = new SystemDataMapper();
-	           String sql = "select " + mapper.schema();
-	           return this.jdbcTemplate.query(sql, mapper, new Object[] { "Content Provider" });
-  }
-
+	         final SystemDataMapper mapper = new SystemDataMapper();
+	         final String sql = "select " + mapper.schema();
+	         return this.jdbcTemplate.query(sql, mapper, new Object[] { "Content Provider" });
+     }
 }

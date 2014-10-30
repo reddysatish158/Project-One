@@ -28,8 +28,8 @@ import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.mifosplatform.finance.billingorder.exceptions.BillingOrderNoRecordsFoundException;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.ApiRequestParameterHelper;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
@@ -68,13 +68,13 @@ public class OrdersApiResource {
 	  private final MCodeReadPlatformService mCodeReadPlatformService;
 	  private final ApiRequestParameterHelper apiRequestParameterHelper;
 	  private final PaymodeReadPlatformService paymodeReadPlatformService;
-	  private final GlobalConfigurationRepository configurationRepository;
+	  private final ConfigurationRepository configurationRepository;
 	  private final DefaultToApiJsonSerializer<OrderData> toApiJsonSerializer;
 	  private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 	  
 
 	  @Autowired
-	   public OrdersApiResource(final PlatformSecurityContext context,final GlobalConfigurationRepository configurationRepository,  
+	   public OrdersApiResource(final PlatformSecurityContext context,final ConfigurationRepository configurationRepository,  
 	   final DefaultToApiJsonSerializer<OrderData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper,
 	   final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,final OrderReadPlatformService orderReadPlatformService,
 	   final PlanReadPlatformService planReadPlatformService,final PaymodeReadPlatformService paymodeReadPlatformService,
@@ -208,7 +208,7 @@ public class OrdersApiResource {
     public String retrieveRenewalOrderDetails(@QueryParam("orderId")final Long orderId,@QueryParam("planType")final String planType, @Context final UriInfo uriInfo) {
         context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
     	List<SubscriptionData> contractPeriods=this.planReadPlatformService.retrieveSubscriptionData(orderId,planType);
-    	GlobalConfigurationProperty configurationProperty=this.configurationRepository.findOneByName(CONFIG_PROPERTY);
+    	Configuration configurationProperty=this.configurationRepository.findOneByName(CONFIG_PROPERTY);
     	
     	for(int i=0;i<contractPeriods.size();i++){
     		if(contractPeriods.get(i).getContractdata().equalsIgnoreCase("Perpetual")){

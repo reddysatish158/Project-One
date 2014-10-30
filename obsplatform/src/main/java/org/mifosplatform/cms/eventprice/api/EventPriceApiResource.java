@@ -1,4 +1,7 @@
-package org.mifosplatform.cms.eventpricing.api;
+/**
+ * 
+ */
+package org.mifosplatform.cms.eventprice.api;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -22,10 +25,10 @@ import org.mifosplatform.billing.discountmaster.service.DiscountReadPlatformServ
 import org.mifosplatform.billing.planprice.service.PriceReadPlatformService;
 import org.mifosplatform.cms.eventmaster.data.EventDetailsData;
 import org.mifosplatform.cms.eventmaster.service.EventMasterReadPlatformService;
-import org.mifosplatform.cms.eventpricing.data.ClientTypeData;
-import org.mifosplatform.cms.eventpricing.data.EventPricingData;
-import org.mifosplatform.cms.eventpricing.domain.EventPricing;
-import org.mifosplatform.cms.eventpricing.service.EventPricingReadPlatformService;
+import org.mifosplatform.cms.eventprice.data.ClientTypeData;
+import org.mifosplatform.cms.eventprice.data.EventPriceData;
+import org.mifosplatform.cms.eventprice.domain.EventPrice;
+import org.mifosplatform.cms.eventprice.service.EventPriceReadPlatformService;
 import org.mifosplatform.cms.mediadetails.data.MediaAssetLocationDetails;
 import org.mifosplatform.cms.mediadetails.service.MediaAssetDetailsReadPlatformService;
 import org.mifosplatform.commands.domain.CommandWrapper;
@@ -43,46 +46,49 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-
+/**
+ * Class to Create, Update and Delete {@link EventPrice}
+ * @author Rakesh
+ */
 @Path("/eventprice")
 @Component
 @Scope("singleton")
-public class EventPricingApiResource {
+public class EventPriceApiResource {
 	
-	private final Set<String> RESPONSE_PARAMETERS = new HashSet<String>(Arrays.asList("id","eventId","discountId","formatType","optType","clientType","discount","price",
-			"eventName","clientTypeId"));
+	private final Set<String> RESPONSE_PARAMETERS = new HashSet<String>(Arrays.asList("id", "eventId", "discountId", "formatType", "optType", "clientType", "discount", "price",
+			"eventName", "clientTypeId"));
 	
 	private final String resourceNameForPermissions = "EVENTPRICE";
 	private final PlatformSecurityContext context;
-	private EventMasterReadPlatformService eventMasterReadPlatformService;
-	private MediaAssetDetailsReadPlatformService assetDetailsReadPlatformService;
-	private EventPricingReadPlatformService eventPricingReadService;
-	private ApiRequestParameterHelper apiRequestParameterHelper;
-	private DefaultToApiJsonSerializer<EventPricingData> apiJsonSerializer;
-	private PriceReadPlatformService priceReadPlatformService;
+	private final EventMasterReadPlatformService eventMasterReadPlatformService;
+	private final MediaAssetDetailsReadPlatformService assetDetailsReadPlatformService;
+	private final EventPriceReadPlatformService eventPricingReadService;
+	private final ApiRequestParameterHelper apiRequestParameterHelper;
+	private final DefaultToApiJsonSerializer<EventPriceData> apiJsonSerializer;
 	private final DiscountReadPlatformService discountReadPlatformService;
-	private PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService;
+	private final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService;
 	
 	@Autowired
-	public EventPricingApiResource(final EventMasterReadPlatformService eventMasterReadPlatformService,final MediaAssetDetailsReadPlatformService assetReadPlatformService,
-								   final EventPricingReadPlatformService eventPricingReadService,final ApiRequestParameterHelper apiRequestParameterHelper,
-								   final DefaultToApiJsonSerializer<EventPricingData> apiJsonSerializer,final PriceReadPlatformService priceReadPlatformService,
-								   final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService,final PlatformSecurityContext context,
-								   final DiscountReadPlatformService discountReadPlatformService) {
-		
+	public EventPriceApiResource(final EventMasterReadPlatformService eventMasterReadPlatformService,
+								 final MediaAssetDetailsReadPlatformService assetReadPlatformService,
+								 final EventPriceReadPlatformService eventPricingReadService,
+								 final ApiRequestParameterHelper apiRequestParameterHelper,
+								 final DefaultToApiJsonSerializer<EventPriceData> apiJsonSerializer,
+								 final DiscountReadPlatformService discountReadPlatformService,
+								 final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService,
+								 final PlatformSecurityContext context) {
 		this.eventMasterReadPlatformService = eventMasterReadPlatformService;
 		this.assetDetailsReadPlatformService = assetReadPlatformService;
 		this.eventPricingReadService = eventPricingReadService;
 		this.apiRequestParameterHelper = apiRequestParameterHelper;
 		this.apiJsonSerializer = apiJsonSerializer;
-		this.priceReadPlatformService = priceReadPlatformService;
+		this.discountReadPlatformService = discountReadPlatformService;
 		this.commandSourceWritePlatformService = commandSourceWritePlatformService;
-		this.discountReadPlatformService=discountReadPlatformService;
 		this.context = context;
 	}
 
 	/**
-	 * Method to retrieve {@link EventPricing} Data
+	 * Method to retrieve {@link EventPrice} Data
 	 * 
 	 * @param eventId
 	 * @param uriInfo
@@ -92,30 +98,28 @@ public class EventPricingApiResource {
 	@Path("template")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String retrievePriceTemplateData(@QueryParam("eventId") Long eventId,@Context UriInfo uriInfo) {
+	public String retrieveEventPriceTemplateData(@QueryParam("eventId") final Long eventId, @Context final UriInfo uriInfo) {
 		
 		this.context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		Set<String> responseParameters = ApiParameterHelper.extractFieldsForResponseIfProvided(uriInfo.getQueryParameters());
+		final Set<String> responseParameters = ApiParameterHelper.extractFieldsForResponseIfProvided(uriInfo.getQueryParameters());
 		responseParameters.addAll(RESPONSE_PARAMETERS);
-		EventPricingData templateData = handleTemplateRelatedData(eventId);
+		final EventPriceData templateData = handleEventPriceTemplateData(eventId);
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 		return this.apiJsonSerializer.serialize(settings, templateData, RESPONSE_PARAMETERS);
 	}
 	
-	
-	
-	public EventPricingData handleTemplateRelatedData(Long eventId) {
-		List<EnumOptionData> optType = this.eventMasterReadPlatformService.retrieveOptTypeData();
-		List<EventDetailsData> details = this.eventMasterReadPlatformService.retrieveEventDetailsData(eventId.intValue());
-		List<ClientTypeData> clientType = this.eventPricingReadService.clientType();
-		List<MediaAssetLocationDetails> format = this.assetDetailsReadPlatformService.retrieveMediaAssetLocationData(details.get(0).getMediaId());
-		List<DiscountMasterData> discountdata = this.discountReadPlatformService.retrieveAllDiscounts();
- 		EventPricingData pricingData = new EventPricingData(optType,format,discountdata,clientType,eventId);
+	public EventPriceData handleEventPriceTemplateData(final Long eventId) {
+		final List<EnumOptionData> optType = this.eventMasterReadPlatformService.retrieveOptTypeData();
+		final List<EventDetailsData> details = this.eventMasterReadPlatformService.retrieveEventDetailsData(eventId.intValue());
+		final List<ClientTypeData> clientType = this.eventPricingReadService.clientType();
+		final List<MediaAssetLocationDetails> format = this.assetDetailsReadPlatformService.retrieveMediaAssetLocationData(details.get(0).getMediaId());
+		final List<DiscountMasterData> discountdata = this.discountReadPlatformService.retrieveAllDiscounts();
+		final EventPriceData pricingData = new EventPriceData(optType, format, discountdata, clientType, eventId);
 		return pricingData;
 	}
 	
 	/**
-	 * Method to retrieve single {@link EventPricing} for eventId
+	 * Method to retrieve single {@link EventPrice} for eventId
 	 * 
 	 * @param eventId
 	 * @param uriInfo
@@ -125,16 +129,16 @@ public class EventPricingApiResource {
 	@Path("{eventId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String retrievePriceData(@PathParam("eventId") Long eventId, @Context UriInfo uriInfo) {
+	public String retrieveAllEventPriceDatas(@PathParam("eventId") final Long eventId, @Context final UriInfo uriInfo) {
 		
 		this.context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		List<EventPricingData> priceData = this.eventPricingReadService.retrieventPriceData(eventId);
+		final List<EventPriceData> priceData = this.eventPricingReadService.retrieventPriceData(eventId);
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 		return this.apiJsonSerializer.serialize(settings, priceData, RESPONSE_PARAMETERS);
 	}
 	
 	/**
-	 * Method to Create single {@link EventPricing} for eventId
+	 * Method to Create single {@link EventPrice} for eventId
 	 * 
 	 * @param eventId
 	 * @param jsonBodyRequest
@@ -144,36 +148,36 @@ public class EventPricingApiResource {
 	@Path("{eventId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String createEventPricing(@PathParam("eventId") Long eventId, final String jsonBodyRequest) {
-		final CommandWrapper commandRequest = new CommandWrapperBuilder().createEventPricing(eventId).withJson(jsonBodyRequest).build();
+	public String createEventPrice(@PathParam("eventId") final Long eventId, final String jsonBodyRequest) {
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().createEventPrice(eventId).withJson(jsonBodyRequest).build();
 		final CommandProcessingResult result  = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
 		
 		return this.apiJsonSerializer.serialize(result);
 	}
 	
 	/**
-	 * Method to get details for single {@link EventPricing} for eventPriceId
+	 * Method to get details for single {@link EventPrice} for eventPriceId
 	 * 
 	 * @param eventPriceId
 	 * @param uriInfo
 	 * @return
 	 */
 	@GET
-	@Path("{id}/update")
+	@Path("singleeventprice/{eventPriceId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String updateEventPricing(@PathParam("id") final Long eventPriceId, @Context final UriInfo uriInfo) {
+	public String retrieveSingleEventPriceDatas(@PathParam("eventPriceId") final Long eventPriceId, @Context final UriInfo uriInfo) {
 		
 		this.context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		Set<String> responseParameters = ApiParameterHelper.extractFieldsForResponseIfProvided(uriInfo.getQueryParameters());
+		final Set<String> responseParameters = ApiParameterHelper.extractFieldsForResponseIfProvided(uriInfo.getQueryParameters());
 		responseParameters.addAll(RESPONSE_PARAMETERS);
 
-		EventPricingData eventPricing = this.eventPricingReadService.retrieventPriceDetails(eventPriceId);
-		List<EnumOptionData> optType = this.eventMasterReadPlatformService.retrieveOptTypeData();
-		List<EventDetailsData> details = this.eventMasterReadPlatformService.retrieveEventDetailsData(eventPricing.getEventId().intValue());
-		List<ClientTypeData> clientType = this.eventPricingReadService.clientType();
-		List<MediaAssetLocationDetails> format = this.assetDetailsReadPlatformService.retrieveMediaAssetLocationData(details.get(0).getMediaId());
-		List<DiscountMasterData> discountdata = this.discountReadPlatformService.retrieveAllDiscounts();
+		final EventPriceData eventPricing = this.eventPricingReadService.retrieventPriceDetails(eventPriceId);
+		final List<EnumOptionData> optType = this.eventMasterReadPlatformService.retrieveOptTypeData();
+		final List<EventDetailsData> details = this.eventMasterReadPlatformService.retrieveEventDetailsData(eventPricing.getEventId().intValue());
+		final List<ClientTypeData> clientType = this.eventPricingReadService.clientType();
+		final List<MediaAssetLocationDetails> format = this.assetDetailsReadPlatformService.retrieveMediaAssetLocationData(details.get(0).getMediaId());
+		final List<DiscountMasterData> discountdata = this.discountReadPlatformService.retrieveAllDiscounts();
 		eventPricing.setClientTypes(clientType);
 		eventPricing.setOptTypes(optType);
 		eventPricing.setFormat(format);
@@ -185,25 +189,26 @@ public class EventPricingApiResource {
 	}
 	
 	/**
-	 * Method to update single {@link EventPricing} for eventPriceId
+	 * Method to update single {@link EventPrice} for eventPriceId
 	 * 
 	 * @param eventPriceId
 	 * @param jsonRequestBody
 	 * @return
 	 */
 	@PUT
-	@Path("{eventPriceId}/update")
+	@Path("{eventPriceId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String updateEventPrice(@PathParam("eventPriceId")Long eventPriceId, final String jsonRequestBody) {
-		final CommandWrapper commandRequest = new CommandWrapperBuilder().updateEventPricing(eventPriceId).withJson(jsonRequestBody).build();
+	public String updateEventPrice(@PathParam("eventPriceId")final Long eventPriceId, final String jsonRequestBody) {
+		
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().updateEventPrice(eventPriceId).withJson(jsonRequestBody).build();
 		final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
 		
 		return this.apiJsonSerializer.serialize(result);
 	}
 	
 	/**
-	 * Method to delete single {@link EventPricing} for eventPriceId
+	 * Method to delete single {@link EventPrice} for eventPriceId
 	 * 
 	 * @param eventPriceId
 	 * @return
@@ -212,8 +217,9 @@ public class EventPricingApiResource {
 	@Path("{eventPriceId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String deleteEventPricing(@PathParam("eventPriceId")Long eventPriceId) {
-		final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteEventPricing(eventPriceId).build();
+	public String deleteEventPrice(@PathParam("eventPriceId")final Long eventPriceId) {
+		
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteEventPrice(eventPriceId).build();
 		final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
 		
 		return this.apiJsonSerializer.serialize(result);

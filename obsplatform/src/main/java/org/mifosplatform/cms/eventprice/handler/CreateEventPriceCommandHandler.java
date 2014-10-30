@@ -1,7 +1,6 @@
-package org.mifosplatform.cms.eventpricing.handler;
+package org.mifosplatform.cms.eventprice.handler;
 
-import org.mifosplatform.cms.eventpricing.domain.EventPricing;
-import org.mifosplatform.cms.eventpricing.service.EventPricingWritePlatformService;
+import org.mifosplatform.cms.eventprice.service.EventPriceWritePlatformService;
 import org.mifosplatform.commands.handler.NewCommandSourceHandler;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
@@ -20,13 +19,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class CreateEventPriceCommandHandler implements NewCommandSourceHandler {
 
 	@Autowired
-	private EventPricingWritePlatformService eventPricingWritePlatformService;
+	private EventPriceWritePlatformService eventPricingWritePlatformService;
 	
 	
     @Transactional
     public CommandProcessingResult processCommand(final JsonCommand command) {
 
-        return this.eventPricingWritePlatformService.createEventPricing(command);
+        return this.eventPricingWritePlatformService.createEventPrice(command);
     }
 
 }

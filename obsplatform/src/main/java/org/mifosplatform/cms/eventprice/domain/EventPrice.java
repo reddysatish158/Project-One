@@ -1,4 +1,4 @@
-package org.mifosplatform.cms.eventpricing.domain;
+package org.mifosplatform.cms.eventprice.domain;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -19,12 +19,12 @@ import org.mifosplatform.infrastructure.core.api.JsonCommand;
  * Domain for {@link EventPricing}
  * 
  * @author pavani
- *
+ * @author Rakesh
  */
 @Entity
 @Table(name = "b_event_pricing")
-@ComparableFields(on={"formatType","optType","clientType","discountId","price"})
-public class EventPricing {
+@ComparableFields(on={"formatType", "optType", "clientType", "discountId", "price"})
+public class EventPrice {
 
 	@Id
 	@GeneratedValue
@@ -56,23 +56,23 @@ public class EventPricing {
 	@Column(name = "is_deleted")
 	private char isDeleted;
 	
-	public EventPricing() {
+	public EventPrice() {
 		
 	}
 	
-	public static EventPricing fromJson(final JsonCommand command, EventMaster eventMaster) {
-		Integer eventId = command.integerValueOfParameterNamed("eventId");
-		String formatType = command.stringValueOfParameterNamed("formatType");
-		String optType = command.stringValueOfParameterNamed("optType");
-		Long clientType = command.longValueOfParameterNamed("clientType");
-		Integer discountId = command.integerValueOfParameterNamed("discountId");
-		String priceString  = command.stringValueOfParameterNamed("price");
-		Double price = Double.parseDouble(priceString);
-		return new EventPricing(eventMaster, formatType, optType, clientType, discountId, price);
+	public static EventPrice fromJson(final JsonCommand command, final EventMaster eventMaster) {
+		
+		final String formatType = command.stringValueOfParameterNamed("formatType");
+		final String optType = command.stringValueOfParameterNamed("optType");
+		final Long clientType = command.longValueOfParameterNamed("clientType");
+		final Integer discountId = command.integerValueOfParameterNamed("discountId");
+		final String priceString  = command.stringValueOfParameterNamed("price");
+		final Double price = Double.parseDouble(priceString);
+		return new EventPrice(eventMaster, formatType, optType, clientType, discountId, price);
 	}
 		
-	public EventPricing(EventMaster eventId, String formatType, String optType, Long clientType,
-						Integer discountId, Double price) {
+	public EventPrice(final EventMaster eventId, final String formatType, final String optType, final Long clientType,
+					  final Integer discountId, final Double price) {
 		this.eventId = eventId;
 		this.formatType = formatType;
 		this.optType = optType;
@@ -92,7 +92,7 @@ public class EventPricing {
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(Long id) {
+	public void setId(final Long id) {
 		this.id = id;
 	}
 
@@ -106,7 +106,7 @@ public class EventPricing {
 	/**
 	 * @param eventId the eventId to set
 	 */
-	public void setEventId(EventMaster eventId) {
+	public void setEventId(final EventMaster eventId) {
 		this.eventId = eventId;
 	}
 
@@ -120,7 +120,7 @@ public class EventPricing {
 	/**
 	 * @param formatType the formatType to set
 	 */
-	public void setFormatType(String formatType) {
+	public void setFormatType(final String formatType) {
 		this.formatType = formatType;
 	}
 
@@ -134,7 +134,7 @@ public class EventPricing {
 	/**
 	 * @param optType the optType to set
 	 */
-	public void setOptType(String optType) {
+	public void setOptType(final String optType) {
 		this.optType = optType;
 	}
 
@@ -148,7 +148,7 @@ public class EventPricing {
 	/**
 	 * @param clientType the clientType to set
 	 */
-	public void setClientType(Long clientType) {
+	public void setClientType(final Long clientType) {
 		this.clientType = clientType;
 	}
 
@@ -162,7 +162,7 @@ public class EventPricing {
 	/**
 	 * @param discountId the discountId to set
 	 */
-	public void setDiscountId(Integer discountId) {
+	public void setDiscountId(final Integer discountId) {
 		this.discountId = discountId;
 	}
 
@@ -176,7 +176,7 @@ public class EventPricing {
 	/**
 	 * @param price the price to set
 	 */
-	public void setPrice(Double price) {
+	public void setPrice(final Double price) {
 		this.price = price;
 	}
 
@@ -190,7 +190,7 @@ public class EventPricing {
 	/**
 	 * @param isDeleted the isDeleted to set
 	 */
-	public void setIsDeleted(char isDeleted) {
+	public void setIsDeleted(final char isDeleted) {
 		this.isDeleted = isDeleted;
 	}
 }

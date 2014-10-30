@@ -122,10 +122,10 @@ public class SynchronousCommandProcessingService implements
 
 		if (wrapper.isConfigurationResource()) {
 			 if(wrapper.isCreate()){
-				handler = applicationContext.getBean("createGlobalConfigurationCommandHandler",NewCommandSourceHandler.class);
+				handler = applicationContext.getBean("createSmtpConfigurationCommandHandler", NewCommandSourceHandler.class);
 			 }
 			else if(wrapper.isUpdateOperation()){
-				handler = applicationContext.getBean("updateGlobalConfigurationCommandHandler",NewCommandSourceHandler.class);
+				handler = applicationContext.getBean("updateConfigurationCommandHandler", NewCommandSourceHandler.class);
 			}
 		} else if (wrapper.isDatatableResource()) {
 			if (wrapper.isCreateDatatable()) {
@@ -709,7 +709,7 @@ public class SynchronousCommandProcessingService implements
 		               } else if(wrapper.isUpdateEvent()) {
 		                handler = applicationContext.getBean("updateEventMasterCommandHandler",NewCommandSourceHandler.class);
 		               } else if(wrapper.isCloseEvent()) {
-		                handler = applicationContext.getBean("closeEventMasterCommandHandler",NewCommandSourceHandler.class);
+		                handler = applicationContext.getBean("deleteEventMasterCommandHandler",NewCommandSourceHandler.class);
 		               } else {
 		                throw new UnsupportedCommandException(wrapper.commandName());
 		               }
@@ -719,7 +719,7 @@ public class SynchronousCommandProcessingService implements
 	               } else if(wrapper.isUpdateEventPrice()) {
 	                handler = applicationContext.getBean("updateEventPriceCommandHandler",NewCommandSourceHandler.class);
 	               } else if(wrapper.isCloseEventPrice()) {
-	                handler = applicationContext.getBean("closeEventPriceCommandHandler",NewCommandSourceHandler.class);
+	                handler = applicationContext.getBean("deleteEventPriceCommandHandler",NewCommandSourceHandler.class);
 	               } else {
 	                throw new UnsupportedCommandException(wrapper.commandName());
 	               }
@@ -753,9 +753,9 @@ public class SynchronousCommandProcessingService implements
 					     if(wrapper.isCreateMediaAsset()) {
 							 handler = applicationContext.getBean("createMediaAssetCommandHandler",NewCommandSourceHandler.class);
 						 }else if(wrapper.isUpdateMediaAsset()) {
-							 handler = applicationContext.getBean("updateAssetCommandHandler",NewCommandSourceHandler.class);
+							 handler = applicationContext.getBean("updateMediaAssetCommandHandler",NewCommandSourceHandler.class);
 						 }else if(wrapper.isCloseMediaAsset()) {
-							 handler = applicationContext.getBean("deleteAssetCommandHandler",NewCommandSourceHandler.class);
+							 handler = applicationContext.getBean("deleteMediaAssetCommandHandler",NewCommandSourceHandler.class);
 						 }
 			} else if(wrapper.isBatch()){
 						if(wrapper.isCreate()){

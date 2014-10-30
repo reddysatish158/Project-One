@@ -31,8 +31,8 @@ import org.mifosplatform.finance.payments.domain.PaypalEnquireyRepository;
 import org.mifosplatform.finance.payments.exception.PaymentDetailsNotFoundException;
 import org.mifosplatform.finance.payments.exception.ReceiptNoDuplicateException;
 import org.mifosplatform.finance.payments.serialization.PaymentCommandFromApiJsonDeserializer;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -74,7 +74,7 @@ public class PaymentWritePlatformServiceImpl implements PaymentWritePlatformServ
 	private final ChequePaymentRepository chequePaymentRepository;
 	private final PaypalEnquireyRepository paypalEnquireyRepository;
 	private final PaymodeReadPlatformService paymodeReadPlatformService ;
-	private final GlobalConfigurationRepository globalConfigurationRepository;
+	private final ConfigurationRepository globalConfigurationRepository;
 	private final PaymentCommandFromApiJsonDeserializer fromApiJsonDeserializer;
 	private final ActionDetailsReadPlatformService actionDetailsReadPlatformService; 
 	private final ClientBalanceReadPlatformService clientBalanceReadPlatformService;
@@ -87,7 +87,7 @@ public class PaymentWritePlatformServiceImpl implements PaymentWritePlatformServ
 			final ClientBalanceRepository clientBalanceRepository,final ChequePaymentRepository chequePaymentRepository,
 			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,final ActionDetailsReadPlatformService actionDetailsReadPlatformService,
 			final UpdateClientBalance updateClientBalance,final ActiondetailsWritePlatformService actiondetailsWritePlatformService,final PaymodeReadPlatformService paymodeReadPlatformService,
-			final InvoiceRepository invoiceRepository,final GlobalConfigurationRepository globalConfigurationRepository,
+			final InvoiceRepository invoiceRepository,final ConfigurationRepository globalConfigurationRepository,
 			final PaypalEnquireyRepository paypalEnquireyRepository,final FromJsonHelper fromApiJsonHelper) {
 		
 		this.context = context;
@@ -373,7 +373,7 @@ public class PaymentWritePlatformServiceImpl implements PaymentWritePlatformServ
 				prop.load(is);
 				PaypalEnquirey paypalEnquirey = this.paypalEnquireyRepository.findOne(paypalEnquireyId);
 				com.paypal.api.payments.Payment.initConfig(prop);
-				GlobalConfigurationProperty paypalGlobalData = this.globalConfigurationRepository.findOneByName("Is_Paypal");
+				Configuration paypalGlobalData = this.globalConfigurationRepository.findOneByName("Is_Paypal");
 				JSONObject object = new JSONObject(paypalGlobalData.getValue());
 				String paypalClientId = object.getString("clientId");
 				String paypalsecretCode = object.getString("secretCode");

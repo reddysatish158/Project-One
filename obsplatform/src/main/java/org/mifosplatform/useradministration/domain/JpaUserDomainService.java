@@ -51,4 +51,5 @@ public class JpaUserDomainService implements UserDomainService {
     private void generateKeyUsedForPasswordSalting(final AppUser appUser) {
         this.userRepository.save(appUser);
     }
+    
 }

@@ -75,7 +75,7 @@ public class PermissionWritePlatformServiceJpaRepositoryImpl implements Permissi
     private Permission findPermissionInCollectionByCode(final Collection<Permission> allPermissions, final String permissionCode) {
 
         if (allPermissions != null) {
-            for (Permission permission : allPermissions) {
+            for (final Permission permission : allPermissions) {
                 if (permission.hasCode(permissionCode)) { return permission; }
             }
         }
