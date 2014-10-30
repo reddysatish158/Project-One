@@ -7,7 +7,8 @@ public class ServiceParameterData {
 	private final String paramValue;
 	private final String type;
 	
-	public ServiceParameterData(Long id, String paramName, String paramValue, String type) {
+	public ServiceParameterData(final Long id, final String paramName, 
+			final String paramValue, final String type) {
 		
 		this.id=id;
 		this.paramName=paramName;

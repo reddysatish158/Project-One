@@ -8,11 +8,16 @@ import javax.persistence.Table;
 
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
+/**
+ * 
+ * @author ashokreddy
+ *
+ */
+
+@SuppressWarnings("serial")
 @Entity
 @Table(name = "b_message_params")
 public class BillingMessageParam extends AbstractPersistable<Long>{
-
-	
 
 	@ManyToOne
     @JoinColumn(name="msgtemplate_id")
@@ -28,7 +33,7 @@ public class BillingMessageParam extends AbstractPersistable<Long>{
 		//default-constructor
 	}
 
-	public BillingMessageParam(Long sequenceNo, String parameterName) {
+	public BillingMessageParam(final Long sequenceNo, final String parameterName) {
 		
 		this.sequenceNo=sequenceNo;
 		this.parameterName=parameterName;
@@ -49,8 +54,7 @@ public class BillingMessageParam extends AbstractPersistable<Long>{
 		this.sequenceNo = sequenceNo;
 	}
 
-	public void update(BillingMessageTemplate billingMessageTemplate) {
-
+	public void update(final BillingMessageTemplate billingMessageTemplate) {
 		this.billingMessageTemplate=billingMessageTemplate;
 	}
 }

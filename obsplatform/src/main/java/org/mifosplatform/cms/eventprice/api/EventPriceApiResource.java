@@ -22,7 +22,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import org.mifosplatform.billing.discountmaster.service.DiscountReadPlatformService;
-import org.mifosplatform.billing.planprice.service.PriceReadPlatformService;
 import org.mifosplatform.cms.eventmaster.data.EventDetailsData;
 import org.mifosplatform.cms.eventmaster.service.EventMasterReadPlatformService;
 import org.mifosplatform.cms.eventprice.data.ClientTypeData;

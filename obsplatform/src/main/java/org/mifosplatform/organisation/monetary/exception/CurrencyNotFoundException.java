@@ -10,9 +10,13 @@ import org.mifosplatform.infrastructure.core.exception.AbstractPlatformResourceN
 /**
  * A {@link RuntimeException} thrown when loan resources are not found.
  */
-public class CurrencyNotFoundException extends AbstractPlatformResourceNotFoundException {
+@SuppressWarnings("serial")
+public class CurrencyNotFoundException extends
+		AbstractPlatformResourceNotFoundException {
 
 	public CurrencyNotFoundException(final String currencyCode) {
-		super("error.msg.currency.currencyCode.invalid", "Currency with identifier " + currencyCode + " does not exist", currencyCode);
+		super("error.msg.currency.currencyCode.invalid",
+				"Currency with identifier " + currencyCode + " does not exist",
+				currencyCode);
 	}
 }

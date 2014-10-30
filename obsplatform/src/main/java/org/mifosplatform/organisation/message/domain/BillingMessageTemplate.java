@@ -19,6 +19,12 @@ import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
 import org.mifosplatform.organisation.message.data.EnumMessageType;
 import org.mifosplatform.useradministration.domain.AppUser;
 
+/**
+ * 
+ * @author ashokreddy
+ *
+ */
+@SuppressWarnings("serial")
 @Entity
 @Table(name = "b_message_template")
 public class BillingMessageTemplate extends AbstractAuditableCustom<AppUser, Long>{
@@ -72,7 +78,8 @@ public class BillingMessageTemplate extends AbstractAuditableCustom<AppUser, Lon
 		//default-constructor
 	}
 	
-	public BillingMessageTemplate(String templateDescription,String subject,String header,String body,String footer, char messageType)
+	public BillingMessageTemplate(final String templateDescription, final String subject,
+			final String header, final String body, final String footer, final char messageType)
 	{
 		this.templateDescription=templateDescription;
 		this.subject=subject;
@@ -136,7 +143,7 @@ public class BillingMessageTemplate extends AbstractAuditableCustom<AppUser, Lon
 		return messageParamDetails;
 	}
 
-	public void setMessageParamDetails(List<BillingMessageParam> messageParamDetails) {
+	public void setMessageParamDetails(final List<BillingMessageParam> messageParamDetails) {
 		this.messageParamDetails = messageParamDetails;
 	}
 
@@ -160,7 +167,7 @@ public class BillingMessageTemplate extends AbstractAuditableCustom<AppUser, Lon
 		return messageData;
 	}
 
-	public static BillingMessageTemplate fromJson(JsonCommand command){
+	public static BillingMessageTemplate fromJson(final JsonCommand command){
 		
 		//final JsonElement element = fromJsonHelper.parse(command.toString());
 		String  templateDescription=command.stringValueOfParameterNamed("templateDescription");
@@ -179,44 +186,36 @@ public class BillingMessageTemplate extends AbstractAuditableCustom<AppUser, Lon
 	}
 
 
-    public void setBillingMessageParam(BillingMessageParam billingMessageParam) {
-	billingMessageParam.update(this);
-	this.messageParamDetails.add(billingMessageParam);
-	
-}
-
+	public void setBillingMessageParam(BillingMessageParam billingMessageParam) {
+		billingMessageParam.update(this);
+		this.messageParamDetails.add(billingMessageParam);
+	}
 
 	public void setMessageData(BillingMessage billingMessage) {
-		//this.messageData = messageData;
 		billingMessage.setupdate(this);
 	}
 
-	public Map<String, Object> updateMessageTemplate(JsonCommand command) {
+	public Map<String, Object> updateMessageTemplate(final JsonCommand command) {
 		// TODO Auto-generated method stub
 		final String value = command.stringValueOfParameterNamed("messageType");
 		this.messageType = value.charAt(0);
 		final Map<String, Object> actualChanges = new LinkedHashMap<String, Object>(1);
+		
 		final String template_description = "template_description";
-		if (command.isChangeInStringParameterNamed(template_description,
-				this.templateDescription)) {
-			final String newValue = command
-					.stringValueOfParameterNamed("template_description");
+		if (command.isChangeInStringParameterNamed(template_description, this.templateDescription)) {
+			final String newValue = command.stringValueOfParameterNamed("template_description");
 			actualChanges.put(template_description, newValue);
 			this.templateDescription = StringUtils.defaultIfEmpty(newValue, null);
 		}
 		final String subject = "subject";
-		if (command.isChangeInStringParameterNamed(subject,
-				this.subject)) {
-			final String newValue = command
-					.stringValueOfParameterNamed("subject");
+		if (command.isChangeInStringParameterNamed(subject, this.subject)) {
+			final String newValue = command.stringValueOfParameterNamed("subject");
 			actualChanges.put(subject, newValue);
 			this.subject = StringUtils.defaultIfEmpty(newValue, null);
 		}
 		final String body = "body";
-		if (command.isChangeInStringParameterNamed(body,
-				this.body)) {
-			final String newValue = command
-					.stringValueOfParameterNamed("body");
+		if (command.isChangeInStringParameterNamed(body, this.body)) {
+			final String newValue = command.stringValueOfParameterNamed("body");
 			actualChanges.put(body, newValue);
 			this.body = StringUtils.defaultIfEmpty(newValue, null);
 		}	
@@ -224,17 +223,14 @@ public class BillingMessageTemplate extends AbstractAuditableCustom<AppUser, Lon
 		final String header = "header";
 		if (command.isChangeInStringParameterNamed(header,
 				this.header)) {
-			final String newValue = command
-					.stringValueOfParameterNamed("header");
+			final String newValue = command.stringValueOfParameterNamed("header");
 			actualChanges.put(header, newValue);
 			this.header = StringUtils.defaultIfEmpty(newValue, null);
 		}
 		
 		final String footer = "footer";
-		if (command.isChangeInStringParameterNamed(footer,
-				this.footer)) {
-			final String newValue = command
-					.stringValueOfParameterNamed("footer");
+		if (command.isChangeInStringParameterNamed(footer, this.footer)) {
+			final String newValue = command.stringValueOfParameterNamed("footer");
 			actualChanges.put(footer, newValue);
 			this.footer = StringUtils.defaultIfEmpty(newValue, null);
 		}
@@ -246,15 +242,10 @@ public class BillingMessageTemplate extends AbstractAuditableCustom<AppUser, Lon
 	}
 
 	public void isDelete() {
-	if(this.isDeleted!= 'Y'){
-		this.isDeleted='Y';
-		this.templateDescription=this.templateDescription+"_DELETED"+this.getId();
+		if (this.isDeleted != 'Y') {
+			this.isDeleted = 'Y';
+			this.templateDescription = this.templateDescription + "_DELETED" + this.getId();
+		}
 	}
-		
-		
-		
-	}
-    
-	
-	
+    	
 }

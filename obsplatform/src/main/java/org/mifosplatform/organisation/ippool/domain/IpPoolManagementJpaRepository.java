@@ -7,6 +7,11 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+/**
+ * 
+ * @author ashokreddy
+ *
+ */
 public interface IpPoolManagementJpaRepository extends JpaRepository<IpPoolManagementDetail, Long>, 
                JpaSpecificationExecutor<IpPoolManagementDetail> {
 	

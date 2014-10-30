@@ -897,12 +897,12 @@ public class SynchronousCommandProcessingService implements
 			              }else if(wrapper.isUpdateOperation()){
 			            	  handler = applicationContext.getBean("updateSupplierCommandHandler",NewCommandSourceHandler.class);
 			              }
-			}else if(wrapper.isRandomGeneratorResource()){
+			}else if(wrapper.isVoucherResource()){
 
-						if(wrapper.isCreateRandomGenerator()) {
-							handler = applicationContext.getBean("createRandomGeneratorCommandHandler",NewCommandSourceHandler.class);
-						}else if(wrapper.isProcessRandomGenerator()){
-							handler = applicationContext.getBean("processRandomGeneratorCommandHandler",NewCommandSourceHandler.class);
+						if(wrapper.isCreateVoucherGroup()) {
+							handler = applicationContext.getBean("createVoucherGroupCommandHandler",NewCommandSourceHandler.class);
+						}else if(wrapper.isGenerateVoucherPin()){
+							handler = applicationContext.getBean("generateVoucherPinCommandHandler",NewCommandSourceHandler.class);
 						}
 
 			}else if (wrapper.isSchedulerResource()) {

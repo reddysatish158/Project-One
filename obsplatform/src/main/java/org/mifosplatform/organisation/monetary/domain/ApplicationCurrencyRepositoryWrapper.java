@@ -25,31 +25,37 @@ import org.springframework.stereotype.Service;
 @Service
 public class ApplicationCurrencyRepositoryWrapper {
 
-    private final ApplicationCurrencyRepository repository;
+	private final ApplicationCurrencyRepository repository;
 
-    @Autowired
-    public ApplicationCurrencyRepositoryWrapper(final ApplicationCurrencyRepository repository) {
-        this.repository = repository;
-    }
+	@Autowired
+	public ApplicationCurrencyRepositoryWrapper(
+			final ApplicationCurrencyRepository repository) {
+		this.repository = repository;
+	}
 
-    public ApplicationCurrency findOneWithNotFoundDetection(final MonetaryCurrency currency) {
+	public ApplicationCurrency findOneWithNotFoundDetection(final MonetaryCurrency currency) {
 
-        final ApplicationCurrency defaultApplicationCurrency = this.repository.findOneByCode(currency.getCode());
-        if (defaultApplicationCurrency == null) { throw new CurrencyNotFoundException(currency.getCode()); }
+		final ApplicationCurrency defaultApplicationCurrency = this.repository.findOneByCode(currency.getCode());
+		if (defaultApplicationCurrency == null) {
+			throw new CurrencyNotFoundException(currency.getCode());
+		}
 
-        final ApplicationCurrency applicationCurrency = ApplicationCurrency.from(defaultApplicationCurrency,
-                currency.getDigitsAfterDecimal());
+		final ApplicationCurrency applicationCurrency = ApplicationCurrency.from(defaultApplicationCurrency,
+						currency.getDigitsAfterDecimal());
 
-        return applicationCurrency;
-    }
+		return applicationCurrency;
+	}
 
-    /**
-     * Used when its not needed for {@link ApplicationCurrency} to inherit
-     * decimal place settings of existing currency.
-     */
-    public ApplicationCurrency findOneWithNotFoundDetection(final String currencyCode) {
-        final ApplicationCurrency applicationCurrency = this.repository.findOneByCode(currencyCode);
-        if (applicationCurrency == null) { throw new CurrencyNotFoundException(currencyCode); }
-        return applicationCurrency;
-    }
+	/**
+	 * Used when its not needed for {@link ApplicationCurrency} to inherit
+	 * decimal place settings of existing currency.
+	 */
+	public ApplicationCurrency findOneWithNotFoundDetection(final String currencyCode) {
+		
+		final ApplicationCurrency applicationCurrency = this.repository.findOneByCode(currencyCode);
+		if (applicationCurrency == null) {
+			throw new CurrencyNotFoundException(currencyCode);
+		}
+		return applicationCurrency;
+	}
 }

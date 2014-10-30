@@ -9,17 +9,17 @@ public class PaymentEnumClass {
 		return enumPaymentData(PaymentEnum.fromInt(id));
 	}
 	
-public static MediaEnumoptionData enumPaymentData(final PaymentEnum paymentEnum) {
+	public static MediaEnumoptionData enumPaymentData(final PaymentEnum paymentEnum) {
 
+		MediaEnumoptionData optionData;
 		
-	MediaEnumoptionData optionData = null;
 		switch (paymentEnum) {
 		case FINISHED:
 			optionData = new MediaEnumoptionData(PaymentEnum.FINISHED.getValue(), PaymentEnum.FINISHED.getCode(), "FINISHED");
 			break;
-			
+
 		default:
-			optionData = new MediaEnumoptionData(PaymentEnum.INVALID.getValue(),  PaymentEnum.INVALID.getCode(), "INVALID");
+			optionData = new MediaEnumoptionData(PaymentEnum.INVALID.getValue(), PaymentEnum.INVALID.getCode(), "INVALID");
 			break;
 		}
 

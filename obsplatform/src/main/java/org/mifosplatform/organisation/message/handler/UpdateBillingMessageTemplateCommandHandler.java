@@ -7,8 +7,11 @@ import org.mifosplatform.organisation.message.service.BillingMessageTemplateWrit
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
-
+/**
+ * 
+ * @author ashokreddy
+ *
+ */
 @Service
 public class UpdateBillingMessageTemplateCommandHandler implements NewCommandSourceHandler {
 

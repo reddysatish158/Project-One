@@ -4,6 +4,6 @@ import org.mifosplatform.scheduledjobs.scheduledjobs.data.EventActionData;
 
 public interface ProcessEventActionService {
 
-	void ProcessEventActions(EventActionData eventActionData);
+	void processEventActions(EventActionData eventActionData);
 
 }

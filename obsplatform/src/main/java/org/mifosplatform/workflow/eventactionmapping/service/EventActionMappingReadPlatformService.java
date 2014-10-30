@@ -8,9 +8,9 @@ import org.mifosplatform.workflow.eventactionmapping.data.EventActionMappingData
 public interface EventActionMappingReadPlatformService {
 
 	List<EventActionMappingData> retrieveAllEventMapping();
-	
+
 	List<McodeData> retrieveEventMapData(String str);
-	
+
 	EventActionMappingData retrieveEventActionDetail(Long id);
 
 	List<EventActionMappingData> retrieveEvents(String event);

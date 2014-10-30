@@ -20,7 +20,11 @@ import org.springframework.stereotype.Component;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonElement;
 
-
+/**
+ * 
+ * @author ashokreddy
+ *
+ */
 @Component
 public class IpPoolManagementCommandFromApiJsonDeserializer {
 
@@ -37,6 +41,7 @@ public class IpPoolManagementCommandFromApiJsonDeserializer {
 	}
 	
 	
+	@SuppressWarnings("serial")
 	public void validateForCreate(String json){
 		
 		if(StringUtils.isBlank(json)){
@@ -46,15 +51,22 @@ public class IpPoolManagementCommandFromApiJsonDeserializer {
 		fromJsonHelper.checkForUnsupportedParameters(typeOfMap, json, supportedParams);
 		
 		final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
-		final DataValidatorBuilder baseValidatorBuilder = new DataValidatorBuilder(dataValidationErrors);
+		final DataValidatorBuilder baseValidatorBuilder = new DataValidatorBuilder(dataValidationErrors).resource("ippool");;
 		
 		final JsonElement element = fromJsonHelper.parse(json);
 		
-		/*final String ipPoolDescription = fromJsonHelper.extractStringNamed("ipPoolDescription", element);		
-		baseValidatorBuilder.reset().parameter("ipPoolDescription").value(ipPoolDescription).notBlank().notExceedingLengthOf(100);*/
+		
+		final String type = fromJsonHelper.extractStringNamed("type", element);
+		baseValidatorBuilder.reset().parameter("type").value(type).notBlank();
 		
 		final String ipAddress = fromJsonHelper.extractStringNamed("ipAddress", element);
-		baseValidatorBuilder.reset().parameter("ipAddress").value(ipAddress).notBlank().notExceedingLengthOf(100);
+		baseValidatorBuilder.reset().parameter("ipAddress").value(ipAddress).notBlank().notExceedingLengthOf(16);
+		
+		final String subnet = fromJsonHelper.extractStringNamed("subnet", element);
+		if(subnet != null && !(subnet.equalsIgnoreCase(""))){
+			baseValidatorBuilder.reset().parameter("subnet").value(subnet).inMinMaxRange(0, 32);
+		}
+		
 		
         throwExceptionIfValidationWarningsExist(dataValidationErrors);
 	}
@@ -89,6 +101,7 @@ public class IpPoolManagementCommandFromApiJsonDeserializer {
         throwExceptionIfValidationWarningsExist(dataValidationErrors);
 	}
 	
+	@SuppressWarnings("serial")
 	public void validateForUpdateDecription(String json){
 		
 		if(StringUtils.isBlank(json)){

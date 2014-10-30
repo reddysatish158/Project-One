@@ -23,6 +23,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+/**
+ * The class <code>ProvisioningAdapterApiResource</code> is developed for
+ * Adapter Controlling From OBS.
+ * 
+ * We can Start,stop,Restart the Adapter from this Class. we can also
+ * downloading log files of 1 week Period.
+ * 
+ * @author ashokreddy
+ * 
+ */
 @Path("/adapter")
 @Component
 @Scope("singleton")
@@ -35,46 +45,80 @@ public class ProvisioningAdapterApiResource {
 	private final ProvisioningWritePlatformService provisioningWritePlatformService;
 
 	@Autowired
-	public ProvisioningAdapterApiResource(final PlatformSecurityContext context,
+	public ProvisioningAdapterApiResource(
+			final PlatformSecurityContext context,
 			final DefaultToApiJsonSerializer<ProvisioningData> toApiJsonSerializer,
-			final ProvisioningWritePlatformService provisioningWritePlatformService ) {
+			final ProvisioningWritePlatformService provisioningWritePlatformService) {
 
 		this.context = context;
 		this.toApiJsonSerializer = toApiJsonSerializer;
 		this.provisioningWritePlatformService = provisioningWritePlatformService;
 	}
 
+	/**
+	 * This method <code>retrieveLogDetails</code> is Used for Retrieve Log
+	 * Information. like previous 7 days log file names From specific Directory.
+	 * 
+	 * Note: Specific Directory should be sent in requestData.
+	 * 
+	 * @param requestData
+	 *            Containg input data in the Form of JsonObject.
+	 * @return
+	 */
 	@POST
 	@Path("logs")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrieveProvisiongSystemDetail(final String apiRequestBodyAsJson) {
+	public String retrieveLogDetails(final String requestData) {
+		
 		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		List<ProvisionAdapter> output = this.provisioningWritePlatformService.gettingLogInformation(apiRequestBodyAsJson);
-		ProvisioningData data = new ProvisioningData();
+		final List<ProvisionAdapter> output = this.provisioningWritePlatformService.gettingLogInformation(requestData);
+		final ProvisioningData data = new ProvisioningData();
 		data.setProvisionAdapterData(output);
 		return this.toApiJsonSerializer.serialize(data);
 	}
-	
+
+	/**
+	 * This method <code>runningAdapterCommands</code> is Used for 
+	 * Running the System Commands.
+	 * 
+	 * Note: command should be sent in requestData.
+	 *  
+	 * @param requestData
+	 * 			 Containg input data in the Form of JsonObject.
+	 * @return
+	 */
 	@POST
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String addProvisiongSystemDetails(final String apiRequestBodyAsJson) {
+	public String runningAdapterCommands(final String requestData) {
+		
 		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		String output = this.provisioningWritePlatformService.runAdapterCommands(apiRequestBodyAsJson);
-		ProvisioningData data = new ProvisioningData();
+		final String output = this.provisioningWritePlatformService.runAdapterCommands(requestData);
+		final ProvisioningData data = new ProvisioningData();
 		data.setStatus(output);
 		return this.toApiJsonSerializer.serialize(data);
 	}
-	
+
+	/**
+	 * This method <code>runningAdapterCommands</code> is Used for 
+	 * Downloading .csv log files from Specific path.
+	 * 
+	 * Note : log file path should be sent in the "printFilePath" parameter
+	 * 
+	 * @param printFilePath
+	 * 			Downloading file path
+	 * @return
+	 */
 	@GET
 	@Path("printlog")
 	@Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_OCTET_STREAM })
+	@Produces({ MediaType.APPLICATION_OCTET_STREAM })
 	public Response logFile(@QueryParam("filePath") final String printFilePath) {
+		
 		if (printFilePath != null) {
 			File file = new File(printFilePath);
-			ResponseBuilder response = Response.ok(file);
+			final ResponseBuilder response = Response.ok(file);
 			response.header("Content-Disposition", "attachment; filename=\"" + printFilePath + "\"");
 			response.header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 			return response.build();

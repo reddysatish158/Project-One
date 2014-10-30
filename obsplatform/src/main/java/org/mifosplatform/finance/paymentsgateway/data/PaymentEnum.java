@@ -3,7 +3,8 @@ package org.mifosplatform.finance.paymentsgateway.data;
 
 public enum PaymentEnum {
 
-	FINISHED("FINISHED","Finished"), INVALID("INVALID","Invalid");
+	FINISHED("FINISHED","Finished"),
+	INVALID("INVALID","Invalid");
 
 	private final String code;
 	private final String value;
@@ -25,7 +26,8 @@ public enum PaymentEnum {
 	
 	public static PaymentEnum fromInt(final Integer frequency) {
 
-		PaymentEnum addressEnum = PaymentEnum.INVALID;
+		PaymentEnum addressEnum;
+		
 		switch (frequency) {
 		case 1:
 			addressEnum = PaymentEnum.FINISHED;

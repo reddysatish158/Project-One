@@ -14,95 +14,91 @@ import org.joda.time.LocalDate;
 public class PaymentGatewayDownloadData {
 
 	
-	private String SerialNo;
-	private LocalDate PaymendDate;
-	private BigDecimal AmountPaid;
-	private String PhoneMSISDN;
-	private String Remarks;
-	private String Status;
-	private String ReceiptNo;
+	private String serialNo;
+	private LocalDate paymendDate;
+	private BigDecimal amountPaid;
+	private String phoneMSISDN;
+	private String remarks;
+	private String status;
+	private String receiptNo;
 	private String paymentId;
 
-	public PaymentGatewayDownloadData(String SerialNumber, LocalDate PaymentDate,
-			BigDecimal AmountPaid, String PhoneMSISDN, String Remarks,
-			String Status, String ReceiptNo,String paymentId) {
-		this.SerialNo = SerialNumber;
-		this.PaymendDate = PaymentDate;
-		this.AmountPaid = AmountPaid;
-		this.PhoneMSISDN = PhoneMSISDN;
-		this.Remarks = Remarks;
-		this.Status = Status;
-		this.ReceiptNo = ReceiptNo;
+	public PaymentGatewayDownloadData(final String serialNumber, final LocalDate paymentDate,
+			final BigDecimal amountPaid, final String phoneMSISDN, final String remarks,
+			final String status, final String receiptNo, final String paymentId) {
+		this.serialNo = serialNumber;
+		this.paymendDate = paymentDate;
+		this.amountPaid = amountPaid;
+		this.phoneMSISDN = phoneMSISDN;
+		this.remarks = remarks;
+		this.status = status;
+		this.receiptNo = receiptNo;
 		this.paymentId = paymentId;
 	}
-	
 
 	public String getSerialNo() {
-		return SerialNo;
-	}
-
-	public LocalDate getPaymendDate() {
-		return PaymendDate;
-	}
-
-	public BigDecimal getAmountPaid() {
-		return AmountPaid;
-	}
-
-	public String getPhoneMSISDN() {
-		return PhoneMSISDN;
-	}
-
-	public String getRemarks() {
-		return Remarks;
-	}
-
-	public String getStatus() {
-		return Status;
-	}
-
-	public String getReceiptNo() {
-		return ReceiptNo;
+		return serialNo;
 	}
 
 	public void setSerialNo(String serialNo) {
-		SerialNo = serialNo;
+		this.serialNo = serialNo;
+	}
+
+	public LocalDate getPaymendDate() {
+		return paymendDate;
 	}
 
 	public void setPaymendDate(LocalDate paymendDate) {
-		PaymendDate = paymendDate;
+		this.paymendDate = paymendDate;
+	}
+
+	public BigDecimal getAmountPaid() {
+		return amountPaid;
 	}
 
 	public void setAmountPaid(BigDecimal amountPaid) {
-		AmountPaid = amountPaid;
+		this.amountPaid = amountPaid;
+	}
+
+	public String getPhoneMSISDN() {
+		return phoneMSISDN;
 	}
 
 	public void setPhoneMSISDN(String phoneMSISDN) {
-		PhoneMSISDN = phoneMSISDN;
+		this.phoneMSISDN = phoneMSISDN;
+	}
+
+	public String getRemarks() {
+		return remarks;
 	}
 
 	public void setRemarks(String remarks) {
-		Remarks = remarks;
+		this.remarks = remarks;
+	}
+
+	public String getStatus() {
+		return status;
 	}
 
 	public void setStatus(String status) {
-		Status = status;
+		this.status = status;
+	}
+
+	public String getReceiptNo() {
+		return receiptNo;
 	}
 
 	public void setReceiptNo(String receiptNo) {
-		ReceiptNo = receiptNo;
+		this.receiptNo = receiptNo;
 	}
-
 
 	public String getPaymentId() {
 		return paymentId;
 	}
 
-
 	public void setPaymentId(String paymentId) {
 		this.paymentId = paymentId;
 	}
-	
 	
 	
 }

@@ -40,7 +40,7 @@ import org.mifosplatform.infrastructure.jobs.service.SchedulerJobRunnerReadServi
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
 import org.mifosplatform.organisation.mcodevalues.service.MCodeReadPlatformService;
-import org.mifosplatform.organisation.message.data.BillingMessageData;
+import org.mifosplatform.organisation.message.data.BillingMessageTemplateData;
 import org.mifosplatform.organisation.message.service.BillingMesssageReadPlatformService;
 import org.mifosplatform.portfolio.group.service.SearchParameters;
 import org.mifosplatform.provisioning.processscheduledjobs.service.SheduleJobReadPlatformService;
@@ -182,7 +182,7 @@ public class SchedulerJobApiResource {
     	      jobDetailData.setQueryData(queryData);
     	      if(jobDetailData.getName().equalsIgnoreCase(SchedulerJobApiConstants.JOB_MESSANGER)){
     	    	  
-    	    	  final Collection<BillingMessageData> templateData = this.billingMesssageReadPlatformService.retrieveAllMessageTemplates();
+    	    	  final Collection<BillingMessageTemplateData> templateData = this.billingMesssageReadPlatformService.retrieveAllMessageTemplateParams();
     	    	  jobDetailData.setMessageData(templateData);
 		       }
     	
