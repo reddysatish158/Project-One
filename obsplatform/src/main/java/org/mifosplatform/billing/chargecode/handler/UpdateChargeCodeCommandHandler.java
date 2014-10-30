@@ -7,10 +7,7 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-/**
- * @author hugo
- * 
- */
+
 @Service
 public class UpdateChargeCodeCommandHandler implements NewCommandSourceHandler {
 

@@ -9,6 +9,7 @@ import org.mifosplatform.billing.promotioncodes.exception.PromotionCodeNotFoundE
 import org.mifosplatform.billing.promotioncodes.serialization.PromotionCodeCommandFromApiJsonDeserializer;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
+import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author hugo
@@ -53,6 +55,7 @@ public class PromotionCodeWritePlatformServiceImpl implements
 	 * #createPromotionCode(org.mifosplatform.infrastructure.core.api.JsonCommand
 	 * )
 	 */
+	@Transactional
 	@Override
 	public CommandProcessingResult createPromotionCode(JsonCommand command) {
 
@@ -81,7 +84,7 @@ public class PromotionCodeWritePlatformServiceImpl implements
 			throw new PlatformDataIntegrityException(
 					"error.msg.promotionCode.duplicate.name",
 					"A promotion code with'" + name + "'already exists",
-					"displayName", name);
+					name, name);
 		}
 		LOGGER.error(dve.getMessage(), dve);
 		throw new PlatformDataIntegrityException(
@@ -97,6 +100,7 @@ public class PromotionCodeWritePlatformServiceImpl implements
 	 * @see #updatePromotionCode(java.lang.Long,
 	 * org.mifosplatform.infrastructure.core.api.JsonCommand)
 	 */
+	@Transactional
 	@Override
 	public CommandProcessingResult updatePromotionCode(final Long id,
 			final JsonCommand command) {
@@ -111,7 +115,10 @@ public class PromotionCodeWritePlatformServiceImpl implements
 			if (!changes.isEmpty()) {
 				this.promotionCodeRepository.saveAndFlush(promotionCode);
 			}
-			return new CommandProcessingResult(id);
+			
+			return new CommandProcessingResultBuilder()
+			.withCommandId(command.commandId())
+					.withEntityId(promotionCode.getId()).with(changes).build();
 
 		} catch (DataIntegrityViolationException dve) {
 
@@ -128,6 +135,7 @@ public class PromotionCodeWritePlatformServiceImpl implements
 	 * 
 	 * @see #deletePromotionCode(java.lang.Long)
 	 */
+	@Transactional
 	@Override
 	public CommandProcessingResult deletePromotionCode(Long id) {
 

@@ -12,43 +12,45 @@ import java.util.List;
  */
 public final class GenericResultsetData {
 
-    private final List<ResultsetColumnHeaderData> columnHeaders;
-    private final List<ResultsetRowData> data;
+	private final List<ResultsetColumnHeaderData> columnHeaders;
+	private final List<ResultsetRowData> data;
 
-    public GenericResultsetData(final List<ResultsetColumnHeaderData> columnHeaders, final List<ResultsetRowData> resultsetDataRows) {
-        this.columnHeaders = columnHeaders;
-        this.data = resultsetDataRows;
-    }
+	public GenericResultsetData(
+			final List<ResultsetColumnHeaderData> columnHeaders,
+			final List<ResultsetRowData> resultsetDataRows) {
+		this.columnHeaders = columnHeaders;
+		this.data = resultsetDataRows;
+	}
 
-    public List<ResultsetColumnHeaderData> getColumnHeaders() {
-        return columnHeaders;
-    }
+	public List<ResultsetColumnHeaderData> getColumnHeaders() {
+		return columnHeaders;
+	}
 
-    public List<ResultsetRowData> getData() {
-        return data;
-    }
+	public List<ResultsetRowData> getData() {
+		return data;
+	}
 
-    public String getColTypeOfColumnNamed(final String columnName) {
+	public String getColTypeOfColumnNamed(final String columnName) {
 
-        String colType = null;
-        for (ResultsetColumnHeaderData columnHeader : this.columnHeaders) {
-            if (columnHeader.isNamed(columnName)) {
-                colType = columnHeader.getColumnType();
-            }
-        }
+		String colType = null;
+		for (ResultsetColumnHeaderData columnHeader : this.columnHeaders) {
+			if (columnHeader.isNamed(columnName)) {
+				colType = columnHeader.getColumnType();
+			}
+		}
 
-        return colType;
-    }
+		return colType;
+	}
 
-    public boolean hasNoEntries() {
-        return this.data.isEmpty();
-    }
+	public boolean hasNoEntries() {
+		return this.data.isEmpty();
+	}
 
-    public boolean hasEntries() {
-        return !hasNoEntries();
-    }
+	public boolean hasEntries() {
+		return !hasNoEntries();
+	}
 
-    public boolean hasMoreThanOneEntry() {
-        return this.data.size() > 1;
-    }
+	public boolean hasMoreThanOneEntry() {
+		return this.data.size() > 1;
+	}
 }

@@ -53,7 +53,7 @@ public class PromotionCodesApiResource {
 	private final PlatformSecurityContext context;
 	private final DefaultToApiJsonSerializer<PromotionCodeData> toApiJsonSerializer;
 	private final ApiRequestParameterHelper apiRequestParameterHelper;
-	private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
+	private final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService;
 	private final PromotionCodeReadPlatformService promotionCodeReadPlatformService;
 	private final MCodeReadPlatformService mCodeReadPlatformService;
 	private final ContractPeriodReadPlatformService contractPeriodReadPlatformService;
@@ -63,7 +63,7 @@ public class PromotionCodesApiResource {
 			final PlatformSecurityContext context,
 			final DefaultToApiJsonSerializer<PromotionCodeData> toApiJsonSerializer,
 			final ApiRequestParameterHelper apiRequestParameterHelper,
-			final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
+			final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService,
 			final MCodeReadPlatformService codeReadPlatformService,
 			final PromotionCodeReadPlatformService promotionCodeReadPlatformService,
 			final ContractPeriodReadPlatformService contractPeriodReadPlatformService) {
@@ -71,7 +71,7 @@ public class PromotionCodesApiResource {
 		this.context = context;
 		this.toApiJsonSerializer = toApiJsonSerializer;
 		this.apiRequestParameterHelper = apiRequestParameterHelper;
-		this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+		this.commandSourceWritePlatformService = commandSourceWritePlatformService;
 		this.mCodeReadPlatformService = codeReadPlatformService;
 		this.promotionCodeReadPlatformService = promotionCodeReadPlatformService;
 		this.contractPeriodReadPlatformService = contractPeriodReadPlatformService;
@@ -79,7 +79,7 @@ public class PromotionCodesApiResource {
 
 	/**
 	 * @param uriInfo
-	 * @return get all PromotionCodeDetails
+	 * @return retrieved all PromotionCodeDetails
 	 */
 	@GET
 	@Consumes({ MediaType.APPLICATION_JSON })
@@ -98,7 +98,7 @@ public class PromotionCodesApiResource {
 
 	/**
 	 * @param uriInfo
-	 * @return get template data for creating promotion codes
+	 * @return retrieved template data for creating promotion codes
 	 */
 	@GET
 	@Path("template")
@@ -135,7 +135,7 @@ public class PromotionCodesApiResource {
 				resourceNameForPermissions);
 		final CommandWrapper commandRequest = new CommandWrapperBuilder()
 				.createPromotionCode().withJson(apiRequestBodyAsJson).build();
-		final CommandProcessingResult result = this.commandsSourceWritePlatformService
+		final CommandProcessingResult result = this.commandSourceWritePlatformService
 				.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 	}
@@ -143,7 +143,7 @@ public class PromotionCodesApiResource {
 	/**
 	 * @param promotionId
 	 * @param uriInfo
-	 * @return get single promotion code details
+	 * @return retrieved single promotion code details
 	 */
 	@GET
 	@Path("{promotionId}")
@@ -172,7 +172,7 @@ public class PromotionCodesApiResource {
 	/**
 	 * @param promotionId
 	 * @param apiRequestBodyAsJson
-	 * @return updated promotion code
+	 * @return single promotion code details are update here
 	 */
 	@PUT
 	@Path("{promotionId}")
@@ -187,7 +187,7 @@ public class PromotionCodesApiResource {
 		final CommandWrapper commandRequest = new CommandWrapperBuilder()
 				.updatePromotionCode(promotionId)
 				.withJson(apiRequestBodyAsJson).build();
-		final CommandProcessingResult result = this.commandsSourceWritePlatformService
+		final CommandProcessingResult result = this.commandSourceWritePlatformService
 				.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 	}
@@ -207,7 +207,7 @@ public class PromotionCodesApiResource {
 				resourceNameForPermissions);
 		final CommandWrapper commandRequest = new CommandWrapperBuilder()
 				.deletePromotionCode(promotionId).build();
-		final CommandProcessingResult result = this.commandsSourceWritePlatformService
+		final CommandProcessingResult result = this.commandSourceWritePlatformService
 				.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 

@@ -83,7 +83,7 @@ public class CountryCurrecnyApiResource {
 
 	/**
 	 * @param uriInfo
-	 * @return get list of all Configured country currency details
+	 * @return retrieved list of all Configured country currency details
 	 */
 	@GET
 	@Consumes({ MediaType.APPLICATION_JSON })
@@ -102,7 +102,7 @@ public class CountryCurrecnyApiResource {
 
 	/**
 	 * @param uriInfo
-	 * @return get template data for creating currency configuration
+	 * @return retrieved template data for creating currency configuration
 	 */
 	@GET
 	@Path("template")
@@ -176,7 +176,7 @@ public class CountryCurrecnyApiResource {
 	/**
 	 * @param currencyId
 	 * @param apiRequestBodyAsJson
-	 * @return updated details
+	 * @return update details
 	 */
 	@PUT
 	@Path("{currencyId}")

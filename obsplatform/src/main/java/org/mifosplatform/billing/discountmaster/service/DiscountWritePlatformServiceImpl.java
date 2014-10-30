@@ -9,6 +9,7 @@ import org.mifosplatform.billing.discountmaster.exception.DiscountMasterNotFound
 import org.mifosplatform.billing.discountmaster.serialization.DiscountCommandFromApiJsonDeserializer;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
+import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author hugo
@@ -52,6 +54,7 @@ public class DiscountWritePlatformServiceImpl implements
 	 * @see
 	 * #createNewDiscount(org.mifosplatform.infrastructure.core.api.JsonCommand)
 	 */
+	@Transactional
 	@Override
 	public CommandProcessingResult createNewDiscount(final JsonCommand command) {
 
@@ -96,6 +99,7 @@ public class DiscountWritePlatformServiceImpl implements
 	 * @see #updateDiscount(java.lang.Long,
 	 * org.mifosplatform.infrastructure.core.api.JsonCommand)
 	 */
+	@Transactional
 	@Override
 	public CommandProcessingResult updateDiscount(final Long entityId,
 			final JsonCommand command) {
@@ -110,7 +114,10 @@ public class DiscountWritePlatformServiceImpl implements
 			if (!changes.isEmpty()) {
 				this.discountMasterRepository.saveAndFlush(discountMaster);
 			}
-			return new CommandProcessingResult(entityId);
+			
+			return new CommandProcessingResultBuilder()
+					.withCommandId(command.commandId())
+					.withEntityId(discountMaster.getId()).with(changes).build();
 
 		} catch (DataIntegrityViolationException dve) {
 
@@ -128,6 +135,7 @@ public class DiscountWritePlatformServiceImpl implements
 	 * 
 	 * @see #deleteDiscount(java.lang.Long)
 	 */
+	@Transactional
 	@Override
 	public CommandProcessingResult deleteDiscount(final Long entityId) {
 

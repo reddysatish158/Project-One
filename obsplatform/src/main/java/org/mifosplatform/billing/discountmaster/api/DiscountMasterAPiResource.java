@@ -40,7 +40,7 @@ import org.springframework.stereotype.Component;
  * @author hugo
  * 
  */
-@Path("/discounts")
+@Path("/discount")
 @Component
 @Scope("singleton")
 public class DiscountMasterAPiResource {
@@ -78,7 +78,7 @@ public class DiscountMasterAPiResource {
 
 	/**
 	 * @param uriInfo
-	 * @return get all discounts details
+	 * @return retrieved all discounts details
 	 */
 	@GET
 	@Consumes({ MediaType.APPLICATION_JSON })
@@ -97,7 +97,7 @@ public class DiscountMasterAPiResource {
 
 	/**
 	 * @param uriInfo
-	 * @return get template data for creating discounts
+	 * @return retrieved drop down data for creating discounts
 	 */
 	@GET
 	@Path("template")
@@ -173,7 +173,7 @@ public class DiscountMasterAPiResource {
 	/**
 	 * @param discountId
 	 * @param apiRequestBodyAsJson
-	 * @return single discount details for editing
+	 * @return single discount details are update here
 	 */
 	@PUT
 	@Path("{discountId}")

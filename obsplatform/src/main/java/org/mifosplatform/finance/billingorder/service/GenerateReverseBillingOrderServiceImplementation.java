@@ -113,7 +113,7 @@ public class GenerateReverseBillingOrderServiceImplementation implements
 			
 			DiscountMaster discountMaster = null;
 			if(billingOrderCommand.getDiscountMasterData()!= null){
-				discountMaster = this.discountMasterRepository.findOne(billingOrderCommand.getDiscountMasterData().getDiscountMasterId());
+				discountMaster = this.discountMasterRepository.findOne(billingOrderCommand.getDiscountMasterData().getId());
 			}
 			
 			List<InvoiceTaxCommand> invoiceTaxCommands = billingOrderCommand.getListOfTax();

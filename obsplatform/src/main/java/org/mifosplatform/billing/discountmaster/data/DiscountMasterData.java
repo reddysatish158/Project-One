@@ -22,25 +22,23 @@ public class DiscountMasterData {
 	private LocalDate discountEndDate;
 	private String isDeleted;
 	private Long orderPriceId;
-	private Long discountMasterId;
+	private Long orderDiscountId;
 	private BigDecimal discountAmount;
 	private BigDecimal discountedChargeAmount;
 	private List<EnumOptionData> statusData;
 	private Collection<MCodeData> discountTypeData;
-	private String discountstatus;
+	private String discountStatus;
 
 	public DiscountMasterData(final Long id, final String discountCode,
 			final String discountDescription, final String discounType,
 			final BigDecimal discountRate, final LocalDate startDate,
-			final String discountstatus) {
-		this.discountMasterId = id;
+			final String discountStatus) {
+		this.id = id;
 		this.discountCode = discountCode;
 		this.discountDescription = discountDescription;
 		this.discountType = discounType;
 		this.discountRate = discountRate;
-		this.discountAmount = BigDecimal.ZERO;
-		this.discountedChargeAmount = BigDecimal.ZERO;
-		this.discountstatus = discountstatus;
+		this.discountStatus = discountStatus;
 		this.discountStartDate = startDate;
 
 	}
@@ -51,7 +49,7 @@ public class DiscountMasterData {
 			final BigDecimal discountRate, final String isDeleted) {
 		this.id = id;
 		this.orderPriceId = orderPriceId;
-		this.discountMasterId = orderDiscountId;
+		this.orderDiscountId = orderDiscountId;
 		this.discountStartDate = discountStartDate;
 		this.discountEndDate = discountEndDate;
 		this.discountType = discountType;
@@ -66,14 +64,6 @@ public class DiscountMasterData {
 		this.statusData = statusData;
 		this.discountTypeData = discountTypeData;
 
-	}
-
-	public BigDecimal getDiscountedChargeAmount() {
-		return discountedChargeAmount;
-	}
-
-	public void setDiscountedChargeAmount(BigDecimal discountedChargeAmount) {
-		this.discountedChargeAmount = discountedChargeAmount;
 	}
 
 	public Long getId() {
@@ -140,12 +130,12 @@ public class DiscountMasterData {
 		this.orderPriceId = orderPriceId;
 	}
 
-	public Long getDiscountMasterId() {
-		return discountMasterId;
+	public Long getOrderDiscountId() {
+		return orderDiscountId;
 	}
 
-	public void setDiscountMasterId(final Long discountMasterId) {
-		this.discountMasterId = discountMasterId;
+	public void setOrderDiscountId(final Long orderDiscountId) {
+		this.orderDiscountId = orderDiscountId;
 	}
 
 	public BigDecimal getDiscountAmount() {
@@ -180,12 +170,20 @@ public class DiscountMasterData {
 		this.discountTypeData = discountTypeData;
 	}
 
-	public String getDiscountstatus() {
-		return discountstatus;
+	public String getDiscountStatus() {
+		return discountStatus;
 	}
 
-	public void setDiscountstatus(final String discountstatus) {
-		this.discountstatus = discountstatus;
+	public void setDiscountStatus(final String discountStatus) {
+		this.discountStatus = discountStatus;
+	}
+
+	public BigDecimal getDiscountedChargeAmount() {
+		return discountedChargeAmount;
+	}
+
+	public void setDiscountedChargeAmount(BigDecimal discountedChargeAmount) {
+		this.discountedChargeAmount = discountedChargeAmount;
 	}
 
 }

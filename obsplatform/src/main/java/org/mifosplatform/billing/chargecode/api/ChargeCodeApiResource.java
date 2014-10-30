@@ -69,7 +69,7 @@ public class ChargeCodeApiResource {
 
 	/**
 	 * @param uriInfo
-	 * @return get list of all chargecodes details
+	 * @return retrieved list of all chargecodes details
 	 */
 	@GET
 	@Consumes({ MediaType.APPLICATION_JSON })
@@ -86,7 +86,7 @@ public class ChargeCodeApiResource {
 
 	/**
 	 * @param uriInfo
-	 * @return get template data for creating charge codes
+	 * @return retrieved template data for creating charge codes
 	 */
 	@GET
 	@Path("template")
@@ -130,7 +130,7 @@ public class ChargeCodeApiResource {
 	/**
 	 * @param chargeCodeId
 	 * @param uriInfo
-	 * @return get single charge code details
+	 * @return retrieved single charge code details
 	 */
 	@GET
 	@Path("{chargeCodeId}")
@@ -158,7 +158,7 @@ public class ChargeCodeApiResource {
 	/**
 	 * @param chargeCodeId
 	 * @param apiRequestBodyAsJson
-	 * @return updated charge code
+	 * @return update charge code here
 	 */
 	@PUT
 	@Path("{chargeCodeId}")

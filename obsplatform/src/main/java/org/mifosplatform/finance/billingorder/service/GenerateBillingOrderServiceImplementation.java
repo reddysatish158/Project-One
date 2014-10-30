@@ -193,7 +193,7 @@ public class GenerateBillingOrderServiceImplementation implements
 			if (billingOrderCommand.getDiscountMasterData() != null) {
 				discountMaster = this.discountMasterRepository
 						.findOne(billingOrderCommand.getDiscountMasterData()
-								.getDiscountMasterId());
+								.getId());
 			}
 
 			List<InvoiceTaxCommand> invoiceTaxCommands = billingOrderCommand

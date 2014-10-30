@@ -2,6 +2,7 @@ package org.mifosplatform.billing.currency.service;
 
 import java.util.Map;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.mifosplatform.billing.chargecode.service.ChargeCodeWritePlatformServiceImp;
 import org.mifosplatform.billing.currency.domain.CountryCurrency;
 import org.mifosplatform.billing.currency.domain.CountryCurrencyRepository;
@@ -113,11 +114,13 @@ public class CountryCurrencyWritePlatformServiceImpl implements
 			}
 			return new CommandProcessingResultBuilder() 
 					.withCommandId(command.commandId()) 
-					.withEntityId(entityId) 
+					.withEntityId(countryCurrency.getId()) 
 					.with(changes) 
 					.build();
 		} catch (DataIntegrityViolationException dve) {
+			if (dve.getCause() instanceof ConstraintViolationException) {
 			handleDataIntegretyIssue(dve, command);
+			}
 			return new CommandProcessingResult(Long.valueOf(-1));
 		}
 
