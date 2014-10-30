@@ -2,7 +2,7 @@ package org.mifosplatform.organisation.address.data;
 
 
 
-public class AddressDetails {
+public class AddressLocationDetails {
 	
   private final String countryCode;
   private final String countryName;
@@ -14,7 +14,8 @@ public class AddressDetails {
   private final Long countryId;
   private final Long stateId;
 	
-	public AddressDetails(String countryCode,String countryName,String cityCode,String cityName, String stateCode,String stateName,Long countryId,Long stateId,Long cityId){
+	public AddressLocationDetails(final String countryCode,final String countryName,final String cityCode,final String cityName, 
+				final String stateCode,final String stateName,final Long countryId,final Long stateId,final Long cityId){
 		this.countryCode = countryCode;
 		this.countryName = countryName;
 		this.cityCode = cityCode;

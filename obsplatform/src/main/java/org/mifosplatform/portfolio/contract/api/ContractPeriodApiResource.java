@@ -28,7 +28,6 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.mifosplatform.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
-import org.mifosplatform.portfolio.contract.data.PeriodData;
 import org.mifosplatform.portfolio.contract.data.SubscriptionData;
 import org.mifosplatform.portfolio.contract.service.ContractPeriodReadPlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +40,7 @@ import org.springframework.stereotype.Component;
 public class ContractPeriodApiResource {
 	  private  final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(Arrays.asList("id",
 	           "subscriptionPeriod","subscriptionType","units","allowedtypes","subscriptionTypeId"));
-        private final String resourceNameForPermissions = "CONTRACT";
+        private final static String RESOURCENAMEFORPERMISSIONS = "CONTRACT";
 	    private final PlatformSecurityContext context;
 	    private final DefaultToApiJsonSerializer<SubscriptionData> toApiJsonSerializer;
 	    private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -63,6 +62,9 @@ public class ContractPeriodApiResource {
 		    }		
 		
 	
+    /**
+	 * using this method for Posting contract details
+	 */
 	@POST
 	@Consumes({MediaType.APPLICATION_JSON})
 	@Produces({MediaType.APPLICATION_JSON})
@@ -72,35 +74,43 @@ public class ContractPeriodApiResource {
 	        return this.toApiJsonSerializer.serialize(result);
 	}
 
-	
+	/**
+	 * Using this method getting one contract list using by contractId
+	 */
 	@GET
-	@Path("{SubscriptionId}")
+	@Path("{contractId}")
 	@Consumes({MediaType.APPLICATION_JSON})
 	@Produces({MediaType.APPLICATION_JSON})
-	public String retrieveContractDetails(@PathParam("SubscriptionId") final Long SubscriptionId, @Context final UriInfo uriInfo) {
-		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		SubscriptionData productData = this.contractPeriodReadPlatformService.retrieveSubscriptionData(SubscriptionId);
+	public String retrieveOneContractDetails(@PathParam("contractId") final Long contractId, @Context final UriInfo uriInfo) {
+		context.authenticatedUser().validateHasReadPermission(RESOURCENAMEFORPERMISSIONS);
+		SubscriptionData subscriptionData = this.contractPeriodReadPlatformService.retrieveSubscriptionData(contractId);
 		 final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-		 //List<PeriodData> allowedtypes = this.contractPeriodReadPlatformService.retrieveAllPlatformPeriod();
-		 List<DurationTypeData> durationTypeData = this.chargeCodeReadPlatformService.getDurationType();
-			productData = new SubscriptionData(durationTypeData, productData);
-	        return this.toApiJsonSerializer.serialize(settings, productData, RESPONSE_DATA_PARAMETERS);
+		 final List<DurationTypeData> durationTypeData = this.chargeCodeReadPlatformService.getDurationType();
+		 subscriptionData = new SubscriptionData(durationTypeData, subscriptionData);
+	        return this.toApiJsonSerializer.serialize(settings, subscriptionData, RESPONSE_DATA_PARAMETERS);
 	}
+	
+	/**
+	 * Using this method getting all contracts list
+	 */
 	@GET
 	@Consumes({MediaType.APPLICATION_JSON})
 	@Produces({MediaType.APPLICATION_JSON})
 	public String retrieveAllContracts(@Context final UriInfo uriInfo) {
-		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		Collection<SubscriptionData> products=this.contractPeriodReadPlatformService.retrieveAllSubscription();
+		context.authenticatedUser().validateHasReadPermission(RESOURCENAMEFORPERMISSIONS);
+		final Collection<SubscriptionData> subscriptionData=this.contractPeriodReadPlatformService.retrieveAllSubscription();
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-		return this.toApiJsonSerializer.serialize(settings, products, RESPONSE_DATA_PARAMETERS);
+		return this.toApiJsonSerializer.serialize(settings, subscriptionData, RESPONSE_DATA_PARAMETERS);
 	}
 	
+	/**
+	 * using this method editing contract details
+	 */
 	@PUT
-	@Path("{SubscriptionId}")
+	@Path("{contractId}")
 	@Consumes({MediaType.APPLICATION_JSON})
 	@Produces({MediaType.APPLICATION_JSON})
-	public String updateSubscription(@PathParam("SubscriptionId") final Long contractId, final String apiRequestBodyAsJson){
+	public String updateSubscription(@PathParam("contractId") final Long contractId, final String apiRequestBodyAsJson){
 
 		
 		 final CommandWrapper commandRequest = new CommandWrapperBuilder().updateContract(contractId).withJson(apiRequestBodyAsJson).build();
@@ -108,31 +118,37 @@ public class ContractPeriodApiResource {
 		  return this.toApiJsonSerializer.serialize(result);
 	}
 	
+	/**
+	 * using this method deleting  contract details by contractId
+	 */
 	 @DELETE
-		@Path("{SubscriptionId}")
+		@Path("{contractId}")
 		@Consumes({MediaType.APPLICATION_JSON})
 		@Produces({MediaType.APPLICATION_JSON})
-		public String deleteSubscription(@PathParam("SubscriptionId") final Long SubscriptionId) {
-		 final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteContract(SubscriptionId).build();
+		public String deleteSubscription(@PathParam("contractId") final Long contractId) {
+		 final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteContract(contractId).build();
 
 	        final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 
 	        return this.toApiJsonSerializer.serialize(result);
 
 		}
+	 
+	 /**
+	 * template for creating contract details
+	 */
 	 @GET
 		@Path("template")
 		@Consumes({MediaType.APPLICATION_JSON})
 		@Produces({MediaType.APPLICATION_JSON})
 		public String retrieveAllSubscriptionDetails(@Context final UriInfo uriInfo) {
 
-		 context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		 context.authenticatedUser().validateHasReadPermission(RESOURCENAMEFORPERMISSIONS);
 			
-			//List<PeriodData> allowedtypes = this.contractPeriodReadPlatformService.retrieveAllPlatformPeriod();
-			List<DurationTypeData> durationTypeData = this.chargeCodeReadPlatformService.getDurationType();
+			final List<DurationTypeData> durationTypeData = this.chargeCodeReadPlatformService.getDurationType();
 			final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters()); 
-			SubscriptionData product = new SubscriptionData(durationTypeData);
-	         return this.toApiJsonSerializer.serialize(settings, product, RESPONSE_DATA_PARAMETERS);
+			final SubscriptionData subscriptionData = new SubscriptionData(durationTypeData);
+	         return this.toApiJsonSerializer.serialize(settings, subscriptionData, RESPONSE_DATA_PARAMETERS);
 		}
 	 
 

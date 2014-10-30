@@ -1,4 +1,4 @@
-package org.mifosplatform.organisation.groupsDetails.data;
+package org.mifosplatform.organisation.groupsdetails.data;
 
 public class GroupsDetailsData {
 
@@ -12,8 +12,8 @@ public class GroupsDetailsData {
 	private String attribute4;
 	private String isProvision;
 	
-	public GroupsDetailsData(Long id,String groupName,String groupAddress,Long countNo, String attribute1, 
-			                       String attribute2, String attribute3, String attribute4,String isProvision){
+	public GroupsDetailsData(final Long id,final String  groupName, final String groupAddress, final Long countNo, final String attribute1, 
+			                       final String attribute2, final String attribute3, final String attribute4, final String isProvision){
 		
 		this.id = id;
 		this.groupName = groupName;
@@ -30,7 +30,7 @@ public class GroupsDetailsData {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(final Long id) {
 		this.id = id;
 	}
 
@@ -38,7 +38,7 @@ public class GroupsDetailsData {
 		return groupName;
 	}
 
-	public void setGroupName(String groupName) {
+	public void setGroupName(final String groupName) {
 		this.groupName = groupName;
 	}
 
@@ -46,7 +46,7 @@ public class GroupsDetailsData {
 		return groupAddress;
 	}
 
-	public void setGroupAddress(String groupAddress) {
+	public void setGroupAddress(final String groupAddress) {
 		this.groupAddress = groupAddress;
 	}
 
@@ -54,7 +54,7 @@ public class GroupsDetailsData {
 		return countNo;
 	}
 
-	public void setCountNo(Long countNo) {
+	public void setCountNo(final Long countNo) {
 		this.countNo = countNo;
 	}
 
@@ -62,7 +62,7 @@ public class GroupsDetailsData {
 		return attribute1;
 	}
 
-	public void setAttribute1(String attribute1) {
+	public void setAttribute1(final String attribute1) {
 		this.attribute1 = attribute1;
 	}
 
@@ -70,7 +70,7 @@ public class GroupsDetailsData {
 		return attribute2;
 	}
 
-	public void setAttribute2(String attribute2) {
+	public void setAttribute2(final String attribute2) {
 		this.attribute2 = attribute2;
 	}
 
@@ -78,7 +78,7 @@ public class GroupsDetailsData {
 		return attribute3;
 	}
 
-	public void setAttribute3(String attribute3) {
+	public void setAttribute3(final String attribute3) {
 		this.attribute3 = attribute3;
 	}
 
@@ -86,7 +86,7 @@ public class GroupsDetailsData {
 		return attribute4;
 	}
 
-	public void setAttribute4(String attribute4) {
+	public void setAttribute4(final String attribute4) {
 		this.attribute4 = attribute4;
 	}
 
@@ -94,7 +94,7 @@ public class GroupsDetailsData {
 		return isProvision;
 	}
 
-	public void setIsProvision(String isProvision) {
+	public void setIsProvision(final String isProvision) {
 		this.isProvision = isProvision;
 	}
 

@@ -1,4 +1,4 @@
-package org.mifosplatform.organisation.address.service;
+package org.mifosplatform.organisation.address.domain;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -19,6 +19,11 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 public class Country extends AbstractPersistable<Long>{
 	
 
+/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 @Column(name="country_code")
 private String countryCode;
 
@@ -34,7 +39,7 @@ public String getCountryCode() {
 }
 
 
-public void setCountryCode(String countryCode) {
+public void setCountryCode(final String countryCode) {
 	this.countryCode = countryCode;
 }
 
@@ -44,7 +49,7 @@ public String getCountryName() {
 }
 
 
-public void setCountryName(String countryName) {
+public void setCountryName(final String countryName) {
 	this.countryName = countryName;
 }
 
@@ -54,7 +59,7 @@ public String getIsActive() {
 }
 
 
-public void setIsActive(String isActive) {
+public void setIsActive(final String isActive) {
 	this.isActive = isActive;
 }
 
@@ -62,7 +67,7 @@ public Country(){
 	// TODO Auto-generated constructor stub
 }
 
-public Country(String entityCode, String entityName) {
+public Country(final String entityCode, final String entityName) {
 this.countryCode=entityCode;
 this.countryName=entityName;
 this.isActive="Y";
@@ -71,12 +76,12 @@ this.isActive="Y";
 }
 
 
-public static Country fromJson(JsonCommand command) {
+public static Country fromJson(final JsonCommand command) {
 	final String cityCode = command.stringValueOfParameterNamed("entityCode");
     final String cityName = command.stringValueOfParameterNamed("entityName");
      return new Country(cityCode,cityName);
 }
-public Map<String, Object> update(JsonCommand command) {
+public Map<String, Object> update(final JsonCommand command) {
 	final Map<String, Object> actualChanges = new LinkedHashMap<String, Object>(1);
 	final String countryCodeParamName="entityCode";
 	if (command.isChangeInStringParameterNamed(countryCodeParamName,this.countryCode)){

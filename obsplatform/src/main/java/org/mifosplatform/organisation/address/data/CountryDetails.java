@@ -5,7 +5,7 @@ public class CountryDetails {
 	private final Long id;
 	private final String countryName;
 	
-	public CountryDetails(Long id, String countryName) {
+	public CountryDetails(final Long id, final String countryName) {
            
 		this.id=id;
 		this.countryName=countryName;

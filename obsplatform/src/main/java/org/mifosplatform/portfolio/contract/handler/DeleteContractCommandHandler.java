@@ -1,7 +1,6 @@
 package org.mifosplatform.portfolio.contract.handler;
 
 import org.mifosplatform.commands.handler.NewCommandSourceHandler;
-import org.mifosplatform.infrastructure.codes.service.CodeWritePlatformService;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.portfolio.contract.service.ContractPeriodWritePlatformService;

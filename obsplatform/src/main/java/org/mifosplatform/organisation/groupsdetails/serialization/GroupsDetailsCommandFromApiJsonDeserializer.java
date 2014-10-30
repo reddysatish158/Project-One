@@ -1,4 +1,4 @@
-package org.mifosplatform.organisation.groupsDetails.serialization;
+package org.mifosplatform.organisation.groupsdetails.serialization;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;

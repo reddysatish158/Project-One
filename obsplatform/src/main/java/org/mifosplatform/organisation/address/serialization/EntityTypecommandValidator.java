@@ -1,4 +1,4 @@
-package org.mifosplatform.organisation.address.service;
+package org.mifosplatform.organisation.address.serialization;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +19,8 @@ public class EntityTypecommandValidator {
 
 
 	public void validateForCreate() {
-         List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
-		DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("address");
+        final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
+		final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("address");
 		baseDataValidator.reset().parameter("entityCode").value(command.getEntityCode()).integerGreaterThanZero().notNull().notBlank();
 		baseDataValidator.reset().parameter("entityName").value(command.getEntityName()).notBlank().notNull();
 

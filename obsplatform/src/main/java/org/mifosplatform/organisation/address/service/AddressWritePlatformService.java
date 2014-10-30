@@ -7,9 +7,9 @@ public interface AddressWritePlatformService {
 	
 	
 
-	CommandProcessingResult updateAddress(Long addrId, JsonCommand command);
+	CommandProcessingResult updateAddress(Long clientId, JsonCommand command);
 
-	CommandProcessingResult createNewLocation(JsonCommand command,String supportedEntityType);
+	CommandProcessingResult createLocation(JsonCommand command,String supportedEntityType);
 
 	CommandProcessingResult createAddress(Long clientId, JsonCommand command);
 	

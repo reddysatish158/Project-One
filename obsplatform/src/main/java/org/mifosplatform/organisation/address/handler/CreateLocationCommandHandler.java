@@ -14,12 +14,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class CreateNewLocationCommandHandler implements NewCommandSourceHandler {
+public class CreateLocationCommandHandler implements NewCommandSourceHandler {
 
     private final AddressWritePlatformService writePlatformService;
 
     @Autowired
-    public CreateNewLocationCommandHandler(final AddressWritePlatformService writePlatformService) {
+    public CreateLocationCommandHandler(final AddressWritePlatformService writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 
@@ -27,6 +27,6 @@ public class CreateNewLocationCommandHandler implements NewCommandSourceHandler 
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
 
-        return this.writePlatformService.createNewLocation(command,command.getSupportedEntityType());
+        return this.writePlatformService.createLocation(command,command.getSupportedEntityType());
     }
 }

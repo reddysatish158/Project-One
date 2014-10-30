@@ -16,6 +16,11 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @Table(name = "b_contract_period",uniqueConstraints = @UniqueConstraint(name = "contract_period_key", columnNames = { "contract_period" }))
 public class Contract extends AbstractPersistable<Long> {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Column(name = "contract_period", nullable = false)
 	private String subscriptionPeriod;
 
@@ -32,7 +37,7 @@ public class Contract extends AbstractPersistable<Long> {
 	}
 
 	public Contract(final String subscriptionPeriod, final Long units,
-			final String subscriptionType, final Long subscriptionTypeId) {
+			final String subscriptionType) {
 
 		this.subscriptionPeriod = subscriptionPeriod;
 		this.subscriptionType = subscriptionType;
@@ -62,10 +67,10 @@ public class Contract extends AbstractPersistable<Long> {
 	    final String subscriptionPeriod = command.stringValueOfParameterNamed("subscriptionPeriod");
 	    final String subscriptionType = command.stringValueOfParameterNamed("subscriptionType");
 	    final Long units = command.longValueOfParameterNamed("units");
-	    return new Contract(subscriptionPeriod,units,subscriptionType,null);
+	    return new Contract(subscriptionPeriod,units,subscriptionType);
 	}
 
-	public Map<String, Object> update(JsonCommand command) {
+	public Map<String, Object> update(final JsonCommand command) {
 		 final Map<String, Object> actualChanges = new LinkedHashMap<String, Object>(1);
 		  final String subscriptionPeriod = "subscriptionPeriod";
 	        if (command.isChangeInStringParameterNamed(subscriptionPeriod, this.subscriptionPeriod)) {

@@ -1,4 +1,4 @@
-package org.mifosplatform.organisation.groupsDetails.domain;
+package org.mifosplatform.organisation.groupsdetails.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,6 +10,11 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @Entity
 @Table(name = "b_group")
 public class GroupsDetails extends AbstractPersistable<Long>{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	@Column(name = "group_name")
 	private String groupName;
@@ -36,8 +41,8 @@ public class GroupsDetails extends AbstractPersistable<Long>{
 		
 	}
 	
-	public  GroupsDetails(String groupName,String groupAddress,String attribute1,String attribute2,
-					String attribute3,String attribute4) {
+	public  GroupsDetails(final String groupName,final String groupAddress,final String attribute1,final String attribute2,
+					final String attribute3,final String attribute4) {
 			this.groupName = groupName;
 			this.groupAddress = groupAddress;
 			this.attribute1 = attribute1;
@@ -45,7 +50,7 @@ public class GroupsDetails extends AbstractPersistable<Long>{
 			this.attribute3 = attribute3;
 			this.attribute4 = attribute4;
 	}
-	public static GroupsDetails fromJson(JsonCommand command) {
+	public static GroupsDetails fromJson(final JsonCommand command) {
 		
 		final String groupName = command.stringValueOfParameterNamed("groupName");
 		final String groupAddress = command.stringValueOfParameterNamed("groupAddress");
@@ -68,7 +73,7 @@ public class GroupsDetails extends AbstractPersistable<Long>{
 		return groupName;
 	}
 
-	public void setGroupName(String groupName) {
+	public void setGroupName(final String groupName) {
 		this.groupName = groupName;
 	}
 
@@ -76,7 +81,7 @@ public class GroupsDetails extends AbstractPersistable<Long>{
 		return groupAddress;
 	}
 
-	public void setGroupAddress(String groupAddress) {
+	public void setGroupAddress(final String groupAddress) {
 		this.groupAddress = groupAddress;
 	}
 
@@ -84,7 +89,7 @@ public class GroupsDetails extends AbstractPersistable<Long>{
 		return attribute1;
 	}
 
-	public void setAttribute1(String attribute1) {
+	public void setAttribute1(final String attribute1) {
 		this.attribute1 = attribute1;
 	}
 
@@ -92,7 +97,7 @@ public class GroupsDetails extends AbstractPersistable<Long>{
 		return attribute2;
 	}
 
-	public void setAttribute2(String attribute2) {
+	public void setAttribute2(final String attribute2) {
 		this.attribute2 = attribute2;
 	}
 
@@ -100,7 +105,7 @@ public class GroupsDetails extends AbstractPersistable<Long>{
 		return attribute3;
 	}
 
-	public void setAttribute3(String attribute3) {
+	public void setAttribute3(final String attribute3) {
 		this.attribute3 = attribute3;
 	}
 
@@ -108,7 +113,7 @@ public class GroupsDetails extends AbstractPersistable<Long>{
 		return attribute4;
 	}
 
-	public void setAttribute4(String attribute4) {
+	public void setAttribute4(final String attribute4) {
 		this.attribute4 = attribute4;
 	}
 
@@ -116,7 +121,7 @@ public class GroupsDetails extends AbstractPersistable<Long>{
 		return isProvision;
 	}
 
-	public void setIsProvision(char isProvision) {
+	public void setIsProvision(final char isProvision) {
 		this.isProvision = isProvision;
 	}
 	
