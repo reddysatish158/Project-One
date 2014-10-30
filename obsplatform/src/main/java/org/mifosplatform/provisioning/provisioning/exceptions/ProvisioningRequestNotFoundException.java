@@ -2,6 +2,7 @@ package org.mifosplatform.provisioning.provisioning.exceptions;
 
 import org.mifosplatform.infrastructure.core.exception.AbstractPlatformDomainRuleException;
 
+@SuppressWarnings("serial")
 public class ProvisioningRequestNotFoundException extends AbstractPlatformDomainRuleException {
 
 	public ProvisioningRequestNotFoundException(Long provisionId) {

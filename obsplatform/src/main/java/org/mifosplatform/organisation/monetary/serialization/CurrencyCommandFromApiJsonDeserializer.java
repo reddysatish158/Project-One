@@ -28,37 +28,47 @@ import com.google.gson.reflect.TypeToken;
 @Component
 public final class CurrencyCommandFromApiJsonDeserializer {
 
-    /**
-     * The parameters supported for this command.
-     */
-    private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("currencies"));
+	/**
+	 * The parameters supported for this command.
+	 */
+	private final Set<String> supportedParameters = new HashSet<String>(
+			Arrays.asList("currencies"));
 
-    private final FromJsonHelper fromApiJsonHelper;
+	private final FromJsonHelper fromApiJsonHelper;
 
-    @Autowired
-    public CurrencyCommandFromApiJsonDeserializer(final FromJsonHelper fromApiJsonHelper) {
-        this.fromApiJsonHelper = fromApiJsonHelper;
-    }
+	@Autowired
+	public CurrencyCommandFromApiJsonDeserializer(
+			final FromJsonHelper fromApiJsonHelper) {
+		this.fromApiJsonHelper = fromApiJsonHelper;
+	}
 
-    public void validateForUpdate(final String json) {
+	public void validateForUpdate(final String json) {
 
-        if (StringUtils.isBlank(json)) { throw new InvalidJsonException(); }
+		if (StringUtils.isBlank(json)) {
+			throw new InvalidJsonException();
+		}
 
-        final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
-        fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, supportedParameters);
+		final Type typeOfMap = new TypeToken<Map<String, Object>>() {
+		}.getType();
+		
+		fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, supportedParameters);
 
-        final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
-        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("currencies");
+		final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
+		final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("currencies");
 
-        final JsonElement element = fromApiJsonHelper.parse(json);
-        final String[] currencies = fromApiJsonHelper.extractArrayNamed("currencies", element);
-        baseDataValidator.reset().parameter("currencies").value(currencies).arrayNotEmpty();
+		final JsonElement element = fromApiJsonHelper.parse(json);
+		final String[] currencies = fromApiJsonHelper.extractArrayNamed("currencies", element);
+		baseDataValidator.reset().parameter("currencies").value(currencies).arrayNotEmpty();
 
-        throwExceptionIfValidationWarningsExist(dataValidationErrors);
-    }
+		throwExceptionIfValidationWarningsExist(dataValidationErrors);
+	}
 
-    private void throwExceptionIfValidationWarningsExist(final List<ApiParameterError> dataValidationErrors) {
-        if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist",
-                "Validation errors exist.", dataValidationErrors); }
-    }
+	private void throwExceptionIfValidationWarningsExist(
+			final List<ApiParameterError> dataValidationErrors) {
+		if (!dataValidationErrors.isEmpty()) {
+			throw new PlatformApiDataValidationException(
+					"validation.msg.validation.errors.exist",
+					"Validation errors exist.", dataValidationErrors);
+		}
+	}
 }

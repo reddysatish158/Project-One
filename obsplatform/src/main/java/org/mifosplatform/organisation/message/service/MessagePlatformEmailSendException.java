@@ -5,6 +5,12 @@
  */
 package org.mifosplatform.organisation.message.service;
 
+/**
+ * 
+ * @author ashokreddy
+ *
+ */
+@SuppressWarnings("serial")
 public class MessagePlatformEmailSendException extends RuntimeException {
 
     public MessagePlatformEmailSendException(final Throwable e) {

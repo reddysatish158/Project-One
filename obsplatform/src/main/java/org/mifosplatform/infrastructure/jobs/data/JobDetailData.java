@@ -4,48 +4,37 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+
+import org.mifosplatform.organisation.message.data.BillingMessageTemplateData;
 import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
-import org.mifosplatform.organisation.message.data.BillingMessageData;
 import org.mifosplatform.scheduledjobs.scheduledjobs.data.JobParameterData;
 import org.mifosplatform.scheduledjobs.scheduledjobs.data.ScheduleJobData;
 
 public class JobDetailData {
 
-    @SuppressWarnings("unused")
     private final Long jobId;
-
-    @SuppressWarnings("unused")
+    
     private final String displayName;
     
-    @SuppressWarnings("unused")
     private final String name;
 
-    @SuppressWarnings("unused")
     private final Date nextRunTime;
 
-    @SuppressWarnings("unused")
     private final String initializingError;
     
-    @SuppressWarnings("unused")
     private final String cronExpression;
     
-    @SuppressWarnings("unused")
     private final String cronDescription;
 
-    @SuppressWarnings("unused")
     private final boolean active;
 
-    @SuppressWarnings("unused")
     private final boolean currentlyRunning;
 
-    @SuppressWarnings("unused")
     private final JobDetailHistoryData lastRunHistory;
     
-    @SuppressWarnings("unused")
     private  List<ScheduleJobData> queryData;
     
-    @SuppressWarnings("unused")
-    private   Collection<BillingMessageData> billingMessageDatas;
+    private   Collection<BillingMessageTemplateData> billingMessageDatas;
 
 	private JobParameterData jobparameters;
 
@@ -117,7 +106,7 @@ public class JobDetailData {
 		
 	}
 
-	public void setMessageData(Collection<BillingMessageData> templateData) {
+	public void setMessageData(Collection<BillingMessageTemplateData> templateData) {
 		
 		this.billingMessageDatas=templateData;
 		
@@ -134,6 +123,22 @@ public class JobDetailData {
 
 	public void setProvisionSysData(Collection<MCodeData> provisionSysData) {
 		this.provisionSysData = provisionSysData;
+	}
+
+	public List<ScheduleJobData> getQueryData() {
+		return queryData;
+	}
+
+	public Collection<BillingMessageTemplateData> getBillingMessageDatas() {
+		return billingMessageDatas;
+	}
+
+	public JobParameterData getJobparameters() {
+		return jobparameters;
+	}
+
+	public Long getHistoryId() {
+		return historyId;
 	}
     
 	

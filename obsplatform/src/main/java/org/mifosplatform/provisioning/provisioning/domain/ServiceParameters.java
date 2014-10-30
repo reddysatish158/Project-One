@@ -18,6 +18,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
 
+@SuppressWarnings("serial")
 @Entity
 @Table(name="b_service_parameters")
 public class ServiceParameters extends AbstractAuditableCustom<AppUser,Long>{
@@ -46,7 +47,9 @@ public class ServiceParameters extends AbstractAuditableCustom<AppUser,Long>{
 	}
 
 
-	public ServiceParameters(Long clientId, Long orderId, String planName,String paramName,String paramValue, String status) {
+	public ServiceParameters(final Long clientId, final Long orderId, 
+			final String planName, final String paramName,
+			final String paramValue, final String status) {
 	
 		       this.clientId=clientId;
 		       this.orderId=orderId;
@@ -57,10 +60,12 @@ public class ServiceParameters extends AbstractAuditableCustom<AppUser,Long>{
 	}
 
 
-	public static ServiceParameters fromJson(JsonElement j,FromJsonHelper fromJsonHelper, Long clientId, Long orderId, String planName, String status,String ipRange, Long subnet) {
+	public static ServiceParameters fromJson(final JsonElement j, final FromJsonHelper fromJsonHelper,
+			final Long clientId, final Long orderId, final String planName,
+			final String status, final String ipRange, final Long subnet) {
 
 		 final String paramName = fromJsonHelper.extractStringNamed("paramName",j);
-		 String service =null;
+		 String service;
 		 if(paramName.equalsIgnoreCase("IP_ADDRESS")){
 			  if(ipRange.equalsIgnoreCase("subnet")){
 				  service= fromJsonHelper.extractStringNamed("paramValue",j);
@@ -146,37 +151,41 @@ public class ServiceParameters extends AbstractAuditableCustom<AppUser,Long>{
 	}
 
 
-	public Map<String, Object> updateServiceParam(JsonArray serviceParameters,FromJsonHelper fromApiJsonHelper, JsonCommand command) {
-		
-		
-		final Map<String, Object> actualChanges = new LinkedHashMap<String, Object>(1);
-		
-		for(JsonElement element:serviceParameters){
-			String paramName=fromApiJsonHelper.extractStringNamed("paramName",element);
-			if(this.parameterName.equalsIgnoreCase(paramName)){
-				
-				 String service =null;
-				 if(paramName.equalsIgnoreCase("IP_ADDRESS")){
-						String[] ipaddresses = fromApiJsonHelper.extractArrayNamed("paramValue",element);
-						JSONArray array=new JSONArray();
-						for(String ipAddress:ipaddresses){
-							array.add(ipAddress);
-						}
-						service=array.toString();
-					 }else
-				  service=fromApiJsonHelper.extractStringNamed("paramValue", element);
-			
-				 if (!service.equalsIgnoreCase(this.parameterValue)) {
-				
-				this.parameterValue=service;
-				actualChanges.put(parameterName, service);
-				return actualChanges;
-				
+	public Map<String, Object> updateServiceParam(final JsonArray serviceParameters,
+			final FromJsonHelper fromApiJsonHelper, final JsonCommand command) {
+
+		final Map<String, Object> actualChanges = new LinkedHashMap<String, Object>(
+				1);
+
+		for (JsonElement element : serviceParameters) {
+			String paramName = fromApiJsonHelper.extractStringNamed(
+					"paramName", element);
+			if (this.parameterName.equalsIgnoreCase(paramName)) {
+
+				String service;
+				if (paramName.equalsIgnoreCase("IP_ADDRESS")) {
+					String[] ipaddresses = fromApiJsonHelper.extractArrayNamed(
+							"paramValue", element);
+					JSONArray array = new JSONArray();
+					for (String ipAddress : ipaddresses) {
+						array.add(ipAddress);
+					}
+					service = array.toString();
+				} else
+					service = fromApiJsonHelper.extractStringNamed(
+							"paramValue", element);
+
+				if (!service.equalsIgnoreCase(this.parameterValue)) {
+
+					this.parameterValue = service;
+					actualChanges.put(parameterName, service);
+					return actualChanges;
+
+				}
+
 			}
-			
-		}
 		}
 		return actualChanges;
-	
+
 	}
 }

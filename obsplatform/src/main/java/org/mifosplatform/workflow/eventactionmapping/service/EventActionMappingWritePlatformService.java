@@ -7,7 +7,8 @@ public interface EventActionMappingWritePlatformService {
 
 	CommandProcessingResult createEventActionMapping(JsonCommand command);
 
-	CommandProcessingResult updateEventActionMapping(Long id, JsonCommand command);
+	CommandProcessingResult updateEventActionMapping(Long id,
+			JsonCommand command);
 
 	CommandProcessingResult deleteEventActionMapping(Long id);
 

@@ -13,11 +13,11 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
-import org.mifosplatform.organisation.randomgenerator.domain.RandomGenerator;
-import org.mifosplatform.organisation.randomgenerator.domain.RandomGeneratorDetails;
-import org.mifosplatform.organisation.randomgenerator.domain.RandomGeneratorDetailsRepository;
 import org.mifosplatform.organisation.redemption.exception.PinNumberNotFoundException;
 import org.mifosplatform.organisation.redemption.serialization.RedemptionCommandFromApiJsonDeserializer;
+import org.mifosplatform.organisation.voucher.domain.Voucher;
+import org.mifosplatform.organisation.voucher.domain.VoucherDetails;
+import org.mifosplatform.organisation.voucher.domain.VoucherDetailsRepository;
 import org.mifosplatform.portfolio.client.domain.Client;
 import org.mifosplatform.portfolio.client.domain.ClientRepository;
 import org.mifosplatform.portfolio.client.exception.ClientNotFoundException;
@@ -42,7 +42,7 @@ public class RedemptionWritePlatformServiceImpl implements
 	private final static Logger LOGGER = LoggerFactory.getLogger(RedemptionWritePlatformServiceImpl.class);
 	private final PlatformSecurityContext context;	
 	private final FromJsonHelper fromJsonHelper;
-	private final RandomGeneratorDetailsRepository randomGeneratorDetailsRepository;
+	private final VoucherDetailsRepository voucherDetailsRepository;
 	private final ClientRepository clientRepository;
 	private final AdjustmentWritePlatformService adjustmentWritePlatformService;
 	private final OrderWritePlatformService orderWritePlatformService;
@@ -58,7 +58,7 @@ public class RedemptionWritePlatformServiceImpl implements
 	private final static int RENEWAL_ORDER_STATUS = 1;
 	
 	@Autowired
-	public RedemptionWritePlatformServiceImpl(final PlatformSecurityContext context,final RandomGeneratorDetailsRepository randomGeneratorDetailsRepository,
+	public RedemptionWritePlatformServiceImpl(final PlatformSecurityContext context,final VoucherDetailsRepository voucherDetailsRepository,
 		final ClientRepository clientRepository,final AdjustmentWritePlatformService adjustmentWritePlatformService,final FromJsonHelper fromJsonHelper,
 		final OrderWritePlatformService orderWritePlatformService,final ContractPeriodReadPlatformService contractPeriodReadPlatformService,
 		final RedemptionReadPlatformService redemptionReadPlatformService,final OrderRepository orderRepository,final RedemptionCommandFromApiJsonDeserializer apiJsonDeserializer) {
@@ -71,7 +71,7 @@ public class RedemptionWritePlatformServiceImpl implements
 		this.orderWritePlatformService = orderWritePlatformService;
 		this.redemptionReadPlatformService=redemptionReadPlatformService;
 		this.adjustmentWritePlatformService = adjustmentWritePlatformService;
-		this.randomGeneratorDetailsRepository = randomGeneratorDetailsRepository;
+		this.voucherDetailsRepository = voucherDetailsRepository;
 		this.contractPeriodReadPlatformService = contractPeriodReadPlatformService;
 		
 	}
@@ -88,75 +88,77 @@ public class RedemptionWritePlatformServiceImpl implements
 			final Long clientId = command.longValueOfParameterNamed("clientId");
 			final String pinNum = command.stringValueOfParameterNamed("pinNumber");
 			this.clientObjectRetrieveById(clientId);
-			final RandomGeneratorDetails randomGeneratorDetails = retrieveRandomDetailsByPinNo(pinNum);
-			final RandomGenerator randomGenerator = randomGeneratorDetails.getRandomGenerator();
-			final String pinType = randomGenerator.getPinType();
+
+			final VoucherDetails voucherDetails = retrieveRandomDetailsByPinNo(pinNum);
+			final Voucher voucher = voucherDetails.getVoucher();
+			final String pinType = voucher.getPinType();
 			 
-			 if(pinType.equalsIgnoreCase(VALUE_PINTYPE)){
+			if(pinType.equalsIgnoreCase(VALUE_PINTYPE)){
 				 
-				 final BigDecimal pinValue = new BigDecimal(randomGenerator.getPinValue());
-				 final JsonObject json = new JsonObject();
-				 json.addProperty("adjustment_type", "CREDIT");json.addProperty("adjustment_code", 123);
-				 json.addProperty("amount_paid",pinValue);json.addProperty("Remarks", "Adjustment Post By Redemption");
-				 json.addProperty("locale", "en");json.addProperty("dateFormat",DATEFORMAT);
-				 json.addProperty("adjustment_date", simpleDateFormat);
-				 final JsonCommand commd = new JsonCommand(null, json.toString(), json, fromJsonHelper, null, clientId, null, null, clientId, null, null, null, null, null, null,null);
-		          this.adjustmentWritePlatformService.createAdjustments(commd);
-			 }
-			 if(pinType.equalsIgnoreCase(PRODUCE_PINTYPE)){
+				final BigDecimal pinValue = new BigDecimal(pinType);
+				final JsonObject json = new JsonObject();
+				json.addProperty("adjustment_type", "CREDIT");json.addProperty("adjustment_code", 123);
+				json.addProperty("amount_paid",pinValue);json.addProperty("Remarks", "Adjustment Post By Redemption");
+				json.addProperty("locale", "en");json.addProperty("dateFormat",DATEFORMAT);
+				json.addProperty("adjustment_date", simpleDateFormat);
+				final JsonCommand commd = new JsonCommand(null, json.toString(), json, fromJsonHelper, null, clientId, null, null, clientId, null, null, null, null, null, null,null);
+				this.adjustmentWritePlatformService.createAdjustments(commd);
+			}
+			 
+			if(pinType.equalsIgnoreCase(PRODUCE_PINTYPE)){
 				 
-				 final Long planId = Long.parseLong(randomGenerator.getPinValue());
-				 final List<Long> orderIds=this.redemptionReadPlatformService.retrieveOrdersData(clientId,planId);
-				 final JsonObject json = new JsonObject();
-				 final List<SubscriptionData> subscriptionDatas=this.contractPeriodReadPlatformService.retrieveSubscriptionDatabyContractType("Month(s)",1);
+				final Long planId = Long.parseLong(pinType);
+				final List<Long> orderIds=this.redemptionReadPlatformService.retrieveOrdersData(clientId,planId);
+				final JsonObject json = new JsonObject();
+				final List<SubscriptionData> subscriptionDatas=this.contractPeriodReadPlatformService.retrieveSubscriptionDatabyContractType("Month(s)",1);
+				
+				if(orderIds.isEmpty()){
+					 
+					json.addProperty("billAlign", false);json.addProperty("planCode", planId);
+					json.addProperty("contractPeriod", subscriptionDatas.get(0).getId());
+					json.addProperty("isNewplan", true);
+					json.addProperty("paytermCode", "Monthly");json.addProperty("locale", "en");
+					json.addProperty("dateFormat",DATEFORMAT); json.addProperty("start_date", simpleDateFormat);
+					final JsonCommand commd = new JsonCommand(null, json.toString(), json, fromJsonHelper, null,clientId, null, null, null, null, null, null, null, null, null,null);
+					this.orderWritePlatformService.createOrder(clientId, commd);
 				 
-				 if(orderIds.isEmpty()){
+				}else {
 					 
-					 json.addProperty("billAlign", false);json.addProperty("planCode", planId);
-					 json.addProperty("contractPeriod", subscriptionDatas.get(0).getId());
-					 json.addProperty("isNewplan", true);
-					 json.addProperty("paytermCode", "Monthly");json.addProperty("locale", "en");
-					 json.addProperty("dateFormat",DATEFORMAT); json.addProperty("start_date", simpleDateFormat);
-					 final JsonCommand commd = new JsonCommand(null, json.toString(), json, fromJsonHelper, null,clientId, null, null, null, null, null, null, null, null, null,null);
-					    this.orderWritePlatformService.createOrder(clientId, commd);
-				 }else {
+					final Long orderId = orderIds.get(0);
 					 
-					 final Long orderId = orderIds.get(0);
+					final Order order=this.orderRepository.findOne(orderId);
 					 
-					 final Order order=this.orderRepository.findOne(orderId);
-					 
-						if(order.getStatus() == RECONNECT_ORDER_STATUS){
+						if(order.getStatus() == RECONNECT_ORDER_STATUS){					
+							this.orderWritePlatformService.reconnectOrder(orderId);
+						} else if(order.getStatus() == RENEWAL_ORDER_STATUS){
 							
-						   this.orderWritePlatformService.reconnectOrder(orderId);
+							json.addProperty("renewalPeriod", subscriptionDatas.get(0).getId());
+							json.addProperty("description", "Order Renewal By Redemption");
+							final JsonCommand commd = new JsonCommand(null, json.toString(), json, fromJsonHelper, null, clientId, null, null, clientId, null, null, null, null, null, null,null);
+							this.orderWritePlatformService.renewalClientOrder(commd, orderId);				
 						}
-						
-						else if(order.getStatus() == RENEWAL_ORDER_STATUS){
-							
-							 json.addProperty("renewalPeriod", subscriptionDatas.get(0).getId());
-							 json.addProperty("description", "Order Renewal By Redemption");
-							 final JsonCommand commd = new JsonCommand(null, json.toString(), json, fromJsonHelper, null, clientId, null, null, clientId, null, null, null, null, null, null,null);
-						   this.orderWritePlatformService.renewalClientOrder(commd, orderId);
-						}
-				 }
-			 }
+				}
+			}
+			  
+			voucherDetails.setClientId(clientId);
+			this.voucherDetailsRepository.save(voucherDetails);
 			 
-			 
-			 randomGeneratorDetails.setClientId(clientId);
-			 this.randomGeneratorDetailsRepository.save(randomGeneratorDetails);
-			 
-			 return new CommandProcessingResult(clientId);
-	    }catch(DataIntegrityViolationException dve){
-	    	handleCodeDataIntegrityIssues(dve);
+			return new CommandProcessingResult(clientId);
+		}catch(DataIntegrityViolationException dve){
+			handleCodeDataIntegrityIssues(dve);
 	    	return new CommandProcessingResult(Long.valueOf(-1));
-	    }
+		}
 		
 	}
 	
-	private RandomGeneratorDetails retrieveRandomDetailsByPinNo(final String pinNumber) {
-		
-			final RandomGeneratorDetails randomDetails = this.randomGeneratorDetailsRepository.findOneByPinNumber(pinNumber);
-			if(randomDetails == null){throw new PinNumberNotFoundException(pinNumber);}
-		return randomDetails;
+
+	private VoucherDetails retrieveRandomDetailsByPinNo(String pinNumber) {
+
+		final VoucherDetails voucherDetails = this.voucherDetailsRepository.findOneByPinNumber(pinNumber);
+		if (voucherDetails == null) {
+			throw new PinNumberNotFoundException(pinNumber);
+		}
+		return voucherDetails;
 	}
 
 	private Client clientObjectRetrieveById(final Long clientId) {

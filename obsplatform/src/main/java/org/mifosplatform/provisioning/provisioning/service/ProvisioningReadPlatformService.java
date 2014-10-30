@@ -25,9 +25,9 @@ public interface ProvisioningReadPlatformService {
 	List<ServiceParameterData> getSerivceParameters(Long orderId);
 
 	List<ServiceParameterData> getProvisionedSerivceParameters(Long orderId);
-	
+
 	Long getHardwareDetails(String oldHardWare, Long clientId, String name);
-	
+
 	List<ProcessRequestData> getProcessRequestData(String orderNo);
 
 	ProcessRequestData getProcessRequestIDData(Long id);

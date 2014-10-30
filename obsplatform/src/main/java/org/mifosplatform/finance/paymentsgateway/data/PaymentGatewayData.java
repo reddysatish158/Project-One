@@ -7,6 +7,11 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.mifosplatform.infrastructure.core.data.MediaEnumoptionData;
 
+/**
+ * 
+ * @author ashokreddy
+ *
+ */
 public class PaymentGatewayData {
 
 	private Long id;
@@ -23,9 +28,9 @@ public class PaymentGatewayData {
 	private LocalDate paymendDate;
 	private Object phoneMSISDN;
 
-	public PaymentGatewayData(Long id, String serialNo, String phoneNo,
-			DateTime paymentDate, BigDecimal amountPaid, String receiptNo,
-			String clientName, String status, Long paymentId, String remarks) {
+	public PaymentGatewayData(final Long id, final String serialNo, final String phoneNo,
+			final DateTime paymentDate, final BigDecimal amountPaid, final String receiptNo,
+			final String clientName, final String status, final Long paymentId, final String remarks) {
 		this.id=id;
 		this.paymentId=paymentId;
 		this.serialNo=serialNo;
@@ -88,6 +93,15 @@ public class PaymentGatewayData {
 	public String getRemarks() {
 		return remarks;
 	}
+
+	public LocalDate getPaymendDate() {
+		return paymendDate;
+	}
+
+	public Object getPhoneMSISDN() {
+		return phoneMSISDN;
+	}
+	
 	
 	
 	

@@ -819,14 +819,14 @@ public class CommandWrapper {
 		   return this.actionName.equalsIgnoreCase("CREATE") && this.entityName.equalsIgnoreCase("SUPPLIER");
 		}
 
-		public boolean isRandomGeneratorResource() {
+		public boolean isVoucherResource() {
 		
-			return this.entityName.equalsIgnoreCase("RANDAMGENERATOR");
+			return this.entityName.equalsIgnoreCase("VOUCHER");
 	     }
 
-		public boolean isCreateRandomGenerator() {
+		public boolean isCreateVoucherGroup() {
 			
-			return this.actionName.equalsIgnoreCase("CREATE") && this.entityName.equalsIgnoreCase("RANDAMGENERATOR");
+			return this.actionName.equalsIgnoreCase("CREATE") && this.entityName.equalsIgnoreCase("VOUCHER");
 	    }
 
 		 public boolean isSchedulerResource() {
@@ -1090,8 +1090,8 @@ public class CommandWrapper {
 		public boolean isCreateStatment() {
 			return this.actionName.equalsIgnoreCase("CREATESTATMENT");
 		}
-			public boolean isProcessRandomGenerator() {
-			return this.actionName.equalsIgnoreCase("PROCESS") && this.entityName.equalsIgnoreCase("RANDAMGENERATOR");
+			public boolean isGenerateVoucherPin() {
+			return this.actionName.equalsIgnoreCase("PROCESS") && this.entityName.equalsIgnoreCase("VOUCHER");
 		}
 		
 	

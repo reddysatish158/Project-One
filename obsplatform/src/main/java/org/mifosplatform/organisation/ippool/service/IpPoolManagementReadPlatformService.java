@@ -6,8 +6,12 @@ import org.mifosplatform.crm.clientprospect.service.SearchSqlQuery;
 import org.mifosplatform.infrastructure.core.service.Page;
 import org.mifosplatform.organisation.ippool.data.IpPoolData;
 import org.mifosplatform.organisation.ippool.data.IpPoolManagementData;
-import org.mifosplatform.organisation.ippool.domain.IpPoolManagementDetail;
 
+/**
+ * 
+ * @author ashokreddy
+ *
+ */
 public interface IpPoolManagementReadPlatformService {
 
 	List<IpPoolData> getUnallocatedIpAddressDetailds();

@@ -11,7 +11,7 @@ import org.mifosplatform.organisation.monetary.data.CurrencyData;
 
 public interface CurrencyReadPlatformService {
 
-    Collection<CurrencyData> retrieveAllowedCurrencies();
+	Collection<CurrencyData> retrieveAllowedCurrencies();
 
-    Collection<CurrencyData> retrieveAllPlatformCurrencies();
+	Collection<CurrencyData> retrieveAllPlatformCurrencies();
 }

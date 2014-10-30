@@ -16,7 +16,9 @@ public class PlanMappingData {
 	private List<PlanCodeData> planCodeData;
 	private String image;
 
-	public PlanMappingData(Long id, String planCode, String planIdentification,String planStatus, Long planId,String image) {
+	public PlanMappingData(final Long id, final String planCode, 
+			final String planIdentification, final String planStatus, 
+			final Long planId, final String image) {
 
 		this.id = id;
 		this.planCode = planCode;
@@ -26,7 +28,8 @@ public class PlanMappingData {
 		this.image = image;
 	}
 
-	public PlanMappingData(List<PlanCodeData> planCodeData,List<EnumOptionData> status) {
+	public PlanMappingData(final List<PlanCodeData> planCodeData,
+			final List<EnumOptionData> status) {
 		
 		this.planCodeData = planCodeData;
 		this.status = status;	
@@ -67,10 +70,10 @@ public class PlanMappingData {
 	public Long getPlanId() {
 		return planId;
 	}
-	
-	
-	
-	
+
+	public String getImage() {
+		return image;
+	}
 	
 
 }

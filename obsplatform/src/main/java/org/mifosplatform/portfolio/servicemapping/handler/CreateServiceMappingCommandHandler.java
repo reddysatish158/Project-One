@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CreateServiceMappingCommandHandler implements NewCommandSourceHandler{
 	
 	private final ServiceMappingWritePlatformService serviceMappingWritePlatformService;
+	
 	@Autowired
 	public CreateServiceMappingCommandHandler(final ServiceMappingWritePlatformService serviceMappingWritePlatformService) {
 		this.serviceMappingWritePlatformService = serviceMappingWritePlatformService;

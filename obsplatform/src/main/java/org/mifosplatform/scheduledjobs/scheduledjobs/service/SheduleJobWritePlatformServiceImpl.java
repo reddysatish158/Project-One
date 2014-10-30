@@ -1372,7 +1372,7 @@ public void eventActionProcessor() {
 			for(EventActionData eventActionData:actionDatas){
 				fw.append("Process Response id="+eventActionData.getId()+" ,orderId="+eventActionData.getOrderId()+" ,Provisiong System="+eventActionData.getActionName()+ " \r\n");
 				System.out.println(eventActionData.getId());
-				this.actiondetailsWritePlatformService.ProcessEventActions(eventActionData);
+				this.actiondetailsWritePlatformService.processEventActions(eventActionData);
 			}
 			System.out.println("Event Actions are Processed....");
 			fw.append("Event Actions are Completed.... \r\n");

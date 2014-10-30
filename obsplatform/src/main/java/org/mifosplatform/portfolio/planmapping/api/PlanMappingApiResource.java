@@ -33,6 +33,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+/**
+ * 
+ * @author ashokreddy
+ *
+ */
 @Path("/planmapping")
 @Component
 @Scope("singleton")
@@ -71,7 +76,7 @@ public class PlanMappingApiResource {
 	@Produces({MediaType.APPLICATION_JSON})
 	public String getPlanMapping(@Context final UriInfo uriInfo) {
 		
-		List<PlanMappingData> planMapping = this.planMappingReadPlatformService.getPlanMapping();
+		final List<PlanMappingData> planMapping = this.planMappingReadPlatformService.getPlanMapping();
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, planMapping, RESPONSE_DATA_PARAMETERS); 
 		
@@ -83,9 +88,9 @@ public class PlanMappingApiResource {
 	@Consumes({MediaType.APPLICATION_JSON})
 	@Produces({MediaType.APPLICATION_JSON})
 	public String getTemplateRelatedData(@Context final UriInfo uriInfo) {
-		List<PlanCodeData> planCodeData = this.planMappingReadPlatformService.getPlanCode();
-		List<EnumOptionData> status = this.planReadPlatformService.retrieveNewStatus();
-		PlanMappingData planMappingData = new PlanMappingData(planCodeData,status);
+		final List<PlanCodeData> planCodeData = this.planMappingReadPlatformService.getPlanCode();
+		final List<EnumOptionData> status = this.planReadPlatformService.retrieveNewStatus();
+		final PlanMappingData planMappingData = new PlanMappingData(planCodeData,status);
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 		return this.toApiJsonSerializer.serialize(settings, planMappingData,RESPONSE_DATA_PARAMETERS);
 	}
@@ -102,27 +107,32 @@ public class PlanMappingApiResource {
 	
 	@GET
 	@Path("{planMappingId}")
-	@Consumes({MediaType.APPLICATION_JSON})
-	@Produces({MediaType.APPLICATION_JSON})
-	public String getServiceMappingForEdit(@PathParam("planMappingId") final Long planMappingId, @Context final UriInfo uriInfo){
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String getServiceMappingForEdit(
+			@PathParam("planMappingId") final Long planMappingId,
+			@Context final UriInfo uriInfo) {
 		this.context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		PlanMappingData planMappingData = this.planMappingReadPlatformService.getPlanMapping(planMappingId);
-		List<EnumOptionData> status = this.planReadPlatformService.retrieveNewStatus();
-		List<PlanCodeData> planCodeData = this.planMappingReadPlatformService.getPlanCode();
-		 planMappingData.setStatus(status);
-		 planMappingData.setPlanCodeData(planCodeData); 
-	   final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-       return this.toApiJsonSerializer.serialize(settings, planMappingData, RESPONSE_DATA_PARAMETERS); 
+		final PlanMappingData planMappingData = this.planMappingReadPlatformService.getPlanMapping(planMappingId);
+		final List<EnumOptionData> status = this.planReadPlatformService.retrieveNewStatus();
+		final List<PlanCodeData> planCodeData = this.planMappingReadPlatformService.getPlanCode();
+		planMappingData.setStatus(status);
+		planMappingData.setPlanCodeData(planCodeData);
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		return this.toApiJsonSerializer.serialize(settings, planMappingData,
+				RESPONSE_DATA_PARAMETERS);
 	}
 	
 	@PUT
 	@Path("{planMappingId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String updateServiceMapping(@PathParam("planMappingId") final Long planMappingId, final String apiRequestBodyAsJson) {
-		 final CommandWrapper commandRequest = new CommandWrapperBuilder().updateProvisioningPlanMapping(planMappingId).withJson(apiRequestBodyAsJson).build();
-		 final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-		 return this.toApiJsonSerializer.serialize(result);
+	public String updateServiceMapping(
+			@PathParam("planMappingId") final Long planMappingId,
+			final String apiRequestBodyAsJson) {
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().updateProvisioningPlanMapping(planMappingId).withJson(apiRequestBodyAsJson).build();
+		final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+		return this.toApiJsonSerializer.serialize(result);
 	}
 
 }

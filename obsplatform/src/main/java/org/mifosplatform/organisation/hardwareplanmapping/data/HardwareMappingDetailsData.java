@@ -6,11 +6,12 @@ public class HardwareMappingDetailsData {
 	private final Long orderId;
 	private final String planCode;
 
-	public HardwareMappingDetailsData(Long planId, Long orderId, String planCode) {
-	
-		this.planId=planId;
-		this.planCode=planCode;
-		this.orderId=orderId;
+	public HardwareMappingDetailsData(final Long planId, 
+			final Long orderId, final String planCode) {
+
+		this.planId = planId;
+		this.planCode = planCode;
+		this.orderId = orderId;
 	}
 
 	public Long getPlanId() {
@@ -25,5 +26,4 @@ public class HardwareMappingDetailsData {
 		return planCode;
 	}
 
-	
 }

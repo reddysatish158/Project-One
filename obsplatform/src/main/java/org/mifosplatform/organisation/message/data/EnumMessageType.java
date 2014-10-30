@@ -1,14 +1,21 @@
 package org.mifosplatform.organisation.message.data;
 
-
+/**
+ * 
+ * @author ashokreddy
+ *
+ */
 public enum EnumMessageType {
 
-	EMAIL("E","Email"), Message("M","Message"),OSDMESSAGE("O","OSDMessage"), INVALID("N","invalid");
+	EMAIL("E","Email"), 
+	Message("M","Message"), 
+	OSDMESSAGE("O","OSDMessage"), 
+	INVALID("N","invalid");
 
 	private final String code;
 	private final String value;
 
-	private EnumMessageType(final String value,final String code) {
+	private EnumMessageType(final String value, final String code) {
 		this.code=code;
 		this.value = value;
 	}
@@ -25,7 +32,8 @@ public enum EnumMessageType {
 	
 	public static EnumMessageType fromInt(final Integer frequency) {
 
-		EnumMessageType addressEnum = EnumMessageType.INVALID;
+		EnumMessageType addressEnum;
+		
 		switch (frequency) {
 		case 1:
 			addressEnum = EnumMessageType.EMAIL;

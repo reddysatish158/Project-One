@@ -42,6 +42,9 @@ public class SelfCare extends AbstractPersistable<Long>{
 	@Column(name="device_id")
 	private String deviceId;
 	
+	@Column(name="zebra_subscriber_id")
+	private Long zebraSubscriberId;
+	
 	public SelfCare() {
 		// TODO Auto-generated constructor stub
 	}
@@ -138,6 +141,12 @@ public class SelfCare extends AbstractPersistable<Long>{
 	}
 	public void setToken(String token) {
 		this.token = token;
+	}
+	public Long getZebraSubscriberId() {
+		return zebraSubscriberId;
+	}
+	public void setZebraSubscriberId(Long zebraSubscriberId) {
+		this.zebraSubscriberId = zebraSubscriberId;
 	}
 	
 	
