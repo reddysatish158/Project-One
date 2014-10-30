@@ -10,11 +10,11 @@ import org.joda.time.LocalDate;
 import org.joda.time.Months;
 import org.joda.time.Weeks;
 import org.mifosplatform.billing.taxmaster.data.TaxMappingRateData;
+import org.mifosplatform.billing.discountmaster.data.DiscountMasterData;
 import org.mifosplatform.finance.billingorder.commands.BillingOrderCommand;
 import org.mifosplatform.finance.billingorder.commands.InvoiceTaxCommand;
 import org.mifosplatform.finance.billingorder.data.BillingOrderData;
 import org.mifosplatform.finance.billingorder.domain.BillingOrderRepository;
-import org.mifosplatform.finance.data.DiscountMasterData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -92,10 +92,10 @@ public class GenerateDisconnectionBill {
            if(discountMasterData.getDiscountRate() !=null&& (billingOrderData.getBillStartDate().after(discountMasterData.getDiscountStartDate().toDate())
         		   ||(billingOrderData.getBillStartDate().compareTo(discountMasterData.getDiscountStartDate().toDate())==0))){
 
-    		if (discountMasterData.getDiscounType().equalsIgnoreCase("percentage")){
+    		if (discountMasterData.getDiscountType().equalsIgnoreCase("percentage")){
     			discountAmount = price.multiply(discountMasterData.getDiscountRate().divide(new BigDecimal(100)));
 	               price = price.subtract(discountAmount).setScale(2, RoundingMode.HALF_UP);
-    		 }else if(discountMasterData.getDiscounType().equalsIgnoreCase("flat")){
+    		 }else if(discountMasterData.getDiscountType().equalsIgnoreCase("flat")){
     		     price = price.subtract(discountMasterData.getDiscountRate());
               }
            }
@@ -226,10 +226,10 @@ public class GenerateDisconnectionBill {
 			  if(discountMasterData.getDiscountRate() !=null && (billingOrderData.getBillStartDate().after(discountMasterData.getDiscountStartDate().toDate())
 	        		   ||(billingOrderData.getBillStartDate().compareTo(discountMasterData.getDiscountStartDate().toDate())==0))){
 
-		    		if (discountMasterData.getDiscounType().equalsIgnoreCase("percentage")){
+		    		if (discountMasterData.getDiscountType().equalsIgnoreCase("percentage")){
 		    			   discountAmount = price.multiply(discountMasterData.getDiscountRate().divide(new BigDecimal(100)));
 			               price = price.subtract(discountAmount);
-		    		}else if(discountMasterData.getDiscounType().equalsIgnoreCase("flat")){
+		    		}else if(discountMasterData.getDiscountType().equalsIgnoreCase("flat")){
 		    			  price = price.subtract(discountMasterData.getDiscountRate());
 		    		
 		              }

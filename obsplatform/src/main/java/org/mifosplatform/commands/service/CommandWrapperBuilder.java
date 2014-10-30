@@ -1559,7 +1559,7 @@ public CommandWrapperBuilder updateCountryCurrency(Long id) {
 	return this;
 }
 
-public CommandWrapperBuilder deleteCuntryCurrency(Long id) {
+public CommandWrapperBuilder deleteCountryCurrency(Long id) {
 	this.actionName="DELETE";
 	this.entityName="COUNTRYCURRENCY";
 	this.entityId=id;
@@ -2295,30 +2295,26 @@ public CommandWrapperBuilder updateProvisioningPlanMapping(Long planMappingId) {
 }
 	
 
-public CommandWrapperBuilder createDBDatatable(final String json) {
+public CommandWrapperBuilder createDatatable(final String json) {
     this.actionName = "CREATE";
     this.entityName = "DATATABLE";
-    this.entityId = null;
     this.href = "/datatables/";
     this.json = json;
     return this;
 }
 
-public CommandWrapperBuilder updateDBDatatable(final String datatable, final String json) {
+public CommandWrapperBuilder updateDatatable(final String datatable, final String json) {
     this.actionName = "UPDATE";
     this.entityName = "DATATABLE";
-    this.entityId = null;
     this.href = "/datatables/" + datatable;
     this.json = json;
     return this;
 }
 
-public CommandWrapperBuilder deleteDBDatatable(final String datatable, final String json) {
+public CommandWrapperBuilder deleteDatatable(final String datatable) {
     this.actionName = "DELETE";
     this.entityName = "DATATABLE";
-    this.entityId = null;
     this.href = "/datatables/" + datatable;
-    this.json = json;
     return this;
 }
 
@@ -2330,7 +2326,7 @@ public CommandWrapperBuilder registerDBDatatable(final String datatable, final S
     return this;
 }
 
- public CommandWrapperBuilder createDatatable(final String datatable, final Long apptableId, final Long datatableId) {
+ public CommandWrapperBuilder createDatatableEntry(final String datatable, final Long apptableId, final Long datatableId) {
     this.actionName = "CREATE";
     commonDatatableSettings(datatable, apptableId, datatableId);
     return this;

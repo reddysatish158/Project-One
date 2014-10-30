@@ -6,60 +6,55 @@ import java.util.List;
 import org.mifosplatform.billing.taxmapping.data.TaxMapData;
 import org.mifosplatform.organisation.priceregion.data.PriceRegionData;
 
+public class ChargeCodeData {
 
-public class ChargeCodeData {	
-	
 	private Long id;
-	
 	private String chargeCode;
-	
 	private String chargeDescription;
-
 	private String chargeType;
-	
 	private Integer chargeDuration;
-	
 	private String durationType;
-
 	private Integer taxInclusive;
-	
 	private String billFrequencyCode;
-	
+
 	private List<ChargeCodeData> chargeCodeData;
 	private List<ChargeTypeData> chargeTypeData;
 	private List<DurationTypeData> durationTypeData;
 	private List<BillFrequencyCodeData> billFrequencyCodeData;
-	
-	
+
 	private Collection<ChargeCodeData> chargeCodeForTax;
 	private List<String> chargeDescriptionForTax;
 	private List<TaxMapData> taxMapData;
 
 	private List<PriceRegionData> priceRegionData;
-	
-	
-	public ChargeCodeData(final List<TaxMapData> tmd){
+
+	public ChargeCodeData(final List<TaxMapData> tmd) {
 		this.taxMapData = tmd;
-		
+
 	}
-	
-	
-	public ChargeCodeData() {}
-	
-	public ChargeCodeData(List<ChargeCodeData> chargeCodeData, List<ChargeTypeData> chargeType, List<DurationTypeData> durationType, List<BillFrequencyCodeData> billFrequencyCodeData){
+
+	public ChargeCodeData() {
+	}
+
+	public ChargeCodeData(final List<ChargeCodeData> chargeCodeData,
+			final List<ChargeTypeData> chargeType,
+			final List<DurationTypeData> durationType,
+			final List<BillFrequencyCodeData> billFrequencyCodeData) {
 		this.chargeCodeData = chargeCodeData;
 		this.chargeTypeData = chargeType;
 		this.durationTypeData = durationType;
 		this.billFrequencyCodeData = billFrequencyCodeData;
-		
+
 	}
-	
-	public ChargeCodeData(String chargeCode,String chargeDescription){
+
+	public ChargeCodeData(String chargeCode, String chargeDescription) {
 		this.chargeCode = chargeCode;
 		this.chargeDescription = chargeDescription;
 	}
-	
-	public ChargeCodeData(Long id,String chargeCode, String chargeDescription,String chargeType,Integer chargeDuration,String durationType,Integer taxInclusive,String billFrequencyCode) {
+
+	public ChargeCodeData(Long id, String chargeCode, String chargeDescription,
+			String chargeType, Integer chargeDuration, String durationType,
+			Integer taxInclusive, String billFrequencyCode) {
 		this.id = id;
 		this.chargeCode = chargeCode;
 		this.chargeDescription = chargeDescription;
@@ -78,7 +73,8 @@ public class ChargeCodeData {
 	}
 
 	/**
-	 * @param chargeCode the chargeCode to set
+	 * @param chargeCode
+	 *            the chargeCode to set
 	 */
 	public void setChargeCode(String chargeCode) {
 		this.chargeCode = chargeCode;
@@ -92,7 +88,8 @@ public class ChargeCodeData {
 	}
 
 	/**
-	 * @param chargeDescription the chargeDescription to set
+	 * @param chargeDescription
+	 *            the chargeDescription to set
 	 */
 	public void setChargeDescription(String chargeDescription) {
 		this.chargeDescription = chargeDescription;
@@ -106,7 +103,8 @@ public class ChargeCodeData {
 	}
 
 	/**
-	 * @param chargeType the chargeType to set
+	 * @param chargeType
+	 *            the chargeType to set
 	 */
 	public void setChargeType(String chargeType) {
 		this.chargeType = chargeType;
@@ -120,7 +118,8 @@ public class ChargeCodeData {
 	}
 
 	/**
-	 * @param chargeDuration the chargeDuration to set
+	 * @param chargeDuration
+	 *            the chargeDuration to set
 	 */
 	public void setchargeDuration(Integer chargeDuration) {
 		this.chargeDuration = chargeDuration;
@@ -134,7 +133,8 @@ public class ChargeCodeData {
 	}
 
 	/**
-	 * @param durationType the durationType to set
+	 * @param durationType
+	 *            the durationType to set
 	 */
 	public void setDurationType(String durationType) {
 		this.durationType = durationType;
@@ -148,7 +148,8 @@ public class ChargeCodeData {
 	}
 
 	/**
-	 * @param taxInclusive the taxInclusive to set
+	 * @param taxInclusive
+	 *            the taxInclusive to set
 	 */
 	public void setTaxInclusive(Integer taxInclusive) {
 		this.taxInclusive = taxInclusive;
@@ -162,12 +163,12 @@ public class ChargeCodeData {
 	}
 
 	/**
-	 * @param billFrequencyCode the billFrequencyCode to set
+	 * @param billFrequencyCode
+	 *            the billFrequencyCode to set
 	 */
 	public void setBillFrequencyCode(String billFrequencyCode) {
 		this.billFrequencyCode = billFrequencyCode;
 	}
-
 
 	/**
 	 * @return the id
@@ -176,14 +177,13 @@ public class ChargeCodeData {
 		return id;
 	}
 
-
 	/**
-	 * @param id the id to set
+	 * @param id
+	 *            the id to set
 	 */
 	public void setId(Long id) {
 		this.id = id;
 	}
-
 
 	/**
 	 * @return the chargeDuration
@@ -192,14 +192,13 @@ public class ChargeCodeData {
 		return chargeDuration;
 	}
 
-
 	/**
-	 * @param chargeDuration the chargeDuration to set
+	 * @param chargeDuration
+	 *            the chargeDuration to set
 	 */
 	public void setChargeDuration(Integer chargeDuration) {
 		this.chargeDuration = chargeDuration;
 	}
-
 
 	/**
 	 * @return the chargeCodeData
@@ -208,14 +207,13 @@ public class ChargeCodeData {
 		return chargeCodeData;
 	}
 
-
 	/**
-	 * @param chargeCodeData the chargeCodeData to set
+	 * @param chargeCodeData
+	 *            the chargeCodeData to set
 	 */
 	public void setChargeCodeData(List<ChargeCodeData> chargeCodeData) {
 		this.chargeCodeData = chargeCodeData;
 	}
-
 
 	/**
 	 * @return the chargeTypeData
@@ -224,14 +222,13 @@ public class ChargeCodeData {
 		return chargeTypeData;
 	}
 
-
 	/**
-	 * @param chargeTypeData the chargeTypeData to set
+	 * @param chargeTypeData
+	 *            the chargeTypeData to set
 	 */
 	public void setChargeTypeData(List<ChargeTypeData> chargeTypeData) {
 		this.chargeTypeData = chargeTypeData;
 	}
-
 
 	/**
 	 * @return the durationTypeData
@@ -240,14 +237,13 @@ public class ChargeCodeData {
 		return durationTypeData;
 	}
 
-
 	/**
-	 * @param durationTypeData the durationTypeData to set
+	 * @param durationTypeData
+	 *            the durationTypeData to set
 	 */
 	public void setDurationTypeData(List<DurationTypeData> durationTypeData) {
 		this.durationTypeData = durationTypeData;
 	}
-
 
 	/**
 	 * @return the billFrequencyData
@@ -256,14 +252,14 @@ public class ChargeCodeData {
 		return billFrequencyCodeData;
 	}
 
-
 	/**
-	 * @param billFrequencyData the billFrequencyData to set
+	 * @param billFrequencyData
+	 *            the billFrequencyData to set
 	 */
-	public void setBillFrequencyCodeData(List<BillFrequencyCodeData> billFrequencyCodeData) {
+	public void setBillFrequencyCodeData(
+			List<BillFrequencyCodeData> billFrequencyCodeData) {
 		this.billFrequencyCodeData = billFrequencyCodeData;
 	}
-
 
 	/**
 	 * @return the chargeCodeForTax
@@ -272,14 +268,13 @@ public class ChargeCodeData {
 		return chargeCodeForTax;
 	}
 
-
 	/**
-	 * @param chargeCodeForTax the chargeCodeForTax to set
+	 * @param chargeCodeForTax
+	 *            the chargeCodeForTax to set
 	 */
 	public void setChargeCodeForTax(Collection<ChargeCodeData> chargeCodeForTax) {
 		this.chargeCodeForTax = chargeCodeForTax;
 	}
-
 
 	/**
 	 * @return the chargeDescriptionForTax
@@ -288,14 +283,13 @@ public class ChargeCodeData {
 		return chargeDescriptionForTax;
 	}
 
-
 	/**
-	 * @param chargeDescriptionForTax the chargeDescriptionForTax to set
+	 * @param chargeDescriptionForTax
+	 *            the chargeDescriptionForTax to set
 	 */
 	public void setChargeDescriptionForTax(List<String> chargeDescriptionForTax) {
 		this.chargeDescriptionForTax = chargeDescriptionForTax;
 	}
-
 
 	/**
 	 * @return the taxMapData
@@ -304,20 +298,17 @@ public class ChargeCodeData {
 		return taxMapData;
 	}
 
-
 	/**
-	 * @param taxMapData the taxMapData to set
+	 * @param taxMapData
+	 *            the taxMapData to set
 	 */
 	public void setTaxMapData(List<TaxMapData> taxMapData) {
 		this.taxMapData = taxMapData;
 	}
 
-
 	public void setRegionalTaxData(List<PriceRegionData> priceRegionData) {
-             this.priceRegionData=priceRegionData;       
-	
+		this.priceRegionData = priceRegionData;
+
 	}
-	
-	
 
 }

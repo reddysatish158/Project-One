@@ -10,7 +10,8 @@ import org.joda.time.LocalDate;
 import org.mifosplatform.billing.taxmaster.data.TaxMappingRateData;
 import org.mifosplatform.finance.billingorder.data.BillingOrderData;
 import org.mifosplatform.finance.billingorder.data.GenerateInvoiceData;
-import org.mifosplatform.finance.data.DiscountMasterData;
+import org.mifosplatform.billing.discountmaster.data.DiscountMasterData;
+import org.mifosplatform.infrastructure.core.domain.JdbcSupport;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.portfolio.order.data.OrderPriceData;
@@ -243,22 +244,22 @@ private static final class OrderMapper implements RowMapper<GenerateInvoiceData>
 @Override
 public DiscountMasterData mapRow(ResultSet rs, int rowNum)
 		throws SQLException {
-	Long discountMasterid = rs.getLong("discountOrderId");
+	Long discountMasterid = rs.getLong("discountId");
 	Long orderPriceId = rs.getLong("orderPriceId");
-	Long orderDiscountId = rs.getLong("discountId");
-	Date discountStartDate = rs.getDate("discountStartDate");
-	Date discountEndDate = rs.getDate("discountEndDate");
+	Long orderDiscountId = rs.getLong("orderDiscountId");
+	LocalDate discountStartDate = JdbcSupport.getLocalDate(rs,"discountStartDate");
+	LocalDate discountEndDate = JdbcSupport.getLocalDate(rs,"discountEndDate");
 	String discountType = rs.getString("discountType");
 	BigDecimal discountRate = rs.getBigDecimal("discountRate");
 	String isDeleted = rs.getString("isDeleted");
 	
 
 	return new DiscountMasterData(discountMasterid, orderPriceId,orderDiscountId, 
-			new LocalDate(discountStartDate), discountEndDate,discountType, discountRate, isDeleted);
+			discountStartDate, discountEndDate,discountType, discountRate, isDeleted);
 }
 
 public String discountOrderSchema() {
-	return    " od.id AS discountOrderId,od.orderprice_id AS orderPriceId,od.discount_id AS discountId,od.discount_startdate AS discountStartDate,"
+	return    " od.id AS orderDiscountId,od.orderprice_id AS orderPriceId,od.discount_id AS discountId,od.discount_startdate AS discountStartDate,"
 			+ " od.discount_enddate AS discountEndDate,od.discount_type AS discountType,od.discount_rate AS discountRate,od.is_deleted AS isDeleted "
 			+ " FROM b_orders os inner join b_order_price op on op.order_id = os.id inner join b_order_discount od on od.order_id = os.id and od.orderprice_id=op.id "
 			+ " WHERE od.is_deleted='N' and os.id= ? and op.id= ? ";

@@ -5,12 +5,15 @@ import org.mifosplatform.infrastructure.core.exception.AbstractPlatformResourceN
 /**
  * A {@link RuntimeException} thrown when a code is not found.
  */
-public class PromotionCodeNotFoundException extends AbstractPlatformResourceNotFoundException {
+public class PromotionCodeNotFoundException extends
+		AbstractPlatformResourceNotFoundException {
 
-    public PromotionCodeNotFoundException(final String id) {
-        super("error.msg.promotionCode.not.found", "PromotionCode with this id"+id+"not exist",id);
-        
-    }
+	private static final long serialVersionUID = 1L;
 
-   
+	public PromotionCodeNotFoundException(final String id) {
+		super("error.msg.promotionCode.not.found", "PromotionCode with this id"
+				+ id + "not exist", id);
+
+	}
+
 }

@@ -9,19 +9,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class UpdatePromotionCodeCommandHandler implements NewCommandSourceHandler {
+public class UpdatePromotionCodeCommandHandler implements
+		NewCommandSourceHandler {
 
 	private final PromotionCodeWritePlatformService writePlatformService;
 
-    @Autowired
-    public UpdatePromotionCodeCommandHandler(PromotionCodeWritePlatformService writePlatformService) {
-        this.writePlatformService = writePlatformService;
-    }
+	@Autowired
+	public UpdatePromotionCodeCommandHandler(
+			PromotionCodeWritePlatformService writePlatformService) {
+		this.writePlatformService = writePlatformService;
+	}
 
-    @Transactional
-    @Override
-    public CommandProcessingResult processCommand(final JsonCommand command) {
+	@Transactional
+	@Override
+	public CommandProcessingResult processCommand(final JsonCommand command) {
 
-        return this.writePlatformService.updatePromotionCode(command.entityId(), command);
-    }
+		return this.writePlatformService.updatePromotionCode(
+				command.entityId(), command);
+	}
 }

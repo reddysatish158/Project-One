@@ -20,75 +20,99 @@ import org.springframework.stereotype.Component;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonElement;
 
+/**
+ * @author hugo Deserializer for code JSON to validate API request.
+ */
 @Component
 public class ChargeCodeCommandFromApiJsonDeserializer {
 
-	final private Set<String> supportedParameters = new HashSet<String>(Arrays.asList("billFrequencyCode","chargeCode","chargeDescription","chargeDuration","chargeType","dateFormat","durationType","locale","taxInclusive"));
-	private final FromJsonHelper fromApiJsonHelper;  
-	
+	/**
+	 * The parameters supported for this command.
+	 */
+	final private Set<String> supportedParameters = new HashSet<String>(
+			Arrays.asList("billFrequencyCode", "chargeCode",
+					"chargeDescription", "chargeDuration", "chargeType",
+					"dateFormat", "durationType", "locale", "taxInclusive"));
+	private final FromJsonHelper fromApiJsonHelper;
+
 	@Autowired
-	public ChargeCodeCommandFromApiJsonDeserializer(final FromJsonHelper fromApiJsonHelper){
+	public ChargeCodeCommandFromApiJsonDeserializer(
+			final FromJsonHelper fromApiJsonHelper) {
 		this.fromApiJsonHelper = fromApiJsonHelper;
 	}
-	
-	public void validaForCreate(String json){
-		if(StringUtils.isBlank(json)){
+
+	/**
+	 * @param json
+	 * check validation for create charge codes
+	 */
+
+	public void validaForCreate(String json) {
+		if (StringUtils.isBlank(json)) {
 			throw new InvalidJsonException();
 		}
-		
-		
-		 final Type typeOfMap = new TypeToken<Map<String, Object>>() {
 
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;}.getType();
-			
-		 fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, supportedParameters);
-		 
-		 final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
-	     final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("chargecode");
+		final Type typeOfMap = new TypeToken<Map<String, Object>>() {
+			private static final long serialVersionUID = 1L;
+		}.getType();
 
-	     final JsonElement element = fromApiJsonHelper.parse(json);
+		fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json,
+				supportedParameters);
 
-	     final String billFrequencyCode = fromApiJsonHelper.extractStringNamed("billFrequencyCode", element);
-	     //if(billFrequencyCode.contains("-1"))
-	    	 baseDataValidator.reset().parameter("billFrequencyCode").value(billFrequencyCode).notBlank();
-	    /* else
-	    	 baseDataValidator.reset().parameter("billFrequencyCode").value(billFrequencyCode).notBlank();
-	     */
-	     final String chargeCode = fromApiJsonHelper.extractStringNamed("chargeCode", element);
-	     baseDataValidator.reset().parameter("chargeCode").value(chargeCode).notBlank();
-	     
-	     final String chargeDescription = fromApiJsonHelper.extractStringNamed("chargeDescription", element);
-	     baseDataValidator.reset().parameter("chargeDescription").value(chargeDescription).notBlank();
-	     
-	     final Integer chargeDuration = fromApiJsonHelper.extractIntegerWithLocaleNamed("chargeDuration", element);
-	     baseDataValidator.reset().parameter("chargeDuration").value(chargeDuration).notBlank().integerGreaterThanZero();
-	     
-	     
-	     final String chargeType = fromApiJsonHelper.extractStringNamed("chargeType", element);
-	    // if(chargeType.contains("-1"))
-	    	 baseDataValidator.reset().parameter("chargeType").value(chargeType).notBlank();
-	   /*  else
-	    	 baseDataValidator.reset().parameter("chargeType").value(chargeType).notBlank();
-	     */
-	     final String durationType = fromApiJsonHelper.extractStringNamed("durationType", element);
-	   //  if(durationType.contains("-1"))
-	    	 baseDataValidator.reset().parameter("durationType").value(durationType).notBlank();
-	   /*  else
-	    	 baseDataValidator.reset().parameter("durationType").value(durationType).notBlank();*/
-	     
-	     final boolean taxInclusive = fromApiJsonHelper.extractBooleanNamed("taxInclusive", element);
-	     baseDataValidator.reset().parameter("taxInclusive").value(taxInclusive).notBlank();
-	   
-	     
-	     throwExceptionIfValidationWarningsExist(dataValidationErrors);
+		final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
+		final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(
+				dataValidationErrors).resource("chargecode");
+
+		final JsonElement element = fromApiJsonHelper.parse(json);
+
+		final String billFrequencyCode = fromApiJsonHelper.extractStringNamed(
+				"billFrequencyCode", element);
+		// if(billFrequencyCode.contains("-1"))
+		baseDataValidator.reset().parameter("billFrequencyCode")
+				.value(billFrequencyCode).notBlank();
+		/*
+		 * else baseDataValidator.reset().parameter("billFrequencyCode").value(
+		 * billFrequencyCode).notBlank();
+		 */
+		final String chargeCode = fromApiJsonHelper.extractStringNamed(
+				"chargeCode", element);
+		baseDataValidator.reset().parameter("chargeCode").value(chargeCode)
+				.notBlank();
+
+		final String chargeDescription = fromApiJsonHelper.extractStringNamed(
+				"chargeDescription", element);
+		baseDataValidator.reset().parameter("chargeDescription")
+				.value(chargeDescription).notBlank();
+
+		final Integer chargeDuration = fromApiJsonHelper
+				.extractIntegerWithLocaleNamed("chargeDuration", element);
+		baseDataValidator.reset().parameter("chargeDuration")
+				.value(chargeDuration).notBlank().integerGreaterThanZero();
+
+		final String chargeType = fromApiJsonHelper.extractStringNamed(
+				"chargeType", element);
+		baseDataValidator.reset().parameter("chargeType").value(chargeType)
+				.notBlank();
+	
+		final String durationType = fromApiJsonHelper.extractStringNamed(
+				"durationType", element);
+		baseDataValidator.reset().parameter("durationType").value(durationType)
+				.notBlank();
+
+		final boolean taxInclusive = fromApiJsonHelper.extractBooleanNamed(
+				"taxInclusive", element);
+		baseDataValidator.reset().parameter("taxInclusive").value(taxInclusive)
+				.notBlank();
+
+		throwExceptionIfValidationWarningsExist(dataValidationErrors);
 
 	}
-	
-	private void throwExceptionIfValidationWarningsExist(final List<ApiParameterError> dataValidationErrors) {
-        if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist",
-                "Validation errors exist.", dataValidationErrors); }
-    }
+
+	private void throwExceptionIfValidationWarningsExist(
+			final List<ApiParameterError> dataValidationErrors) {
+		if (!dataValidationErrors.isEmpty()) {
+			throw new PlatformApiDataValidationException(
+					"validation.msg.validation.errors.exist",
+					"Validation errors exist.", dataValidationErrors);
+		}
+	}
 }

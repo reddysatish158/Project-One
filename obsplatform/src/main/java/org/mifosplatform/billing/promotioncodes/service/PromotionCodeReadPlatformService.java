@@ -6,14 +6,8 @@ import org.mifosplatform.billing.promotioncodes.data.PromotionCodeData;
 
 public interface PromotionCodeReadPlatformService {
 
-	List<PromotionCodeData> retrieveAllEventMapping();
+	List<PromotionCodeData> retrieveAllPromotionCodes();
 
-	PromotionCodeData retriveSingleRecord(Long id);
-	
-/*	List<McodeData> retrieveEventMapData(String str);
-	
-	PromotionCodeData retrieveEventActionDetail(Long id);
-
-	List<PromotionCodeData> retrieveEvents(String event);*/
+	PromotionCodeData retriveSinglePromotionCodeDetails(Long id);
 
 }
