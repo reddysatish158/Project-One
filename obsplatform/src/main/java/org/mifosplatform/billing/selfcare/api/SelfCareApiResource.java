@@ -191,7 +191,7 @@ public class SelfCareApiResource {
         }
         ClientData clientsData = this.clientReadPlatformService.retrieveOne(clientId);
         ClientBalanceData balanceData = this.clientBalanceReadPlatformService.retrieveBalance(clientId);
-        List<AddressData> addressData = this.addressReadPlatformService.retrieveAddressDetails(clientId);
+        List<AddressData> addressData = this.addressReadPlatformService.retrieveAddressDetailsBy(clientId);
         final List<OrderData> clientOrdersData = this.orderReadPlatformService.retrieveClientOrderDetails(clientId);
         final List<FinancialTransactionsData> statementsData = this.billMasterReadPlatformService.retrieveStatments(clientId);
         List<PaymentData> paymentsData = paymentReadPlatformService.retrivePaymentsData(clientId);

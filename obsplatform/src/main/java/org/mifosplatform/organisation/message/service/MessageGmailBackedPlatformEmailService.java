@@ -100,8 +100,8 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 		     properties.setProperty("mail.smtp.host", hostName);   
 		     properties.put("mail.smtp.ssl.trust",hostName);
 		     properties.put("mail.smtp.auth", "true");  
-		     properties.put("mail.smtp.starttls.enable", starttlsValue);
-		     properties.put("mail.smtp.starttls.required", starttlsValue);
+		     properties.put("mail.smtp.starttls.enable", starttlsValue);//put as false
+		     properties.put("mail.smtp.starttls.required", starttlsValue);//put as false
 
 
 		     Session session = Session.getDefaultInstance(properties,   

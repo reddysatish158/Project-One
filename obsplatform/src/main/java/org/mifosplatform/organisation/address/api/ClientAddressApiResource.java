@@ -30,7 +30,7 @@ import org.mifosplatform.infrastructure.core.serialization.DefaultToApiJsonSeria
 import org.mifosplatform.infrastructure.core.service.Page;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.organisation.address.data.AddressData;
-import org.mifosplatform.organisation.address.data.AddressDetails;
+import org.mifosplatform.organisation.address.data.AddressLocationDetails;
 import org.mifosplatform.organisation.address.exception.AddressNoRecordsFoundException;
 import org.mifosplatform.organisation.address.service.AddressReadPlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,11 +71,11 @@ public class ClientAddressApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveAddressTemplateInfo(@Context final UriInfo uriInfo) {
         context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-    List<String> countryData = this.addressReadPlatformService.retrieveCountryDetails();
-    List<String> statesData = this.addressReadPlatformService.retrieveStateDetails();
-    List<String> citiesData = this.addressReadPlatformService.retrieveCityDetails();
-    List<EnumOptionData> enumOptionDatas = this.addressReadPlatformService.addressType();
-    AddressData data=new AddressData(null,countryData,statesData,citiesData,enumOptionDatas);
+    final List<String> countryData = this.addressReadPlatformService.retrieveCountryDetails();
+    final List<String> statesData = this.addressReadPlatformService.retrieveStateDetails();
+    final List<String> citiesData = this.addressReadPlatformService.retrieveCityDetails();
+    final List<EnumOptionData> enumOptionDatas = this.addressReadPlatformService.addressType();
+    final AddressData data=new AddressData(null,countryData,statesData,citiesData,enumOptionDatas);
     final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
     return this.toApiJsonSerializer.serialize(settings, data, RESPONSE_DATA_PARAMETERS);
     
@@ -87,106 +87,126 @@ public class ClientAddressApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveAddressdetails( @Context final UriInfo uriInfo,	@PathParam("selectedname") final String selectedname ) {
         context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-        List<AddressData> citiesData = this.addressReadPlatformService.retrieveCityDetails(selectedname);
-        List<EnumOptionData> enumOptionDatas = this.addressReadPlatformService.addressType();
-        AddressData data=new AddressData(citiesData, null, null, null,enumOptionDatas);
+        final List<AddressData> citiesData = this.addressReadPlatformService.retrieveCityDetails(selectedname);
+        final List<EnumOptionData> enumOptionDatas = this.addressReadPlatformService.addressType();
+        final AddressData data=new AddressData(citiesData, null, null, null,enumOptionDatas);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, data, RESPONSE_DATA_PARAMETERS);
     }
+	
+	/**
+	 * this method is using for getting Client Address data with clientId
+	 */
 	@GET
-	@Path("details/{clientId}")
+	@Path("addressdetails/{clientId}")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveClientAddress( @PathParam("clientId") final Long clientId , @Context final UriInfo uriInfo) {
         context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-        List<AddressData> addressdata = this.addressReadPlatformService.retrieveAddressDetails(clientId);
-     //  List<String> countryData = this.addressReadPlatformService.retrieveCountryDetails();
-      //  List<String> statesData = this.addressReadPlatformService.retrieveStateDetails();
-        List<String> citiesData = this.addressReadPlatformService.retrieveCityDetails();
-        List<EnumOptionData> enumOptionDatas = this.addressReadPlatformService.addressType();
-        AddressData data=new AddressData(addressdata,null,null,citiesData,enumOptionDatas);
+        final List<AddressData> addressdata = this.addressReadPlatformService.retrieveAddressDetailsBy(clientId);
+        final List<String> citiesData = this.addressReadPlatformService.retrieveCityDetails();
+        final List<EnumOptionData> enumOptionDatas = this.addressReadPlatformService.addressType();
+        final AddressData data=new AddressData(addressdata,null,null,citiesData,enumOptionDatas);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, data, RESPONSE_DATA_PARAMETERS);
 	}
 	
+	/**
+	 * this method is using for getting state and country name by using city name
+	 */
 	@GET
-	@Path("template/{Name}")
+	@Path("template/{cityName}")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public String retrieveAddress(@PathParam("Name") final String Name , @Context final UriInfo uriInfo) {
+    public String retrieveAddressByCityName(@PathParam("cityName") final String cityName , @Context final UriInfo uriInfo) {
         context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
       
-        AddressData Data = this.addressReadPlatformService.retrieveName(Name);
-//        city =Data.getCity();
+        final AddressData addressData = this.addressReadPlatformService.retrieveAdressBy(cityName);
      
-        if(Data== null){
+        if(addressData== null){
         	throw new AddressNoRecordsFoundException();
         }
-        // AddressData data=new AddressData(Data);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-        return this.toApiJsonSerializer.serialize(settings, Data, RESPONSE_DATA_PARAMETERS);
+        return this.toApiJsonSerializer.serialize(settings, addressData, RESPONSE_DATA_PARAMETERS);
 	}
 	
+	/**
+	 * this method is using for creating new  Client Address
+	 */
 	@POST
 	@Path("{clientId}")
 	@Consumes({MediaType.APPLICATION_JSON})
 	@Produces({MediaType.APPLICATION_JSON})
-	public String createAddress(@PathParam("clientId") final Long clientId, final String apiRequestBodyAsJson) {
+	public String createNewClientAddress(@PathParam("clientId") final Long clientId, final String apiRequestBodyAsJson) {
 		 final CommandWrapper commandRequest = new CommandWrapperBuilder().createAddress(clientId).withJson(apiRequestBodyAsJson).build();
 	        final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 	        return this.toApiJsonSerializer.serialize(result);
 	}
 
-	
+	/**
+	 * this method is using for editing Client Address
+	 */
 	@PUT
-	@Path("{addrId}")
+	@Path("{clientId}")
 	@Consumes({MediaType.APPLICATION_JSON})
 	@Produces({MediaType.APPLICATION_JSON})
-	public String updateClientAddress(@PathParam("addrId") final Long addrId, final String apiRequestBodyAsJson){
-		 final CommandWrapper commandRequest = new CommandWrapperBuilder().updateAddress(addrId).withJson(apiRequestBodyAsJson).build();
+	public String updateClientAddress(@PathParam("clientId") final Long clientId, final String apiRequestBodyAsJson){
+		 final CommandWrapper commandRequest = new CommandWrapperBuilder().updateAddress(clientId).withJson(apiRequestBodyAsJson).build();
 		 final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 		  return this.toApiJsonSerializer.serialize(result);
 
 	}
 
-	
-	@POST
-	@Path("{entityType}/new")
-	@Consumes({MediaType.APPLICATION_JSON})
-	@Produces({MediaType.APPLICATION_JSON})
-	public String NewRecord(@PathParam("entityType") final String entityType, final String jsonRequestBody) {
-		    final CommandWrapper commandRequest = new CommandWrapperBuilder().createNewRecord(entityType).withJson(jsonRequestBody).build();
-	        final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-	        return this.toApiJsonSerializer.serialize(result);
-	
-	}
-	
+	/**
+	 * this method is using for getting data in Address Master
+	 */
 	@GET
 	@Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
 	public String retrieveAddress(@Context final UriInfo uriInfo,@QueryParam("sqlSearch") final String sqlSearch,  @QueryParam("limit") final Integer limit, @QueryParam("offset") final Integer offset){
 		context.authenticatedUser().validateHasReadPermission(resourceNameForLocationPermissions);
 		final SearchSqlQuery searchAddresses =SearchSqlQuery.forSearch(sqlSearch, offset,limit );
-		final Page<AddressDetails> addresses = this.addressReadPlatformService.retrieveAllAddresses(searchAddresses);
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		final Page<AddressLocationDetails> addresses = this.addressReadPlatformService.retrieveAllAddressLocations(searchAddresses);
 		 return this.toApiJsonSerializer.serialize(addresses);
 	}
+	
+	/**
+	 * this method is using for creating Country , State , and City in Address Master
+	 */
+	@POST
+	@Path("{entityType}/new")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public String createAddressLocation(@PathParam("entityType") final String entityType, final String jsonRequestBody) {
+		    final CommandWrapper commandRequest = new CommandWrapperBuilder().createLocation(entityType).withJson(jsonRequestBody).build();
+	        final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+	        return this.toApiJsonSerializer.serialize(result);
+	
+	}
+	
+	/**
+	 * this method is using for editing Country , State , and City in Address Master
+	 */
 	@PUT
 	@Path("{entityType}/{id}")
 	@Consumes({MediaType.APPLICATION_JSON})
 	@Produces({MediaType.APPLICATION_JSON})
-	public String updateNewRecord(@PathParam("entityType") final String entityType,@PathParam("id") final Long id, final String apiRequestBodyAsJson){
-		 final CommandWrapper commandRequest = new CommandWrapperBuilder().updateNewRecord(entityType,id).withJson(apiRequestBodyAsJson).build();
+	public String updateAddressLocation(@PathParam("entityType") final String entityType,@PathParam("id") final Long id, final String apiRequestBodyAsJson){
+		 final CommandWrapper commandRequest = new CommandWrapperBuilder().updateLocation(entityType,id).withJson(apiRequestBodyAsJson).build();
 		 final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 		  return this.toApiJsonSerializer.serialize(result);
 		  
 	}
+	
+	/**
+	 * this method is using for deleting Country , State , and City in Address Master
+	 */
 	@DELETE
 	@Path("{entityType}/{id}")
 	@Consumes({MediaType.APPLICATION_JSON})
 	@Produces({MediaType.APPLICATION_JSON})
-	public String deleteNewRecord(@PathParam("entityType") final String entityType,@PathParam("id") final Long id, final String apiRequestBodyAsJson){
-		 final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteNewRecord(entityType,id).withJson(apiRequestBodyAsJson).build();
+	public String deleteAddressLocation(@PathParam("entityType") final String entityType,@PathParam("id") final Long id, final String apiRequestBodyAsJson){
+		 final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteLocation(entityType,id).withJson(apiRequestBodyAsJson).build();
 		 final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 		  return this.toApiJsonSerializer.serialize(result);
 
@@ -198,8 +218,7 @@ public class ClientAddressApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
 	public String retrieveCountryDetails(@Context final UriInfo uriInfo,@QueryParam("sqlSearch") final String sqlSearch,  @QueryParam("limit") final Integer limit, @QueryParam("offset") final Integer offset){
 		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		List<String> countryData = this.addressReadPlatformService.retrieveCountryDetails();
-		//final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		final List<String> countryData = this.addressReadPlatformService.retrieveCountryDetails();
 		 return this.toApiJsonSerializer.serialize(countryData);
 	}
 	

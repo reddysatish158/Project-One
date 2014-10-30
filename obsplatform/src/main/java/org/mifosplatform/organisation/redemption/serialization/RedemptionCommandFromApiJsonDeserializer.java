@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.joda.time.LocalDate;
 import org.mifosplatform.infrastructure.core.data.ApiParameterError;
 import org.mifosplatform.infrastructure.core.data.DataValidatorBuilder;
 import org.mifosplatform.infrastructure.core.exception.InvalidJsonException;
@@ -49,8 +48,9 @@ public final class RedemptionCommandFromApiJsonDeserializer {
 
         final JsonElement element = fromApiJsonHelper.parse(json);
 
-        final String clientId = fromApiJsonHelper.extractStringNamed("clientId", element);
-        baseDataValidator.reset().parameter("clientId").value(clientId).notBlank().notExceedingLengthOf(100);
+        final Integer clientId = fromApiJsonHelper.extractIntegerWithLocaleNamed("clientId", element);
+        baseDataValidator.reset().parameter("clientId").value(clientId).notBlank().integerGreaterThanZero().notExceedingLengthOf(100);
+        
         final String pinNumber = fromApiJsonHelper.extractStringNamed("pinNumber", element);
         baseDataValidator.reset().parameter("pinNumber").value(pinNumber).notBlank();
         throwExceptionIfValidationWarningsExist(dataValidationErrors);

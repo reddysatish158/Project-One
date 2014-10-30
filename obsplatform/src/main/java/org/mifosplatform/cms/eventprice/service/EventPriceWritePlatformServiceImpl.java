@@ -6,7 +6,7 @@ package org.mifosplatform.cms.eventprice.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mifosplatform.billing.pricing.exceptions.DuplicatEventPrice;
+import org.mifosplatform.billing.planprice.exceptions.DuplicatEventPrice;
 import org.mifosplatform.cms.eventmaster.domain.EventMaster;
 import org.mifosplatform.cms.eventmaster.domain.EventMasterRepository;
 import org.mifosplatform.cms.eventprice.data.EventPriceData;

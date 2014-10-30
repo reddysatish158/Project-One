@@ -1,6 +1,6 @@
 package org.mifosplatform.infrastructure.jobs.service;
 
-public interface MiddlewareJobConstants {
+public class MiddlewareJobConstants {
 
 	 public static final String Activation = "ACTIVATION";
 	 public static final String ReConnection = "RECONNECTION";

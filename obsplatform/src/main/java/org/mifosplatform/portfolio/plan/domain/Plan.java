@@ -2,9 +2,11 @@ package org.mifosplatform.portfolio.plan.domain;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -19,6 +21,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.joda.time.LocalDate;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 
 @Entity
@@ -65,25 +68,23 @@ public class Plan{
 
 	@LazyCollection(LazyCollectionOption.FALSE)
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "plan", orphanRemoval = true)
-	private List<PlanDetails> details = new ArrayList<PlanDetails>();
+	private Set<PlanDetails> planDetails = new HashSet<PlanDetails>();
 	
 	@Column(name = "provision_sys")
 	private String provisionSystem;
     
-
-	
 	public Plan() {
 		// TODO Auto-generated constructor stub
 	}
 
 	public Plan(final String code, final String description,final LocalDate start_date, final LocalDate endDate,
-			final Long bill_rule, final Long status,
-			final List<PlanDetails> details, String provisioingSystem, boolean isPrepaid, boolean allowTopup,boolean isHwReq) {
+			final Long bill_rule, final Long status,final List<PlanDetails> details,final String provisioingSystem,
+			final boolean isPrepaid,final boolean allowTopup,final boolean isHwReq) {
 			
 				this.planCode = code;
 				this.description = description;
-					if (endDate != null)
-						this.endDate = endDate.toDate();
+				if (endDate != null)
+				  this.endDate = endDate.toDate();
 				this.startDate = start_date.toDate();
 				this.status = status;
 				this.billRule = bill_rule;
@@ -91,89 +92,78 @@ public class Plan{
 				this.isPrepaid=isPrepaid?'Y':'N';
 				this.allowTopup=allowTopup?'Y':'N';
 				this.isHwReq=isHwReq?'Y':'N';
-	}
-
-	public List<PlanDetails> getDetails() {
-		return details;
-	}
-
-	public String getCode() {
-		return planCode;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public Long getStatus() {
-		return status;
-	}
-
-	public Date getStart_date() {
-		return startDate;
-	}
-
-	public Date getEnd_date() {
-		return endDate;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public String getPlanCode() {
-		return planCode;
-	}
-
-	public Date getStartDate() {
-		return startDate;
-	}
-
-	public Date getEndDate() {
-		return endDate;
-	}
-
-	public Long getBillRule() {
-		return billRule;
-	}
-
-	public char isDeleted() {
-		return deleted;
-	}
-
-
-	public void addServieDetails(PlanDetails serviceDetail) {
-
-		serviceDetail.update(this);
-		this.details.add(serviceDetail);
-	}
-
-	public char isHardwareReq() {
-		return isHwReq;
-	}
-
-	public char getDeleted() {
-		return deleted;
-	}
-
-	public String getProvisionSystem() {
-		return provisionSystem;
-	}
-
-	public void delete() {
-
-		if (deleted =='y') {
-
-		} else {
-			this.deleted = 'y';
-			this.planCode=this.planCode+"_"+this.getId()+"_DELETED";
-					for(PlanDetails planDetails:this.details){
-						planDetails.delete();
-					}
 		}
-	}
 
-	public Map<String, Object> update(JsonCommand command) {
+	public Set<PlanDetails> getDetails() {
+			return planDetails;
+		}
+
+		public String getCode() {
+		return planCode;
+		}
+
+		public String getDescription() {
+			return description;
+		}
+		public Long getStatus() {
+			return status;
+		}
+		
+		public Long getId() {
+			return id;
+		}
+
+		public String getPlanCode() {
+			return planCode;
+		}
+
+		public Date getStartDate() {
+			return startDate;
+		}
+
+		public Date getEndDate() {
+			return endDate;
+		}
+
+		public Long getBillRule() {
+			return billRule;
+		}
+
+		public char isDeleted() {
+			return deleted;
+		}
+
+		public void addServieDetails(final Set<PlanDetails> selectedServices) {
+			this.planDetails.clear();
+			for(PlanDetails planDetails:selectedServices){
+				planDetails.update(this);
+				this.planDetails.add(planDetails);
+			}
+		}
+
+		public char isHardwareReq() {
+			return isHwReq;
+		}
+
+		public char getDeleted() {
+			return deleted;
+		}
+
+		public String getProvisionSystem() {
+			return provisionSystem;
+		}
+
+		public void delete() {
+			if (this.deleted == ConfigurationConstants.CONST_IS_N) {
+				this.deleted = 'y';
+				this.planCode=this.planCode+"_"+this.getId()+"_DELETED";
+				for(PlanDetails planDetails:this.planDetails){
+					planDetails.delete();
+				}
+			}
+		}
+
+	public Map<String, Object> update(final JsonCommand command) {
 		 
 		final Map<String, Object> actualChanges = new LinkedHashMap<String, Object>(1);
 		final String firstnameParamName = "planCode";
@@ -193,6 +183,12 @@ public class Plan{
 	            final String newValue = command.stringValueOfParameterNamed(provisioingSystem);
 	            actualChanges.put(provisioingSystem, newValue);
 	            this.provisionSystem = StringUtils.defaultIfEmpty(newValue, null);
+	        }
+	        
+	        final String servicesParamName = "services";
+	        if (command.isChangeInArrayParameterNamed(servicesParamName, getServicesAsIdStringArray())) {
+	            final String[] newValue = command.arrayValueOfParameterNamed(servicesParamName);
+	            actualChanges.put(servicesParamName, newValue);
 	        }
 	        
 	    final String startDateParamName = "startDate";
@@ -236,19 +232,28 @@ public class Plan{
 	            return actualChanges;
 	}
 
+	 private String[] getServicesAsIdStringArray() {
+		 	
+		 final List<String> roleIds = new ArrayList<>();
+        	for (final PlanDetails details : this.planDetails) {
+        		roleIds.add(details.getId().toString());
+        	}
+        	return roleIds.toArray(new String[roleIds.size()]);
+	 }
+
 	public static Plan fromJson(JsonCommand command) {
-		    final String planCode = command.stringValueOfParameterNamed("planCode");
-		    final String planDescription = command.stringValueOfParameterNamed("planDescription");
-		    final LocalDate startDate = command.localDateValueOfParameterNamed("startDate");
-		    final LocalDate endDate = command.localDateValueOfParameterNamed("endDate");
-		    final Long status = command.longValueOfParameterNamed("status");
-		    final Long billRule = command.longValueOfParameterNamed("billRule");
-		    final String provisioingSystem=command.stringValueOfParameterNamed("provisioingSystem");
-		    boolean isPrepaid=command.booleanPrimitiveValueOfParameterNamed("isPrepaid");
-		    boolean allowTopup=command.booleanPrimitiveValueOfParameterNamed("allowTopup");
-		    boolean isHwReq=command.booleanPrimitiveValueOfParameterNamed("isHwReq");
+		 
+		final String planCode = command.stringValueOfParameterNamed("planCode");
+		final String planDescription = command.stringValueOfParameterNamed("planDescription");
+		final LocalDate startDate = command.localDateValueOfParameterNamed("startDate");
+		final LocalDate endDate = command.localDateValueOfParameterNamed("endDate");
+		final Long status = command.longValueOfParameterNamed("status");
+		final Long billRule = command.longValueOfParameterNamed("billRule");
+		final String provisioingSystem=command.stringValueOfParameterNamed("provisioingSystem");
+		final boolean isPrepaid=command.booleanPrimitiveValueOfParameterNamed("isPrepaid");
+		final boolean allowTopup=command.booleanPrimitiveValueOfParameterNamed("allowTopup");
+		final boolean isHwReq=command.booleanPrimitiveValueOfParameterNamed("isHwReq");
 		   
-		    
 		return new Plan(planCode,planDescription,startDate,endDate,billRule,status,null,provisioingSystem,isPrepaid,allowTopup,isHwReq);
 	}
 

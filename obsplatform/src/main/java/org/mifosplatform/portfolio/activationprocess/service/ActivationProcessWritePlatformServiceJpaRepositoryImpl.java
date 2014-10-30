@@ -251,7 +251,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 				
 				String zipCode = command.stringValueOfParameterNamed("zipCode");
 				// client creation
-				AddressData addressData = this.addressReadPlatformService.retrieveName(city);
+				AddressData addressData = this.addressReadPlatformService.retrieveAdressBy(city);
 				CodeValue codeValue=this.codeValueRepository.findOneByCodeValue("Normal");
 				JSONObject clientcreation = new JSONObject();
 				clientcreation.put("officeId", new Long(1));

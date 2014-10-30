@@ -2,24 +2,22 @@ package org.mifosplatform.organisation.address.command;
 
 import java.util.Set;
 
-import org.joda.time.LocalDate;
 
 public class AddressCommand {
 	
-	private Long clientId;
-	private String addressKey;
-	private String addressNo;
-	private String street;
-	private String city;
-	private String state;
-	private String country;
-	private String zip;
-	private Set<String> modifiedParameters;
+	private final Long clientId;
+	private final String addressKey;
+	private final String addressNo;
+	private final String street;
+	private final String city;
+	private final String state;
+	private final String country;
+	private final String zip;
+	private final Set<String> modifiedParameters;
 	
 
-	public AddressCommand(Set<String> modifiedParameters, Long clientid, String addressKey, String addressNo,
-			String street, String zip, String city, String state,
-			String country) {
+	public AddressCommand(final Set<String> modifiedParameters, final Long clientid, final String addressKey,final String addressNo,
+			final String street, final String zip, final String city, final String state,final String country) {
 		
 		this.modifiedParameters=modifiedParameters;		
 		this.clientId=clientid;

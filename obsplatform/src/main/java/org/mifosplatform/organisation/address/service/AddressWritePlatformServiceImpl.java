@@ -12,6 +12,12 @@ import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext
 import org.mifosplatform.organisation.address.data.AddressData;
 import org.mifosplatform.organisation.address.domain.Address;
 import org.mifosplatform.organisation.address.domain.AddressRepository;
+import org.mifosplatform.organisation.address.domain.City;
+import org.mifosplatform.organisation.address.domain.CityRepository;
+import org.mifosplatform.organisation.address.domain.Country;
+import org.mifosplatform.organisation.address.domain.CountryRepository;
+import org.mifosplatform.organisation.address.domain.State;
+import org.mifosplatform.organisation.address.domain.StateRepository;
 import org.mifosplatform.organisation.address.exception.CityNotFoundException;
 import org.mifosplatform.organisation.address.exception.CountryNotFoundException;
 import org.mifosplatform.organisation.address.exception.StateNotFoundException;
@@ -53,41 +59,38 @@ public class AddressWritePlatformServiceImpl implements AddressWritePlatformServ
 	}
 
 	@Override
-	public CommandProcessingResult createAddress(Long clientId,JsonCommand command) {
+	public CommandProcessingResult createAddress(final Long clientId,final JsonCommand command) {
 		try {
 			context.authenticatedUser();
 			final Address address = Address.fromJson(clientId,command);
 			this.addressRepository.save(address);
 			return new CommandProcessingResult(address.getId(),clientId);
 		} catch (DataIntegrityViolationException dve) {
-			 handleCodeDataIntegrityIssues(command, dve);
+			 handleCodeDataIntegrityIssues( dve);
 			return  CommandProcessingResult.empty();
 		}
 	}
 
-	private void handleCodeDataIntegrityIssues(JsonCommand command,
-			DataIntegrityViolationException dve) {
+	private void handleCodeDataIntegrityIssues(final DataIntegrityViolationException dve) {
 		  logger.error(dve.getMessage(), dve);
 		
 	}
 
 	@Override
-	public CommandProcessingResult updateAddress(Long addrId,JsonCommand command) {
+	public CommandProcessingResult updateAddress(final Long clientId,final JsonCommand command) {
 		try
 		{
 			  context.authenticatedUser();
-	            //this.fromApiJsonDeserializer.validateForUpdate(command.json());
-	          Long ClientId=command.longValueOfParameterNamed("clientId");
 	            
 	             Map<String, Object> changes =new HashMap<String, Object>();
-	             List<AddressData> addressDatas =this.addressReadPlatformService.retrieveClientAddressDetails(command.longValueOfParameterNamed("clientId"));
+	             final List<AddressData> addressDatas =this.addressReadPlatformService.retrieveClientAddressDetails(clientId);
 	                
 	             final String addressType=command.stringValueOfParameterNamed(ADDRESSTYPE);
 	             
 	             
 	             if(addressDatas.size()==1 && addressType.equalsIgnoreCase("BILLING")){
 	            	 
-	            	 Address  newAddress=Address.fromJson(ClientId, command);
+	            	 final Address  newAddress=Address.fromJson(clientId, command);
                	  this.addressRepository.save(newAddress);
 	            	 
 	             }
@@ -101,33 +104,20 @@ public class AddressWritePlatformServiceImpl implements AddressWritePlatformServ
 	                                  this.addressRepository.save(address);
 	                    	  }
          }
-	                     /*for(AddressData addressData:addressDatas){
-	                    	 
-	                     if(!addressData.getAddressType().equalsIgnoreCase("BILLING") && addressType.equalsIgnoreCase("BILLING") ){
-	                    	 
-	                    	 if(addressData.getAddressType().equalsIgnoreCase("PRIMARY")){
-	                    		 
-	                    	 }
-	                    	 else{
-	                    	 Address  newAddress=Address.fromJson(command.longValueOfParameterNamed("clientId"), command);
-	                    	  this.addressRepository.save(newAddress);
-	                    	 }
-	                     }*/
-	                   //  }
-         return new CommandProcessingResultBuilder() //
-         .withCommandId(command.commandId()) //
-         .withEntityId(addrId) //
-         .withClientId(ClientId)
-         .with(changes) //
+         return new CommandProcessingResultBuilder() 
+         .withCommandId(command.commandId()) 
+         .withEntityId(clientId) 
+         .withClientId(clientId)
+         .with(changes) 
          .build();
 	} catch (DataIntegrityViolationException dve) {
-		 handleCodeDataIntegrityIssues(command, dve);
+		 handleCodeDataIntegrityIssues(dve);
 		return new CommandProcessingResult(Long.valueOf(-1));
 	}
 }
 
-	private Address retrieveAddressBy(Long addrId) {
-		Address address=this.addressRepository.findOne(addrId);
+	private Address retrieveAddressBy(final Long addrId) {
+		final Address address=this.addressRepository.findOne(addrId);
 	    if(address== null){
 		throw new CodeNotFoundException(addrId);
 	    }
@@ -135,25 +125,24 @@ public class AddressWritePlatformServiceImpl implements AddressWritePlatformServ
 	}
 
 	@Override
-	public CommandProcessingResult createNewLocation(JsonCommand command,String entityType) {
+	public CommandProcessingResult createLocation(final JsonCommand command,final String entityType) {
   try{
 	  
 	  this.context.authenticatedUser();
 	 
 	  if(entityType.equalsIgnoreCase("city")){
-		//  City city=new City(command.getEntityCode(),command.getEntityName(),command.getParentEntityId());
 			final City city = City.fromJson(command);
 		  this.cityRepository.save(city);
 		  return new CommandProcessingResult(Long.valueOf(city.getId()));
 	  }else if(entityType.equalsIgnoreCase("state")){
 		  
-		  State state=State.fromJson(command);
+		  final State state=State.fromJson(command);
 		  this.stateRepository.save(state);
 		  
 		  return new CommandProcessingResult(Long.valueOf(state.getId()));
 	  }else{
 		  
-		  Country country=Country.fromJson(command);
+		  final Country country=Country.fromJson(command);
 		  this.countryRepository.save(country);
 		  return new CommandProcessingResult(Long.valueOf(country.getId()));
 	  }
@@ -161,17 +150,17 @@ public class AddressWritePlatformServiceImpl implements AddressWritePlatformServ
 		  
 	  
   } catch (DataIntegrityViolationException dve) {
-	  handleCodeDataIntegrityIssues(command, dve);
+	  handleCodeDataIntegrityIssues(dve);
 		return new CommandProcessingResult(Long.valueOf(-1));
 	}
 
 	}
 	@Override
-	public CommandProcessingResult updateLocation(JsonCommand command,String entityType, Long id) {
+	public CommandProcessingResult updateLocation(final JsonCommand command,final String entityType, final Long id) {
 	  try{
 		this.context.authenticatedUser();
 		if(entityType.equalsIgnoreCase("city")){
-		   City city=cityObjectRetrieveById(id);
+			final City city=cityObjectRetrieveById(id);
 		   final Map<String, Object> changes = city.update(command);
 		   	if(!changes.isEmpty()){
 		   		this.cityRepository.save(city);
@@ -179,7 +168,7 @@ public class AddressWritePlatformServiceImpl implements AddressWritePlatformServ
 		   	return new CommandProcessingResult(id);
       	}else if(entityType.equalsIgnoreCase("state")){
 			  
-  			State state=stateObjectRetrieveById(id);
+      		final State state=stateObjectRetrieveById(id);
   			final Map<String, Object> changes = state.update(command);
 	  
   			if(!changes.isEmpty()){
@@ -188,7 +177,7 @@ public class AddressWritePlatformServiceImpl implements AddressWritePlatformServ
   			return new CommandProcessingResult(id);
   	 	}else {
 			  
-  	 		Country country=countryObjectRetrieveById(id);
+  	 		final Country country=countryObjectRetrieveById(id);
   			final Map<String, Object> changes = country.update(command);
 	  
   				if(!changes.isEmpty()){
@@ -198,34 +187,34 @@ public class AddressWritePlatformServiceImpl implements AddressWritePlatformServ
   	 		}
 		  
 	  	}catch (DataIntegrityViolationException dve) {
-			handleCodeDataIntegrityIssues(command, dve);
+			handleCodeDataIntegrityIssues(dve);
 			return null;
 	  	}
 	}
 
-	private City cityObjectRetrieveById(Long id){
-		City city=this.cityRepository.findOne(id);
+	private City cityObjectRetrieveById(final Long id){
+		final City city=this.cityRepository.findOne(id);
 		if (city== null) { throw new CityNotFoundException(id.toString()); }
 		return city;
 	}
-	private State stateObjectRetrieveById(Long id){
-		State state=this.stateRepository.findOne(id);
+	private State stateObjectRetrieveById(final Long id){
+		final State state=this.stateRepository.findOne(id);
 		if (state== null) { throw new StateNotFoundException(id.toString()); }
 		return state;
 	}
-	private Country countryObjectRetrieveById(Long id){
-		Country country=this.countryRepository.findOne(id);
+	private Country countryObjectRetrieveById(final Long id){
+		final Country country=this.countryRepository.findOne(id);
 		if (country== null) { throw new CountryNotFoundException(id.toString()); }
 		return country;
 	}
 
 	@Override
-	public CommandProcessingResult deleteLocation(JsonCommand command,String entityType, Long id) {
+	public CommandProcessingResult deleteLocation(final JsonCommand command,final String entityType, final Long id) {
 		
 		try{
 	    	 this.context.authenticatedUser();
 	    	 if(entityType.equalsIgnoreCase("city")){
-	    		 City city = this.cityRepository.findOne(id);
+	    		 final City city = this.cityRepository.findOne(id);
 	    		 if(city==null){
 	        		 throw new CityNotFoundException(id.toString());
 	        	 }
@@ -234,7 +223,7 @@ public class AddressWritePlatformServiceImpl implements AddressWritePlatformServ
 	    		 return new CommandProcessingResult(id);
 	        	 
 	    	 }else if(entityType.equalsIgnoreCase("state")){
-	    		 State state = this.stateRepository.findOne(id);
+	    		 final State state = this.stateRepository.findOne(id);
 	    		 if(state==null){
 	        		 throw new StateNotFoundException(id.toString());
 	        	 }
@@ -243,7 +232,7 @@ public class AddressWritePlatformServiceImpl implements AddressWritePlatformServ
 	    		 return new CommandProcessingResult(id);
 	        	 
 	    	 }else{
-	    		 Country country = this.countryRepository.findOne(id);
+	    		 final Country country = this.countryRepository.findOne(id);
 	    			if (country== null) { 
 	    				throw new CountryNotFoundException(id.toString()); 
 	    			}
@@ -253,7 +242,7 @@ public class AddressWritePlatformServiceImpl implements AddressWritePlatformServ
 	        	 
 	    	 }
 	}catch (DataIntegrityViolationException dve) {
-		handleCodeDataIntegrityIssues(command, dve);
+		handleCodeDataIntegrityIssues(dve);
 		return null;
   	}
   }

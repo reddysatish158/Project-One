@@ -1123,20 +1123,11 @@ public class CommandWrapperBuilder {
 		return this;
 	}
 
-	public CommandWrapperBuilder updateAddress(final Long addrId) {
+	public CommandWrapperBuilder updateAddress(final Long clientId) {
 		this.actionName = "UPDATE";
 		this.entityName = "ADDRESS";
-		this.entityId = addrId;
-		this.href = "/address/" + addrId;
-		return this;
-	}
-
-	public CommandWrapperBuilder createNewRecord(final String entityType) {
-		this.actionName = "CREATE";
-		// this.entityName = "ADDRESS";
-		this.entityName = "LOCATION";
-		this.supportedEntityType=entityType;
-		this.href = "/address/" + entityType;
+		this.entityId = clientId;
+		this.href = "/address/" + clientId;
 		return this;
 	}
 
@@ -2002,7 +1993,15 @@ public CommandWrapperBuilder deleteUserChatmessage(Long meesageId) {
 	return this;
 }
 
-public CommandWrapperBuilder updateNewRecord(final String entityType,Long entityId) {
+public CommandWrapperBuilder createLocation(final String entityType) {
+	this.actionName = "CREATE";
+	this.entityName = "LOCATION";
+	this.supportedEntityType=entityType;
+	this.href = "/address/" + entityType;
+	return this;
+}
+
+public CommandWrapperBuilder updateLocation(final String entityType,Long entityId) {
 	this.actionName = "UPDATE";
 	this.entityName = "LOCATION";
 	this.entityId = entityId;
@@ -2011,7 +2010,7 @@ public CommandWrapperBuilder updateNewRecord(final String entityType,Long entity
 	return this;
 }
 
-public CommandWrapperBuilder deleteNewRecord(final String entityType, Long entityId) {
+public CommandWrapperBuilder deleteLocation(final String entityType, Long entityId) {
 	this.actionName = "DELETE";
 	this.entityName = "LOCATION";
 	this.entityId = entityId;
@@ -2072,9 +2071,9 @@ public CommandWrapperBuilder addNewProvisioning(Long clientId) {
 
 public CommandWrapperBuilder createGroupsDetails() {
 	this.actionName = "CREATE";
-	this.entityName = "GROUPS";
+	this.entityName = "GROUPSDETAILS";
 	this.entityId = null;
-	this.href = "/groups";
+	this.href = "/groupsdetails";
 	return this;
 }
 
@@ -2215,9 +2214,9 @@ public CommandWrapperBuilder deleteClientCardDetails(Long id, Long clientId) {
 	return this;	
 }
 
-public CommandWrapperBuilder createprovisioningDetails(Long prepareRequestId) {
+public CommandWrapperBuilder createGroupsDetailsProvision(Long prepareRequestId) {
 	this.actionName = "CREATE";
-	this.entityName = "PROVISION";
+	this.entityName = "GROUPSPROVISION";
 	this.entityId = prepareRequestId;
 	this.href = "/provision/"+prepareRequestId;
 	return this;
@@ -2521,6 +2520,15 @@ public CommandWrapperBuilder deleteChildFromParentClient(Long clientId) {
 	this.href = "/parentclient/" +clientId;
 	return this;
   }
+
+public CommandWrapperBuilder updateUploadFile(Long uploadStatusId) {
+	
+	this.actionName = "PROCESS";
+	this.entityName = "DATAUPLOADS";
+	this.entityId = uploadStatusId;
+	this.href = "/dataupload/" +clientId;
+	return this;
+}
 
 }
 

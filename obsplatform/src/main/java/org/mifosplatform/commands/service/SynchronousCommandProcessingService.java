@@ -586,12 +586,12 @@ public class SynchronousCommandProcessingService implements
 			} else if (wrapper.isDelete()) {
 				handler = applicationContext.getBean("deleteAddressCommandHandler",NewCommandSourceHandler.class);
 			}
-		}else if(wrapper.isAddressMappingResource()){
-			if (wrapper.isNewRecord()) {
-				handler = applicationContext.getBean("createNewLocationCommandHandler",NewCommandSourceHandler.class);
-			}else if (wrapper.isUpdateNewRecord()) {
+		}else if(wrapper.isAddressMasterResource()){
+			if (wrapper.isCreateLocation()) {
+				handler = applicationContext.getBean("createLocationCommandHandler",NewCommandSourceHandler.class);
+			}else if (wrapper.isUpdateLocation()) {
 				handler = applicationContext.getBean("updateLocationCommandHandler",NewCommandSourceHandler.class);
-			}else if (wrapper.isdeleteNewRecord()) {
+			}else if (wrapper.isDeleteLocation()) {
 				handler = applicationContext.getBean("deleteLocationCommandHandler",NewCommandSourceHandler.class);
 			}
 			
@@ -677,9 +677,9 @@ public class SynchronousCommandProcessingService implements
 				if(wrapper.isCreate()){
 					handler = applicationContext.getBean("createInventoryItemAllocationCommandHandler",NewCommandSourceHandler.class);
 				}
-			}else if (wrapper.isUploadStatusResource()) {
-	        	if (wrapper.isCreate()) {
-					handler = applicationContext.getBean("uploadStatusWritePlatformService", NewCommandSourceHandler.class);
+			}else if (wrapper.isDataUploadResource()) {
+	        	if (wrapper.isProcess()) {
+					handler = applicationContext.getBean("processDataUploadCommandHandler", NewCommandSourceHandler.class);
 				}	
 	        } else if (wrapper.isChargeCodeResource()) {
 	        	if(wrapper.isCreate()){
@@ -1073,9 +1073,9 @@ public class SynchronousCommandProcessingService implements
 				} else if (wrapper.isUpdateLoginStatus()) {
 		    	   handler= applicationContext.getBean("updateLoginStatusCommandHandler", NewCommandSourceHandler.class);
 
-			  } else if (wrapper.isGroupDetailsProvisionResource()) {
+			  } else if (wrapper.isGroupsDetailsProvisionResource()) {
 		        	if (wrapper.isCreate()) {
-		                handler = applicationContext.getBean("createGroupDetailsProvisionCommandHandler", NewCommandSourceHandler.class);
+		                handler = applicationContext.getBean("createGroupsDetailsProvisionCommandHandler", NewCommandSourceHandler.class);
 		        	}else {
 		                    throw new UnsupportedCommandException(wrapper.commandName());
 		                }
@@ -1146,7 +1146,9 @@ public class SynchronousCommandProcessingService implements
 		        	if(wrapper.isLocationAttributeMediaAsset()) {
 						 handler = applicationContext.getBean("createMediaAssetLocationAttributeCommandHandler",NewCommandSourceHandler.class);
 					 }
-            }
+            }else {
+            	throw new UnsupportedCommandException(wrapper.commandName());
+		     }
 	       return handler;
 	}
 }

@@ -34,16 +34,15 @@ import org.mifosplatform.portfolio.order.domain.Order;
 import org.mifosplatform.portfolio.order.domain.OrderHistory;
 import org.mifosplatform.portfolio.order.domain.OrderHistoryRepository;
 import org.mifosplatform.portfolio.order.domain.OrderRepository;
+import org.mifosplatform.portfolio.order.domain.StatusTypeEnum;
+import org.mifosplatform.portfolio.order.domain.UserActionStatusTypeEnum;
 import org.mifosplatform.portfolio.plan.domain.Plan;
 import org.mifosplatform.portfolio.plan.domain.PlanRepository;
-import org.mifosplatform.portfolio.plan.domain.StatusTypeEnum;
-import org.mifosplatform.portfolio.plan.domain.UserActionStatusTypeEnum;
 import org.mifosplatform.portfolio.transactionhistory.service.TransactionHistoryWritePlatformService;
 import org.mifosplatform.provisioning.provisioning.api.ProvisioningApiConstants;
 import org.mifosplatform.provisioning.provisioning.service.ProvisioningWritePlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class HardwareSwappingWriteplatformServiceImpl implements HardwareSwappingWriteplatformService {

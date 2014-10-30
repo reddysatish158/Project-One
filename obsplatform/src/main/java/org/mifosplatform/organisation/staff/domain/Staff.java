@@ -25,13 +25,17 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 public class Staff extends AbstractPersistable<Long> {
 
     
-    @Column(name = "firstname", length = 50)
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Column(name = "firstname", length = 50)
     private String firstname;
 
     @Column(name = "lastname", length = 50)
     private String lastname;
 
-    @SuppressWarnings("unused")
     @Column(name = "display_name", length = 100)
     private String displayName;
 
@@ -47,10 +51,10 @@ public class Staff extends AbstractPersistable<Long> {
     public static Staff fromJson(final Office staffOffice, final JsonCommand command) {
 
         final String firstnameParamName = "firstname";
-        String firstname = command.stringValueOfParameterNamed(firstnameParamName);
+        final String firstname = command.stringValueOfParameterNamed(firstnameParamName);
 
         final String lastnameParamName = "lastname";
-        String lastname = command.stringValueOfParameterNamed(lastnameParamName);
+        final String lastname = command.stringValueOfParameterNamed(lastnameParamName);
 
         final String isLoanOfficerParamName = "isLoanOfficer";
         final boolean isLoanOfficer = command.booleanPrimitiveValueOfParameterNamed(isLoanOfficerParamName);
@@ -58,7 +62,7 @@ public class Staff extends AbstractPersistable<Long> {
         return new Staff(staffOffice, firstname, lastname, isLoanOfficer);
     }
 
-    public static Staff createNew(Office staffOffice, final String firstname, final String lastname, boolean isLoanOfficer) {
+    public static Staff createNew(final Office staffOffice, final String firstname, final String lastname, final boolean isLoanOfficer) {
         return new Staff(staffOffice, firstname, lastname, isLoanOfficer);
     }
 

@@ -29,6 +29,7 @@ public class UpdateUserCommandHandler implements NewCommandSourceHandler {
     public CommandProcessingResult processCommand(final JsonCommand command) {
 
         final Long userId = command.entityId();
+        
         return this.writePlatformService.updateUser(userId, command);
     }
 }

@@ -63,12 +63,15 @@ public class SmartSearchReadplatformServiceImpl implements SmartSearchReadplatfo
     		  final Integer  limit,final Integer offset) {
     	
         final SmartSearchMapper rm = new SmartSearchMapper();
-        String sql = "select " + rm.schema();
+StringBuilder stringBuilder=new StringBuilder();
+   stringBuilder.append("select ").append(rm.schema());
+        //String sql = "select " + rm.schema();
         final Object[] objectArray = new Object[3];
         int arrayPos = 0;
 
         if (searchText != null ) {
-            sql += " and p.receipt_no like '%"+searchText+"%'";
+            //sql += " and p.receipt_no like '%"+searchText+"%'";
+        	stringBuilder.append(" and p.receipt_no like '%"+searchText+"%'");
           /*  objectArray[arrayPos] = searchText;
             arrayPos = arrayPos + 1;*/
         }
@@ -80,7 +83,8 @@ public class SmartSearchReadplatformServiceImpl implements SmartSearchReadplatfo
             String toDateString = null;
             
             if (fromDate != null && toDate != null) {
-                sql += "  AND p.payment_date BETWEEN ? AND ?";
+                //sql += "  AND p.payment_date BETWEEN ? AND ?";
+            	stringBuilder.append("  AND p.payment_date BETWEEN ? AND ?");
                 fromDateString = df.format(fromDate);
                 toDateString = df.format(toDate);
                 objectArray[arrayPos] = fromDateString;
@@ -89,23 +93,25 @@ public class SmartSearchReadplatformServiceImpl implements SmartSearchReadplatfo
                 arrayPos = arrayPos + 1;
                 
             } else if (fromDate != null) {
-                sql += " AND p.payment_date >= ? ";
+                //sql += " AND p.payment_date >= ? ";
+            	stringBuilder.append(" AND p.payment_date >= ? ");
                 fromDateString = df.format(fromDate);
                 objectArray[arrayPos] = fromDateString;
                 arrayPos = arrayPos + 1;
                 
             } else if (toDate != null) {
-                sql += "  AND p.payment_date <= ? ";
+                //sql += "  AND p.payment_date <= ? ";
+            	stringBuilder.append("  AND p.payment_date <= ? ");
                 toDateString = df.format(toDate);
                 objectArray[arrayPos] = toDateString;
                 arrayPos = arrayPos + 1;
             }
         }
 
-        sql += "  order by p.payment_date limit "+limit+" offset "+offset;
-      
+        //sql += "  order by p.payment_date limit "+limit+" offset "+offset;
+        stringBuilder.append("  order by p.payment_date limit "+limit+" offset "+offset);
         final Object[] finalObjectArray = Arrays.copyOf(objectArray, arrayPos);
-        return this.paginationHelper.fetchPage(this.jdbcTemplate, "SELECT FOUND_ROWS()",sql, finalObjectArray, rm);
+        return this.paginationHelper.fetchPage(this.jdbcTemplate, "SELECT FOUND_ROWS()",stringBuilder.toString(), finalObjectArray, rm);
     }
 
    

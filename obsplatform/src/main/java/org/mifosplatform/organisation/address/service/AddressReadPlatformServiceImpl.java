@@ -12,7 +12,7 @@ import org.mifosplatform.infrastructure.core.service.PaginationHelper;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.organisation.address.data.AddressData;
-import org.mifosplatform.organisation.address.data.AddressDetails;
+import org.mifosplatform.organisation.address.data.AddressLocationDetails;
 import org.mifosplatform.organisation.address.data.CountryDetails;
 import org.mifosplatform.organisation.address.domain.AddressEnum;
 import org.mifosplatform.portfolio.order.data.AddressStatusEnumaration;
@@ -29,7 +29,7 @@ public class AddressReadPlatformServiceImpl implements AddressReadPlatformServic
 	
 	private final JdbcTemplate jdbcTemplate;
 	private final PlatformSecurityContext context;
-	private final PaginationHelper<AddressDetails> paginationHelper=new PaginationHelper<AddressDetails>();
+	private final PaginationHelper<AddressLocationDetails> paginationHelper=new PaginationHelper<AddressLocationDetails>();
 
 	@Autowired
 	public AddressReadPlatformServiceImpl(final PlatformSecurityContext context,
@@ -40,12 +40,12 @@ public class AddressReadPlatformServiceImpl implements AddressReadPlatformServic
 
 
 	@Override
-	public List<AddressData> retrieveAddressDetails(Long clientId) {
+	public List<AddressData> retrieveAddressDetailsBy(final Long clientId) {
 
 		try{
 		context.authenticatedUser();
-		AddressMapper mapper = new AddressMapper();
-		String sql = "select " + mapper.schema()+" where is_deleted='n' and a.address_key='PRIMARY' and a.client_id="+clientId;
+		final AddressMapper mapper = new AddressMapper();
+		final String sql = "select " + mapper.schema()+" where is_deleted='n' and a.address_key='PRIMARY' and a.client_id="+clientId;
 		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
 		}catch (final EmptyResultDataAccessException e) {
 			return null;
@@ -61,19 +61,17 @@ public class AddressReadPlatformServiceImpl implements AddressReadPlatformServic
 		}
 
 		@Override
-		public AddressData mapRow(final ResultSet rs,
-				@SuppressWarnings("unused") final int rowNum)
-				throws SQLException {
+		public AddressData mapRow(final ResultSet rs,final int rowNum)throws SQLException {
 
-			Long id = rs.getLong("id");
-			Long clientId = rs.getLong("clientId");
-			String addressKey = rs.getString("addressKey");
-			String addressNo = rs.getString("addressNo");
-			String street = rs.getString("street");
-			String zip = rs.getString("zip");
-			String city = rs.getString("city");
-			String state = rs.getString("state");
-			String country = rs.getString("country");
+			final Long id = rs.getLong("id");
+			final Long clientId = rs.getLong("clientId");
+			final String addressKey = rs.getString("addressKey");
+			final String addressNo = rs.getString("addressNo");
+			final String street = rs.getString("street");
+			final String zip = rs.getString("zip");
+			final String city = rs.getString("city");
+			final String state = rs.getString("state");
+			final String country = rs.getString("country");
 			
 			return new AddressData(id,clientId,null,addressNo,street,zip,city,state, country,addressKey,null);
 
@@ -81,10 +79,10 @@ public class AddressReadPlatformServiceImpl implements AddressReadPlatformServic
 	}
 
 	@Override
-	public List<AddressData> retrieveSelectedAddressDetails(String selectedname) {
+	public List<AddressData> retrieveSelectedAddressDetails(final String selectedname) {
 		
-		AddressMapper mapper = new AddressMapper();
-		String sql = "select " + mapper.schema()+" where a.city=? or a.state =? or a.country =? and a.is_deleted='n'";
+		final AddressMapper mapper = new AddressMapper();
+		final String sql = "select " + mapper.schema()+" where a.city=? or a.state =? or a.country =? and a.is_deleted='n'";
 
 		return this.jdbcTemplate.query(sql, mapper, new Object[]  { selectedname,selectedname,selectedname });
 	}
@@ -92,9 +90,9 @@ public class AddressReadPlatformServiceImpl implements AddressReadPlatformServic
 	public List<AddressData> retrieveAddressDetails() {
 
 		context.authenticatedUser();
-		AddressMapper mapper = new AddressMapper();
+		final AddressMapper mapper = new AddressMapper();
 
-		String sql = "select " + mapper.schema()+" where is_deleted='n'";
+		final String sql = "select " + mapper.schema()+" where is_deleted='n'";
 
 		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
 
@@ -104,9 +102,9 @@ public class AddressReadPlatformServiceImpl implements AddressReadPlatformServic
 	@Override
 	public List<String> retrieveCountryDetails() {
 		context.authenticatedUser();
-		AddressMapper1 mapper = new AddressMapper1();
+		final AddressMapper1 mapper = new AddressMapper1();
 
-		String sql = "select " + mapper.sqlschema("country_name","country");
+		final String sql = "select " + mapper.sqlschema("country_name","country");
 
 		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
 
@@ -114,18 +112,15 @@ public class AddressReadPlatformServiceImpl implements AddressReadPlatformServic
 
 	private static final class AddressMapper1 implements RowMapper<String> {
 
-		public String sqlschema(String placeholder,String tablename) {
+		public String sqlschema(final String placeholder,final String tablename) {
 			return placeholder+" as data from b_"+tablename;
 
 		}
 
 		@Override
-		public String mapRow(final ResultSet rs,
-				@SuppressWarnings("unused") final int rowNum)
-				throws SQLException {
-
+		public String mapRow(final ResultSet rs,final int rowNum)	throws SQLException {
 			
-			String country = rs.getString("data");
+			final String country = rs.getString("data");
 			return country;
 		
 
@@ -137,9 +132,9 @@ public class AddressReadPlatformServiceImpl implements AddressReadPlatformServic
 	@Override
 	public List<String> retrieveStateDetails() {
 		context.authenticatedUser();
-		AddressMapper1 mapper = new AddressMapper1();
+		final AddressMapper1 mapper = new AddressMapper1();
 
-		String sql = "select " + mapper.sqlschema("state_name","state");
+		final String sql = "select " + mapper.sqlschema("state_name","state");
 
 		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
 
@@ -149,9 +144,9 @@ public class AddressReadPlatformServiceImpl implements AddressReadPlatformServic
 	@Override
 	public List<String> retrieveCityDetails() {
 		context.authenticatedUser();
-		AddressMapper1 mapper = new AddressMapper1();
+		final AddressMapper1 mapper = new AddressMapper1();
 
-		String sql = "select " + mapper.sqlschema("city_name","city");
+		final String sql = "select " + mapper.sqlschema("city_name","city");
 
 		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
 
@@ -159,11 +154,11 @@ public class AddressReadPlatformServiceImpl implements AddressReadPlatformServic
 
 
 	@Override
-	public List<AddressData> retrieveCityDetails(String selectedname) {
+	public List<AddressData> retrieveCityDetails(final String selectedname) {
 		context.authenticatedUser();
-		DataMapper mapper = new DataMapper();
+		final DataMapper mapper = new DataMapper();
 
-		String sql = "select " + mapper.schema(selectedname);
+		final String sql = "select " + mapper.schema(selectedname);
 
 		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
 
@@ -171,18 +166,16 @@ public class AddressReadPlatformServiceImpl implements AddressReadPlatformServic
 
 	private static final class DataMapper implements RowMapper<AddressData> {
 
-		public String schema(String placeHolder) {
+		public String schema(final String placeHolder) {
 			return "id as id,"+placeHolder+"_name as data from b_"+placeHolder;
 
 		}
 
 		@Override
-		public AddressData mapRow(final ResultSet rs,
-				@SuppressWarnings("unused") final int rowNum)
-				throws SQLException {
+		public AddressData mapRow(final ResultSet rs,final int rowNum) throws SQLException {
 
-			Long id = rs.getLong("id");
-			String data = rs.getString("data");
+			final Long id = rs.getLong("id");
+			final String data = rs.getString("data");
 		
 			//String serviceDescription = rs.getString("service_description");
 			return new AddressData(id,data);
@@ -193,23 +186,23 @@ public class AddressReadPlatformServiceImpl implements AddressReadPlatformServic
 	@Override
 	public List<EnumOptionData> addressType() {
 		
-		EnumOptionData primary = AddressStatusEnumaration.enumOptionData(AddressEnum.PRIMARY);
-		EnumOptionData billing =AddressStatusEnumaration.enumOptionData(AddressEnum.BILLING);
-		List<EnumOptionData> categotyType = Arrays.asList(primary,billing);
+		final EnumOptionData primary = AddressStatusEnumaration.enumOptionData(AddressEnum.PRIMARY);
+		final EnumOptionData billing =AddressStatusEnumaration.enumOptionData(AddressEnum.BILLING);
+		final List<EnumOptionData> categotyType = Arrays.asList(primary,billing);
 			return categotyType;
 	}
 
 
 	@Override
-	public AddressData retrieveName(String Name) {
+	public AddressData retrieveAdressBy(final String cityName) {
         try{
         	
 		context.authenticatedUser();
 		String sql;
-		retrieveMapper mapper=new retrieveMapper();
+		final retrieveMapper mapper=new retrieveMapper();
 	    sql = "SELECT  " + mapper.schema();
 	
-		return this.jdbcTemplate.queryForObject(sql, mapper, new Object[] { Name });
+		return this.jdbcTemplate.queryForObject(sql, mapper, new Object[] { cityName });
 	}catch (EmptyResultDataAccessException e) {
 		return null;
 	}
@@ -226,9 +219,9 @@ public class AddressReadPlatformServiceImpl implements AddressReadPlatformServic
 
 		@Override
 		public AddressData mapRow(final ResultSet rs, final int rowNum)	throws SQLException {
-			String city = rs.getString("cityName");
-			String state = rs.getString("stateName");
-			String country=rs.getString("countryName");
+			final String city = rs.getString("cityName");
+			final String state = rs.getString("stateName");
+			final String country=rs.getString("countryName");
 			return new AddressData(city,state,country);
 		}
 	}
@@ -237,9 +230,9 @@ public class AddressReadPlatformServiceImpl implements AddressReadPlatformServic
 	public List<CountryDetails> retrieveCountries() {
 		try{
 			context.authenticatedUser();
-			CountryMapper mapper = new CountryMapper();
+			final CountryMapper mapper = new CountryMapper();
 
-			String sql = "select " + mapper.schema();
+			final String sql = "select " + mapper.schema();
 
 			return this.jdbcTemplate.query(sql, mapper, new Object[] {});
 			}catch (final EmptyResultDataAccessException e) {
@@ -255,12 +248,10 @@ public class AddressReadPlatformServiceImpl implements AddressReadPlatformServic
 			}
 
 			@Override
-			public CountryDetails mapRow(final ResultSet rs,
-					@SuppressWarnings("unused") final int rowNum)
-					throws SQLException {
+			public CountryDetails mapRow(final ResultSet rs, final int rowNum) throws SQLException {
 
-				Long id = rs.getLong("id");
-				String countryName = rs.getString("countryName");
+				final Long id = rs.getLong("id");
+				final String countryName = rs.getString("countryName");
 			
 				return new CountryDetails(id,countryName);
 
@@ -268,12 +259,12 @@ public class AddressReadPlatformServiceImpl implements AddressReadPlatformServic
 		}
 
 		@Override
-		public List<AddressData> retrieveClientAddressDetails(Long clientId) {
+		public List<AddressData> retrieveClientAddressDetails(final Long clientId) {
 			try{
 				context.authenticatedUser();
-				AddressMapper mapper = new AddressMapper();
+				final AddressMapper mapper = new AddressMapper();
 
-				String sql = "select " + mapper.schema()+" where a.is_deleted='n' and a.client_id=?";
+				final String sql = "select " + mapper.schema()+" where a.is_deleted='n' and a.client_id=?";
 
 				return this.jdbcTemplate.query(sql, mapper, new Object[] {clientId});
 				}catch (final EmptyResultDataAccessException e) {
@@ -282,14 +273,14 @@ public class AddressReadPlatformServiceImpl implements AddressReadPlatformServic
 			}
 		
 		@Override
-		public Page<AddressDetails> retrieveAllAddresses(SearchSqlQuery searchAddresses){
+		public Page<AddressLocationDetails> retrieveAllAddressLocations(final SearchSqlQuery searchAddresses){
 			try{
 				context.authenticatedUser();
-				AddressActionMapper mapper=new AddressActionMapper();
+				final AddressLocationMapper locationMapper=new AddressLocationMapper();
 				
-				StringBuilder sqlBuilder = new StringBuilder(200);
+				final StringBuilder sqlBuilder = new StringBuilder(200);
 				  sqlBuilder.append("select ");
-				  sqlBuilder.append(mapper.schema());
+				  sqlBuilder.append(locationMapper.schema());
 				  String sqlSearch=searchAddresses.getSqlSearch();
 				  String extraCriteria = "";
 				    if (sqlSearch != null) {
@@ -306,7 +297,7 @@ public class AddressReadPlatformServiceImpl implements AddressReadPlatformServic
 			            sqlBuilder.append(" offset ").append(searchAddresses.getOffset());
 			        }
 				    return this.paginationHelper.fetchPage(this.jdbcTemplate, "SELECT FOUND_ROWS()",sqlBuilder.toString(),
-			                new Object[] {},mapper);
+			                new Object[] {},locationMapper);
 			}catch (final EmptyResultDataAccessException e) {
 				return null;
 			}
@@ -314,7 +305,7 @@ public class AddressReadPlatformServiceImpl implements AddressReadPlatformServic
 		 
 	   }
 		
-		public static final class AddressActionMapper implements RowMapper<AddressDetails>{
+		public static final class AddressLocationMapper implements RowMapper<AddressLocationDetails>{
 			public String schema() {
 				
 				return "country.id as countryId,country.country_code as countryCode,country.country_name as counryName,"+
@@ -327,18 +318,18 @@ public class AddressReadPlatformServiceImpl implements AddressReadPlatformServic
 				
 			}
 			@Override
-			public AddressDetails mapRow(final ResultSet rs,@SuppressWarnings("unused") final int rowNum)  throws SQLException {
+			public AddressLocationDetails mapRow(final ResultSet rs, final int rowNum) throws SQLException {
 				
-					String countryCode=rs.getString("countryCode");
-					String countryName=rs.getString("counryName");
-					String cityCode=rs.getString("cityCode");
-					String cityName=rs.getString("cityName");
-					String stateCode=rs.getString("stateCode");
-					String stateName=rs.getString("stateName");
-					Long cityId=rs.getLong("cityId");
-					Long countryId=rs.getLong("countryId");
-					Long stateId=rs.getLong("stateId");
-					return new AddressDetails(countryCode,countryName,cityCode,cityName,stateCode,stateName,countryId,stateId,cityId);
+				final String countryCode=rs.getString("countryCode");
+				final String countryName=rs.getString("counryName");
+				final String cityCode=rs.getString("cityCode");
+				final String cityName=rs.getString("cityName");
+				final String stateCode=rs.getString("stateCode");
+				final String stateName=rs.getString("stateName");
+				final Long cityId=rs.getLong("cityId");
+				final Long countryId=rs.getLong("countryId");
+				final Long stateId=rs.getLong("stateId");
+					return new AddressLocationDetails(countryCode,countryName,cityCode,cityName,stateCode,stateName,countryId,stateId,cityId);
 				}
 			}
 

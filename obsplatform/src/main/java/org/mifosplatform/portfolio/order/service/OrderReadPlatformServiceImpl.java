@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.joda.time.LocalDate;
 import org.mifosplatform.billing.payterms.data.PaytermData;
-import org.mifosplatform.billing.pricing.service.PriceReadPlatformService;
+import org.mifosplatform.billing.planprice.service.PriceReadPlatformService;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
 import org.mifosplatform.infrastructure.core.domain.JdbcSupport;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
@@ -47,7 +47,7 @@ public class OrderReadPlatformServiceImpl implements OrderReadPlatformService
 	public List<PlanCodeData> retrieveAllPlatformData(Long planId) {
 		  context.authenticatedUser();
 
-	        String sql = "select s.id as id,s.plan_code as plan_code,s.is_prepaid as isPrepaid from b_plan_master s " +
+	        String sql = "select s.id as id,s.plan_code as planCode,s.is_prepaid as isPrepaid from b_plan_master s " +
 	        		" where s.plan_status=1 and  s.is_deleted='n'  and s.id !=? ";
 	        RowMapper<PlanCodeData> rm = new PeriodMapper();
 	        return this.jdbcTemplate.query(sql, rm, new Object[] {planId});
@@ -59,10 +59,10 @@ public class OrderReadPlatformServiceImpl implements OrderReadPlatformService
 	        public PlanCodeData mapRow(final ResultSet rs, final int rowNum) throws SQLException {
 
 	        Long id = rs.getLong("id");
-	            String plan_code = rs.getString("plan_code");
+	            String planCode = rs.getString("planCode");
 	            String isPrepaid = rs.getString("isPrepaid");
-	            List<ServiceData> services= priceReadPlatformService.retrievePrcingDetails(id);
-	            return new PlanCodeData(id,plan_code,services,isPrepaid);
+	            List<ServiceData> services= priceReadPlatformService.retrieveServiceDetails(id);
+	            return new PlanCodeData(id,planCode,services,isPrepaid,null);
 
 	        }
 

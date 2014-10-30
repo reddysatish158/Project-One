@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.mifosplatform.billing.currency.domain.CountryCurrencyRepository;
 import org.mifosplatform.billing.currency.serialization.CountryCurrencyCommandFromApiJsonDeserializer;
-import org.mifosplatform.billing.pricing.domain.CountryCurrency;
+import org.mifosplatform.billing.planprice.domain.CountryCurrency;
 import org.mifosplatform.infrastructure.codes.exception.CodeNotFoundException;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
