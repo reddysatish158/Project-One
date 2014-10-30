@@ -3,6 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+
 package org.mifosplatform.useradministration.handler;
 
 import org.mifosplatform.commands.handler.NewCommandSourceHandler;
@@ -28,6 +29,7 @@ public class UpdateUserCommandHandler implements NewCommandSourceHandler {
     public CommandProcessingResult processCommand(final JsonCommand command) {
 
         final Long userId = command.entityId();
+        
         return this.writePlatformService.updateUser(userId, command);
     }
 }

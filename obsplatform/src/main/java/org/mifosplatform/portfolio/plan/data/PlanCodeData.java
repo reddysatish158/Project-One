@@ -5,27 +5,23 @@ import java.util.List;
 import org.joda.time.LocalDate;
 
 public class PlanCodeData {
-	private Long id;
-	private String planCode;
-	private List<ServiceData> availableServices;
-	private LocalDate start_date;
-	private String isPrepaid;
-	private String planDescription;
-	public PlanCodeData(final Long id,final String planCode,final List<ServiceData> data, String isPrepaid)
+	private final Long id;
+	private final String planCode;
+	private final List<ServiceData> availableServices;
+	private final LocalDate starDate;
+	private final String isPrepaid;
+	private final String planDescription;
+	
+	public PlanCodeData(final Long id,final String planCode,final List<ServiceData> data,final String isPrepaid,
+			final String planDescription)
 	{
 		this.id=id;
 		this.planCode=planCode;
 		this.availableServices=data;
-		this.start_date=new LocalDate();
+		this.starDate=new LocalDate();
 		this.isPrepaid=isPrepaid;
-
-	}
-
-	public PlanCodeData(Long id, String planCode, String planDescription) {
-		
-		this.id=id;
-		this.planCode=planCode;
 		this.planDescription=planDescription;
+
 	}
 
 	public Long getId() {
@@ -41,7 +37,7 @@ public class PlanCodeData {
 	}
 
 	public LocalDate getStartDate() {
-		return start_date;
+		return starDate;
 	}
 
 	/**
@@ -55,7 +51,7 @@ public class PlanCodeData {
 	 * @return the start_date
 	 */
 	public LocalDate getStart_date() {
-		return start_date;
+		return starDate;
 	}
 
 	/**

@@ -72,7 +72,7 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
 
         {
             put("string", "VARCHAR");
-            put("number", "INT");
+            put("number", "BIGINT");
             put("decimal", "DECIMAL");
             put("date", "DATE");
             put("text", "TEXT");
@@ -436,7 +436,7 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
 
     private String datatableColumnNameToCodeValueName(final String columnName, final String code) {
 
-        return (code + "_cd_" + columnName);
+        return (code + "_" + columnName);
     }
 
     private void throwExceptionIfValidationWarningsExist(final List<ApiParameterError> dataValidationErrors) {

@@ -565,8 +565,8 @@ public class CommandWrapper {
 	public boolean isAllocateHardwareResource(){
 		return this.entityName.equalsIgnoreCase("ALLOCATION");
 	}
-	public boolean isUploadStatusResource() {
-		return this.entityName.equalsIgnoreCase("UPLOADSTATUS");
+	public boolean isDataUploadResource() {
+		return this.entityName.equalsIgnoreCase("DATAUPLOADS");
 	}
 	 public boolean isTicketResource() {
 	    	return this.entityName.equalsIgnoreCase("TICKET");
@@ -612,14 +612,14 @@ public class CommandWrapper {
        public boolean isCloseEventPrice () {
         return this.actionName.equalsIgnoreCase("DELETE") && this.entityName.equalsIgnoreCase("EVENTPRICE");
        }
-		public boolean isNewRecord() {
+		public boolean isCreateLocation() {
 			 return this.actionName.equalsIgnoreCase("CREATE") && this.entityName.equalsIgnoreCase("LOCATION");
 		}
-		public boolean isUpdateNewRecord() {
+		public boolean isUpdateLocation() {
 			return  this.actionName.equalsIgnoreCase("UPDATE") &&  this.entityName.equalsIgnoreCase("LOCATION");
 		}
 		
-		public boolean isdeleteNewRecord() {
+		public boolean isDeleteLocation() {
 			return  this.actionName.equalsIgnoreCase("DELETE") &&  this.entityName.equalsIgnoreCase("LOCATION");
 		}
 
@@ -964,7 +964,7 @@ public class CommandWrapper {
             return this.entityName.equalsIgnoreCase("CACHE");
         }
 
-		public boolean isAddressMappingResource() {
+		public boolean isAddressMasterResource() {
 			return this.entityName.equalsIgnoreCase("LOCATION");
 		}
 
@@ -984,7 +984,7 @@ public class CommandWrapper {
 			return this.actionName.equalsIgnoreCase("TERMINATE") && this.entityName.equalsIgnoreCase("ORDER");
 		}
 		public boolean isGroupDetailsResource(){
-			return this.actionName.equalsIgnoreCase("CREATE") && this.entityName.equalsIgnoreCase("GROUPS");
+			return this.actionName.equalsIgnoreCase("CREATE") && this.entityName.equalsIgnoreCase("GROUPSDETAILS");
 			
 		}
 
@@ -1028,9 +1028,9 @@ public class CommandWrapper {
 			 return this.entityName.equals("CLIENTCARDDETAILS");
 		}
 
-		public boolean isGroupDetailsProvisionResource() {
+		public boolean isGroupsDetailsProvisionResource() {
 			
-			return this.entityName.equalsIgnoreCase("PROVISION");
+			return this.entityName.equalsIgnoreCase("GROUPSPROVISION");
 		}
 		
 		public boolean isTaxExemptionResource() {
@@ -1199,5 +1199,9 @@ public class CommandWrapper {
 		}
 		public boolean isLocationAttributeMediaAsset() {
 			return this.actionName.equalsIgnoreCase("CREATE") && this.entityName.equalsIgnoreCase("MEDIAASSETLOCATIONATTRIBUTES");
+		}
+
+		public boolean isProcess() {
+			return this.actionName.equalsIgnoreCase("PROCESS") && this.entityName.equalsIgnoreCase("DATAUPLOADS");
 		}
 }

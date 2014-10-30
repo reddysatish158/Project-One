@@ -60,11 +60,12 @@ public class CreditDistributionWritePlatformServiceImpl implements CreditDistrib
 			 final JsonElement element = fromJsonHelper.parse(command.json());
 			 final BigDecimal avialableAmount = fromJsonHelper.extractBigDecimalWithLocaleNamed("avialableAmount",element);
 			 final Long paymentId=command.longValueOfParameterNamed("paymentId");
+			 Long clientId = null;
 		     JsonArray creditDistributions = fromJsonHelper.extractJsonArrayNamed("creditdistributions", element);
 		        
 		        for(JsonElement j:creditDistributions)
 		        {
-		        	
+		        	clientId=fromJsonHelper.extractLongNamed("clientId", j);
 		        	CreditDistribution creditDistribution= CreditDistribution.fromJson(j,fromJsonHelper);
 		        	this.creditDistributionRepository.save(creditDistribution);
 		        	Invoice invoice=this.invoiceRepository.findOne(creditDistribution.getInvoiceId());
@@ -79,7 +80,7 @@ public class CreditDistributionWritePlatformServiceImpl implements CreditDistrib
 		    	  this.paymentRepository.save(payment);
 		    	  
 		      }
-		    return new CommandProcessingResult(Long.valueOf(1l));
+		    return new CommandProcessingResult(Long.valueOf(1l),clientId);
 		}catch(DataIntegrityViolationException dve){
 			handleDataIntegrityIssues(command, dve); 
 			return new CommandProcessingResult(Long.valueOf(-1));

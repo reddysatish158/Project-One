@@ -4,10 +4,15 @@ import java.util.Collection;
 import java.util.List;
 
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
+import org.mifosplatform.portfolio.plan.data.ServiceData;
 import org.mifosplatform.portfolio.service.data.ServiceMasterData;
 import org.mifosplatform.portfolio.service.data.ServiceMasterOptionsData;
 
 public interface ServiceMasterReadPlatformService {
+	
+
+	List<ServiceData> retrieveAllServices();
+	
 	 Collection<ServiceMasterData> retrieveAllServiceMasterData() ;
 
 	List<ServiceMasterOptionsData> retrieveServices();

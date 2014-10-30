@@ -6,8 +6,8 @@ import net.sf.json.JSONObject;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
@@ -59,7 +59,7 @@ public class ProvisioningServiceParamsWriteplatformServiceImpl implements
 	private final IpPoolManagementJpaRepository ipPoolManagementJpaRepository;
 	private final InventoryItemDetailsRepository inventoryItemDetailsRepository;
 	private final IpPoolManagementReadPlatformService ipPoolManagementReadPlatformService;
-	private final GlobalConfigurationRepository globalConfigurationRepository;
+	private final ConfigurationRepository globalConfigurationRepository;
 
 	@Autowired
 	public ProvisioningServiceParamsWriteplatformServiceImpl(
@@ -74,7 +74,7 @@ public class ProvisioningServiceParamsWriteplatformServiceImpl implements
 			final ServiceMasterRepository masterRepository,
 			final IpPoolManagementReadPlatformService ipPoolManagementReadPlatformService,
 			final ClientRepository clientRepository,
-			final GlobalConfigurationRepository globalConfigurationRepository) {
+			final ConfigurationRepository globalConfigurationRepository) {
 
 		this.context = securityContext;
 		this.orderRepository = orderRepository;
@@ -146,7 +146,7 @@ public class ProvisioningServiceParamsWriteplatformServiceImpl implements
 									String ipData = ipAddress + "/" + subnet;
 									IpGeneration ipGeneration = new IpGeneration(ipData, this.ipPoolManagementReadPlatformService);
 									// ipAddressArray=this.ipGeneration.getInfo().getAllAddresses(ipData);//
-									GlobalConfigurationProperty configuration = globalConfigurationRepository.findOneByName("include-network-broadcast-ip");
+									Configuration configuration = globalConfigurationRepository.findOneByName("include-network-broadcast-ip");
 									ipGeneration.setInclusiveHostCount(configuration.getValue().equalsIgnoreCase("true"));
 									ipAddressArray = ipGeneration.getInfo().getsubnetAddresses();
 
@@ -282,6 +282,7 @@ public class ProvisioningServiceParamsWriteplatformServiceImpl implements
 	private void handleCodeDataIntegrityIssues(JsonCommand command,
 			DataIntegrityViolationException dve) {
 
+		@SuppressWarnings("unused")
 		Throwable realCause = dve.getMostSpecificCause();
 		throw new PlatformDataIntegrityException(
 				"error.msg.office.unknown.data.integrity.issue",

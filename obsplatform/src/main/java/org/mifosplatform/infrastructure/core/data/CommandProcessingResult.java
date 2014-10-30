@@ -81,6 +81,7 @@ public class CommandProcessingResult {
         this.changes = new HashMap<String, Object>();
     }
     
+
     public CommandProcessingResult(final Long entityId,final Long clientId) {
         if (entityId != null) {
             this.resourceIdentifier = entityId.toString();

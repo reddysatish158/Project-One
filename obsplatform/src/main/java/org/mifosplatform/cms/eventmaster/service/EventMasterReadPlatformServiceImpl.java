@@ -19,7 +19,7 @@ import org.mifosplatform.infrastructure.core.data.EnumOptionData;
 import org.mifosplatform.infrastructure.core.domain.JdbcSupport;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
 import org.mifosplatform.portfolio.order.data.OrderStatusEnumaration;
-import org.mifosplatform.portfolio.plan.domain.StatusTypeEnum;
+import org.mifosplatform.portfolio.order.domain.StatusTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Service;
 /**{@link Service} Class for {@link EventMaster} Read Service
  *implements {@link EventMasterReadPlatformService}
  * @author pavani
- *
+ * @author Rakesh
  */
 @Service
 public class EventMasterReadPlatformServiceImpl implements
@@ -45,19 +45,19 @@ public class EventMasterReadPlatformServiceImpl implements
 	
 	@Override
 	public List<EnumOptionData> retrieveOptTypeData() {
-		EnumOptionData rent = OptTypeEnum.optType(OptType.RENT);
-		EnumOptionData own = OptTypeEnum.optType(OptType.OWN);
-		List<EnumOptionData> optType = Arrays.asList(rent,own);
+		final EnumOptionData rent = OptTypeEnum.optType(OptType.RENT);
+		final EnumOptionData own = OptTypeEnum.optType(OptType.OWN);
+		final List<EnumOptionData> optType = Arrays.asList(rent,own);
 		return optType;
 	}
 
 	@Override
 	public List<EnumOptionData> retrieveNewStatus() {
-		EnumOptionData active = OrderStatusEnumaration
+		final EnumOptionData active = OrderStatusEnumaration
 				.OrderStatusType(StatusTypeEnum.ACTIVE);
-		EnumOptionData inactive = OrderStatusEnumaration
+		final EnumOptionData inactive = OrderStatusEnumaration
 				.OrderStatusType(StatusTypeEnum.INACTIVE);
-		List<EnumOptionData> categotyType = Arrays.asList(active, inactive);
+		final List<EnumOptionData> categotyType = Arrays.asList(active, inactive);
 		return categotyType;
 
 	}
@@ -66,9 +66,8 @@ public class EventMasterReadPlatformServiceImpl implements
 	public List<EventMasterData> retrieveEventMasterDataForEventOrders() {
 		try {
 			final EventMasterMapper eventMasterMapper = new EventMasterMapper();
-			
-			final String sql = "SELECT " + eventMasterMapper.eventMasterSchema()+" where evnt.status=1 and evnt.event_end_date > now() or evnt.event_end_date is null";
-			return jdbcTemplate.query(sql, eventMasterMapper,new Object[] {});
+			final String sql = "SELECT " + eventMasterMapper.eventMasterSchema() + " where evnt.status=1 and evnt.event_end_date > now() or evnt.event_end_date is null";
+			return jdbcTemplate.query(sql, eventMasterMapper, new Object[] {});
 		} catch (EmptyResultDataAccessException e) {
 			return null;
 		}
@@ -78,9 +77,8 @@ public class EventMasterReadPlatformServiceImpl implements
 	public List<EventMasterData> retrieveEventMasterData() {
 		try {
 			final EventMasterMapper eventMasterMapper = new EventMasterMapper();
-			
-			final String sql = "SELECT " + eventMasterMapper.eventMasterSchema()+" where evnt.event_end_date > now() or evnt.event_end_date is null";
-			return jdbcTemplate.query(sql, eventMasterMapper,new Object[] {});
+			final String sql = "SELECT " + eventMasterMapper.eventMasterSchema() + " where evnt.event_end_date > now() or evnt.event_end_date is null";
+			return jdbcTemplate.query(sql, eventMasterMapper, new Object[] {});
 		} catch (EmptyResultDataAccessException e) {
 			return null;
 		}
@@ -88,81 +86,76 @@ public class EventMasterReadPlatformServiceImpl implements
 	
 	private static final class EventMasterMapper implements RowMapper<EventMasterData> {
 		public String eventMasterSchema() {
-			return " evnt.id as id, evnt.event_name as eventName, evnt.event_description as eventDescription, evnt.status as status,evnt.created_date as createdDate, "
+			return " evnt.id as id, evnt.event_name as eventName, evnt.event_description as eventDescription, evnt.status as status, evnt.created_date as createdDate, "
 						+ "evnt.event_category as eventCategory from b_event_master evnt ";
 		}
 		@Override
-		public EventMasterData mapRow(final ResultSet rs, final int rowNum) throws SQLException {
+		public EventMasterData mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {
 			
-			final Long id = rs.getLong("id");
-			final String eventName = rs.getString("eventName");
-			final String eventDescription = rs.getString("eventDescription");
-			final Integer statusId = rs.getInt("status");
-			String status=OrderStatusEnumaration.OrderStatusType(statusId).getValue();
-			LocalDate createdDate = JdbcSupport.getLocalDate(rs, "createdDate");
-			final String eventCategory=rs.getString("eventCategory");
-			return new EventMasterData(id, eventName, eventDescription,status,null,createdDate,eventCategory);
+			final Long id = resultSet.getLong("id");
+			final String eventName = resultSet.getString("eventName");
+			final String eventDescription = resultSet.getString("eventDescription");
+			final Integer statusId = resultSet.getInt("status");
+			final String status = OrderStatusEnumaration.OrderStatusType(statusId).getValue();
+			final LocalDate createdDate = JdbcSupport.getLocalDate(resultSet, "createdDate");
+			final String eventCategory = resultSet.getString("eventCategory");
+			return new EventMasterData(id, eventName, eventDescription, status, null, createdDate, eventCategory);
 		}
 	}
 
 	@Override
-	public EventMasterData retrieveEventMasterDetails(Integer eventId){
-		String sql = " select evnt.id as id, evnt.event_name as eventName, evnt.event_description as eventDescription, evnt.status as status,evnt.event_start_date as eventStartDate, " +
-						" evnt.event_end_date as eventEndDate, evnt.event_validity as eventValidity, charge_code as chargeCode,evnt.event_category as eventCategory "
+	public EventMasterData retrieveEventMasterDetails(final Integer eventId){
+		final String sql = " select evnt.id as id, evnt.event_name as eventName, evnt.event_description as eventDescription, evnt.status as status, evnt.event_start_date as eventStartDate, " +
+						" evnt.event_end_date as eventEndDate, evnt.event_validity as eventValidity, charge_code as chargeCode, evnt.event_category as eventCategory "
 						+ " from b_event_master evnt "
 						+ "where evnt.id='"+eventId+"'";
-		RowMapper<EventMasterData> rm = new EventMapper();
-		return this.jdbcTemplate.queryForObject(sql, rm,new Object[]{});
+		RowMapper<EventMasterData> rowMap = new EventMapper();
+		return this.jdbcTemplate.queryForObject(sql, rowMap, new Object[]{});
 	}
 	
 	private static final class EventMapper implements RowMapper<EventMasterData> {
 		@Override
-		public EventMasterData mapRow(final ResultSet rs,final int rowNum) throws SQLException {
-			Long id = rs.getLong("id");
-			String eventName = rs.getString("eventName");
-			String eventDescription = rs.getString("eventDescription");
-			//LocalDate eventStartDate = JdbcSupport.getLocalDate(rs, "eventStartDate");
-			Date eventStartDate = rs.getTimestamp("eventStartDate");
-			//LocalDate eventEndDate = JdbcSupport.getLocalDate(rs, "eventEndDate");
-			Date eventEndDate = rs.getTimestamp("eventEndDate");
-			LocalDate eventValidity = JdbcSupport.getLocalDate(rs, "eventValidity");
-			Long status = rs.getLong("status");
-			/*int allowCancellation = JdbcSupport.getInteger(rs, "allowCancellation");*/
-			String chargeData = rs.getString("chargeCode"); 
-			final String eventCategory=rs.getString("eventCategory");
-			return new EventMasterData(id, eventName, eventDescription, status, null, eventStartDate, eventEndDate, eventValidity,chargeData,eventCategory);
+		public EventMasterData mapRow(final ResultSet resultSet,final int rowNum) throws SQLException {
+			final Long id = resultSet.getLong("id");
+			final String eventName = resultSet.getString("eventName");
+			final String eventDescription = resultSet.getString("eventDescription");
+			final Date eventStartDate = resultSet.getTimestamp("eventStartDate");
+			final Date eventEndDate = resultSet.getTimestamp("eventEndDate");
+			final LocalDate eventValidity = JdbcSupport.getLocalDate(resultSet, "eventValidity");
+			final Long status = resultSet.getLong("status");
+			final String chargeData = resultSet.getString("chargeCode"); 
+			final String eventCategory = resultSet.getString("eventCategory");
+			return new EventMasterData(id, eventName, eventDescription, status, null, eventStartDate, eventEndDate, eventValidity, chargeData, eventCategory);
 		}
 	}
 	
 	@Override
-	public List<EventDetailsData> retrieveEventDetailsData(Integer eventId) {
-		String sql = "Select ed.id as id, ed.event_id as eventId,ed.media_id as mediaId,m.title as title "
-					  +" from b_event_detail ed,b_media_asset m where ed.media_id=m.id and event_id = ?";
+	public List<EventDetailsData> retrieveEventDetailsData(final Integer eventId) {
+		final String sql = "Select ed.id as id, ed.event_id as eventId, ed.media_id as mediaId, m.title as title "
+					  +" from b_event_detail ed, b_media_asset m where ed.media_id=m.id and event_id = ?";
 		
-		RowMapper<EventDetailsData> rm = new EventDetailsMapper();
+		final RowMapper<EventDetailsData> rowMap = new EventDetailsMapper();
 		
-		return this.jdbcTemplate.query(sql, rm,new Object[]{eventId});
+		return this.jdbcTemplate.query(sql, rowMap, new Object[]{eventId});
 	}
 	
 	@Override
-	public EventDetailsData retrieveEventDetails(Integer eventId) {
-		String sql = "Select id as id, event_id as eventId,media_id as mediaId," 
+	public EventDetailsData retrieveEventDetails(final Integer eventId) {
+		final String sql = "Select id as id, event_id as eventId, media_id as mediaId," 
 				 + " event_start_date as eventStartDate, event_end_date as eventEndDate " 
 				 + " from b_event_detail where event_id = ?";
-			RowMapper<EventDetailsData> rm = new EventDetailsMapper();
+		final RowMapper<EventDetailsData> rowMap = new EventDetailsMapper();
 			
-			return this.jdbcTemplate.queryForObject(sql, rm,new Object[] {eventId});
+		return this.jdbcTemplate.queryForObject(sql, rowMap, new Object[] {eventId});
  	}
 	private static final class EventDetailsMapper implements RowMapper<EventDetailsData> {
 		@Override
-		public EventDetailsData mapRow(final ResultSet rs,final int rowNum) throws SQLException {
-			Long id = rs.getLong("id");
-			Integer eventId = rs.getInt("eventId");
-			Long mediaId = rs.getLong("mediaId");
-			String mediaTitle = rs.getString("title");
+		public EventDetailsData mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {
+			final Long id = resultSet.getLong("id");
+			final Integer eventId = resultSet.getInt("eventId");
+			final Long mediaId = resultSet.getLong("mediaId");
+			final String mediaTitle = resultSet.getString("title");
 			return new EventDetailsData(id, eventId, mediaId, mediaTitle);
 		}
 	}
 }	
-
-	

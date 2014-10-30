@@ -4,7 +4,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.mifosplatform.billing.chargecode.data.ChargesData;
-import org.mifosplatform.billing.pricing.service.PriceReadPlatformService;
+import org.mifosplatform.billing.discountmaster.service.DiscountReadPlatformService;
+import org.mifosplatform.billing.planprice.service.PriceReadPlatformService;
 import org.mifosplatform.finance.data.DiscountMasterData;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.api.JsonQuery;
@@ -45,7 +46,7 @@ public class OneTimeSaleWritePlatformServiceImpl implements OneTimeSaleWritePlat
 	private final InvoiceOneTimeSale invoiceOneTimeSale;
 	private final OneTimeSaleRepository  oneTimeSaleRepository;
 	private final ItemReadPlatformService itemReadPlatformService;
-	private final PriceReadPlatformService priceReadPlatformService;
+	private final DiscountReadPlatformService discountReadPlatformService;
 	private final OneTimeSaleReadPlatformService oneTimeSaleReadPlatformService;
 	private final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService;
 	private final InventoryItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService;
@@ -56,8 +57,8 @@ public class OneTimeSaleWritePlatformServiceImpl implements OneTimeSaleWritePlat
 			final ItemRepository itemMasterRepository,final OneTimesaleCommandFromApiJsonDeserializer apiJsonDeserializer,
 			final InvoiceOneTimeSale invoiceOneTimeSale,final ItemReadPlatformService itemReadPlatformService,final FromJsonHelper fromJsonHelper,
 			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,final OneTimeSaleReadPlatformService oneTimeSaleReadPlatformService,
-			final PriceReadPlatformService priceReadPlatformService,final InventoryItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService,
-			final OrderDetailsReadPlatformServices orderDetailsReadPlatformServices)
+			final InventoryItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService,
+			final OrderDetailsReadPlatformServices orderDetailsReadPlatformServices,final DiscountReadPlatformService discountReadPlatformService)
 	{
 		this.context=context;
 		this.fromJsonHelper=fromJsonHelper;
@@ -66,7 +67,7 @@ public class OneTimeSaleWritePlatformServiceImpl implements OneTimeSaleWritePlat
 		this.itemMasterRepository=itemMasterRepository;
 		this.oneTimeSaleRepository=oneTimeSaleRepository;
 		this.itemReadPlatformService=itemReadPlatformService;
-		this.priceReadPlatformService=priceReadPlatformService;
+		this.discountReadPlatformService=discountReadPlatformService;
 		this.oneTimeSaleReadPlatformService=oneTimeSaleReadPlatformService;
 		this.transactionHistoryWritePlatformService = transactionHistoryWritePlatformService;
 		this.inventoryItemDetailsWritePlatformService=inventoryItemDetailsWritePlatformService;
@@ -153,7 +154,7 @@ public class OneTimeSaleWritePlatformServiceImpl implements OneTimeSaleWritePlat
 			}
 			BigDecimal TotalPrice=itemprice.multiply(new BigDecimal(quantity));
 			List<ItemData> itemCodeData = this.oneTimeSaleReadPlatformService.retrieveItemData();
-			List<DiscountMasterData> discountdata = this.priceReadPlatformService.retrieveDiscountDetails();
+			List<DiscountMasterData> discountdata = this.discountReadPlatformService.retrieveAllDiscounts();
 			ItemData itemData = this.itemReadPlatformService.retrieveSingleItemDetails(itemId);
 			List<ChargesData> chargesDatas=this.itemReadPlatformService.retrieveChargeCode();
 			

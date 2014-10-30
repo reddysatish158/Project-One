@@ -72,6 +72,7 @@ public class RolesApiResource {
             final DefaultToApiJsonSerializer<RolePermissionsData> permissionsToApiJsonSerializer,
             final ApiRequestParameterHelper apiRequestParameterHelper,
             final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
+    	
         this.context = context;
         this.roleReadPlatformService = readPlatformService;
         this.permissionReadPlatformService = permissionReadPlatformService;

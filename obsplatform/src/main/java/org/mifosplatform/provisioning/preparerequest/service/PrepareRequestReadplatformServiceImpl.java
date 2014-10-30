@@ -13,8 +13,8 @@ import org.mifosplatform.portfolio.order.data.OrderStatusEnumaration;
 import org.mifosplatform.portfolio.order.domain.Order;
 import org.mifosplatform.portfolio.order.domain.OrderLine;
 import org.mifosplatform.portfolio.order.domain.OrderRepository;
-import org.mifosplatform.portfolio.plan.domain.StatusTypeEnum;
-import org.mifosplatform.portfolio.plan.domain.UserActionStatusTypeEnum;
+import org.mifosplatform.portfolio.order.domain.StatusTypeEnum;
+import org.mifosplatform.portfolio.order.domain.UserActionStatusTypeEnum;
 import org.mifosplatform.portfolio.planmapping.domain.PlanMapping;
 import org.mifosplatform.portfolio.planmapping.domain.PlanMappingRepository;
 import org.mifosplatform.portfolio.service.domain.ProvisionServiceDetails;
@@ -92,7 +92,7 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 				
 				return "  pr.id AS id,pr.client_id AS clientId,pr.order_id AS orderId,pr.provisioning_sys AS provisioningSystem,c.firstname AS userName," +
 						" p.is_hw_req AS hwRequired,p.plan_code AS planName,pr.request_type AS requestType FROM b_prepare_request pr,m_client c,b_orders o," +
-						" b_plan_master p WHERE pr.client_id = c.id AND o.plan_id = p.id AND pr.provisioning_sys != 'packetspan' AND pr.order_id = o.id" +
+						" b_plan_master p WHERE pr.client_id = c.id AND o.plan_id = p.id AND pr.order_id = o.id" +
 						" AND (pr.is_provisioning = 'N' OR pr.status = 'PENDING') GROUP BY pr.order_id DESC";
 			}
 

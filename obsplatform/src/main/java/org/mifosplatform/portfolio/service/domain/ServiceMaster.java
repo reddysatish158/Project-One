@@ -10,6 +10,7 @@ import javax.persistence.UniqueConstraint;
 
 import org.apache.commons.lang.StringUtils;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
+import org.mifosplatform.portfolio.plan.data.ServiceData;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 @Entity
@@ -33,6 +34,9 @@ public class ServiceMaster extends AbstractPersistable<Long> {
 	
 	@Column(name = "is_optional", nullable = false, length = 100)
 	private char isOptional;
+	
+	@Column(name = "is_auto")
+	private char isAutoProvision;
 
 	@Column(name = "is_deleted")
 	private String isDeleted="n";
@@ -46,21 +50,21 @@ public static ServiceMaster fromJson(final JsonCommand command) {
     final String serviceCode = command.stringValueOfParameterNamed("serviceCode");
     final String serviceDescription = command.stringValueOfParameterNamed("serviceDescription");
     final String serviceType = command.stringValueOfParameterNamed("serviceType");
-   // final String serviceUnitType = command.stringValueOfParameterNamed("serviceUnitType");
     final String status= command.stringValueOfParameterNamed("status");
     final boolean isOptional= command.booleanPrimitiveValueOfParameterNamed("isOptional");
+    final boolean isAutoProvision= command.booleanPrimitiveValueOfParameterNamed("isAutoProvision");
     
-    return new ServiceMaster(serviceCode,serviceDescription,serviceType,status,isOptional);
+    return new ServiceMaster(serviceCode,serviceDescription,serviceType,status,isOptional,isAutoProvision);
 }
 
-	public ServiceMaster(String serviceCode, String serviceDescription,
-			String serviceType,String  status,boolean isOptional) {
+	public ServiceMaster(final String serviceCode, final String serviceDescription,
+			final String serviceType,final String  status,final boolean isOptional, final boolean isAutoProvision) {
 		this.serviceCode = serviceCode;
 		this.serviceDescription = serviceDescription;
 		this.serviceType = serviceType;
-	//	this.serviceUnittype=serviceUnitType;
 		this.status=status;
 		this.isOptional=isOptional?'Y':'N';
+		this.isAutoProvision=isAutoProvision?'Y':'N';
 	}
 
 	
@@ -82,8 +86,29 @@ public static ServiceMaster fromJson(final JsonCommand command) {
 		return this.isDeleted;
 	}
 
+	
 
-	public  Map<String, Object> update(JsonCommand command) {
+	public String getServiceUnittype() {
+		return serviceUnittype;
+	}
+
+
+	public String getStatus() {
+		return status;
+	}
+
+
+	public char getIsOptional() {
+		return isOptional;
+	}
+
+
+	public char isAuto() {
+		return isAutoProvision;
+	}
+
+
+	public  Map<String, Object> update(final JsonCommand command) {
 		
 		  final Map<String, Object> actualChanges = new LinkedHashMap<String, Object>(1);
 		  final String serviceCodeParamName = "serviceCode";
@@ -124,8 +149,10 @@ public static ServiceMaster fromJson(final JsonCommand command) {
 	       
 	        final boolean isOptional= command.booleanPrimitiveValueOfParameterNamed("isOptional");
 	        this.isOptional=isOptional?'Y':'N';
-	        return actualChanges;
 
+	        final boolean isAutoProvision= command.booleanPrimitiveValueOfParameterNamed("isAutoProvision");
+	        this.isAutoProvision=isAutoProvision?'Y':'N';
+	        return actualChanges;
 	}
 
 	public void delete() {
@@ -136,6 +163,11 @@ public static ServiceMaster fromJson(final JsonCommand command) {
 			this.serviceCode=this.serviceCode+"_"+this.getId();
 			isDeleted="y";
 		}
+	}
+
+
+	public ServiceData todata() {
+		return new ServiceData(getId(),null,null,null,this.serviceCode,this.serviceDescription,null,null,null,null);
 	}
 
 

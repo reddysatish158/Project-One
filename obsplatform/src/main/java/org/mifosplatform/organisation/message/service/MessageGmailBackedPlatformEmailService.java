@@ -32,9 +32,9 @@ import org.apache.commons.mail.HtmlEmail;
 import org.joda.time.LocalDate;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
-import org.mifosplatform.infrastructure.configuration.exception.GlobalConfigurationPropertyNotFoundException;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.exception.ConfigurationPropertyNotFoundException;
 import org.mifosplatform.organisation.message.data.BillingMessageDataForProcessing;
 import org.mifosplatform.organisation.message.domain.BillingMessage;
 import org.mifosplatform.organisation.message.domain.BillingMessageRepository;
@@ -49,8 +49,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class MessageGmailBackedPlatformEmailService implements MessagePlatformEmailService {
 	
+
 	private final BillingMessageRepository messageDataRepository;
-	private final GlobalConfigurationRepository repository;
+	private final ConfigurationRepository repository;
+
 	private String authuser;
 	private String encodedPassword;
 	private String authpwd;
@@ -58,11 +60,12 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 	private int portNumber;
 	private String port;
 	private String starttlsValue;
-	private GlobalConfigurationProperty configuration;
+	private Configuration configuration;
 	
 	@Autowired
-	public MessageGmailBackedPlatformEmailService(BillingMessageRepository messageDataRepository,final GlobalConfigurationRepository repository) {
 
+	public MessageGmailBackedPlatformEmailService(BillingMessageRepository messageDataRepository,final ConfigurationRepository repository) {
+		
 		this.messageDataRepository = messageDataRepository;
 		this.repository=repository;
 	}
@@ -92,6 +95,7 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public String sendToUserEmail(BillingMessageDataForProcessing emailDetail) {
 		
@@ -103,8 +107,8 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 		     properties.setProperty("mail.smtp.host", hostName);   
 		     properties.put("mail.smtp.ssl.trust",hostName);
 		     properties.put("mail.smtp.auth", "true");  
-		     properties.put("mail.smtp.starttls.enable", starttlsValue);
-		     properties.put("mail.smtp.starttls.required", starttlsValue);
+		     properties.put("mail.smtp.starttls.enable", starttlsValue);//put as false
+		     properties.put("mail.smtp.starttls.required", starttlsValue);//put as false
 
 
 		     Session session = Session.getDefaultInstance(properties,   
@@ -167,7 +171,7 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 		     }
 		        
 		}else{	
-			throw new GlobalConfigurationPropertyNotFoundException("SMTP GlobalConfiguration Property Not Found"); 		
+			throw new ConfigurationPropertyNotFoundException("SMTP GlobalConfiguration Property Not Found"); 		
 		}
 
 		
@@ -231,6 +235,7 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public String createEmail(String pdfFileName, String emailId) {
 		
@@ -280,7 +285,7 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 		    	return "Email sending Failed";
 			}		
 		}else{			
-			throw new GlobalConfigurationPropertyNotFoundException("SMTP GlobalConfiguration Property Not Found"); 		
+			throw new ConfigurationPropertyNotFoundException("SMTP GlobalConfiguration Property Not Found"); 		
 
 		}
 		 
@@ -337,7 +342,7 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 				}
 				
 		}else{			
-			throw new GlobalConfigurationPropertyNotFoundException("SMTP GlobalConfiguration Property Not Found"); 			
+			throw new ConfigurationPropertyNotFoundException("SMTP GlobalConfiguration Property Not Found"); 			
 		}
 		       
 	}
@@ -376,7 +381,7 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 				}
 				
 		}else{			
-			throw new GlobalConfigurationPropertyNotFoundException("SMTP GlobalConfiguration Property Not Found"); 			
+			throw new ConfigurationPropertyNotFoundException("SMTP GlobalConfiguration Property Not Found"); 			
 		}
 		       
 	}

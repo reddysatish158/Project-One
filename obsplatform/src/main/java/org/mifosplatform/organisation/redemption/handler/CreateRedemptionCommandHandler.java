@@ -11,17 +11,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class CreateRedemptionCommandHandler implements NewCommandSourceHandler {
 
-	private final RedemptionWritePlatformService writePlatformService;
+	private final RedemptionWritePlatformService redemptionWritePlatformService;
 	
 	@Autowired
-	public CreateRedemptionCommandHandler(RedemptionWritePlatformService writePlatformService){
-		this.writePlatformService = writePlatformService;
+	public CreateRedemptionCommandHandler(final RedemptionWritePlatformService redemptionWritePlatformService){
+		this.redemptionWritePlatformService = redemptionWritePlatformService;
 	}
 	
 	@Transactional
 	@Override
-	public CommandProcessingResult processCommand(JsonCommand command) {
-		return this.writePlatformService.createRedemption(command);
+	public CommandProcessingResult processCommand(final JsonCommand command) {
+		return this.redemptionWritePlatformService.createRedemption(command);
 	}
 
 }

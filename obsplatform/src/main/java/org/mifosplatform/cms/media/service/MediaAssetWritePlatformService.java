@@ -8,9 +8,9 @@ public interface MediaAssetWritePlatformService {
 
 	CommandProcessingResult createMediaAsset(JsonCommand command);
 
-	CommandProcessingResult updateAsset(JsonCommand command);
+	CommandProcessingResult updateMediaAsset(JsonCommand command);
 
-	CommandProcessingResult deleteAsset(JsonCommand command);
+	CommandProcessingResult deleteMediaAsset(JsonCommand command);
 	
 	/**
 	 * This method used for creating media attributes and locations

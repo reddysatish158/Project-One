@@ -10,6 +10,10 @@ import javax.persistence.Table;
 
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 
+/**
+ * @author hugo
+ *
+ */
 @Entity
 @Table(name = "b_plan_detail")
 public class PlanDetails {
@@ -32,17 +36,23 @@ public class PlanDetails {
 
 
 	public PlanDetails()
-	{}
+	{
+		  // This constructor is intentionally empty. Nothing special is needed here.
+	}
 	public PlanDetails(final String serviceCode)
 	{
 
 		this.serviceCode=serviceCode;
-		//this.is_deleted=null;
 		this.plan=null;
 
 	}
-
-
+	
+	public Long getId() {
+		return id;
+	}
+	public char getIsDeleted() {
+		return isDeleted;
+	}
 	public String getServiceCode() {
 		return serviceCode;
 	}
@@ -58,7 +68,7 @@ public class PlanDetails {
 		return plan;
 	}
 
-	public void update(Plan plan)
+	public void update(final Plan plan)
 	{
 		this.plan=plan;
 	}
@@ -66,17 +76,10 @@ public class PlanDetails {
 		this.isDeleted='y';
 
 	}
-	public static PlanDetails fromJson(JsonCommand command) {
+	public static PlanDetails fromJson(final JsonCommand command) {
 		
 		    final String serviceCode = command.stringValueOfParameterNamed("serviceCode");
 		    return new PlanDetails(serviceCode);
 		
 	}
-	public void update(JsonCommand command) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-
 }

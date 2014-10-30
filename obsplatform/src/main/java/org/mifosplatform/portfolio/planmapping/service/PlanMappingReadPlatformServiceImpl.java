@@ -85,7 +85,7 @@ public class PlanMappingReadPlatformServiceImpl implements PlanMappingReadPlatfo
 			String planCode = rs.getString("planCode");
 			String planDescription = rs.getString("planDescription");
 
-			return new PlanCodeData(id, planCode, planDescription);
+			return new PlanCodeData(id, planCode,null,null,planDescription);
 
 		}
 	}

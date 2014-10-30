@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
 public class OfficeAdjustmentsApiResource {
 
 	private final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(Arrays.asList("discountCode", "discountOptions"));
-    private final String resourceNameForPermissions = "OFFICEADJUSTMENT";
+    private static final String RESOURCENAMEFORPERMISSIONS = "OFFICEADJUSTMENT";
     private final PlatformSecurityContext context;
     private final AdjustmentReadPlatformService readPlatformService;
     private final DefaultToApiJsonSerializer<AdjustmentCodeData> toApiJsonSerializer;
@@ -59,9 +59,9 @@ public class OfficeAdjustmentsApiResource {
     @Consumes({MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_JSON})
     public String retrieveTempleteInfo(@Context final UriInfo uriInfo) {
-    	context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-        List<AdjustmentData> data=this.readPlatformService.retrieveAllAdjustmentsCodes();
-        AdjustmentCodeData datas=new AdjustmentCodeData(data);
+    	context.authenticatedUser().validateHasReadPermission(RESOURCENAMEFORPERMISSIONS);
+        final List<AdjustmentData> data = this.readPlatformService.retrieveAllAdjustmentsCodes();
+        final AdjustmentCodeData datas = new AdjustmentCodeData(data);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, datas, RESPONSE_DATA_PARAMETERS);
     }
@@ -70,7 +70,7 @@ public class OfficeAdjustmentsApiResource {
     @Path("{officeId}")
 	@Consumes({MediaType.APPLICATION_JSON})
 	@Produces({MediaType.APPLICATION_JSON})
-	public String addNewOfficeAdjustment(@PathParam("officeId") final Long officeId,final String apiRequestBodyAsJson) {
+	public String addNewOfficeAdjustment(@PathParam("officeId") final Long officeId, final String apiRequestBodyAsJson) {
     	
     	final CommandWrapper commandRequest = new CommandWrapperBuilder().createOfficeAdjustment(officeId).withJson(apiRequestBodyAsJson).build();
 

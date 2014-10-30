@@ -2,10 +2,10 @@ package org.mifosplatform.organisation.address.data;
 
 public class StateDetails  {
 	
-	private Long id;
-	private String stateName;
+	private final Long id;
+	private final String stateName;
 
-	public StateDetails(Long id, String stateName) {
+	public StateDetails(final Long id, final String stateName) {
 
 	    this.id=id;
 	    this.stateName=stateName;

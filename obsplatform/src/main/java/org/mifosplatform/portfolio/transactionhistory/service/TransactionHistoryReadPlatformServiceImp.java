@@ -124,10 +124,11 @@ public class TransactionHistoryReadPlatformServiceImp implements TransactionHist
 			Long id = rs.getLong("id");
 			Long clientId = rs.getLong("clientId");
 			String transactionType = rs.getString("transactionType");
-			DateTime transactionDate = JdbcSupport.getDateTime(rs, "transactionDate");
+			//DateTime transactionDate = JdbcSupport.getDateTime(rs, "transactionDate");
+			LocalDate transactionDate=JdbcSupport.getLocalDate(rs,"transactionDate");
 			String history = rs.getString("history");
 			String user=rs.getString("userName");
-			return new TransactionHistoryData(id,clientId, transactionType, transactionDate, history,user);
+			return new TransactionHistoryData(id,clientId, transactionType, transactionDate, null ,history,user);
 		}
 
 	}
@@ -136,7 +137,7 @@ public class TransactionHistoryReadPlatformServiceImp implements TransactionHist
 		
 		return "SQL_CALC_FOUND_ROWS pcs.id AS id,pcs.client_id AS clientId,"+
 			   "pcs.action_name AS actionName,pcs.entity_name AS entityName,pcs.made_on_date AS transactionDate,"+
-			   "pcs.command_as_json AS history,a.username as userName "+
+			   "pcs.resource_id as resourceId,pcs.command_as_json AS history,a.username as userName "+
 			   "FROM m_portfolio_command_source pcs,m_appuser a WHERE a.id = pcs.maker_id";
 	}
 
@@ -203,10 +204,12 @@ public class TransactionHistoryReadPlatformServiceImp implements TransactionHist
 			String actionName = rs.getString("actionName");
 			String entityName= rs.getString("entityName");
 			String transactionType = actionName+" "+entityName;
-			DateTime transactionDate = JdbcSupport.getDateTime(rs, "transactionDate");
+			//DateTime transactionDate = JdbcSupport.getDateTime(rs, "transactionDate");
+			LocalDate transactionDate=JdbcSupport.getLocalDate(rs,"transactionDate");
+			String resourceId=rs.getString("resourceId");
 			String history = rs.getString("history");
 			String user=rs.getString("userName");
-			return new TransactionHistoryData(id,clientId, transactionType, transactionDate, history,user);
+			return new TransactionHistoryData(id,clientId, transactionType, transactionDate, resourceId, history,user);
 		}
 
 	}

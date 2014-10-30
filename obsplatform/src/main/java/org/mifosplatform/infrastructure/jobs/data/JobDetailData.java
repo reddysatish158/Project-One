@@ -4,54 +4,43 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+
 import org.mifosplatform.organisation.message.data.BillingMessageTemplateData;
-import org.mifosplatform.portfolio.plan.data.SystemData;
+import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
 import org.mifosplatform.scheduledjobs.scheduledjobs.data.JobParameterData;
 import org.mifosplatform.scheduledjobs.scheduledjobs.data.ScheduleJobData;
 
 public class JobDetailData {
 
-    @SuppressWarnings("unused")
     private final Long jobId;
-
-    @SuppressWarnings("unused")
+    
     private final String displayName;
     
-    @SuppressWarnings("unused")
     private final String name;
 
-    @SuppressWarnings("unused")
     private final Date nextRunTime;
 
-    @SuppressWarnings("unused")
     private final String initializingError;
     
-    @SuppressWarnings("unused")
     private final String cronExpression;
     
-    @SuppressWarnings("unused")
     private final String cronDescription;
 
-    @SuppressWarnings("unused")
     private final boolean active;
 
-    @SuppressWarnings("unused")
     private final boolean currentlyRunning;
 
-    @SuppressWarnings("unused")
     private final JobDetailHistoryData lastRunHistory;
     
-    @SuppressWarnings("unused")
     private  List<ScheduleJobData> queryData;
     
-    @SuppressWarnings("unused")
     private   Collection<BillingMessageTemplateData> billingMessageDatas;
 
 	private JobParameterData jobparameters;
 
 	private Long historyId;
 	
-	private List<SystemData> provisionSysData;
+	private Collection<MCodeData> provisionSysData;
 
     public JobDetailData(final Long jobId, final String displayName, String name, final Date nextRunTime, final String initializingError,
             final String cronExpression,final boolean active, final boolean currentlyRunning, final JobDetailHistoryData lastRunHistory, 
@@ -128,12 +117,28 @@ public class JobDetailData {
 		
 	}
 
-	public List<SystemData> getProvisionSysData() {
+	public Collection<MCodeData> getProvisionSysData() {
 		return provisionSysData;
 	}
 
-	public void setProvisionSysData(List<SystemData> provisionSysData) {
+	public void setProvisionSysData(Collection<MCodeData> provisionSysData) {
 		this.provisionSysData = provisionSysData;
+	}
+
+	public List<ScheduleJobData> getQueryData() {
+		return queryData;
+	}
+
+	public Collection<BillingMessageTemplateData> getBillingMessageDatas() {
+		return billingMessageDatas;
+	}
+
+	public JobParameterData getJobparameters() {
+		return jobparameters;
+	}
+
+	public Long getHistoryId() {
+		return historyId;
 	}
     
 	

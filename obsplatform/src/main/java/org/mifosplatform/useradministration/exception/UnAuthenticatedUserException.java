@@ -3,6 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+
 package org.mifosplatform.useradministration.exception;
 
 import org.springframework.security.core.context.SecurityContext;
@@ -12,5 +13,10 @@ import org.springframework.security.core.context.SecurityContext;
  * user exists within the platform {@link SecurityContext}.
  */
 public class UnAuthenticatedUserException extends RuntimeException {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
     // no added behaviour
 }

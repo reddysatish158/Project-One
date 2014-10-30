@@ -4,7 +4,7 @@ package org.mifosplatform.portfolio.service.data;
 
 public enum ServiceUnitTypeEnum {
 
-	ON_OFF(1, "ServiceUnitType.onoff"), //
+	ON_OFF(1, "ServiceUnitType.onoff"), 
 	SCHEME(2, "ServiceUnitType.scheme"),
 	QUANTITY(3, "ServiceUnitType.quantity"),
 	INVALID(4,"ServiceUnitType.invalid");

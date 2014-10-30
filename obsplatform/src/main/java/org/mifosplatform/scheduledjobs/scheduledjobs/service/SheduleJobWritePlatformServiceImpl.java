@@ -32,8 +32,8 @@ import org.mifosplatform.crm.ticketmaster.service.TicketMasterReadPlatformServic
 import org.mifosplatform.finance.billingmaster.api.BillingMasterApiResourse;
 import org.mifosplatform.finance.billingorder.exceptions.BillingOrderNoRecordsFoundException;
 import org.mifosplatform.finance.billingorder.service.InvoiceClient;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
@@ -102,7 +102,7 @@ private final ActionDetailsReadPlatformService actionDetailsReadPlatformService;
 private final ProcessEventActionService actiondetailsWritePlatformService;
 private final ScheduleJob scheduleJob;
 private final ReadReportingService readExtraDataAndReportingService;
-private final GlobalConfigurationRepository globalConfigurationRepository;
+private final ConfigurationRepository globalConfigurationRepository;
 private final TicketMasterApiResource ticketMasterApiResource;
 private final TicketMasterReadPlatformService ticketMasterReadPlatformService;
 private final OrderRepository orderRepository;
@@ -122,7 +122,7 @@ final BillingMesssageReadPlatformService billingMesssageReadPlatformService,fina
 final ScheduleJob scheduleJob,final EntitlementReadPlatformService entitlementReadPlatformService,
 final EntitlementWritePlatformService entitlementWritePlatformService,final ReadReportingService readExtraDataAndReportingService,
 final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,final OrderRepository orderRepository,
-final GlobalConfigurationRepository globalConfigurationRepository,
+final ConfigurationRepository globalConfigurationRepository,
 final TicketMasterApiResource ticketMasterApiResource, 
 final TicketMasterReadPlatformService ticketMasterReadPlatformService) {
 
@@ -232,7 +232,7 @@ public void processRequest() {
 			   LocalTime date=new LocalTime(zone);
 	           String dateTime=date.getHourOfDay()+"_"+date.getMinuteOfHour()+"_"+date.getSecondOfMinute();
 	           String path=FileUtils.generateLogFileDirectory()+JobName.REQUESTOR.toString()+ File.separator +"Requester_"+new LocalDate().toString().replace("-","")+"_"+dateTime+".log";
-	           GlobalConfigurationProperty globalConfiguration=this.globalConfigurationRepository.findOneByName("CPE_TYPE");
+	           Configuration globalConfiguration=this.globalConfigurationRepository.findOneByName("CPE_TYPE");
 	           File fileHandler = new File(path.trim());
 	           fileHandler.createNewFile();
 	           FileWriter fw = new FileWriter(fileHandler);
@@ -532,6 +532,7 @@ JobParameterData data=this.sheduleJobReadPlatformService.getJobParameters(JobNam
          }
          
          for (ScheduleJobData scheduleJobData : sheduleDatas) {
+        	 
         	 fw.append("ScheduleJobData id= "+scheduleJobData.getId()+" ,BatchName= "+scheduleJobData.getBatchName()+
         			 " ,query="+scheduleJobData.getQuery()+"\r\n");
         	 fw.append("Selected Message Template Name is :" +data.getMessageTemplate()+" \r\n");

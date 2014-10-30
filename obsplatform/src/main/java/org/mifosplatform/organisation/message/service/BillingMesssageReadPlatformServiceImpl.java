@@ -13,8 +13,8 @@ import java.util.List;
 
 import org.joda.time.LocalDate;
 import org.mifosplatform.cms.media.domain.MediaTypeEnumaration;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.data.MediaEnumoptionData;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.core.service.FileUtils;
@@ -27,7 +27,8 @@ import org.mifosplatform.organisation.message.domain.BillingMessage;
 import org.mifosplatform.organisation.message.domain.BillingMessageRepository;
 import org.mifosplatform.organisation.message.domain.BillingMessageTemplate;
 import org.mifosplatform.organisation.message.domain.BillingMessageTemplateRepository;
-import org.mifosplatform.portfolio.plan.domain.UserActionStatusTypeEnum;
+
+import org.mifosplatform.portfolio.order.domain.UserActionStatusTypeEnum;
 import org.mifosplatform.provisioning.processrequest.domain.ProcessRequest;
 import org.mifosplatform.provisioning.processrequest.domain.ProcessRequestDetails;
 import org.mifosplatform.provisioning.processrequest.domain.ProcessRequestRepository;
@@ -56,7 +57,7 @@ public class BillingMesssageReadPlatformServiceImpl implements
 	private static String parameterValue;
 	private static BillingMesssageReadPlatformService billingMesssageReadPlatformService;
 	private static FileWriter fw;
-	private static GlobalConfigurationRepository globalConfigurationRepository;
+	private static ConfigurationRepository globalConfigurationRepository;
 
 	@SuppressWarnings("static-access")
 	@Autowired
@@ -65,7 +66,7 @@ public class BillingMesssageReadPlatformServiceImpl implements
 			final BillingMessageRepository messageDataRepository,
 			final ProcessRequestRepository processRequestRepository,
 			final BillingMessageTemplateRepository messageTemplateRepository,
-			final GlobalConfigurationRepository globalConfigurationRepository) {
+			final ConfigurationRepository globalConfigurationRepository) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 		this.messageDataRepository = messageDataRepository;
 		this.processRequestRepository = processRequestRepository;
@@ -337,7 +338,7 @@ public class BillingMesssageReadPlatformServiceImpl implements
 			if (messgeType == 'O') {
 				String requstStatus = UserActionStatusTypeEnum.MESSAGE.toString();
 				Long clientId = billingMesssageReadPlatformService.retrieveClientId(columndata.get(0).toString());
-				GlobalConfigurationProperty configuration = globalConfigurationRepository.findOneByName("OSD_ProvisioningSystem");
+				Configuration configuration = globalConfigurationRepository.findOneByName("OSD_ProvisioningSystem");
 				
 				if (clientId != null && configuration != null) {
 					Long id = Long.valueOf(0);

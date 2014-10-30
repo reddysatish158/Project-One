@@ -9,21 +9,30 @@ import org.mifosplatform.cms.eventmaster.domain.EventDetails;
 /**
  * POJO for {@link EventDetails}
  * 
- * @author pavani
- *
+ * @author Pavani
+ * @author Rakesh
  */
 public class EventDetailsData {
 	
-	Long id;
-	Integer eventId;
-	Long mediaId;
-	LocalDate eventStartDate;
-	LocalDate eventEndDate;
-	String mediaTitle; 
+	private Long id;
+	private Integer eventId;
+	private Long mediaId;	
+	private LocalDate eventStartDate;
+	private LocalDate eventEndDate;	
+	private String mediaTitle; 			
 	
-	
-	public EventDetailsData(Long id,Integer eventId,Long mediaId,
-							LocalDate eventStartDate,LocalDate eventEndDate) {
+	/**
+     * <p> The behavior of this constructor when the given @param's are called
+     * 	it sets to that particular @param varibles
+     *
+     * @param  id
+     * @param  eventId    
+     * @param  mediaId 
+     * @param  eventStartDate    
+     * @param  eventEndDate 
+     */
+	public EventDetailsData(final Long id, final Integer eventId, final Long mediaId, 
+							final LocalDate eventStartDate, final LocalDate eventEndDate) {
 		this.id = id;
 		this.eventId = eventId;
 		this.mediaId = mediaId;
@@ -31,15 +40,21 @@ public class EventDetailsData {
 		this.eventEndDate = eventEndDate;
 	}
 	
-	public EventDetailsData(Long id, Integer eventId,Long mediaId, String mediaTitle) {
-		this.id= id;
+	/**
+     * <p> The behavior of this constructor when the given params are called
+     * 	it sets to that particular @param varibles
+     *
+     * @param  id
+     * @param  eventId    
+     * @param  mediaId 
+     * @param  mediaTitle    
+     *
+     */
+	public EventDetailsData(final Long id, final Integer eventId, final Long mediaId, final String mediaTitle) {
+		this.id = id;
 		this.eventId = eventId;
 		this.mediaId = mediaId;
 		this.mediaTitle = mediaTitle;
-	}
-	
-	public EventDetailsData() {
-		
 	}
 	
 	/**
@@ -51,7 +66,7 @@ public class EventDetailsData {
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(Long id) {
+	public void setId(final Long id) {
 		this.id = id;
 	}
 	/**
@@ -63,7 +78,7 @@ public class EventDetailsData {
 	/**
 	 * @param eventId the eventId to set
 	 */
-	public void setEventId(Integer eventId) {
+	public void setEventId(final Integer eventId) {
 		this.eventId = eventId;
 	}
 	/**
@@ -75,7 +90,7 @@ public class EventDetailsData {
 	/**
 	 * @param mediaId the mediaId to set
 	 */
-	public void setMediaId(Long mediaId) {
+	public void setMediaId(final Long mediaId) {
 		this.mediaId = mediaId;
 	}
 	/**
@@ -87,7 +102,7 @@ public class EventDetailsData {
 	/**
 	 * @param eventStartDate the eventStartDate to set
 	 */
-	public void setEventStartDate(LocalDate eventStartDate) {
+	public void setEventStartDate(final LocalDate eventStartDate) {
 		this.eventStartDate = eventStartDate;
 	}
 	/**
@@ -99,7 +114,7 @@ public class EventDetailsData {
 	/**
 	 * @param eventEndDate the eventEndDate to set
 	 */
-	public void setEventEndDate(LocalDate eventEndDate) {
+	public void setEventEndDate(final LocalDate eventEndDate) {
 		this.eventEndDate = eventEndDate;
 	}
 
@@ -113,7 +128,7 @@ public class EventDetailsData {
 	/**
 	 * @param mediaTitle the mediaTitle to set
 	 */
-	public void setMediaTitle(String mediaTitle) {
+	public void setMediaTitle(final String mediaTitle) {
 		this.mediaTitle = mediaTitle;
 	}
 }

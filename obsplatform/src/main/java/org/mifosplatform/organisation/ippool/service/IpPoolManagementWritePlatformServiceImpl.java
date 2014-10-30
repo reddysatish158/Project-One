@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.map.HashedMap;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -36,7 +36,7 @@ public class IpPoolManagementWritePlatformServiceImpl implements
 	private final IpPoolManagementCommandFromApiJsonDeserializer apiJsonDeserializer;
 	private final IpPoolManagementJpaRepository ipPoolManagementJpaRepository;
 	private final IpPoolManagementReadPlatformService ipPoolManagementReadPlatformService;
-	private final GlobalConfigurationRepository globalConfigurationRepository;
+	private final ConfigurationRepository globalConfigurationRepository;
 
 	@Autowired
 	public IpPoolManagementWritePlatformServiceImpl(
@@ -44,7 +44,7 @@ public class IpPoolManagementWritePlatformServiceImpl implements
 			final IpPoolManagementJpaRepository ipPoolManagementJpaRepository,
 			final IpPoolManagementCommandFromApiJsonDeserializer apiJsonDeserializer,
 			final IpPoolManagementReadPlatformService ipPoolManagementReadPlatformService,
-			final GlobalConfigurationRepository globalConfigurationRepository) {
+			final ConfigurationRepository globalConfigurationRepository) {
 
 		this.context = context;
 		this.apiJsonDeserializer = apiJsonDeserializer;
@@ -54,6 +54,7 @@ public class IpPoolManagementWritePlatformServiceImpl implements
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Transactional
 	@Override
 	public CommandProcessingResult createIpPoolManagement(JsonCommand command) {
@@ -61,6 +62,7 @@ public class IpPoolManagementWritePlatformServiceImpl implements
 		try {
 			context.authenticatedUser();
 			this.apiJsonDeserializer.validateForCreate(command.json());
+
 			String ipAddress = command.stringValueOfParameterNamed("ipAddress");
 			Long subnet = command.longValueOfParameterNamed("subnet");
 			String notes = command.stringValueOfParameterNamed("notes");
@@ -71,7 +73,8 @@ public class IpPoolManagementWritePlatformServiceImpl implements
 				
 				String ipData = ipAddress + "/" + subnet;
 				IpGeneration util = new IpGeneration(ipData, this.ipPoolManagementReadPlatformService);
-				GlobalConfigurationProperty configuration = globalConfigurationRepository.findOneByName("include-network-broadcast-ip");
+				Configuration configuration = globalConfigurationRepository.findOneByName("include-network-broadcast-ip");
+
 				util.setInclusiveHostCount(configuration.getValue().equalsIgnoreCase("true"));
 				String[] data = util.getInfo().getAllAddresses();
 				for (int i = 0; i < data.length; i++) {
@@ -119,8 +122,10 @@ public class IpPoolManagementWritePlatformServiceImpl implements
 
 			if (ipRange.length() > 0) {
 				String maxRangeIp = ipAddress.replaceAll(ipAddress.substring(Math.max(ipAddress.length() - 2, 0)), ipRange);
+				Long maxIpValue=Long.valueOf(maxRangeIp.substring(maxRangeIp.lastIndexOf(".")+1));
+				Long ipValue=Long.valueOf(ipAddress.substring(ipAddress.lastIndexOf(".")+1));
 				// check given ip range is incremental way or not
-				if (ipAddress.compareTo(maxRangeIp) > 0) {
+				if(ipValue.compareTo(maxIpValue)>0){
 					throw new PlatformDataIntegrityException("error.msg.ipaddress.give.incremental.iprange", "please select incremental iprange address", "ipRange");
 				}
 				List<IpPoolManagementDetail> IpPoolManagementDetails = this.ipPoolManagementJpaRepository.findBetweenIpAddresses(ipAddress, maxRangeIp);
@@ -131,6 +136,7 @@ public class IpPoolManagementWritePlatformServiceImpl implements
 					ipPoolDetail.setType(type);
 					ipPoolDetail.setSubnet(subNet);
 					this.ipPoolManagementJpaRepository.save(ipPoolDetail);
+					
 				}
 			} else {
 				IpPoolManagementDetail ipPoolManagementDetail = this.ipPoolManagementJpaRepository.findOne(command.entityId());
@@ -174,15 +180,17 @@ public class IpPoolManagementWritePlatformServiceImpl implements
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public CommandProcessingResult updateIpDescription(JsonCommand command) {
 
 		context.authenticatedUser();
 		this.apiJsonDeserializer.validateForUpdateDecription(command.json());
+
 		Map<String, Object> generatedIPPoolID = new HashedMap();
 		String search = command.stringValueOfParameterNamed("ipAndSubnet");
 		IpGeneration ipGeneration = new IpGeneration(search, this.ipPoolManagementReadPlatformService);
-		GlobalConfigurationProperty configuration = globalConfigurationRepository.findOneByName("include-network-broadcast-ip");
+		Configuration configuration = globalConfigurationRepository.findOneByName("include-network-broadcast-ip");
 		ipGeneration.setInclusiveHostCount(configuration.getValue().equalsIgnoreCase("true"));
 		String[] data = ipGeneration.getInfo().getsubnetAddresses();
 		String ipPoolDescription = ipGeneration.getInfo().getNetmask();
@@ -190,11 +198,15 @@ public class IpPoolManagementWritePlatformServiceImpl implements
 		for (int i = 0; i < data.length; i++) {
 			int j = i + 1;
 			IpPoolManagementData ipPoolManagementData = this.ipPoolManagementReadPlatformService.retrieveIdByIpAddress(data[i]);
-			IpPoolManagementDetail ipPoolManagementDetail = this.ipPoolManagementJpaRepository.findOne(ipPoolManagementData.getId());
-			ipPoolManagementDetail.setIpPoolDescription(ipPoolDescription); // netMask
-																			// id
-			this.ipPoolManagementJpaRepository.save(ipPoolManagementDetail);
-			generatedIPPoolID.put(String.valueOf(j), ipPoolManagementDetail.getId());
+			
+			if(ipPoolManagementData != null){
+				IpPoolManagementDetail ipPoolManagementDetail = this.ipPoolManagementJpaRepository.findOne(ipPoolManagementData.getId());
+				ipPoolManagementDetail.setIpPoolDescription(ipPoolDescription); // netMask
+																				// id
+				this.ipPoolManagementJpaRepository.save(ipPoolManagementDetail);
+				generatedIPPoolID.put(String.valueOf(j), ipPoolManagementDetail.getId());
+			}
+			
 		}
 		return new CommandProcessingResultBuilder().with(generatedIPPoolID).build();
 	}
@@ -204,6 +216,7 @@ public class IpPoolManagementWritePlatformServiceImpl implements
 
 		try {
 
+			@SuppressWarnings("unused")
 			String[] ipAddressArray = null;
 			final String ipValue = command.stringValueOfParameterNamed("ipAddress");
 			final String status = command.stringValueOfParameterNamed("status");

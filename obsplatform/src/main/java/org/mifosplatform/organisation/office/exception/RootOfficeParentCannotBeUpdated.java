@@ -12,7 +12,12 @@ import org.mifosplatform.infrastructure.core.exception.AbstractPlatformDomainRul
  */
 public class RootOfficeParentCannotBeUpdated extends AbstractPlatformDomainRuleException {
 
-    public RootOfficeParentCannotBeUpdated() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public RootOfficeParentCannotBeUpdated() {
         super("error.msg.office.cannot.update.parent.office.of.root.office", "The root office must not be set with a parent office.");
     }
 }

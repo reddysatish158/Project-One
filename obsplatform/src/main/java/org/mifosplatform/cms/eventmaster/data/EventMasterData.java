@@ -14,15 +14,14 @@ import org.mifosplatform.cms.media.data.MediaAssetData;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
 import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
 
-
 /**
  * POJO for {@link EventMaster}
  * 
  * @author pavani
- *
+ * @author Rakesh
  */
 public class EventMasterData {
-
+	
 	private Long id;
 	private String eventName;
 	private String eventDescription;
@@ -34,9 +33,7 @@ public class EventMasterData {
 	private LocalDate createdDate;
 	private String allowCancellation;
 	private String chargeCode;
-	
 	private String mediaTitle;
-	
 	private List<EnumOptionData> statusData;
 	private List<MediaAssetData> mediaAsset;
 	private List<EventDetailsData> selectedMedia;
@@ -44,16 +41,31 @@ public class EventMasterData {
 	private List<ChargesData> chargeData;
 	private EventMasterData eventMasterData;
 	private List<EventDetailsData> eventDetails;
+	@SuppressWarnings("unused")
 	private Long statusId;
 	private Collection<MCodeData> eventCategeorydata;
+	@SuppressWarnings("unused")
 	private String eventCategory;
 	
+	/** Default Constructor */
 	public EventMasterData() {
 		
 	}
 	
-	public EventMasterData (List<MediaAssetData> mediaAsset, List<EnumOptionData> statusData,
-							List<EnumOptionData> optType, List<ChargesData> chargeDatas,Collection<MCodeData> eventCategeorydata) {
+	/**
+     * <p> The behavior of this constructor when the given @param's are called
+     * 	it sets to that particular @param varibles.
+     *
+     * @param  mediaAsset
+     * @param  statusData    
+     * @param  optType 
+     * @param  chargeDatas    
+     * @param  eventCategeorydata 
+     */
+	public EventMasterData (final List<MediaAssetData> mediaAsset, final List<EnumOptionData> statusData,
+							final List<EnumOptionData> optType, final List<ChargesData> chargeDatas, 
+							final Collection<MCodeData> eventCategeorydata) {
+		
 		this.mediaAsset = mediaAsset;
 		this.statusData = statusData;
 		this.optType = optType;
@@ -61,20 +73,47 @@ public class EventMasterData {
 		this.eventCategeorydata=eventCategeorydata;
 	}
 	
-	public EventMasterData(Long id, String eventName, String eventDescription,
-						   String status, String mediaTitle, LocalDate createdDate,String eventCategory ) {
+	/**
+     * <p> The behavior of this constructor when the given @param's are called
+     * 	it sets to that particular @param varibles.
+     *
+     * @param  id
+     * @param  eventName    
+     * @param  eventDescription 
+     * @param  status    
+     * @param  mediaTitle 
+     * @param  createdDate
+     * @param  eventCategory 
+     */
+	public EventMasterData(final Long id, final String eventName, final String eventDescription,
+						   final String status, final String mediaTitle, final LocalDate createdDate, final String eventCategory ) {
 		this.id = id;
 		this.eventName = eventName;
 		this.eventDescription = eventDescription;
 		this.status = status;
 		this.mediaTitle = mediaTitle;
 		this.createdDate = createdDate;
-		this.eventCategory=eventCategory;
+		this.eventCategory = eventCategory;
 	}
 	
-	public EventMasterData(Long id,String eventName,String eventDescription,
-						   Long status, String mediaTitle, Date eventStartDate,
-						   Date eventEndDate,LocalDate eventValidity, String chargeData,String eventCategory) {
+	/**
+     * <p> The behavior of this constructor when the given @param's are called
+     * 	it sets to that particular @param varibles.
+     *
+     * @param  id
+     * @param  eventName    
+     * @param  eventDescription 
+     * @param  status    
+     * @param  mediaTitle 
+     * @param  eventStartDate
+     * @param  eventEndDate 
+     * @param  eventValidity
+     * @param  chargeData
+     * @param  eventCategory
+     */
+	public EventMasterData(final Long id, final String eventName, final String eventDescription, 
+						   final Long status, final String mediaTitle, final Date eventStartDate,
+						   final Date eventEndDate, final LocalDate eventValidity, final String chargeData, final String eventCategory) {
 		this.id= id;
 		this.eventName= eventName;
 		this.eventDescription = eventDescription;
@@ -83,16 +122,21 @@ public class EventMasterData {
 		this.eventStartDate = eventStartDate;
 		this.eventEndDate = eventEndDate;
 		this.eventValidity = eventValidity;
-		/*if(allowCancellation == 1) {
-			this.allowCancellation = "true";
-		} else {
-			this.allowCancellation = "false";
-		}*/
 		this.chargeCode = chargeData;
-		this.eventCategory=eventCategory;
+		this.eventCategory = eventCategory;
 	}
 	
-	public EventMasterData(Long id, String eventName, String eventDescription) {
+	/**
+     * <p> The behavior of this constructor when the given @param's are called
+     * 	it sets to that particular @param varibles.
+     *
+     * @param  id 
+     * @param  eventName    
+     * @param  eventDescription 
+     * @param  chargeDatas    
+     * @param  eventCategeorydata 
+     */
+	public EventMasterData(final Long id, final String eventName, final String eventDescription) {
 		this.id = id;
 		this.eventName = eventName;
 		this.eventDescription = eventDescription;
@@ -107,7 +151,7 @@ public class EventMasterData {
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(Long id) {
+	public void setId(final Long id) {
 		this.id = id;
 	}
 	/**
@@ -119,7 +163,7 @@ public class EventMasterData {
 	/**
 	 * @param eventName the eventName to set
 	 */
-	public void setEventName(String eventName) {
+	public void setEventName(final String eventName) {
 		this.eventName = eventName;
 	}
 	/**
@@ -131,7 +175,7 @@ public class EventMasterData {
 	/**
 	 * @param eventDescription the eventDescription to set
 	 */
-	public void setEventDescription(String eventDescription) {
+	public void setEventDescription(final String eventDescription) {
 		this.eventDescription = eventDescription;
 	}
 	/**
@@ -143,7 +187,7 @@ public class EventMasterData {
 	/**
 	 * @param status the status to set
 	 */
-	public void setStatus(String status) {
+	public void setStatus(final String status) {
 		this.status = status;
 	}
 	/**
@@ -155,7 +199,7 @@ public class EventMasterData {
 	/**
 	 * @param eventStartDate the eventStartDate to set
 	 */
-	public void setEventStartDate(Date eventStartDate) {
+	public void setEventStartDate(final Date eventStartDate) {
 		this.eventStartDate = eventStartDate;
 	}
 	/**
@@ -167,7 +211,7 @@ public class EventMasterData {
 	/**
 	 * @param eventEndDate the eventEndDate to set
 	 */
-	public void setEventEndDate(Date eventEndDate) {
+	public void setEventEndDate(final Date eventEndDate) {
 		this.eventEndDate = eventEndDate;
 	}
 	/**
@@ -179,7 +223,7 @@ public class EventMasterData {
 	/**
 	 * @param eventValidity the eventValidity to set
 	 */
-	public void setEventValidity(LocalDate eventValidity) {
+	public void setEventValidity(final LocalDate eventValidity) {
 		this.eventValidity = eventValidity;
 	}
 	/**
@@ -191,7 +235,7 @@ public class EventMasterData {
 	/**
 	 * @param createdbyId the createdbyId to set
 	 */
-	public void setCreatedbyId(Integer createdbyId) {
+	public void setCreatedbyId(final Integer createdbyId) {
 		this.createdbyId = createdbyId;
 	}
 	/**
@@ -203,7 +247,7 @@ public class EventMasterData {
 	/**
 	 * @param createdDate the createdDate to set
 	 */
-	public void setCreatedDate(LocalDate createdDate) {
+	public void setCreatedDate(final LocalDate createdDate) {
 		this.createdDate = createdDate;
 	}
 
@@ -217,7 +261,7 @@ public class EventMasterData {
 	/**
 	 * @param mediaAsset the mediaAsset to set
 	 */
-	public void setMediaAsset(List<MediaAssetData> mediaAsset) {
+	public void setMediaAsset(final List<MediaAssetData> mediaAsset) {
 		this.mediaAsset = mediaAsset;
 	}
 
@@ -231,7 +275,7 @@ public class EventMasterData {
 	/**
 	 * @param statusData the statusData to set
 	 */
-	public void setStatusData(List<EnumOptionData> statusData) {
+	public void setStatusData(final List<EnumOptionData> statusData) {
 		this.statusData = statusData;
 	}
 
@@ -245,7 +289,7 @@ public class EventMasterData {
 	/**
 	 * @param mediaTitle the mediaTitle to set
 	 */
-	public void setMediaTitle(String mediaTitle) {
+	public void setMediaTitle(final String mediaTitle) {
 		this.mediaTitle = mediaTitle;
 	}
 
@@ -259,7 +303,7 @@ public class EventMasterData {
 	/**
 	 * @param optType the optType to set
 	 */
-	public void setOptType(List<EnumOptionData> optType) {
+	public void setOptType(final List<EnumOptionData> optType) {
 		this.optType = optType;
 	}
 
@@ -273,7 +317,7 @@ public class EventMasterData {
 	/**
 	 * @param eventMasterData the eventMasterData to set
 	 */
-	public void setEventMasterData(EventMasterData eventMasterData) {
+	public void setEventMasterData(final EventMasterData eventMasterData) {
 		this.eventMasterData = eventMasterData;
 	}
 
@@ -287,7 +331,7 @@ public class EventMasterData {
 	/**
 	 * @param eventDetails the eventDetails to set
 	 */
-	public void setEventDetailsData(List<EventDetailsData> eventDetails) {
+	public void setEventDetailsData(final List<EventDetailsData> eventDetails) {
 		this.eventDetails = eventDetails;
 	}
 
@@ -301,14 +345,14 @@ public class EventMasterData {
 	/**
 	 * @param allowCanelation the allowCanelation to set
 	 */
-	public void setAllowCancellation(String allowCancellation) {
+	public void setAllowCancellation(final String allowCancellation) {
 		this.allowCancellation = allowCancellation;
 	}
 
 	/**
 	 * @param eventDetails the eventDetails to set
 	 */
-	public void setEventDetails(List<EventDetailsData> eventDetails) {
+	public void setEventDetails(final List<EventDetailsData> eventDetails) {
 		this.eventDetails = eventDetails;
 	}
 
@@ -322,8 +366,8 @@ public class EventMasterData {
 	/**
 	 * @param details the selectedMedia to set
 	 */
-	public void setSelectedMedia(List<EventDetailsData> details) {
-		this.selectedMedia = details;
+	public void setSelectedMedia(final List<EventDetailsData> eventdetails) {
+		this.selectedMedia = eventdetails;
 	}
 
 	/**
@@ -336,7 +380,7 @@ public class EventMasterData {
 	/**
 	 * @param chargeData the chargeData to set
 	 */
-	public void setChargeData(List<ChargesData> chargeData) {
+	public void setChargeData(final List<ChargesData> chargeData) {
 		this.chargeData = chargeData;
 	}
 
@@ -350,7 +394,7 @@ public class EventMasterData {
 	/**
 	 * @param chargeCode the chargeCode to set
 	 */
-	public void setChargeCode(String chargeCode) {
+	public void setChargeCode(final String chargeCode) {
 		this.chargeCode = chargeCode;
 	}
 
@@ -361,11 +405,17 @@ public class EventMasterData {
 		return allowCancellation;
 	}
 
+	/**
+	 * @return the eventCategeorydata
+	 */
 	public Collection<MCodeData> getEventCategeorydata() {
 		return eventCategeorydata;
 	}
 
-	public void setEventCategeorydata(Collection<MCodeData> eventCategeorydata) {
+	/**
+	 * @param eventCategeorydata the eventCategeorydata to set
+	 */
+	public void setEventCategeorydata(final Collection<MCodeData> eventCategeorydata) {
 		this.eventCategeorydata = eventCategeorydata;
 	}
 	

@@ -78,7 +78,7 @@ public class HardwareAssociationWriteplatformServiceImpl implements HardwareAsso
 			
 			this.associationRepository.saveAndFlush(hardwareAssociation);
 			return new CommandProcessingResultBuilder().withEntityId(
-					hardwareAssociation.getId()).build();
+					hardwareAssociation.getId()).withClientId(command.entityId()).build();
 		} catch (DataIntegrityViolationException dve) {
 			handleCodeDataIntegrityIssues(command, dve);
 			return new CommandProcessingResult(Long.valueOf(-1));
@@ -101,7 +101,7 @@ public class HardwareAssociationWriteplatformServiceImpl implements HardwareAsso
 			if (!changes.isEmpty()) {
 				this.associationRepository.save(hardwareAssociation);
 			}
-			return new CommandProcessingResult(hardwareAssociation.getId());
+			return new CommandProcessingResult(hardwareAssociation.getId(),hardwareAssociation.getClientId());
 		} catch (DataIntegrityViolationException dve) {
 			handleCodeDataIntegrityIssues(command, dve);
 			return new CommandProcessingResult(Long.valueOf(-1));
@@ -135,7 +135,7 @@ public class HardwareAssociationWriteplatformServiceImpl implements HardwareAsso
 				}
     		   association.delete();
     		   this.associationRepository.save(association);
-    		   return new CommandProcessingResult(association.getId());
+    		   return new CommandProcessingResult(association.getId(),association.getClientId());
     		   
 		} catch (DataIntegrityViolationException dve) {
 			handleCodeDataIntegrityIssues(null, dve);

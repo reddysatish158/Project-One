@@ -3,6 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+
 package org.mifosplatform.useradministration.domain;
 
 import javax.persistence.Column;
@@ -15,25 +16,27 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @Table(name = "m_permission")
 public class Permission extends AbstractPersistable<Long> {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Column(name = "grouping", nullable = false, length = 45)
 	private final String grouping;
 
 	@Column(name = "code", nullable = false, length = 100)
 	private final String code;
 
-	@SuppressWarnings("unused")
 	@Column(name = "entity_name", nullable = true, length = 100)
 	private final String entityName;
 
-	@SuppressWarnings("unused")
 	@Column(name = "action_name", nullable = true, length = 100)
 	private final String actionName;
 
 	@Column(name = "can_maker_checker", nullable = false)
 	private boolean canMakerChecker;
 
-	public Permission(final String grouping, final String entityName,
-			final String actionName) {
+	public Permission(final String grouping, final String entityName, final String actionName) {
 		this.grouping = grouping;
 		this.entityName = entityName;
 		this.actionName = actionName;
@@ -71,4 +74,5 @@ public class Permission extends AbstractPersistable<Long> {
 
 		return !isUpdatedValueSame;
 	}
+	
 }

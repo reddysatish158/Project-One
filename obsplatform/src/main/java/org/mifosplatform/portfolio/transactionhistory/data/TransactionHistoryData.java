@@ -19,27 +19,28 @@ public class TransactionHistoryData {
 
 		private Long clientId;
 		private String transactionType;
-		private DateTime transactionDate;
+		private LocalDate transactionDate;
 		private String history;
 		private String user;
-
+		private String resourceId;
 
 		public TransactionHistoryData() {
 			
 		}
 		
-		public TransactionHistoryData(final Long clientId, final String transactionType, final DateTime transactionDate, final String history){
+		public TransactionHistoryData(final Long clientId, final String transactionType, final LocalDate transactionDate, final String history){
 			this.clientId = clientId;
 			this.transactionType = transactionType;
 			this.transactionDate = transactionDate;
 			this.history = history;
 		}
 		
-		public TransactionHistoryData(final Long id, final Long clientId, final String transactionType, final DateTime transactionDate, final String history, String user){
+		public TransactionHistoryData(final Long id, final Long clientId, final String transactionType, final LocalDate transactionDate, final String resourceId, final String history, String user){
 			this.id = id;
 			this.clientId = clientId;
 			this.transactionType = transactionType;
 			this.transactionDate = transactionDate;
+			this.resourceId=resourceId;
 			this.history = history;
 			this.user=user;
 		}
@@ -80,7 +81,7 @@ public class TransactionHistoryData {
 		/**
 		 * @return the transactionDate
 		 */
-		public DateTime getTransactionDate() {
+		public LocalDate getTransactionDate() {
 			return transactionDate;
 		}
 
@@ -88,7 +89,7 @@ public class TransactionHistoryData {
 		/**
 		 * @param transactionDate the transactionDate to set
 		 */
-		public void setTransactionDate(DateTime transactionDate) {
+		public void setTransactionDate(LocalDate transactionDate) {
 			this.transactionDate = transactionDate;
 		}
 

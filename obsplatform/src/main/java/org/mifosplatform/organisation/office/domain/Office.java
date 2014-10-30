@@ -34,7 +34,12 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
         @UniqueConstraint(columnNames = { "external_id" }, name = "externalid_org") })
 public class Office extends AbstractPersistable<Long> {
 
-    @OneToMany(fetch = FetchType.EAGER)
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1760184005999519057L;
+
+	@OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "parent_id")
     private final List<Office> children = new LinkedList<Office>();
 
@@ -67,8 +72,8 @@ public class Office extends AbstractPersistable<Long> {
         final String name = command.stringValueOfParameterNamed("name");
         final LocalDate openingDate = command.localDateValueOfParameterNamed("openingDate");
         final String externalId = command.stringValueOfParameterNamed("externalId");
-        final Long officeType=command.longValueOfParameterNamed("officeType");
-        return new Office(parentOffice, name, openingDate, externalId,officeType);
+        final Long officeType = command.longValueOfParameterNamed("officeType");
+        return new Office(parentOffice, name, openingDate, externalId, officeType);
     }
 
     protected Office() {
@@ -100,7 +105,7 @@ public class Office extends AbstractPersistable<Long> {
 		return externalId;
 	}
 
-	private Office(final Office parent, final String name, final LocalDate openingDate, final String externalId, Long officeType) {
+	private Office(final Office parent, final String name, final LocalDate openingDate, final String externalId, final Long officeType) {
         this.parent = parent;
         this.openingDate = openingDate.toDateMidnight().toDate();
         if (parent != null) {
@@ -159,12 +164,12 @@ public class Office extends AbstractPersistable<Long> {
             this.name = newValue;
         }
         
-        final String officeTypeParam="officeType";
+        final String officeTypeParam = "officeType";
         if(command.isChangeInLongParameterNamed(officeTypeParam, this.officeType)){
         	
-        	final Long newValue=command.longValueOfParameterNamed(officeTypeParam);
+        	final Long newValue = command.longValueOfParameterNamed(officeTypeParam);
         	actualChanges.put(officeTypeParam, newValue);
-        	this.officeType=newValue;
+        	this.officeType = newValue;
         	
         }
 
@@ -250,8 +255,8 @@ public class Office extends AbstractPersistable<Long> {
         }
 
         if (!match) {
-            for (Office child : this.children) {
-                boolean result = child.hasAnOfficeInHierarchyWithId(officeId);
+            for (final Office child : this.children) {
+                final boolean result = child.hasAnOfficeInHierarchyWithId(officeId);
 
                 if (result) {
                     match = result;

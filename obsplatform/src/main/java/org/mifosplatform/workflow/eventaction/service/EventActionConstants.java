@@ -13,6 +13,8 @@ public class EventActionConstants {
 	public static final String EVENT_EDIT_TICKET="Add Comment";
 	public static final String EVENT_CLOSE_TICKET="Close Ticket";
 	public static final String EVENT_EVENT_ORDER="Event Order";
+	public static final String EVENT_SCHEDULE_ORDER_SUSPEND="Schedule Order Suspend";
+	public static final String EVENT_SCHEDULE_ORDER_DISCONNECT="Schedule Order Disconnect";
 	
 	//Actions
 	public static final String ACTION_SEND_MAIL="Send Mail";
@@ -22,6 +24,8 @@ public class EventActionConstants {
 	public static final String ACTION_NEW="New";
 	public static final String ACTION_ACTIVE="Active";
 	public static final String ACTION_DISCONNECT="DISCONNECTED";
+	public static final String ACTION_CREATE_PLAN="CREATE PLAN";
+	public static final String ACTION_SUSPEND="SUSPEND";
 	public static final String ACTION_SEND_PROVISION="SEND PROVISION";
 	public static final String ACTION_SEND_EMAIL="Send Email";
 	public static final String ACTION_PROVISION_IT="Provision IT";

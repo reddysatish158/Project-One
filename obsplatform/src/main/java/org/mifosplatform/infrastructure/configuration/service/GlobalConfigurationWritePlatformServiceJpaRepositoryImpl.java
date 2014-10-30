@@ -8,12 +8,10 @@ package org.mifosplatform.infrastructure.configuration.service;
 import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
-import org.mifosplatform.infrastructure.codes.domain.Code;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.configuration.exception.GlobalConfigurationPropertyNotFoundException;
-import org.mifosplatform.infrastructure.configuration.serialization.GlobalConfigurationCommandFromApiJsonDeserializer;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -30,17 +28,15 @@ import com.google.gson.JsonObject;
 public class GlobalConfigurationWritePlatformServiceJpaRepositoryImpl implements GlobalConfigurationWritePlatformService {
 
     private final PlatformSecurityContext context;
-    private final GlobalConfigurationRepository repository;
-    private final GlobalConfigurationCommandFromApiJsonDeserializer fromApiJsonDeserializer;
+    private final ConfigurationRepository repository;
     private final GlobalConfigurationDataValidator globalConfigurationDataValidator;
 
     @Autowired
     public GlobalConfigurationWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
-            final GlobalConfigurationRepository codeRepository, final GlobalConfigurationCommandFromApiJsonDeserializer fromApiJsonDeserializer,
+            final ConfigurationRepository codeRepository,
             final GlobalConfigurationDataValidator globalConfigurationDataValidator) {
         this.context = context;
         this.repository = codeRepository;
-        this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.globalConfigurationDataValidator=globalConfigurationDataValidator;
     }
 
@@ -54,7 +50,7 @@ public class GlobalConfigurationWritePlatformServiceJpaRepositoryImpl implements
         try {
             this.globalConfigurationDataValidator.validateForUpdate(command);
 
-            final GlobalConfigurationProperty configItemForUpdate = this.repository.findOne(configId);
+            final Configuration configItemForUpdate = this.repository.findOne(configId);
 
             final Map<String, Object> changes = configItemForUpdate.update(command);
 
@@ -99,7 +95,7 @@ public class GlobalConfigurationWritePlatformServiceJpaRepositoryImpl implements
 			json.addProperty("hostName", hostName);
 			json.addProperty("port", port);
 			json.addProperty("starttls", starttls);
-			final GlobalConfigurationProperty globalConfigurationProperty = GlobalConfigurationProperty.fromJson(command, userName, json.toString());
+			final Configuration globalConfigurationProperty = Configuration.fromJson(command, userName, json.toString());
 	        
 			this.repository.save(globalConfigurationProperty);
 			
@@ -111,8 +107,9 @@ public class GlobalConfigurationWritePlatformServiceJpaRepositoryImpl implements
         }
 	}
     
-    private GlobalConfigurationProperty retrieveBy(final String propertyName) {
-        final GlobalConfigurationProperty property = this.repository.findOneByName(propertyName);
+    @SuppressWarnings("unused")
+	private Configuration retrieveBy(final String propertyName) {
+        final Configuration property = this.repository.findOneByName(propertyName);
         if (property == null) { throw new GlobalConfigurationPropertyNotFoundException(propertyName); }
         return property;
     }

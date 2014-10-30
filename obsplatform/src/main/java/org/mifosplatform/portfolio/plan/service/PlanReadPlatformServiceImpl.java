@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.joda.time.LocalDate;
-import org.mifosplatform.billing.pricing.service.PriceReadPlatformService;
+import org.mifosplatform.billing.planprice.service.PriceReadPlatformService;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
 import org.mifosplatform.infrastructure.core.domain.JdbcSupport;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
@@ -14,23 +14,27 @@ import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext
 import org.mifosplatform.portfolio.contract.data.SubscriptionData;
 import org.mifosplatform.portfolio.order.data.OrderStatusEnumaration;
 import org.mifosplatform.portfolio.order.data.VolumeTypeEnumaration;
+import org.mifosplatform.portfolio.order.domain.StatusTypeEnum;
 import org.mifosplatform.portfolio.plan.data.BillRuleData;
 import org.mifosplatform.portfolio.plan.data.PlanData;
 import org.mifosplatform.portfolio.plan.data.ServiceData;
-import org.mifosplatform.portfolio.plan.data.SystemData;
-import org.mifosplatform.portfolio.plan.domain.StatusTypeEnum;
 import org.mifosplatform.portfolio.plan.domain.VolumeTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
+
+/**
+ * @author hugo
+ *
+ */
 @Service
 public class PlanReadPlatformServiceImpl implements PlanReadPlatformService {
 
 	private final JdbcTemplate jdbcTemplate;
 	private final PlatformSecurityContext context;
-	private  static  PriceReadPlatformService priceReadPlatformService;
+	private  final  PriceReadPlatformService priceReadPlatformService;
 	public final static String POST_PAID="postpaid";
 	public final static String PREPAID="prepaid";
 	
@@ -44,54 +48,23 @@ public class PlanReadPlatformServiceImpl implements PlanReadPlatformService {
 		this.priceReadPlatformService=priceReadPlatformService;
 	}
 
-	@Override
-	public List<ServiceData> retrieveAllServices() {
 
-		context.authenticatedUser();
-		PlanMapper mapper = new PlanMapper();
-
-		String sql = "select " + mapper.schema();
-
-		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
-
-	}
-
-	private static final class PlanMapper implements RowMapper<ServiceData> {
-
-		public String schema() {
-			return "da.id as id, da.service_code as service_code, da.service_description as service_description "
-					+ " from b_service da where da.is_deleted='n' ";
-
-		}
-
-		@Override
-		public ServiceData mapRow(final ResultSet rs,
-				@SuppressWarnings("unused") final int rowNum)
-				throws SQLException {
-
-			Long id = rs.getLong("id");
-			String serviceCode = rs.getString("service_code");
-			String serviceDescription = rs.getString("service_description");
-			//String serviceDescription = rs.getString("service_description");
-			return new ServiceData(id,null,null,null,serviceCode, serviceDescription,null);
-
-		}
-	}
-
+	/*
+	 *Retrieve billing Rules
+	 */
 	@Override
 	public List<BillRuleData> retrievebillRules() {
 
 		context.authenticatedUser();
 
-		BillRuleDataMapper mapper = new BillRuleDataMapper();
+		final BillRuleDataMapper mapper = new BillRuleDataMapper();
 
-		String sql = "select " + mapper.schema();
+		final String sql = "select " + mapper.schema();
 
 		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
 	}
 
-	private static final class BillRuleDataMapper implements
-			RowMapper<BillRuleData> {
+	private static final class BillRuleDataMapper implements RowMapper<BillRuleData> {
 
 		public String schema() {
 			return " b.enum_id AS id,b.enum_message_property AS billingRule,b.enum_value AS value FROM r_enum_value b" +
@@ -100,30 +73,24 @@ public class PlanReadPlatformServiceImpl implements PlanReadPlatformService {
 		}
 
 		@Override
-		public BillRuleData mapRow(ResultSet rs, int rowNum)
-				throws SQLException {
+		public BillRuleData mapRow(final ResultSet rs,final int rowNum) throws SQLException {
 
-			Long id = rs.getLong("id");
-			String billrules = rs.getString("billingRule");
-			String value = rs.getString("value");
-			BillRuleData data = new BillRuleData(id, billrules,value);
-
-			return data;
-
+			final Long id = rs.getLong("id");
+			final String billrules = rs.getString("billingRule");
+			final String value = rs.getString("value");
+			return new BillRuleData(id, billrules,value);
+			
 		}
-
 	}
 
 	@Override
-	public List<PlanData> retrievePlanData(String planType) {
+	public List<PlanData> retrievePlanData(final String planType) {
 
 		context.authenticatedUser();
-
 		 String sql=null;
-		PlanDataMapper mapper = new PlanDataMapper();
+		PlanDataMapper mapper = new PlanDataMapper(this.priceReadPlatformService);
 		
-		
-		if(planType!=null && planType.equalsIgnoreCase(PREPAID)){
+		if(planType!=null && PREPAID.equalsIgnoreCase(planType)){
 
 		 sql = "select " + mapper.schema()+" AND pm.is_prepaid ='Y'";
 		 
@@ -138,48 +105,46 @@ public class PlanReadPlatformServiceImpl implements PlanReadPlatformService {
 	}
 
 	private static final class PlanDataMapper implements RowMapper<PlanData> {
+         private final PriceReadPlatformService priceReadPlatformService;
+		
+         public PlanDataMapper(final PriceReadPlatformService priceReadPlatformService) {
+			this.priceReadPlatformService=priceReadPlatformService;
+		}
 
 		public String schema() {
-			return "  pm.id,pm.plan_code,pm.plan_description,pm.start_date,pm.end_date,pm.plan_status,pm.is_prepaid AS isprepaid," +
-					" pm.provision_sys as provisionSystem  FROM    b_plan_master pm WHERE pm.is_deleted = 'n' ";
+			return "  pm.id,pm.plan_code as planCode,pm.plan_description as planDescription,pm.start_date as startDate," +
+					" pm.end_date as endDate,pm.plan_status as planStatus,pm.is_prepaid AS isprepaid," +
+					" pm.provision_sys as provisionSystem  FROM  b_plan_master pm WHERE pm.is_deleted = 'n' ";
 
 		}
 
 		@Override
-		public PlanData mapRow(ResultSet rs, int rowNum) throws SQLException {
+		public PlanData mapRow(final ResultSet rs,final int rowNum) throws SQLException {
 
-			Long id = rs.getLong("id");
-			String planCode = rs.getString("plan_code");
-			String planDescription = rs.getString("plan_description");
-			LocalDate startDate = JdbcSupport.getLocalDate(rs, "start_date");
-		    Long planStatus = rs.getLong("plan_status");
-			LocalDate endDate = JdbcSupport.getLocalDate(rs, "end_date");
-			
-			long plan=planStatus;
-			//Long contractId=rs.getLong("contractId");
-			EnumOptionData enumstatus=OrderStatusEnumaration.OrderStatusType(planStatus.intValue());
-			//return new PlanData(id, planCode, planDescription, startDate,plan, endDate,status);
-			/*return new PlanData(id,planCode,startDate,endDate,null,null,plan,planDescription,null,null,
-					status);
-			*/
+			final Long id = rs.getLong("id");
+			final String planCode = rs.getString("planCode");
+			final String planDescription = rs.getString("planDescription");
+			final LocalDate startDate = JdbcSupport.getLocalDate(rs, "startDate");
+		    final Long planStatus = rs.getLong("planStatus");
+			final LocalDate endDate = JdbcSupport.getLocalDate(rs, "endDate");
+			final EnumOptionData enumstatus=OrderStatusEnumaration.OrderStatusType(planStatus.intValue());
 			List<ServiceData> services=null;
 			if(rs.getString("isprepaid").equalsIgnoreCase("Y")){
-			services=priceReadPlatformService.retrievePrcingDetails(id);
+			services=priceReadPlatformService.retrieveServiceDetails(id);
 			}
-			String provisionSystem=rs.getString("provisionSystem");
-			return new PlanData(id, planCode, startDate, endDate,null,null, plan, planDescription, plan, provisionSystem, enumstatus,
+			final String provisionSystem=rs.getString("provisionSystem");
+			return new PlanData(id, planCode, startDate, endDate,null,null, planStatus, planDescription, provisionSystem, enumstatus,
 					null,null, null,null,null,services,null,null);
 		}
-		
 	}
 
 	@Override
-	public List<SubscriptionData> retrieveSubscriptionData(Long orderId,String planType) {
+	public List<SubscriptionData> retrieveSubscriptionData(final Long orderId,final String planType) {
 
 		context.authenticatedUser();
 		SubscriptionDataMapper mapper = new SubscriptionDataMapper();
 		String sql =null;
-		if(planType != null && orderId != null && "prepaid".equalsIgnoreCase(planType)){
+		if(planType != null && orderId != null && PREPAID.equalsIgnoreCase(planType)){
 			
 			 sql = "select " + mapper.schemaForPrepaidPlans()+" and o.id="+orderId+" GROUP BY sb.contract_period order by sb.contract_period";
 		}else{
@@ -189,6 +154,10 @@ public class PlanReadPlatformServiceImpl implements PlanReadPlatformService {
 		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
 	}
 
+	/**
+	 * @author hugo
+	 *
+	 */
 	private static final class SubscriptionDataMapper implements
 			RowMapper<SubscriptionData> {
 
@@ -206,45 +175,43 @@ public class PlanReadPlatformServiceImpl implements PlanReadPlatformService {
 		}
 
 		@Override
-		public SubscriptionData mapRow(ResultSet rs, int rowNum)
+		public SubscriptionData mapRow(final ResultSet rs,final int rowNum)
 				throws SQLException {
 
-			Long id = rs.getLong("id");
-			String contractPeriod = rs.getString("contractPeriod");
-			String subscriptionType = rs.getString("contractType");
-			String units = rs.getString("units");
-
-			SubscriptionData data = new SubscriptionData(id,contractPeriod,subscriptionType);
-
-			return data;
-
+			final Long id = rs.getLong("id");
+			final String contractPeriod = rs.getString("contractPeriod");
+			final String subscriptionType = rs.getString("contractType");
+			return new SubscriptionData(id,contractPeriod,subscriptionType);
 		}
 
 	}
 
+	/*
+	 *Method for Status Retrieval
+	 */
 	@Override
 	public List<EnumOptionData> retrieveNewStatus() {
-		EnumOptionData active = OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.ACTIVE);
-		EnumOptionData inactive = OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.INACTIVE);
-		List<EnumOptionData> categotyType = Arrays.asList(active, inactive);
-			return categotyType;
-
+		
+		final EnumOptionData active = OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.ACTIVE);
+		final EnumOptionData inactive = OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.INACTIVE);
+		return 	Arrays.asList(active, inactive);
+			
 	}
 
 	@Override
-	public PlanData retrievePlanData(Long planCode) {
+	public PlanData retrievePlanData(final Long planId) {
 		  context.authenticatedUser();
-
-	        String sql = "SELECT pm.id AS id,pm.plan_code AS plan_code,pm.plan_description AS plan_description,pm.start_date AS start_date,pm.end_date AS end_date,"
-	        		   +"pm.plan_status AS plan_status,pm.provision_sys AS provisionSys,pm.bill_rule AS bill_rule,pm.is_prepaid as isPrepaid,"
+	        final String sql = "SELECT pm.id AS id,pm.plan_code AS planCode,pm.plan_description AS planDescription,pm.start_date AS startDate,pm.end_date AS endDate,"
+	        		   +"pm.plan_status AS planStatus,pm.provision_sys AS provisionSys,pm.bill_rule AS billRule,pm.is_prepaid as isPrepaid,"
 	        		  +" pm.allow_topup as allowTopup,v.volume_type as volumeType, v.units as units,pm.is_hw_req as isHwReq,v.units_type as unitType FROM b_plan_master pm  left join b_volume_details v" +
 	        		  " on pm.id = v.plan_id WHERE pm.id = ? AND pm.is_deleted = 'n'";
 
 
 	        RowMapper<PlanData> rm = new ServiceMapper();
 
-	        return this.jdbcTemplate.queryForObject(sql, rm, new Object[] { planCode });
-	}
+	        return this.jdbcTemplate.queryForObject(sql, rm, new Object[] { planId });
+	
+		}
 
 
 	 private static final class ServiceMapper implements RowMapper<PlanData> {
@@ -252,42 +219,37 @@ public class PlanReadPlatformServiceImpl implements PlanReadPlatformService {
 	        @Override
 	        public PlanData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
 
-	        Long id = rs.getLong("id");
-	            String planCode = rs.getString("plan_code");
-	            LocalDate startDate = JdbcSupport.getLocalDate(rs, "start_date");
-	            LocalDate endDate = JdbcSupport.getLocalDate(rs, "end_date");
-	            Long billRule = rs.getLong("bill_rule");
-	            int planStatus = JdbcSupport.getInteger(rs,"plan_status");
-	            String planDescription = rs.getString("plan_description");
-	        
-	            String provisionSys=rs.getString("provisionSys");
-	            String isPrepaid=rs.getString("isPrepaid");
-	            String volume=rs.getString("volumeType");
-	            String allowTopup=rs.getString("allowTopup");
-	            String isHwReq=rs.getString("isHwReq");
-	            String units=rs.getString("units");
-	            String unitType=rs.getString("unitType");
-
-	            //EnumOptionData status = SavingStatusEnumaration.OrderStatusType(plan_status);
-	            long status1=planStatus;
-	            return new PlanData(id,planCode,startDate,endDate,billRule,null,status1,planDescription,status1,
+	            final Long id = rs.getLong("id");
+	            final String planCode = rs.getString("planCode");
+	            final LocalDate startDate = JdbcSupport.getLocalDate(rs, "startDate");
+	            final LocalDate endDate = JdbcSupport.getLocalDate(rs, "endDate");
+	            final Long billRule = rs.getLong("billRule");
+	            final Long planStatus = rs.getLong("planStatus");
+	            final String planDescription = rs.getString("planDescription");
+	            final String provisionSys=rs.getString("provisionSys");
+	            final String isPrepaid=rs.getString("isPrepaid");
+	            final String volume=rs.getString("volumeType");
+	            final String allowTopup=rs.getString("allowTopup");
+	            final String isHwReq=rs.getString("isHwReq");
+	            final String units=rs.getString("units");
+	            final String unitType=rs.getString("unitType");
+	            
+	            return new PlanData(id,planCode,startDate,endDate,billRule,null,planStatus,planDescription,
 	            		provisionSys,null,isPrepaid,allowTopup,volume,units,unitType,null,null,isHwReq);
 	        }
 	}
 
-	@Override
-	public List<ServiceData> getselectedService(List<ServiceData> data,
-			List<ServiceData> services) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
+
+	/* @param planId
+	 * @return PlanDetails
+	 */
 	@Override
-	public List<ServiceData> retrieveSelectedServices(Long planId) {
+	public List<ServiceData> retrieveSelectedServices(final Long planId) {
 		  context.authenticatedUser();
 
-	        String sql = "SELECT sm.id AS id,sm.service_description AS service_description,p.plan_code as planCode,"
-			     +" pm.service_code AS service_code   FROM b_plan_detail pm, b_service sm,b_plan_master p"
+	        String sql = "SELECT sm.id AS id,sm.service_description AS serviceDescription,p.plan_code as planCode,"
+			     +" pm.service_code AS serviceCode   FROM b_plan_detail pm, b_service sm,b_plan_master p"
 				 +" WHERE pm.service_code = sm.service_code AND p.id = pm.plan_id and sm.is_deleted ='n' and  pm.plan_id=?";
 
 
@@ -302,51 +264,22 @@ public class PlanReadPlatformServiceImpl implements PlanReadPlatformService {
 	        @Override
 	        public ServiceData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
 
-	        Long id = rs.getLong("id");
-	            String planCode = rs.getString("planCode");
-	            String serviceCode = rs.getString("service_code");
-	            String serviceDescription = rs.getString("service_description");
-	            return new ServiceData(id,null,planCode,serviceCode,serviceDescription,null,null);
+	            final Long id = rs.getLong("id");
+	            final String serviceCode = rs.getString("serviceCode");
+	            final String serviceDescription = rs.getString("serviceDescription");
+	        	return new ServiceData(id,null,null,null,serviceCode, serviceDescription,null,null,null,null);
+	           
 	        }
 }
 	 
-	 @Override
-		public List<SystemData> retrieveSystemData() {
-			context.authenticatedUser();
-
-			SystemDataMapper mapper = new SystemDataMapper();
-
-			String sql = "select " + mapper.schema();
-
-			return this.jdbcTemplate.query(sql, mapper, new Object[] {});
-		}
-
-		private static final class SystemDataMapper implements RowMapper<SystemData> {
-
-			public String schema() {
-
-
-				return " mc.id as id,mc.code_value as codeValue from m_code m,m_code_value mc where m.id = mc.code_id and m.code_name='Provisioning' order by id";
-
-			}
-
-			@Override
-			public SystemData mapRow(ResultSet rs, int rowNum) throws SQLException {
-				
-				Long id=rs.getLong("id");
-				String ProvisioingSystem = rs.getString("codeValue");
-				return new SystemData(id,ProvisioingSystem);
-				
-			}
-
-		}
 
 		@Override
 		public List<EnumOptionData> retrieveVolumeTypes() {
-			EnumOptionData iptv = VolumeTypeEnumaration.VolumeTypeEnum(VolumeTypeEnum.IPTV);
-			EnumOptionData vod = VolumeTypeEnumaration.VolumeTypeEnum(VolumeTypeEnum.VOD);
-			List<EnumOptionData> categotyType = Arrays.asList(iptv,vod);
-				return categotyType;
+			
+			final EnumOptionData iptv = VolumeTypeEnumaration.VolumeTypeEnum(VolumeTypeEnum.IPTV);
+			final EnumOptionData vod = VolumeTypeEnumaration.VolumeTypeEnum(VolumeTypeEnum.VOD);
+			return  Arrays.asList(iptv,vod);
+				
 		}
 
 		

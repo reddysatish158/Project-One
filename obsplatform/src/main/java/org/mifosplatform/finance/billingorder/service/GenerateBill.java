@@ -13,9 +13,9 @@ import org.mifosplatform.finance.billingorder.commands.BillingOrderCommand;
 import org.mifosplatform.finance.billingorder.commands.InvoiceTaxCommand;
 import org.mifosplatform.finance.billingorder.data.BillingOrderData;
 import org.mifosplatform.finance.data.DiscountMasterData;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
-import org.mifosplatform.infrastructure.configuration.exception.GlobalConfigurationPropertyNotFoundException;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.exception.ConfigurationPropertyNotFoundException;
 import org.mifosplatform.portfolio.order.service.ClientRegionDetails;
 import org.mifosplatform.portfolio.plan.domain.Plan;
 import org.mifosplatform.portfolio.plan.domain.PlanRepository;
@@ -28,12 +28,12 @@ public class GenerateBill {
 	private final BillingOrderReadPlatformService billingOrderReadPlatformService;
 	private final InvoiceTaxPlatformService invoiceTaxPlatformService;
     private final ClientRegionDetails clientRegionDetails;
-    private final GlobalConfigurationRepository globalConfigurationRepository;
+    private final ConfigurationRepository globalConfigurationRepository;
     private final PlanRepository planRepository;
 
 	@Autowired
 	public GenerateBill(BillingOrderReadPlatformService billingOrderReadPlatformService,InvoiceTaxPlatformService invoiceTaxPlatformService,
-			final ClientRegionDetails clientRegionDetails,final GlobalConfigurationRepository globalConfigurationRepository,
+			final ClientRegionDetails clientRegionDetails,final ConfigurationRepository globalConfigurationRepository,
 			final PlanRepository planRepository) {
 		this.billingOrderReadPlatformService = billingOrderReadPlatformService;
 		this.invoiceTaxPlatformService = invoiceTaxPlatformService;
@@ -605,7 +605,7 @@ public class GenerateBill {
 		
 		if(isDiscountPercentage(discountMasterData)){
 			
-			discountAmount = this.calculateDiscountPercentage(discountMasterData.getdiscountRate(), chargePrice);
+			discountAmount = this.calculateDiscountPercentage(discountMasterData.getDiscountRate(), chargePrice);
 			chargePrice = this.chargePriceNotLessThanZero(chargePrice, discountAmount);
 			discountMasterData.setDiscountAmount(discountAmount);
 			discountMasterData.setDiscountedChargeAmount(chargePrice);
@@ -614,7 +614,7 @@ public class GenerateBill {
 		
 		if(isDiscountFlat(discountMasterData)){
 			
-			BigDecimal netFlatAmount=this.calculateDiscountFlat(discountMasterData.getdiscountRate(), chargePrice);	
+			BigDecimal netFlatAmount=this.calculateDiscountFlat(discountMasterData.getDiscountRate(), chargePrice);	
 			discountAmount= chargePrice.subtract(netFlatAmount);
 			netFlatAmount=this.chargePriceNotLessThanZero(chargePrice, discountAmount);
 			discountMasterData.setDiscountAmount(discountAmount);
@@ -674,8 +674,8 @@ public class GenerateBill {
   public String roundingDecimal(){
 	
 	  final String makerCheckerConfigurationProperty = "Rounding";
-      final GlobalConfigurationProperty property = this.globalConfigurationRepository.findOneByName(makerCheckerConfigurationProperty);
-      if (property == null) { throw new GlobalConfigurationPropertyNotFoundException(makerCheckerConfigurationProperty); }
+      final Configuration property = this.globalConfigurationRepository.findOneByName(makerCheckerConfigurationProperty);
+      if (property == null) { throw new ConfigurationPropertyNotFoundException(makerCheckerConfigurationProperty); }
       
       return property.getValue();
 }

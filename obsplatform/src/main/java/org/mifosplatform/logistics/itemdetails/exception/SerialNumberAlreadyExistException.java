@@ -5,6 +5,6 @@ import org.mifosplatform.infrastructure.core.exception.AbstractPlatformDomainRul
 public class SerialNumberAlreadyExistException extends AbstractPlatformDomainRuleException {
 
 	public SerialNumberAlreadyExistException(String SerialNumber) {		
-		super("error.msg.itemdetails.serialnumber.already.exist", "SerialNumber Already Exist with this "+SerialNumber, SerialNumber);
+		super("error.msg.itemdetails.serialnumber.already.exist", "SerialNumber Already Exist "+SerialNumber, SerialNumber);
 	}
 }

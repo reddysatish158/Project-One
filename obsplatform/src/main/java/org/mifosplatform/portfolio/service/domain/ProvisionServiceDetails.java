@@ -10,6 +10,11 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @Table(name = "b_prov_service_details")
 public class ProvisionServiceDetails extends AbstractPersistable<Long> {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Column(name = "service_id")
 	private Long serviceId;
 
@@ -32,8 +37,8 @@ public ProvisionServiceDetails()
 {}
 
 
-public ProvisionServiceDetails(Long serviceId, String serviceUrl, String status,
-		String image) {
+public ProvisionServiceDetails(final Long serviceId, final String serviceUrl, final String status,
+		final String image) {
 	this.serviceId=serviceId;
 	this.serviceIdentification=serviceUrl;
 	this.status=status;

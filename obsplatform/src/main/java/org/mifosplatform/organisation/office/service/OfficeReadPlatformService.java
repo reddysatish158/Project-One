@@ -8,6 +8,7 @@ package org.mifosplatform.organisation.office.service;
 import java.util.Collection;
 import java.util.List;
 
+import org.mifosplatform.finance.financialtransaction.data.FinancialTransactionsData;
 import org.mifosplatform.organisation.office.data.OfficeData;
 import org.mifosplatform.organisation.office.data.OfficeTransactionData;
 
@@ -28,4 +29,6 @@ public interface OfficeReadPlatformService {
     OfficeTransactionData retrieveNewOfficeTransactionDetails();
 
 	List<OfficeData> retrieveAgentTypeData();
+
+	Collection<FinancialTransactionsData> retreiveOfficeFinancialTransactionsData(Long officeId);
 }

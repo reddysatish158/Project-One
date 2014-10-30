@@ -19,9 +19,8 @@ import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.mifosplatform.crm.clientprospect.service.SearchSqlQuery;
-import org.mifosplatform.infrastructure.codes.data.CodeData;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.mifosplatform.infrastructure.core.service.Page;
@@ -35,6 +34,7 @@ import org.mifosplatform.organisation.mcodevalues.service.MCodeReadPlatformServi
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.mifosplatform.infrastructure.codes.data.CodeData;
 
 
 @Path("/ippooling")
@@ -64,7 +64,7 @@ public class IpPoolManagementApiResource {
 	private final MCodeReadPlatformService codeReadPlatformService;
 	
 	private final String resourceNameForPermissions="READ_IPPOOLMANAGEMENT";
-	private final GlobalConfigurationRepository globalConfigurationRepository;
+	private final ConfigurationRepository globalConfigurationRepository;
 	
 	
 	
@@ -72,7 +72,7 @@ public class IpPoolManagementApiResource {
 	public IpPoolManagementApiResource(final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
 			final PlatformSecurityContext context,final DefaultToApiJsonSerializer<IpPoolManagementData> toApiJsonSerializer,
 			final MCodeReadPlatformService codeReadPlatformService,final IpPoolManagementReadPlatformService ipPoolManagementReadPlatformService,
-			final GlobalConfigurationRepository globalConfigurationRepository)
+			final ConfigurationRepository globalConfigurationRepository)
 	{
 		this.commandsSourceWritePlatformService=commandsSourceWritePlatformService;
 		this.context=context;
@@ -119,7 +119,7 @@ public class IpPoolManagementApiResource {
 		if(sqlSearch !=null && sqlSearch.contains("/")){
   		  sqlSearch.trim();
   		  IpGeneration ipGeneration=new IpGeneration(sqlSearch,this.ipPoolManagementReadPlatformService);
-  		  GlobalConfigurationProperty configuration = globalConfigurationRepository.findOneByName("include-network-broadcast-ip");
+  		  Configuration configuration = globalConfigurationRepository.findOneByName("include-network-broadcast-ip");
   		  ipGeneration.setInclusiveHostCount(configuration.getValue().equalsIgnoreCase("true"));
           data=ipGeneration.getInfo().getsubnetAddresses();
 			

@@ -41,8 +41,8 @@ import org.springframework.stereotype.Component;
 @Scope("singleton")
 public class ServiceMasterApiResource {
 	private  final Set<String> RESPONSE_DATA_PARAMETERS=new HashSet<String>(Arrays.asList("id","serviceType","serviceCode","serviceDescription","serviceTypes",
-			"serviceUnitTypes","serviceUnitTypes","isOptional","status","serviceStatus"));
-        private final String resourceNameForPermissions = "SERVICE";
+			"serviceUnitTypes","serviceUnitTypes","isOptional","status","serviceStatus","isAutoProvision"));
+        private final static String RESOURCENAMEFORPERMISSIONS = "SERVICE";
 	    private final PlatformSecurityContext context;
 	    private final DefaultToApiJsonSerializer<ServiceMasterOptionsData> toApiJsonSerializer;
 	    private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -68,6 +68,9 @@ public class ServiceMasterApiResource {
 		        
 		    }		
 		
+	/**
+	 * using this method posting  service data 
+	 */	 
 	@POST
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
@@ -77,43 +80,54 @@ public class ServiceMasterApiResource {
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
         return this.toApiJsonSerializer.serialize(result);
 	}
+	
+	/**
+	 * using this method getting  all services data 
+	 */	
 	 @GET
 		@Consumes({ MediaType.APPLICATION_JSON })
 		@Produces({ MediaType.APPLICATION_JSON })
 		public String retrieveAllService(@Context final UriInfo uriInfo) {
-		   context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		   context.authenticatedUser().validateHasReadPermission(RESOURCENAMEFORPERMISSIONS);
 			final Collection<ServiceMasterOptionsData> masterOptionsDatas = this.serviceMasterReadPlatformService.retrieveServices();
 			final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 			return this.toApiJsonSerializer.serialize(settings, masterOptionsDatas, RESPONSE_DATA_PARAMETERS);
 		}
 
+	     /**
+		 * using this method getting  template data for service
+		 */	
 	    @GET
 	    @Path("template")
 	    @Consumes({MediaType.APPLICATION_JSON})
 	    @Produces({MediaType.APPLICATION_JSON})
 	    public String retrieveTempleteInfo(@Context final UriInfo uriInfo) {
-		 context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		 ServiceMasterOptionsData masterOptionsData=handleTemplateData();
+		 context.authenticatedUser().validateHasReadPermission(RESOURCENAMEFORPERMISSIONS);
+		 final ServiceMasterOptionsData masterOptionsData=handleTemplateData();
 		 final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 			return this.toApiJsonSerializer.serialize(settings, masterOptionsData, RESPONSE_DATA_PARAMETERS);
 		}
 
 	 private ServiceMasterOptionsData handleTemplateData() {
 
-		 Collection<EnumValuesData> serviceType = this.enumReadplaformService.getEnumValues("service_type");
-		 List<EnumOptionData> status = this.planReadPlatformService.retrieveNewStatus();
-		 List<EnumOptionData> serviceUnitType = this.serviceMasterReadPlatformService.retrieveServiceUnitType();
+		 final Collection<EnumValuesData> serviceType = this.enumReadplaformService.getEnumValues("service_type");
+		 final List<EnumOptionData> status = this.planReadPlatformService.retrieveNewStatus();
+		 final List<EnumOptionData> serviceUnitType = this.serviceMasterReadPlatformService.retrieveServiceUnitType();
 		 return new ServiceMasterOptionsData(serviceType,serviceUnitType,status);
 		
 	}
 
+	 /**
+	 * this method for getting  service data using by id
+	 */	
 	@GET
 		@Path("{serviceId}")
 		@Consumes({MediaType.APPLICATION_JSON})
 		@Produces({MediaType.APPLICATION_JSON})
 		public String retrieveSingleServiceDetails(@PathParam("serviceId") final Long serviceId, @Context final UriInfo uriInfo) {
-			ServiceMasterOptionsData productData = this.serviceMasterReadPlatformService.retrieveIndividualService(serviceId);
-			 ServiceMasterOptionsData masterOptionsData=handleTemplateData();
+			context.authenticatedUser().validateHasReadPermission(RESOURCENAMEFORPERMISSIONS);
+			final ServiceMasterOptionsData productData = this.serviceMasterReadPlatformService.retrieveIndividualService(serviceId);
+			 final ServiceMasterOptionsData masterOptionsData=handleTemplateData();
 			 productData.setStatus(masterOptionsData.getStatus());
 			 productData.setServiceTypes(masterOptionsData.getServiceTypes());
 			 productData.setServiceUnitTypes(masterOptionsData.getServiceUnitTypes());
@@ -121,22 +135,29 @@ public class ServiceMasterApiResource {
 	        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 	        return this.toApiJsonSerializer.serialize(settings, productData, RESPONSE_DATA_PARAMETERS);
 		}
+	
+	 /**
+	 * using this method editing single service data 
+	 */	
 	 @PUT
 		@Path("{serviceId}")
 		@Consumes({MediaType.APPLICATION_JSON})
 		@Produces({MediaType.APPLICATION_JSON})
-		public String updateService(@PathParam("serviceId") final Long serviceId, final String apiRequestBodyAsJson){
+		public String updateServiceData(@PathParam("serviceId") final Long serviceId, final String apiRequestBodyAsJson){
 
-			//final ServiceMasterCommand command = this.apiDataConversionService.convertJsonToServiceMasterCommand(null, jsonRequestBody);
 		 final CommandWrapper commandRequest = new CommandWrapperBuilder().updateService(serviceId).withJson(apiRequestBodyAsJson).build();
 		 final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 		  return this.toApiJsonSerializer.serialize(result);
 		}
+	 
+	 /**
+	 * using this method deleting single service data 
+	 */	
  	 @DELETE
 		@Path("{serviceId}")
 		@Consumes({MediaType.APPLICATION_JSON})
 		@Produces({MediaType.APPLICATION_JSON})
-		public String deleteSubscription(@PathParam("serviceId") final Long serviceId) {
+		public String deleteServiceData(@PathParam("serviceId") final Long serviceId) {
 		 final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteService(serviceId).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
         return this.toApiJsonSerializer.serialize(result);

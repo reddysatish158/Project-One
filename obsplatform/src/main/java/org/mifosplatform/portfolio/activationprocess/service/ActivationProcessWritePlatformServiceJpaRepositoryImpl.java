@@ -26,8 +26,8 @@ import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformSer
 import org.mifosplatform.infrastructure.codes.domain.CodeValue;
 import org.mifosplatform.infrastructure.codes.domain.CodeValueRepository;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
@@ -73,7 +73,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
     private final ClientWritePlatformService clientWritePlatformService;
     private final OneTimeSaleWritePlatformService oneTimeSaleWritePlatformService;
     private final OrderWritePlatformService orderWritePlatformService;
-    private final GlobalConfigurationRepository configurationRepository;
+    private final ConfigurationRepository configurationRepository;
 	private final OwnedHardwareWritePlatformService ownedHardwareWritePlatformService;
 	private final AddressReadPlatformService addressReadPlatformService;
 	private final ActivationProcessCommandFromApiJsonDeserializer commandFromApiJsonDeserializer;
@@ -88,7 +88,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
     @Autowired
     public ActivationProcessWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,final FromJsonHelper fromJsonHelper,
     		final ClientWritePlatformService clientWritePlatformService,final OneTimeSaleWritePlatformService oneTimeSaleWritePlatformService,
-    		final OrderWritePlatformService orderWritePlatformService,final GlobalConfigurationRepository globalConfigurationRepository,
+    		final OrderWritePlatformService orderWritePlatformService,final ConfigurationRepository globalConfigurationRepository,
     		final OwnedHardwareWritePlatformService ownedHardwareWritePlatformService, final AddressReadPlatformService addressReadPlatformService,
     		final ActivationProcessCommandFromApiJsonDeserializer commandFromApiJsonDeserializer, final ItemDetailsRepository itemDetailsRepository,
     		final SelfCareTemporaryRepository selfCareTemporaryRepository,final PortfolioCommandSourceWritePlatformService portfolioCommandSourceWritePlatformService,
@@ -164,7 +164,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 	        	resultClient=this.clientWritePlatformService.createClient(comm,true);
 	        }
 
-	        GlobalConfigurationProperty configuration=configurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
+	        Configuration configuration=configurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
 	        if(configuration.getValue().equalsIgnoreCase(ConfigurationConstants.CONFIR_PROPERTY_SALE)){
 	             
 	        	for(JsonElement sale:saleData){
@@ -207,7 +207,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 
 		try {
 			context.authenticatedUser();
-			GlobalConfigurationProperty deviceStatusConfiguration = configurationRepository.
+			Configuration deviceStatusConfiguration = configurationRepository.
 					findOneByName(ConfigurationConstants.CONFIR_PROPERTY_REGISTRATION_DEVICE);
 			
 			commandFromApiJsonDeserializer.validateForCreate(command.json(),deviceStatusConfiguration.isEnabled());
@@ -251,7 +251,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 				
 				String zipCode = command.stringValueOfParameterNamed("zipCode");
 				// client creation
-				AddressData addressData = this.addressReadPlatformService.retrieveName(city);
+				AddressData addressData = this.addressReadPlatformService.retrieveAdressBy(city);
 				CodeValue codeValue=this.codeValueRepository.findOneByCodeValue("Normal");
 				JSONObject clientcreation = new JSONObject();
 				clientcreation.put("officeId", new Long(1));
@@ -368,7 +368,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 				
 
 				// book order
-				GlobalConfigurationProperty selfregistrationconfiguration = configurationRepository.findOneByName(ConfigurationConstants.CONFIR_PROPERTY_SELF_REGISTRATION);
+				Configuration selfregistrationconfiguration = configurationRepository.findOneByName(ConfigurationConstants.CONFIR_PROPERTY_SELF_REGISTRATION);
 				
 				if (selfregistrationconfiguration != null) {
 					

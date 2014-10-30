@@ -25,9 +25,9 @@ public class AddressData {
 	
 	
 
-	public AddressData(Long addressId, Long clientId, String addressKeyId,
-			String addressNo, String street, String zip, String city,
-			String state, String country, String addressKey,Long addressTypeId) {
+	public AddressData(final Long addressId, final Long clientId, final String addressKeyId,
+			final String addressNo, final String street, final String zip, final String city,
+			final String state, final String country, final String addressKey,final Long addressTypeId) {
      
 		this.id=addressId;
 		this.addressKey=addressKeyId;
@@ -46,7 +46,8 @@ public class AddressData {
 
 
 
-	public AddressData(List<AddressData> addressdata, List<String> countryData, List<String> statesData, List<String> citiesData, List<EnumOptionData> enumOptionDatas) {
+	public AddressData(final List<AddressData> addressdata, final List<String> countryData, final List<String> statesData,
+						final List<String> citiesData, final List<EnumOptionData> enumOptionDatas) {
 		if(addressdata!=null && addressdata.size()!=0){
 		this.id=addressdata.get(0).getAddressId();
 	
@@ -70,14 +71,14 @@ public class AddressData {
 
 
 
-	public AddressData(Long id, String data) {
+	public AddressData(final Long id, final String data) {
 
 	this.id=id;
 	this.data=data;
 	
 	}
 
-   public AddressData(String city,String state, String country) {
+   public AddressData(final String city,final String state, final String country) {
 		// TODO Auto-generated constructor stub
 	   this.city=city;
 	   this.state=state;
@@ -86,7 +87,7 @@ public class AddressData {
 
 
 
-   public AddressData(List<AddressData> data) {
+   public AddressData(final List<AddressData> data) {
 	// TODO Auto-generated constructor stub
 	this.addressData=data;
    }

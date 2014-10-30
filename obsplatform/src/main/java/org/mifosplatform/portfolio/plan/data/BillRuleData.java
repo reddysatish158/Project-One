@@ -2,9 +2,10 @@ package org.mifosplatform.portfolio.plan.data;
 
 public class BillRuleData {
 
-	final String billruleOptions;
-	final Long id;
-	private String value;
+	final private String billruleOptions;
+	final private Long id;
+	final private String value;
+	
 	public BillRuleData(final Long id,final String options, String value) {
 		this.id=id;
 		this.billruleOptions=options;

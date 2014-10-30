@@ -24,6 +24,7 @@ import javax.ws.rs.core.UriInfo;
 import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
+import org.mifosplatform.finance.financialtransaction.data.FinancialTransactionsData;
 import org.mifosplatform.infrastructure.codes.data.CodeValueData;
 import org.mifosplatform.infrastructure.codes.service.CodeValueReadPlatformService;
 import org.mifosplatform.infrastructure.core.api.ApiRequestParameterHelper;
@@ -50,10 +51,11 @@ public class OfficesApiResource {
             "openingDate", "hierarchy", "parentId", "parentName", "allowedParents","officeTypes"));
 
     private final String resourceNameForPermissions = "OFFICE";
-
+    
     private final PlatformSecurityContext context;
     private final OfficeReadPlatformService readPlatformService;
     private final DefaultToApiJsonSerializer<OfficeData> toApiJsonSerializer;
+    private final DefaultToApiJsonSerializer<FinancialTransactionsData> toFinancialTransactionApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final CodeValueReadPlatformService codeValueReadPlatformService;
@@ -62,13 +64,15 @@ public class OfficesApiResource {
     @Autowired
     public OfficesApiResource(final PlatformSecurityContext context, final OfficeReadPlatformService readPlatformService,
             final DefaultToApiJsonSerializer<OfficeData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper,
-            final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,final CodeValueReadPlatformService codeValueReadPlatformService) {
+            final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
+            final CodeValueReadPlatformService codeValueReadPlatformService, final DefaultToApiJsonSerializer<FinancialTransactionsData> toFinancialTransactionApiJsonSerializer) {
         this.context = context;
         this.readPlatformService = readPlatformService;
         this.toApiJsonSerializer = toApiJsonSerializer;
         this.apiRequestParameterHelper = apiRequestParameterHelper;
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
-        this.codeValueReadPlatformService=codeValueReadPlatformService;
+        this.codeValueReadPlatformService = codeValueReadPlatformService;
+        this.toFinancialTransactionApiJsonSerializer = toFinancialTransactionApiJsonSerializer;
     }
 
     @GET
@@ -77,12 +81,7 @@ public class OfficesApiResource {
     public String retrieveOffices(@Context final UriInfo uriInfo) {
 
         context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-
         final Collection<OfficeData> offices = this.readPlatformService.retrieveAllOffices();
-        //final Collection<CodeValueData> officeTypes=this.codeValueReadPlatformService.retrieveCodeValuesByCode(OFFICE_TYPE);
-        
-        //OfficeData  office = OfficeData.template(offices, null,officeTypes);
-
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, offices, RESPONSE_DATA_PARAMETERS);
     }
@@ -94,9 +93,7 @@ public class OfficesApiResource {
     public String retrieveOfficeTemplate(@Context final UriInfo uriInfo) {
 
         context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-
         OfficeData office = this.readPlatformService.retrieveNewOfficeTemplate();
-
         final Collection<OfficeData> allowedParents = this.readPlatformService.retrieveAllOfficesForDropdown();
         final Collection<CodeValueData> officeTypes=this.codeValueReadPlatformService.retrieveCodeValuesByCode(OFFICE_TYPE);
         office = OfficeData.appendedTemplate(office, allowedParents,officeTypes);
@@ -133,7 +130,7 @@ public class OfficesApiResource {
         OfficeData office = this.readPlatformService.retrieveOffice(officeId);
         
         if (settings.isTemplate()) {
-            Collection<OfficeData> allowedParents = this.readPlatformService.retrieveAllowedParents(officeId);
+            final Collection<OfficeData> allowedParents = this.readPlatformService.retrieveAllowedParents(officeId);
             final Collection<CodeValueData> codeValueDatas=this.codeValueReadPlatformService.retrieveCodeValuesByCode(OFFICE_TYPE);
             office = OfficeData.appendedTemplate(office, allowedParents,codeValueDatas);
         }
@@ -155,5 +152,19 @@ public class OfficesApiResource {
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 
         return this.toApiJsonSerializer.serialize(result);
+    }
+    
+    /**
+     * Office financial Transactions
+     * */
+    @GET
+    @Path("financialtransactions/{officeId}")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public String retrieveTransactionalData(@PathParam("officeId") final Long officeId, @Context final UriInfo uriInfo)	{
+    	context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+    	final Collection<FinancialTransactionsData> transactionData = this.readPlatformService.retreiveOfficeFinancialTransactionsData(officeId);
+    	final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+        return this.toFinancialTransactionApiJsonSerializer.serialize(settings, transactionData, RESPONSE_DATA_PARAMETERS);
     }
 }

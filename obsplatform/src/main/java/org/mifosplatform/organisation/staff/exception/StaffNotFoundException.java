@@ -13,6 +13,11 @@ import org.mifosplatform.infrastructure.core.exception.AbstractPlatformResourceN
 public class StaffNotFoundException extends
 		AbstractPlatformResourceNotFoundException {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public StaffNotFoundException(final Long id) {
 		super("error.msg.staff.id.invalid", "Staff with identifier " + id
 				+ " does not exist", id);
