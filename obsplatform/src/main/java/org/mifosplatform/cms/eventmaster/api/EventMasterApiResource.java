@@ -46,9 +46,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
- * Class to Create Update and Delete {@link EventMaster}
+ * Class to Create, Update and Delete {@link EventMaster}
  * 
- * @author pavani
+ * @author Pavani
+ * @author Rakesh
  *
  */
 @Path("/eventmaster")
@@ -56,16 +57,16 @@ import org.springframework.stereotype.Component;
 @Scope("singleton")
 public class EventMasterApiResource {
 	
-	private final Set<String> RESPONSE_PARAMETERS = new HashSet<String>(Arrays.asList("id","eventName","eventDescription","status","eventStartDate","eventEndDate",
-			"chargeData","eventValidity"));
+	private final Set<String> RESPONSE_PARAMETERS = new HashSet<String>(Arrays.asList("id", "eventName", "eventDescription", "status", 
+			"eventStartDate", "eventEndDate", "chargeData", "eventValidity"));
 	
 	private final String resourceNameForPermissions = "EVENT";
-	private PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService;
-	private DefaultToApiJsonSerializer<EventMasterData> toApiJsonSerializer;
-	private ApiRequestParameterHelper apiRequestParameterHelper;
-	private PlatformSecurityContext context;
-	private EventMasterReadPlatformService eventMasterReadPlatformService;
-	private MediaAssetReadPlatformService assetReadPlatformService;
+	private final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService;
+	private final DefaultToApiJsonSerializer<EventMasterData> toApiJsonSerializer;
+	private final ApiRequestParameterHelper apiRequestParameterHelper;
+	private final PlatformSecurityContext context;
+	private final EventMasterReadPlatformService eventMasterReadPlatformService;
+	private final MediaAssetReadPlatformService assetReadPlatformService;
 	private final ItemReadPlatformService itemReadPlatformService;
 	private final MCodeReadPlatformService mCodeReadPlatformService;
 	/**
@@ -91,8 +92,8 @@ public class EventMasterApiResource {
 		this.context = context;
 		this.assetReadPlatformService = assetReadPlatformService;
 		this.eventMasterReadPlatformService = eventMasterReadPlatformService;
-		this.itemReadPlatformService=itemReadPlatformService;
-		this.mCodeReadPlatformService=mCodeReadPlatformService;
+		this.itemReadPlatformService = itemReadPlatformService;
+		this.mCodeReadPlatformService = mCodeReadPlatformService;
 	}
 	
 	/**
@@ -109,22 +110,19 @@ public class EventMasterApiResource {
 	@Produces({MediaType.APPLICATION_JSON})
 	public String retrieveEventMasterTempleteData(@Context final UriInfo uriInfo) {
 		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		Set<String> responseParameters = ApiParameterHelper.extractFieldsForResponseIfProvided(uriInfo.getQueryParameters());
+		final Set<String> responseParameters = ApiParameterHelper.extractFieldsForResponseIfProvided(uriInfo.getQueryParameters());
 		responseParameters.addAll(RESPONSE_PARAMETERS);
-		EventMasterData templetData = handleTemplateRelatedData(responseParameters);		
+		final EventMasterData templetData = handleEventMasterTemplateData(responseParameters);		
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 	
 		return this.toApiJsonSerializer.serialize(settings, templetData, RESPONSE_PARAMETERS);
 	}
-	public EventMasterData handleTemplateRelatedData(final Set<String> responseParameters) {
-		
-	//	List<MediaAssetData> mediaData = this.assetReadPlatformService.retrieveAllmediaAssetdata();
-	    List<MediaAssetData> mediaData   = this.assetReadPlatformService.retrieveAllAssetdata();
-		List<EnumOptionData> statusData = this.eventMasterReadPlatformService.retrieveNewStatus();
-		List<EnumOptionData> optType = this.eventMasterReadPlatformService.retrieveOptTypeData();
-		List<ChargesData> chargeDatas = this.itemReadPlatformService.retrieveChargeCode();
-		Collection<MCodeData> eventCategeorydata=this.mCodeReadPlatformService.getCodeValue("Event Category");
-		EventMasterData singleEvent  = new EventMasterData(mediaData,statusData,optType,chargeDatas,eventCategeorydata);
+	public EventMasterData handleEventMasterTemplateData(final Set<String> responseParameters) {
+	    final List<MediaAssetData> mediaData   = this.assetReadPlatformService.retrieveAllAssetdata();
+		final List<EnumOptionData> statusData = this.eventMasterReadPlatformService.retrieveNewStatus();
+		final List<ChargesData> chargeDatas = this.itemReadPlatformService.retrieveChargeCode();
+		final Collection<MCodeData> eventCategeorydata = this.mCodeReadPlatformService.getCodeValue("Event Category");
+		final EventMasterData singleEvent  = new EventMasterData(mediaData, statusData, null, chargeDatas, eventCategeorydata);
 		
 		return singleEvent;	
 	}
@@ -137,40 +135,36 @@ public class EventMasterApiResource {
 	 * @param uriInfo
 	 * @return
 	 */
-	@SuppressWarnings("unused")
 	@GET
 	@Path("{eventId}")
 	@Consumes({MediaType.APPLICATION_JSON})
 	@Produces({MediaType.APPLICATION_JSON})
-	public String retrieveEventMaster(@PathParam("eventId")Integer eventId,@Context final UriInfo uriInfo) {
+	public String retrieveSingleEventMaster(@PathParam("eventId")final Integer eventId, @Context final UriInfo uriInfo) {
 		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		Set<String> responseParameters = ApiParameterHelper.extractFieldsForResponseIfProvided(uriInfo.getQueryParameters());
+		final Set<String> responseParameters = ApiParameterHelper.extractFieldsForResponseIfProvided(uriInfo.getQueryParameters());
 		responseParameters.addAll(RESPONSE_PARAMETERS);
-		List<MediaAssetData> mediaData   = this.assetReadPlatformService.retrieveAllAssetdata();
-		List<EnumOptionData> statusData = this.eventMasterReadPlatformService.retrieveNewStatus();
-		List<EnumOptionData> optType = this.eventMasterReadPlatformService.retrieveOptTypeData();
-		List<EventDetailsData> details = this.eventMasterReadPlatformService.retrieveEventDetailsData(eventId);
-		List<ChargesData> chargeDatas = this.itemReadPlatformService.retrieveChargeCode();
-		Collection<MCodeData> eventCategeorydata=this.mCodeReadPlatformService.getCodeValue("Event Category");
-		EventMasterData event = this.eventMasterReadPlatformService.retrieveEventMasterDetails(eventId);
-	
-		int size = mediaData.size();
-		int selectedSize = details.size();
-		for(int i=0;i<selectedSize;i++) {
-			Long selected = details.get(i).getMediaId();
-			for(int j=0;j<size;j++) {
+		final List<MediaAssetData> mediaData   = this.assetReadPlatformService.retrieveAllAssetdata();
+		final List<EnumOptionData> statusData = this.eventMasterReadPlatformService.retrieveNewStatus();
+		final List<EventDetailsData> eventdetails = this.eventMasterReadPlatformService.retrieveEventDetailsData(eventId);
+		final List<ChargesData> chargeDatas = this.itemReadPlatformService.retrieveChargeCode();
+		final Collection<MCodeData> eventCategeorydata = this.mCodeReadPlatformService.getCodeValue("Event Category");
+		final EventMasterData event = this.eventMasterReadPlatformService.retrieveEventMasterDetails(eventId);
+		
+		int mediaDataSize = mediaData.size();
+		final int eventdetailsSize = eventdetails.size();
+		for(int i = 0; i < eventdetailsSize; i++) {
+			Long selected = eventdetails.get(i).getMediaId();
+			for(int j = 0; j < mediaDataSize; j++) {
 				Long available = mediaData.get(j).getMediaId();
 				if(selected == available) {
 					mediaData.remove(j);
-					size--;
+					mediaDataSize--;
 				}
 			}
 		}
-		
 		event.setMediaAsset(mediaData);
-		event.setOptType(optType);
 		event.setStatusData(statusData);
-		event.setSelectedMedia(details);
+		event.setSelectedMedia(eventdetails);
 		event.setChargeData(chargeDatas);
 		event.setEventCategeorydata(eventCategeorydata);
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -187,29 +181,26 @@ public class EventMasterApiResource {
 	@GET
 	@Consumes({MediaType.APPLICATION_JSON})
 	@Produces({MediaType.APPLICATION_JSON})
-	public String retrieveEventMasterData(@Context UriInfo uriInfo) {
+	public String retrieveAllEventMasterData(@Context final UriInfo uriInfo) {
 		
 		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		final List<EventMasterData> data = this.eventMasterReadPlatformService.retrieveEventMasterData();
+		final List<EventMasterData> eventMasterDatas = this.eventMasterReadPlatformService.retrieveEventMasterData();
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-        return this.toApiJsonSerializer.serialize(settings, data, RESPONSE_PARAMETERS);
+        return this.toApiJsonSerializer.serialize(settings, eventMasterDatas, RESPONSE_PARAMETERS);
 	}
-	
 	
 	/**
 	 * Generic Method for Posting and creating new {@link EventMaster}
 	 * 
-	 * @param clientId
 	 * @param jsonBodyRequest
 	 * @return
 	 */
 	@POST
 	@Consumes({MediaType.APPLICATION_JSON})
 	@Produces({MediaType.APPLICATION_JSON})
-	public String createEventMaster( final String jsonRequestBody) {
-		final CommandWrapper commandRequest = new CommandWrapperBuilder().createEvent().withJson(jsonRequestBody).build();
-		final CommandProcessingResult result  = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
-		
+	public String createEventMaster(final String jsonRequestBody) {
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().createEventMaster().withJson(jsonRequestBody).build();
+		final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 	}
 	
@@ -224,11 +215,10 @@ public class EventMasterApiResource {
 	@Path("{eventId}")
 	@Consumes({MediaType.APPLICATION_JSON})
 	@Produces({MediaType.APPLICATION_JSON})
-	public String updateEventMaster(@PathParam("eventId")Long eventId,final String jsonRequestBody) {
+	public String updateEventMaster(@PathParam("eventId")final Long eventId, final String jsonRequestBody) {
 		
-		final CommandWrapper commandRequest = new CommandWrapperBuilder().updateEvent(eventId).withJson(jsonRequestBody).build();
-		final CommandProcessingResult result  = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
-		
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().updateEventMaster(eventId).withJson(jsonRequestBody).build();
+		final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 	}
 	
@@ -242,8 +232,8 @@ public class EventMasterApiResource {
 	@Path("{eventId}")
 	@Consumes({MediaType.APPLICATION_JSON})
 	@Produces({MediaType.APPLICATION_JSON})
-	public String deleteEventMaster(@PathParam("eventId") Long eventId) {
-		final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteEvent(eventId).build();
+	public String deleteEventMaster(@PathParam("eventId") final Long eventId) {
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteEventMaster(eventId).build();
 		final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 	}

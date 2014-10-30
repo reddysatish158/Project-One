@@ -21,7 +21,7 @@ public class CreateEventMasterCommandHandler implements NewCommandSourceHandler 
 	private EventMasterWritePlatformService eventMasterWritePlatformService;
 
 	@Override
-	public CommandProcessingResult processCommand(JsonCommand command) {
+	public CommandProcessingResult processCommand(final JsonCommand command) {
 		return this.eventMasterWritePlatformService.createEventMaster(command);
 	}
 }

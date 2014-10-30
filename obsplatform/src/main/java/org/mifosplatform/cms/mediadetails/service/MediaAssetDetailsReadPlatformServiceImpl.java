@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
-import org.mifosplatform.cms.eventpricing.data.EventPricingData;
+import org.mifosplatform.cms.eventprice.data.EventPriceData;
 import org.mifosplatform.cms.mediadetails.data.MediaAssetDetailsData;
 import org.mifosplatform.cms.mediadetails.data.MediaAssetLocationDetails;
 import org.mifosplatform.cms.mediadetails.data.MediaLocationData;
@@ -210,22 +210,22 @@ public class MediaAssetDetailsReadPlatformServiceImpl implements MediaAssetDetai
 		}
 
 		@Override
-		public List<EventPricingData> getEventPriceDetails(Long eventId,String clientType) {
+		public List<EventPriceData> getEventPriceDetails(Long eventId,String clientType) {
 			
 			MediaPriceDetailsMapper attributeMapper = new MediaPriceDetailsMapper();
 			String sql = "select " + attributeMapper.attributeDataSchema();
 			return this.jdbcTemplate.query(sql, attributeMapper,new Object[] { eventId,clientType });
 			
 		}
-			private static final class MediaPriceDetailsMapper implements RowMapper<EventPricingData> {
+			private static final class MediaPriceDetailsMapper implements RowMapper<EventPriceData> {
 		@Override
-		public EventPricingData mapRow(ResultSet rs, int rowNum) throws SQLException {
+		public EventPriceData mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Long eventId=rs.getLong("id");
 			//String customerCategory = rs.getString("customer_category");
 			String optType = rs.getString("opt_type");
 			String formatType = rs.getString("format_type");
 			BigDecimal price=rs.getBigDecimal("price");
-			return new EventPricingData(eventId,null,formatType,optType, null, null, price,null,null, eventId);
+			return new EventPriceData(eventId,null,formatType,optType, null, null, price,null,null, eventId);
 			
 		}
 		public String attributeDataSchema() {

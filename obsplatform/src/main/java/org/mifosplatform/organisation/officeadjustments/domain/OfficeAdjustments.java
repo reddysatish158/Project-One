@@ -16,105 +16,110 @@ import org.mifosplatform.useradministration.domain.AppUser;
 	@Table(name = "m_adjustments")
 	public class OfficeAdjustments extends AbstractAuditableCustom<AppUser, Long> {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
 		@Column(name = "office_id", nullable = false, length = 20)
-		private Long office_id;
+		private Long officeId;
 
 		@Column(name = "adjustment_date", nullable = false)
-		private Date adjustment_date;
+		private Date adjustmentDate;
 
 		@Column(name = "adjustment_code", nullable = false, length = 20)
-		private int adjustment_code;
+		private int adjustmentCode;
 
 		@Column(name = "adjustment_type", nullable = false, length = 12)
-		private String adjustment_type;
+		private String adjustmentType;
 
 		@Column(name = "adjustment_amount", nullable = true, length = 22)
-		private BigDecimal amount_paid;
+		private BigDecimal amountPaid;
 
 		@Column(name = "is_deleted")
-		private char isDeleted='N';
+		private char isDeleted = 'N';
 
 		@Column(name = "remarks", nullable = true, length = 200)
-		private String Remarks;
+		private String remarks;
 		
 		public OfficeAdjustments(){
 			
 		}
 		
 		public static OfficeAdjustments fromJson(final JsonCommand command) {
+			
 			    final LocalDate adjustmentDate = command.localDateValueOfParameterNamed("adjustment_date");
 		        final Long adjustmentCode = command.longValueOfParameterNamed("adjustment_code");
 		        final String adjustmentType = command.stringValueOfParameterNamed("adjustment_type");
 		        final BigDecimal amountPaid = command.bigDecimalValueOfParameterNamed("amount_paid");
 		        final String remarks = command.stringValueOfParameterNamed("Remarks");
-				return new OfficeAdjustments(command.entityId(),adjustmentDate,adjustmentCode,adjustmentType,amountPaid,remarks);
+				return new OfficeAdjustments(command.entityId(), adjustmentDate, adjustmentCode, adjustmentType, amountPaid, remarks);
 		}
 		
-		public OfficeAdjustments(Long office_id, LocalDate adjustment_date,
-				Long adjustment_code, String adjustment_type,
-				BigDecimal amount_paid, String Remarks) {
+		public OfficeAdjustments(final Long officeId, final LocalDate adjustmentDate, final Long adjustmentCode, final String adjustmentType,
+					final BigDecimal amountPaid, final String remarks) {
 			
-			this.office_id = office_id;
-			this.adjustment_date = adjustment_date.toDate();
-			this.adjustment_code =(adjustment_code).intValue();
-			this.adjustment_type = adjustment_type;
-			this.amount_paid = amount_paid;
-			this.Remarks = Remarks;
+			this.officeId = officeId;
+			this.adjustmentDate = adjustmentDate.toDate();
+			this.adjustmentCode =(adjustmentCode).intValue();
+			this.adjustmentType = adjustmentType;
+			this.amountPaid = amountPaid;
+			this.remarks = remarks;
 			
 		}
 		
-		public static OfficeAdjustments fromJson(Long office_id, LocalDate adjustment_date,
-				Long adjustment_code, String adjustment_type,
-				BigDecimal amount_paid,String Remarks){
-			return new OfficeAdjustments(office_id,adjustment_date, adjustment_code,
-					adjustment_type, amount_paid, Remarks);
+		public static OfficeAdjustments fromJson(final Long officeId, final LocalDate adjustmentDate, final Long adjustmentCode , final String adjustmentType,
+				final BigDecimal amountPaid, final String remarks){
+			
+			return new OfficeAdjustments(officeId, adjustmentDate , adjustmentCode,
+					adjustmentType, amountPaid, remarks);
 		}
 
-		public Long getOffice_id() {
-			return office_id;
+		public Long getOfficeId() {
+			return officeId;
 		}
 
-		public void setOffice_id(Long office_id) {
-			this.office_id = office_id;
+		public void setOfficeId(final Long officeId) {
+			this.officeId = officeId;
 		}
 
-		public Date getAdjustment_date() {
-			return adjustment_date;
+		public Date getAdjustmentDate() {
+			return adjustmentDate;
 		}
 
-		public void setAdjustment_date(Date adjustment_date) {
-			this.adjustment_date = adjustment_date;
+		public void setAdjustmentDate(final Date adjustmentDate) {
+			this.adjustmentDate = adjustmentDate;
 		}
 
-		public int getAdjustment_code() {
-			return adjustment_code;
+		public int getAdjustmentCode() {
+			return adjustmentCode;
 		}
 
-		public void setAdjustment_code(int adjustment_code) {
-			this.adjustment_code = adjustment_code;
+		public void setAdjustmentCode(final int adjustmentCode) {
+			this.adjustmentCode = adjustmentCode;
 		}
 
-		public String getAdjustment_type() {
-			return adjustment_type;
+		public String getAdjustmentType() {
+			return adjustmentType;
 		}
 
-		public void setAdjustment_type(String adjustment_type) {
-			this.adjustment_type = adjustment_type;
+		public void setAdjustmentType(final String adjustmentType) {
+			this.adjustmentType = adjustmentType;
 		}
 
-		public BigDecimal getAmount_paid() {
-			return amount_paid;
+		public BigDecimal getAmountPaid() {
+			return amountPaid;
 		}
 
-		public void setAmount_paid(BigDecimal amount_paid) {
-			this.amount_paid = amount_paid;
+		public void setAmountPaid(final BigDecimal amountPaid) {
+			this.amountPaid = amountPaid;
 		}
 
 		public String getRemarks() {
-			return Remarks;
+			return remarks;
 		}
 
-		public void setRemarks(String remarks) {
-			Remarks = remarks;
+		public void setRemarks(final String remarks) {
+			this.remarks = remarks;
 		}
 }

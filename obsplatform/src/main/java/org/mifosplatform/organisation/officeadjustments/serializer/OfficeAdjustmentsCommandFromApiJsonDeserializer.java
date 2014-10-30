@@ -33,8 +33,7 @@ public class OfficeAdjustmentsCommandFromApiJsonDeserializer {
 	 */
 	private final Set<String> supportedParameters = new HashSet<String>(
 			Arrays.asList("adjustment_date", "adjustment_code", "adjustment_type",
-				    "amount_paid","Remarks", "locale",
-				    "dateFormat"));
+				    "amount_paid","Remarks", "locale", "dateFormat"));
 	
 	private final FromJsonHelper fromApiJsonHelper;
 	
@@ -42,7 +41,7 @@ public class OfficeAdjustmentsCommandFromApiJsonDeserializer {
 	public OfficeAdjustmentsCommandFromApiJsonDeserializer(final FromJsonHelper fromApiJsonHelper) {
 		this.fromApiJsonHelper = fromApiJsonHelper;
 	}
-	public void validateForCreate(String json) {
+	public void validateForCreate(final String json) {
 		
 		if (StringUtils.isBlank(json)) {
 			throw new InvalidJsonException();

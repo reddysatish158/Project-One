@@ -51,7 +51,7 @@ public class CommandWrapperBuilder {
 		return this;
 	}
 
-	public CommandWrapperBuilder updateGlobalConfiguration(Long configId) {
+	public CommandWrapperBuilder updateConfiguration(Long configId) {
 		this.actionName = "UPDATE";
 		this.entityName = "CONFIGURATION";
 		this.entityId = configId;
@@ -1276,14 +1276,14 @@ public class CommandWrapperBuilder {
 		return this;
 	}
 
-	public CommandWrapperBuilder createEvent() {
+	public CommandWrapperBuilder createEventMaster() {
 		this.entityName = "EVENT";
 		this.actionName = "CREATE";
 		this.href = "";
 		return this;
 	}
 
-	public CommandWrapperBuilder updateEvent(Long eventId) {
+	public CommandWrapperBuilder updateEventMaster(Long eventId) {
 		this.entityName = "EVENT";
 		this.actionName = "UPDATE";
 		this.entityId = eventId;
@@ -1291,7 +1291,7 @@ public class CommandWrapperBuilder {
 		return this;
 	}
 
-	public CommandWrapperBuilder deleteEvent(Long eventId) {
+	public CommandWrapperBuilder deleteEventMaster(Long eventId) {
 		this.entityName = "EVENT";
 		this.actionName = "DELETE";
 		this.entityId = eventId;
@@ -1299,7 +1299,7 @@ public class CommandWrapperBuilder {
 		return this;
 	}
 
-	public CommandWrapperBuilder createEventPricing(Long eventId) {
+	public CommandWrapperBuilder createEventPrice(Long eventId) {
 		this.actionName = "CREATE";
 
 		this.entityName = "EVENTPRICE";
@@ -1308,7 +1308,7 @@ public class CommandWrapperBuilder {
 		return this;
 	}
 
-	public CommandWrapperBuilder updateEventPricing(Long eventPriceId) {
+	public CommandWrapperBuilder updateEventPrice(Long eventPriceId) {
 		this.actionName = "UPDATE";
 		this.entityName = "EVENTPRICE";
 		this.entityId = eventPriceId;
@@ -1316,7 +1316,7 @@ public class CommandWrapperBuilder {
 		return this;
 	}
 	
-	public CommandWrapperBuilder deleteEventPricing(Long eventPriceId) {
+	public CommandWrapperBuilder deleteEventPrice(Long eventPriceId) {
 		this.actionName = "DELETE";
 		this.entityName = "EVENTPRICE";
 		this.entityId = eventPriceId;
@@ -1537,7 +1537,7 @@ public CommandWrapperBuilder createEpg() {
 	return this;
 }
 
-public CommandWrapperBuilder updateAsset(Long assetId) {
+public CommandWrapperBuilder updateMediaAsset(Long assetId) {
 	this.actionName="UPDATE";
 	this.entityName="MEDIAASSET";
 	this.entityId=assetId;
@@ -1545,7 +1545,7 @@ public CommandWrapperBuilder updateAsset(Long assetId) {
 	return this;
 }
 
-public CommandWrapperBuilder deleteAsset(Long assetId) {
+public CommandWrapperBuilder deleteMediaAsset(Long assetId) {
 	this.actionName="DELETE";
 	this.entityName="MEDIAASSET";
 	this.entityId=assetId;
@@ -2120,7 +2120,7 @@ public CommandWrapperBuilder confirnProvisiongDetails(Long processrequestId) {
     return this;
 }
 
-public CommandWrapperBuilder createGlobalConfiguration() {
+public CommandWrapperBuilder createSmtpConfiguration() {
 	this.actionName = "CREATE";
 	this.entityName = "SMTPCONFIGURATION";
 	//this.entityId=configId;
@@ -2474,7 +2474,7 @@ public CommandWrapperBuilder updateSelfcarePassword() {
 	return this;
 }
 
-public CommandWrapperBuilder createMediaAssetLocationAttributes(Long assetId) {
+public CommandWrapperBuilder createMediaAssetLocationAttribute(Long assetId) {
 	this.actionName="CREATE";
 	this.entityName="MEDIAASSETLOCATIONATTRIBUTES";
 	this.entityId=assetId;

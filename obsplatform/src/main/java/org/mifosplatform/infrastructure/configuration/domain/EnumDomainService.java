@@ -14,9 +14,8 @@ import javax.persistence.Table;
 @Table(name = "r_enum_value")
 public class EnumDomainService {
 
-    @SuppressWarnings("unused")
-    @Column(name = "enum_name", nullable = false)
-    private  String enumName;
+   @Column(name = "enum_name", nullable = false)
+   private  String enumName;
 
    @Id
    @Column(name = "enum_id", nullable = false)

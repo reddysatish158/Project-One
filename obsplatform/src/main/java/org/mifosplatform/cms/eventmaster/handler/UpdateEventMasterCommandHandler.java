@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
  * implements {@link NewCommandSourceHandler}
  * 
  * @author pavani
- *
+ * @author Rakesh
  */
 @Service
 public class UpdateEventMasterCommandHandler implements NewCommandSourceHandler {
@@ -25,7 +25,7 @@ public class UpdateEventMasterCommandHandler implements NewCommandSourceHandler 
 	private EventMasterWritePlatformService eventMasterWritePlatformService;
 
 	@Override
-	public CommandProcessingResult processCommand(JsonCommand command) {
+	public CommandProcessingResult processCommand(final JsonCommand command) {
 		return this.eventMasterWritePlatformService.updateEventMaster(command);
 	}
 
