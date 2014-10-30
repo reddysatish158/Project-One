@@ -1,4 +1,4 @@
-package org.mifosplatform.organisation.groupsDetails.domain;
+package org.mifosplatform.organisation.groupsdetails.domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;

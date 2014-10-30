@@ -33,7 +33,7 @@ public class StaffAccountSummaryCollectionData {
 
         private Collection<ClientAccountSummaryData> loans;
 
-        public ClientSummary(Long id, String displayName) {
+        public ClientSummary(final Long id, final String displayName) {
             this.id = id;
             this.displayName = displayName;
         }
@@ -50,7 +50,7 @@ public class StaffAccountSummaryCollectionData {
             return loans;
         }
 
-        public void setLoans(Collection<ClientAccountSummaryData> loans) {
+        public void setLoans(final Collection<ClientAccountSummaryData> loans) {
             this.loans = loans;
         }
     }
@@ -62,7 +62,7 @@ public class StaffAccountSummaryCollectionData {
 
         private Collection<GroupAccountSummaryData> loans;
 
-        public GroupSummary(Long id, String name) {
+        public GroupSummary(final Long id, final String name) {
             this.id = id;
             this.name = name;
         }
@@ -79,7 +79,7 @@ public class StaffAccountSummaryCollectionData {
             return loans;
         }
 
-        public void setLoans(Collection<GroupAccountSummaryData> loans) {
+        public void setLoans(final Collection<GroupAccountSummaryData> loans) {
             this.loans = loans;
         }
     }

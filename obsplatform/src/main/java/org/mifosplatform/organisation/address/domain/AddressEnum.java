@@ -2,7 +2,7 @@ package org.mifosplatform.organisation.address.domain;
 
 public enum AddressEnum {
 
-	PRIMARY(1, "CategoryType.primary"), //
+	PRIMARY(1, "CategoryType.primary"), 
 	BILLING(2, "CategoryType.billing"),
 	INVALID(3, "CategoryType.invalid");
 

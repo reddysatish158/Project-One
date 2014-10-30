@@ -41,8 +41,8 @@ import org.mifosplatform.logistics.item.domain.StatusTypeEnum;
 import org.mifosplatform.logistics.itemdetails.exception.ActivePlansFoundException;
 import org.mifosplatform.organisation.address.domain.Address;
 import org.mifosplatform.organisation.address.domain.AddressRepository;
-import org.mifosplatform.organisation.groupsDetails.domain.GroupsDetails;
-import org.mifosplatform.organisation.groupsDetails.domain.GroupsDetailsRepository;
+import org.mifosplatform.organisation.groupsdetails.domain.GroupsDetails;
+import org.mifosplatform.organisation.groupsdetails.domain.GroupsDetailsRepository;
 import org.mifosplatform.organisation.office.domain.Office;
 import org.mifosplatform.organisation.office.domain.OfficeRepository;
 import org.mifosplatform.organisation.office.exception.OfficeNotFoundException;
@@ -490,6 +490,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         logger.error(dve.getMessage(), dve);
     }
 
+    @Transactional
 	@Override
 	public CommandProcessingResult updateClientTaxExemption(Long clientId,JsonCommand command) {
 		
@@ -506,13 +507,15 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 				 taxValue='N';
 				 clientTaxStatus.setTaxExemption(taxValue);
 			 }
+			 this.clientRepository.save(clientTaxStatus); 
 		}catch(DataIntegrityViolationException dve){
 			 handleDataIntegrityIssues(command, dve);
 	            return CommandProcessingResult.empty();
 		}
-		return new CommandProcessingResultBuilder().withEntityId(clientTaxStatus.getId()).build();
+		return new CommandProcessingResultBuilder().withEntityId(clientTaxStatus.getId()).withClientId(clientId).build();
 	}
 
+    @Transactional
 	@Override
 	public CommandProcessingResult updateClientBillMode(Long clientId,JsonCommand command) {
 		
@@ -527,6 +530,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 			 }else{
 				 
 			 }
+		 this.clientRepository.save(clientBillMode); 	 
 		}catch(DataIntegrityViolationException dve){
 			 handleDataIntegrityIssues(command, dve);
 	            return CommandProcessingResult.empty();
@@ -535,6 +539,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 		return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(clientBillMode.getId()).withClientId(clientId).build();
 	}
 
+    @Transactional
 	@Override
 	public CommandProcessingResult createClientParent(Long entityId,JsonCommand command) {
 			Client childClient=null;

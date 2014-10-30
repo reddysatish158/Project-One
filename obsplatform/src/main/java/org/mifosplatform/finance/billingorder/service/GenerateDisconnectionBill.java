@@ -89,14 +89,14 @@ public class GenerateDisconnectionBill {
 		// If Invoice till date not equal to null
 		if (billingOrderData.getInvoiceTillDate() != null) {
 			
-           if(discountMasterData.getdiscountRate() !=null&& (billingOrderData.getBillStartDate().after(discountMasterData.getDiscountStartDate().toDate())
+           if(discountMasterData.getDiscountRate() !=null&& (billingOrderData.getBillStartDate().after(discountMasterData.getDiscountStartDate().toDate())
         		   ||(billingOrderData.getBillStartDate().compareTo(discountMasterData.getDiscountStartDate().toDate())==0))){
 
     		if (discountMasterData.getDiscounType().equalsIgnoreCase("percentage")){
-    			discountAmount = price.multiply(discountMasterData.getdiscountRate().divide(new BigDecimal(100)));
+    			discountAmount = price.multiply(discountMasterData.getDiscountRate().divide(new BigDecimal(100)));
 	               price = price.subtract(discountAmount).setScale(2, RoundingMode.HALF_UP);
     		 }else if(discountMasterData.getDiscounType().equalsIgnoreCase("flat")){
-    		     price = price.subtract(discountMasterData.getdiscountRate());
+    		     price = price.subtract(discountMasterData.getDiscountRate());
               }
            }
 			
@@ -223,14 +223,14 @@ public class GenerateDisconnectionBill {
 
 		if (billingOrderData.getInvoiceTillDate() != null) {
 			
-			  if(discountMasterData.getdiscountRate() !=null && (billingOrderData.getBillStartDate().after(discountMasterData.getDiscountStartDate().toDate())
+			  if(discountMasterData.getDiscountRate() !=null && (billingOrderData.getBillStartDate().after(discountMasterData.getDiscountStartDate().toDate())
 	        		   ||(billingOrderData.getBillStartDate().compareTo(discountMasterData.getDiscountStartDate().toDate())==0))){
 
 		    		if (discountMasterData.getDiscounType().equalsIgnoreCase("percentage")){
-		    			   discountAmount = price.multiply(discountMasterData.getdiscountRate().divide(new BigDecimal(100)));
+		    			   discountAmount = price.multiply(discountMasterData.getDiscountRate().divide(new BigDecimal(100)));
 			               price = price.subtract(discountAmount);
 		    		}else if(discountMasterData.getDiscounType().equalsIgnoreCase("flat")){
-		    			  price = price.subtract(discountMasterData.getdiscountRate());
+		    			  price = price.subtract(discountMasterData.getDiscountRate());
 		    		
 		              }
 		           }

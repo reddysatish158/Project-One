@@ -8,8 +8,13 @@ import org.mifosplatform.infrastructure.core.exception.AbstractPlatformResourceN
  */
 public class CityNotFoundException extends AbstractPlatformResourceNotFoundException {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public CityNotFoundException(final String id) {
-        super("error.msg.city.not.found", "city with this id"+id+"not exist",id);
+        super("error.msg.city.not.found", "City with this id"+id+"not exist",id);
         
     }
 

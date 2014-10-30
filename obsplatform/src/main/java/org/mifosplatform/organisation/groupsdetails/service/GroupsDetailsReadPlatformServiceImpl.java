@@ -1,4 +1,4 @@
-package org.mifosplatform.organisation.groupsDetails.service;
+package org.mifosplatform.organisation.groupsdetails.service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,7 +9,7 @@ import org.mifosplatform.infrastructure.core.service.Page;
 import org.mifosplatform.infrastructure.core.service.PaginationHelper;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
-import org.mifosplatform.organisation.groupsDetails.data.GroupsDetailsData;
+import org.mifosplatform.organisation.groupsdetails.data.GroupsDetailsData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -32,11 +32,11 @@ public class GroupsDetailsReadPlatformServiceImpl implements GroupsDetailsReadPl
 	}
 	
 	@Override
-	public Page<GroupsDetailsData> retrieveAllGroupsData(SearchSqlQuery searchGroupsDetails) {
+	public Page<GroupsDetailsData> retrieveAllGroupsData(final SearchSqlQuery searchGroupsDetails) {
 		
 		context.authenticatedUser();
-		GroupsDetailsMapper groupsDetailsMapper = new GroupsDetailsMapper();
-		StringBuilder sqlBuilder = new StringBuilder(200);
+		final GroupsDetailsMapper groupsDetailsMapper = new GroupsDetailsMapper();
+		final StringBuilder sqlBuilder = new StringBuilder(200);
 		
 		sqlBuilder.append("select ");
 		sqlBuilder.append(groupsDetailsMapper.schema());
@@ -48,7 +48,7 @@ public class GroupsDetailsReadPlatformServiceImpl implements GroupsDetailsReadPl
 			sqlSearch = sqlSearch.trim();
 			extraCriteria = "where bg.group_name like '%"+sqlSearch+"%' ";
 		}
-		extraCriteria = extraCriteria+" order by id desc ";
+		extraCriteria += " order by id desc ";
 		sqlBuilder.append(extraCriteria);
 		
 		if(searchGroupsDetails.isLimited()){
@@ -65,24 +65,24 @@ public class GroupsDetailsReadPlatformServiceImpl implements GroupsDetailsReadPl
 	private class GroupsDetailsMapper implements RowMapper<GroupsDetailsData>{
 
 		@Override
-		public GroupsDetailsData mapRow(ResultSet rs, int rowNum) throws SQLException {
+		public GroupsDetailsData mapRow(final ResultSet rs, final int rowNum) throws SQLException {
 			
-			Long id = rs.getLong("id");
-			String groupName = rs.getString("groupName");
-			String groupAddress = rs.getString("groupAddress");
-			Long countNo = rs.getLong("countNo");
-			String attribute1 = rs.getString("attribute1");
-			String attribute2 = rs.getString("attribute2");
-			String attribute3 = rs.getString("attribute3");
-			String attribute4 = rs.getString("attribute4");
-			String isProvision = rs.getString("isProvision");
+			final Long id = rs.getLong("id");
+			final String groupName = rs.getString("groupName");
+			final String groupAddress = rs.getString("groupAddress");
+			final Long countNo = rs.getLong("countNo");
+			final String attribute1 = rs.getString("attribute1");
+			final String attribute2 = rs.getString("attribute2");
+			final String attribute3 = rs.getString("attribute3");
+			final String attribute4 = rs.getString("attribute4");
+			final String isProvision = rs.getString("isProvision");
 			
 			return new GroupsDetailsData(id, groupName, groupAddress, countNo,attribute1,attribute2,attribute3,attribute4,isProvision);
 		}
 		
 		public String schema(){
 		
-			String sql = "bg.id as id,bg.group_name as groupName,bg.group_address as groupAddress,bg.attribute1 as attribute1, "+
+			final String sql = "bg.id as id,bg.group_name as groupName,bg.group_address as groupAddress,bg.attribute1 as attribute1, "+
 						    "bg.attribute2 as attribute2,bg.attribute3 as attribute3,bg.attribute4 as attribute4,bg.is_provision as isProvision, "+
 					        "ifnull(mc.cnt,0) as countNo "+
 							"from b_group bg "+ 
@@ -94,11 +94,11 @@ public class GroupsDetailsReadPlatformServiceImpl implements GroupsDetailsReadPl
 	}
 
 	@Override
-	public List<Long> retrieveclientIdsByGroupId(Long groupId) {
+	public List<Long> retrieveclientIdsByGroupId(final Long groupId) {
 	try{
 
 		this.context.authenticatedUser();
-		ClientIdMapper mapper=new ClientIdMapper();
+		final ClientIdMapper mapper=new ClientIdMapper();
 		final String  sql="select "+mapper.schema();
 		return this.jdbcTemplate.query(sql,mapper, new Object[]{groupId});
 		
@@ -111,13 +111,13 @@ public class GroupsDetailsReadPlatformServiceImpl implements GroupsDetailsReadPl
 	private class ClientIdMapper implements RowMapper<Long>{
 
 		@Override
-		public Long mapRow(ResultSet rs, int rowNum) throws SQLException {
+		public Long mapRow(final ResultSet rs, final int rowNum) throws SQLException {
 			
-			Long clientId = rs.getLong("clientId");
+			final Long clientId = rs.getLong("clientId");
 			return clientId;
 		}
 		public String schema(){
-			String sql = "id as clientId from m_client c where group_id=? ";
+			final String sql = "id as clientId from m_client c where group_id=? ";
 			return sql;
 			
 		}

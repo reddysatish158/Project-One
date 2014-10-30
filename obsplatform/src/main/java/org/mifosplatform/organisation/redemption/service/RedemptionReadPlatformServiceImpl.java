@@ -30,13 +30,13 @@ public class RedemptionReadPlatformServiceImpl implements RedemptionReadPlatform
 
 	@Transactional
 	@Override
-	public List<Long> retrieveOrdersData(Long clientId,Long planId){
+	public List<Long> retrieveOrdersData(final Long clientId,final Long planId){
 		
 		try{
 			
 			this.context.authenticatedUser();
-		OrderMapper mapper = new OrderMapper();
-		String sql = "select id as orderId from b_orders where client_id = ? and plan_id = ? ";
+		final OrderMapper mapper = new OrderMapper();
+		final String sql = "select id as orderId from b_orders where client_id = ? and plan_id = ? ";
 		return this.jdbcTemplate.query(sql, mapper, new Object[] { clientId, planId });
 		
 		}catch(EmptyResultDataAccessException accessException){
@@ -47,9 +47,9 @@ public class RedemptionReadPlatformServiceImpl implements RedemptionReadPlatform
 	private static final class OrderMapper implements RowMapper<Long>{
 		
 		@Override
-		public Long mapRow(ResultSet rs, int rowNum) throws SQLException {
+		public Long mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {
 			
-			Long orderId=rs.getLong("orderId");
+			final Long orderId=resultSet.getLong("orderId");
 			
 			return orderId;
 		}

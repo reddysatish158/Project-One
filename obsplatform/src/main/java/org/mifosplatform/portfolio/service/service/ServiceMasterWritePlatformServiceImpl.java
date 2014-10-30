@@ -8,8 +8,6 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
-import org.mifosplatform.portfolio.service.domain.ProvisionServiceDetails;
-import org.mifosplatform.portfolio.service.domain.ProvisionServiceDetailsRepository;
 import org.mifosplatform.portfolio.service.domain.ServiceMaster;
 import org.mifosplatform.portfolio.service.domain.ServiceMasterRepository;
 import org.mifosplatform.portfolio.service.serialization.ServiceCommandFromApiJsonDeserializer;
@@ -27,15 +25,13 @@ public class ServiceMasterWritePlatformServiceImpl  implements ServiceMasterWrit
 	private final PlatformSecurityContext context;
 	private final ServiceMasterRepository serviceMasterRepository;
 	private final ServiceCommandFromApiJsonDeserializer fromApiJsonDeserializer;
-	private final  ProvisionServiceDetailsRepository provisionServiceDetailsRepository;
-@Autowired
+	@Autowired
  public ServiceMasterWritePlatformServiceImpl(final PlatformSecurityContext context,final ServiceMasterRepository serviceMasterRepository,
-		 final ServiceCommandFromApiJsonDeserializer fromApiJsonDeserializer,final ProvisionServiceDetailsRepository provisionServiceDetailsRepository)
+		 final ServiceCommandFromApiJsonDeserializer fromApiJsonDeserializer)
 {
 	this.context=context;
 	this.serviceMasterRepository=serviceMasterRepository;
-	this.fromApiJsonDeserializer=fromApiJsonDeserializer;
-	this.provisionServiceDetailsRepository=provisionServiceDetailsRepository; 
+	this.fromApiJsonDeserializer=fromApiJsonDeserializer; 
 }
     @Transactional
 	@Override
@@ -45,8 +41,6 @@ public class ServiceMasterWritePlatformServiceImpl  implements ServiceMasterWrit
 			   this.fromApiJsonDeserializer.validateForCreate(command.json());
 			   final ServiceMaster serviceMaster = ServiceMaster.fromJson(command);
 			   this.serviceMasterRepository.save(serviceMaster);
-			  /* ProvisionServiceDetails provisionServiceDetails=new ProvisionServiceDetails(serviceMaster.getId(),"http://spark.openbillingsystem.com","Active","billing.jpg");
-			   this.provisionServiceDetailsRepository.save(provisionServiceDetails);*/
 			   
 			   return new CommandProcessingResult(serviceMaster.getId());
 		} catch (DataIntegrityViolationException dve) {
@@ -56,7 +50,7 @@ public class ServiceMasterWritePlatformServiceImpl  implements ServiceMasterWrit
 	}
     
 	@Override
-	public CommandProcessingResult updateService(Long id,JsonCommand command) {
+	public CommandProcessingResult updateService(final Long id,final JsonCommand command) {
 		try
 		{
 			    context.authenticatedUser();
@@ -77,10 +71,9 @@ public class ServiceMasterWritePlatformServiceImpl  implements ServiceMasterWrit
 	}
 	}
 	 private void handleCodeDataIntegrityIssues(final JsonCommand command, final DataIntegrityViolationException dve) {
-	        Throwable realCause = dve.getMostSpecificCause();
+	        final Throwable realCause = dve.getMostSpecificCause();
 	        if (realCause.getMessage().contains("service_code_key")) {
 	            final String name = command.stringValueOfParameterNamed("serviceCode");
-	          //  throw new PlatformDataIntegrityException("error.msg.code.duplicate.name", "A code with name '" + name + "' already exists");
 	            throw new PlatformDataIntegrityException("error.msg.code.duplicate.name", "A code with name'"
 	                    + name + "'already exists", "displayName", name);
 	        }
@@ -97,7 +90,7 @@ public class ServiceMasterWritePlatformServiceImpl  implements ServiceMasterWrit
 	 
 	 
 	@Override
-	public CommandProcessingResult deleteService(Long serviceId) {
+	public CommandProcessingResult deleteService(final Long serviceId) {
 				
 		    context.authenticatedUser();
 	        final ServiceMaster serviceMaster = retrieveCodeBy(serviceId);

@@ -21,7 +21,7 @@ public class ContractPeriodWritePlatformServiceImp implements ContractPeriodWrit
 
 	private final PlatformSecurityContext context;
 	 private final ContractCommandFromApiJsonDeserializer fromApiJsonDeserializer;
-	private SubscriptionRepository subscriptionRepository;
+	private final SubscriptionRepository subscriptionRepository;
 
 	@Autowired
 	 public ContractPeriodWritePlatformServiceImp(final PlatformSecurityContext context,
@@ -33,7 +33,7 @@ public class ContractPeriodWritePlatformServiceImp implements ContractPeriodWrit
 	}
 
 	@Override
-	public CommandProcessingResult createContract(JsonCommand command) {
+	public CommandProcessingResult createContract(final JsonCommand command) {
 		try
 		{
 		context.authenticatedUser();
@@ -47,10 +47,10 @@ public class ContractPeriodWritePlatformServiceImp implements ContractPeriodWrit
 		return  CommandProcessingResult.empty();
 	}
 }
-		private void handleCodeDataIntegrityIssues(JsonCommand command,
-			DataIntegrityViolationException dve) {
+		private void handleCodeDataIntegrityIssues(final JsonCommand command,
+			final DataIntegrityViolationException dve) {
 
-	        Throwable realCause = dve.getMostSpecificCause();
+	        final Throwable realCause = dve.getMostSpecificCause();
 	        if (realCause.getMessage().contains("contract_period_key")) {
 	            final String name = command.stringValueOfParameterNamed("subscriptionPeriod");
 	            throw new PlatformDataIntegrityException("error.msg.contract.code.duplicate.name", "A code with name '" + name + "' already exists",name);
@@ -61,11 +61,11 @@ public class ContractPeriodWritePlatformServiceImp implements ContractPeriodWrit
 	                "Unknown data integrity issue with resource: " + realCause.getMessage());
 	    
 		
-	}
+	    }
 
 		@Override
-		public CommandProcessingResult updateContract(Long contractId,
-				JsonCommand command) {
+		public CommandProcessingResult updateContract(final Long contractId,
+				final JsonCommand command) {
 			try
 			{
 				  context.authenticatedUser();
@@ -98,7 +98,7 @@ public class ContractPeriodWritePlatformServiceImp implements ContractPeriodWrit
 	    }
 
 		@Override
-		public CommandProcessingResult deleteContract(Long contractId) {
+		public CommandProcessingResult deleteContract(final Long contractId) {
 			   context.authenticatedUser();
 
 		        final Contract contract = retrieveCodeBy(contractId);

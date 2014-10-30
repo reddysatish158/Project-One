@@ -57,8 +57,8 @@ public static ServiceMaster fromJson(final JsonCommand command) {
     return new ServiceMaster(serviceCode,serviceDescription,serviceType,status,isOptional,isAutoProvision);
 }
 
-	public ServiceMaster(String serviceCode, String serviceDescription,
-			String serviceType,String  status,boolean isOptional, boolean isAutoProvision) {
+	public ServiceMaster(final String serviceCode, final String serviceDescription,
+			final String serviceType,final String  status,final boolean isOptional, final boolean isAutoProvision) {
 		this.serviceCode = serviceCode;
 		this.serviceDescription = serviceDescription;
 		this.serviceType = serviceType;
@@ -108,7 +108,7 @@ public static ServiceMaster fromJson(final JsonCommand command) {
 	}
 
 
-	public  Map<String, Object> update(JsonCommand command) {
+	public  Map<String, Object> update(final JsonCommand command) {
 		
 		  final Map<String, Object> actualChanges = new LinkedHashMap<String, Object>(1);
 		  final String serviceCodeParamName = "serviceCode";

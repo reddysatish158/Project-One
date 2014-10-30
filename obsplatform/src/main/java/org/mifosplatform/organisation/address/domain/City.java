@@ -1,4 +1,4 @@
-package org.mifosplatform.organisation.address.service;
+package org.mifosplatform.organisation.address.domain;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -19,6 +19,11 @@ import org.mifosplatform.useradministration.domain.AppUser;
 public class City extends AbstractAuditableCustom<AppUser, Long> {
 
 
+/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 @Column(name="city_code")
 private String cityCode;
 
@@ -34,7 +39,7 @@ private char isDeleted='N';
 public City(){
 	
 }
-public City(String entityCode, String entityName, Long parentEntityId) {
+public City(final String entityCode, final String entityName, final Long parentEntityId) {
 
 	 this.cityCode=entityCode;
 	 this.cityName=entityName;
@@ -42,14 +47,14 @@ public City(String entityCode, String entityName, Long parentEntityId) {
 
 
 	}
-public static City fromJson(JsonCommand command) {
+public static City fromJson(final JsonCommand command) {
 	 final String cityCode = command.stringValueOfParameterNamed("entityCode");
 	    final String cityName = command.stringValueOfParameterNamed("entityName");
 	    final Long parentEntityId = command.longValueOfParameterNamed("parentEntityId");
 	     return new City(cityCode,cityName, parentEntityId);
 }
 
-public Map<String, Object> update(JsonCommand command) {
+public Map<String, Object> update(final JsonCommand command) {
 	final Map<String, Object> actualChanges = new LinkedHashMap<String, Object>(1);
 	final String cityCodeParamName="entityCode";
 	if (command.isChangeInStringParameterNamed(cityCodeParamName,this.cityCode)){

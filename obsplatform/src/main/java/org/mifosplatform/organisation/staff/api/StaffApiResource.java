@@ -51,7 +51,7 @@ public class StaffApiResource {
     private final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(Arrays.asList("id", "firstname", "lastname", "displayName",
             "officeId", "officeName", "loanOfficerFlag", "allowedOffices"));
 
-    private final String resourceNameForPermissions = "STAFF";
+    private final static String RESOURCENAMEFORPERMISSIONS = "STAFF";
 
     private final PlatformSecurityContext context;
     private final StaffReadPlatformService readPlatformService;
@@ -72,14 +72,17 @@ public class StaffApiResource {
         this.apiRequestParameterHelper = apiRequestParameterHelper;
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
     }
-
+    
+    /**
+     * this method using for getting all staff data
+     */
     @GET
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveStaff(@Context final UriInfo uriInfo, @QueryParam("sqlSearch") final String sqlSearch,
             @QueryParam("officeId") final Long officeId) {
 
-        context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+        context.authenticatedUser().validateHasReadPermission(RESOURCENAMEFORPERMISSIONS);
 
         final String extraCriteria = getStaffCriteria(sqlSearch, officeId);
         final Collection<StaffData> staff = this.readPlatformService.retrieveAllStaff(extraCriteria);
@@ -87,7 +90,10 @@ public class StaffApiResource {
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, staff, RESPONSE_DATA_PARAMETERS);
     }
-
+    
+    /**
+     * this method using for posting single staff data
+     */
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
@@ -100,13 +106,16 @@ public class StaffApiResource {
         return this.toApiJsonSerializer.serialize(result);
     }
 
+    /**
+     * this method using for getting single staff data
+     */
     @GET
     @Path("{staffId}")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String retreiveStaff(@PathParam("staffId") final Long staffId, @Context final UriInfo uriInfo) {
 
-        context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+        context.authenticatedUser().validateHasReadPermission(RESOURCENAMEFORPERMISSIONS);
 
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
@@ -119,6 +128,9 @@ public class StaffApiResource {
         return this.toApiJsonSerializer.serialize(settings, staff, RESPONSE_DATA_PARAMETERS);
     }
 
+    /**
+     * this method using for editing single staff data
+     */
     @PUT
     @Path("{staffId}")
     @Consumes({ MediaType.APPLICATION_JSON })

@@ -52,7 +52,7 @@ public class Address{
 	private String email;
 
 	@Column(name = "is_deleted", nullable = false)
-	private char deleted='n';
+	private final char deleted='n';
 
 	
 
@@ -63,8 +63,8 @@ public class Address{
 
 
 
-	public Address(Long clientId,String addressKey, String addressNo, String street,
-			String city, String state, String country, String zip, String phone, String email) {
+	public Address(final Long clientId,final String addressKey, final String addressNo, final String street,
+			final String city, final String state, final String country, final String zip, final String phone, final String email) {
 		
 		
 		 this.clientId=clientId;
@@ -80,7 +80,7 @@ public class Address{
          this.email=email;
 	}
 
-		public static Address fromJson(Long clientId, JsonCommand command) {
+		public static Address fromJson(final Long clientId, final JsonCommand command) {
 			 String addressKey = command.stringValueOfParameterNamed("addressType");
 			  addressKey=addressKey.isEmpty()?"PRIMARY":addressKey;
 			    final String addressNo = command.stringValueOfParameterNamed("addressNo");
@@ -102,7 +102,7 @@ public class Address{
 
 
 
-		public Map<String, Object> update(JsonCommand command) {
+		public Map<String, Object> update(final JsonCommand command) {
 
 			  final Map<String, Object> actualChanges = new LinkedHashMap<String, Object>(1);
 			  final String firstnameParamName = "addressType";

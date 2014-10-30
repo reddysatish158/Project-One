@@ -65,9 +65,9 @@ public class StaffWritePlatformServiceJpaRepositoryImpl implements StaffWritePla
 
             this.staffRepository.save(staff);
 
-            return new CommandProcessingResultBuilder() //
-                    .withCommandId(command.commandId()) //
-                    .withEntityId(staff.getId()).withOfficeId(officeId) //
+            return new CommandProcessingResultBuilder() 
+                    .withCommandId(command.commandId()) 
+                    .withEntityId(staff.getId()).withOfficeId(officeId) 
                     .build();
         } catch (DataIntegrityViolationException dve) {
             handleStaffDataIntegrityIssues(command, dve);
@@ -114,7 +114,7 @@ public class StaffWritePlatformServiceJpaRepositoryImpl implements StaffWritePla
      * is.
      */
     private void handleStaffDataIntegrityIssues(final JsonCommand command, final DataIntegrityViolationException dve) {
-        Throwable realCause = dve.getMostSpecificCause();
+        final Throwable realCause = dve.getMostSpecificCause();
         if (realCause.getMessage().contains("display_name")) {
             final String lastname = command.stringValueOfParameterNamed("lastname");
             String displayName = lastname;

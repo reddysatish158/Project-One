@@ -13,6 +13,11 @@ import org.mifosplatform.infrastructure.core.exception.AbstractPlatformResourceN
 public class StaffRoleException extends
 		AbstractPlatformResourceNotFoundException {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public static enum STAFF_ROLE {
 		LOAN_OFFICER, BRANCH_MANAGER;
 		@Override
@@ -21,7 +26,7 @@ public class StaffRoleException extends
 		}
 	}
 
-	public StaffRoleException(final Long id, STAFF_ROLE role) {
+	public StaffRoleException(final Long id, final STAFF_ROLE role) {
 		super("error.msg.staff.id.invalid.role", "Staff with identifier " + id
 				+ " is not a " + role.toString(), id);
 	}
