@@ -82,6 +82,7 @@ public class ChargeCodeApiResource {
 				.process(uriInfo.getQueryParameters());
 		return this.toApiJsonSerializer.serialize(settings, chargeCodes,
 				RESPONSE_PARAMETERS);
+
 	}
 
 	/**
@@ -107,6 +108,7 @@ public class ChargeCodeApiResource {
 				.process(uriInfo.getQueryParameters());
 		return this.toApiJsonSerializer.serialize(settings, chargeCodeData,
 				RESPONSE_PARAMETERS);
+
 	}
 
 	/**

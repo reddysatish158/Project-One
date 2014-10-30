@@ -4,10 +4,10 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 
 public interface ServiceMasterWritePlatformService {
 
-	public CommandProcessingResult updateService(Long serviceId, JsonCommand command);
+	 CommandProcessingResult updateService(Long serviceId, JsonCommand command);
 
-	public CommandProcessingResult deleteService(Long serviceId);
+	 CommandProcessingResult deleteService(Long serviceId);
 
-	public CommandProcessingResult createNewService(JsonCommand command);
+	 CommandProcessingResult createNewService(JsonCommand command);
 
 }

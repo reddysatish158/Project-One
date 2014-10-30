@@ -23,8 +23,8 @@ import net.sf.json.JSONObject;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
@@ -48,10 +48,10 @@ import org.mifosplatform.portfolio.order.domain.HardwareAssociationRepository;
 import org.mifosplatform.portfolio.order.domain.Order;
 import org.mifosplatform.portfolio.order.domain.OrderLine;
 import org.mifosplatform.portfolio.order.domain.OrderRepository;
+import org.mifosplatform.portfolio.order.domain.UserActionStatusTypeEnum;
 import org.mifosplatform.portfolio.order.service.OrderReadPlatformService;
 import org.mifosplatform.portfolio.plan.domain.Plan;
 import org.mifosplatform.portfolio.plan.domain.PlanRepository;
-import org.mifosplatform.portfolio.plan.domain.UserActionStatusTypeEnum;
 import org.mifosplatform.portfolio.service.domain.ServiceMaster;
 import org.mifosplatform.portfolio.service.domain.ServiceMasterRepository;
 import org.mifosplatform.provisioning.processrequest.domain.ProcessRequest;
@@ -103,7 +103,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 	private final IpPoolManagementReadPlatformService ipPoolManagementReadPlatformService;
 	private final PlanRepository planRepository;
 	private final GroupReadPlatformService groupReadPlatformService;
-	private final GlobalConfigurationRepository globalConfigurationRepository;
+	private final ConfigurationRepository globalConfigurationRepository;
 	
     @Autowired
 	public ProvisioningWritePlatformServiceImpl(final PlatformSecurityContext context,final InventoryItemDetailsRepository inventoryItemDetailsRepository,
@@ -114,7 +114,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 			final ProcessRequestReadplatformService processRequestReadplatformService,final IpPoolManagementJpaRepository ipPoolManagementJpaRepository,
 			final IpPoolManagementReadPlatformService ipPoolManagementReadPlatformService,final ProvisioningReadPlatformService provisioningReadPlatformService,
 			final ProcessRequestWriteplatformService processRequestWriteplatformService,final PlanRepository planRepository,
-			final GroupReadPlatformService groupReadPlatformService,final GlobalConfigurationRepository globalConfigurationRepository) {
+			final GroupReadPlatformService groupReadPlatformService,final ConfigurationRepository globalConfigurationRepository) {
 
     	this.context = context;
     	this.fromJsonHelper=fromJsonHelper;
@@ -266,7 +266,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 									String ipAddress=fromJsonHelper.extractStringNamed("paramValue",j);
 									String ipData=ipAddress+"/"+subnet;
 									IpGeneration ipGeneration=new IpGeneration(ipData,this.ipPoolManagementReadPlatformService);
-									GlobalConfigurationProperty configuration = globalConfigurationRepository.findOneByName("include-network-broadcast-ip");
+									Configuration configuration = globalConfigurationRepository.findOneByName("include-network-broadcast-ip");
 									ipGeneration.setInclusiveHostCount(configuration.getValue().equalsIgnoreCase("true"));
 									ipAddressArray=ipGeneration.getInfo().getsubnetAddresses();
 										for(int i=0;i<ipAddressArray.length;i++){

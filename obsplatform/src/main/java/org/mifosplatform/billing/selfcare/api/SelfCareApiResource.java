@@ -37,8 +37,8 @@ import org.mifosplatform.finance.clientbalance.service.ClientBalanceReadPlatform
 import org.mifosplatform.finance.financialtransaction.data.FinancialTransactionsData;
 import org.mifosplatform.finance.payments.data.PaymentData;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.core.serialization.DefaultToApiJsonSerializer;
@@ -74,7 +74,7 @@ public class SelfCareApiResource {
 	private final BillMasterReadPlatformService billMasterReadPlatformService;
 	private final PaymodeReadPlatformService paymentReadPlatformService;
 	private final TicketMasterReadPlatformService ticketMasterReadPlatformService;
-	private final GlobalConfigurationRepository configurationRepository;
+	private final ConfigurationRepository configurationRepository;
 	private final SelfCareRepository selfCareRepository;
 	private final LoginHistoryReadPlatformService loginHistoryReadPlatformService;
 	private final LoginHistoryRepository loginHistoryRepository;
@@ -86,7 +86,7 @@ public class SelfCareApiResource {
 			final SelfCareReadPlatformService selfCareReadPlatformService,final PaymodeReadPlatformService paymentReadPlatformService,  
 			final ClientBalanceReadPlatformService balanceReadPlatformService, final ClientReadPlatformService clientReadPlatformService, 
 			final OrderReadPlatformService  orderReadPlatformService, final BillMasterReadPlatformService billMasterReadPlatformService,
-			final TicketMasterReadPlatformService ticketMasterReadPlatformService,final GlobalConfigurationRepository configurationRepository,
+			final TicketMasterReadPlatformService ticketMasterReadPlatformService,final ConfigurationRepository configurationRepository,
 			final LoginHistoryReadPlatformService loginHistoryReadPlatformService) {
 		
 				this.context = context;
@@ -156,10 +156,10 @@ public class SelfCareApiResource {
         	  SelfCareData careData = new SelfCareData();
         	  Long clientId = selfcare.getClientId();
         	  //adding Is_paypal Global Data by Ashok
-            GlobalConfigurationProperty paypalConfigData=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_PAYPAL_CHECK);
+            Configuration paypalConfigData=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_PAYPAL_CHECK);
             careData.setPaypalConfigData(paypalConfigData);
      
-          GlobalConfigurationProperty viewers=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_ACTIVE_VIEWERS);
+          Configuration viewers=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_ACTIVE_VIEWERS);
           if(viewers != null && viewers.isEnabled()){
           int maxViewersAllowed=Integer.parseInt(viewers.getValue());
           int activeUsers=0;
@@ -191,17 +191,17 @@ public class SelfCareApiResource {
         }
         ClientData clientsData = this.clientReadPlatformService.retrieveOne(clientId);
         ClientBalanceData balanceData = this.clientBalanceReadPlatformService.retrieveBalance(clientId);
-        List<AddressData> addressData = this.addressReadPlatformService.retrieveAddressDetails(clientId);
+        List<AddressData> addressData = this.addressReadPlatformService.retrieveAddressDetailsBy(clientId);
         final List<OrderData> clientOrdersData = this.orderReadPlatformService.retrieveClientOrderDetails(clientId);
         final List<FinancialTransactionsData> statementsData = this.billMasterReadPlatformService.retrieveStatments(clientId);
         List<PaymentData> paymentsData = paymentReadPlatformService.retrivePaymentsData(clientId);
         final List<TicketMasterData> ticketMastersData = this.ticketMasterReadPlatformService.retrieveClientTicketDetails(clientId);
         careData.setDetails(clientsData,balanceData,addressData,clientOrdersData,statementsData,paymentsData,ticketMastersData,loginHistoryId);
       
-        GlobalConfigurationProperty balanceCheck=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_BALANCE_CHECK);
+        Configuration balanceCheck=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_BALANCE_CHECK);
         clientsData.setBalanceCheck(balanceCheck.isEnabled());
         
-        GlobalConfigurationProperty paypalConfigDataForIos=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_PAYPAL_CHECK_IOS);
+        Configuration paypalConfigDataForIos=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_PAYPAL_CHECK_IOS);
         careData.setPaypalConfigDataForIos(paypalConfigDataForIos);
         return this.toApiJsonSerializerForItem.serialize(careData);
         }else{

@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
 import org.mifosplatform.organisation.message.data.BillingMessageData;
-import org.mifosplatform.portfolio.plan.data.SystemData;
 import org.mifosplatform.scheduledjobs.scheduledjobs.data.JobParameterData;
 import org.mifosplatform.scheduledjobs.scheduledjobs.data.ScheduleJobData;
 
@@ -51,7 +51,7 @@ public class JobDetailData {
 
 	private Long historyId;
 	
-	private List<SystemData> provisionSysData;
+	private Collection<MCodeData> provisionSysData;
 
     public JobDetailData(final Long jobId, final String displayName, String name, final Date nextRunTime, final String initializingError,
             final String cronExpression,final boolean active, final boolean currentlyRunning, final JobDetailHistoryData lastRunHistory, 
@@ -128,11 +128,11 @@ public class JobDetailData {
 		
 	}
 
-	public List<SystemData> getProvisionSysData() {
+	public Collection<MCodeData> getProvisionSysData() {
 		return provisionSysData;
 	}
 
-	public void setProvisionSysData(List<SystemData> provisionSysData) {
+	public void setProvisionSysData(Collection<MCodeData> provisionSysData) {
 		this.provisionSysData = provisionSysData;
 	}
     

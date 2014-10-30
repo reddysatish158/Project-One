@@ -51,7 +51,7 @@ public class CommandWrapperBuilder {
 		return this;
 	}
 
-	public CommandWrapperBuilder updateGlobalConfiguration(Long configId) {
+	public CommandWrapperBuilder updateConfiguration(Long configId) {
 		this.actionName = "UPDATE";
 		this.entityName = "CONFIGURATION";
 		this.entityId = configId;
@@ -1123,20 +1123,11 @@ public class CommandWrapperBuilder {
 		return this;
 	}
 
-	public CommandWrapperBuilder updateAddress(final Long addrId) {
+	public CommandWrapperBuilder updateAddress(final Long clientId) {
 		this.actionName = "UPDATE";
 		this.entityName = "ADDRESS";
-		this.entityId = addrId;
-		this.href = "/address/" + addrId;
-		return this;
-	}
-
-	public CommandWrapperBuilder createNewRecord(final String entityType) {
-		this.actionName = "CREATE";
-		// this.entityName = "ADDRESS";
-		this.entityName = "LOCATION";
-		this.supportedEntityType=entityType;
-		this.href = "/address/" + entityType;
+		this.entityId = clientId;
+		this.href = "/address/" + clientId;
 		return this;
 	}
 
@@ -1285,14 +1276,14 @@ public class CommandWrapperBuilder {
 		return this;
 	}
 
-	public CommandWrapperBuilder createEvent() {
+	public CommandWrapperBuilder createEventMaster() {
 		this.entityName = "EVENT";
 		this.actionName = "CREATE";
 		this.href = "";
 		return this;
 	}
 
-	public CommandWrapperBuilder updateEvent(Long eventId) {
+	public CommandWrapperBuilder updateEventMaster(Long eventId) {
 		this.entityName = "EVENT";
 		this.actionName = "UPDATE";
 		this.entityId = eventId;
@@ -1300,7 +1291,7 @@ public class CommandWrapperBuilder {
 		return this;
 	}
 
-	public CommandWrapperBuilder deleteEvent(Long eventId) {
+	public CommandWrapperBuilder deleteEventMaster(Long eventId) {
 		this.entityName = "EVENT";
 		this.actionName = "DELETE";
 		this.entityId = eventId;
@@ -1308,7 +1299,7 @@ public class CommandWrapperBuilder {
 		return this;
 	}
 
-	public CommandWrapperBuilder createEventPricing(Long eventId) {
+	public CommandWrapperBuilder createEventPrice(Long eventId) {
 		this.actionName = "CREATE";
 
 		this.entityName = "EVENTPRICE";
@@ -1317,7 +1308,7 @@ public class CommandWrapperBuilder {
 		return this;
 	}
 
-	public CommandWrapperBuilder updateEventPricing(Long eventPriceId) {
+	public CommandWrapperBuilder updateEventPrice(Long eventPriceId) {
 		this.actionName = "UPDATE";
 		this.entityName = "EVENTPRICE";
 		this.entityId = eventPriceId;
@@ -1325,7 +1316,7 @@ public class CommandWrapperBuilder {
 		return this;
 	}
 	
-	public CommandWrapperBuilder deleteEventPricing(Long eventPriceId) {
+	public CommandWrapperBuilder deleteEventPrice(Long eventPriceId) {
 		this.actionName = "DELETE";
 		this.entityName = "EVENTPRICE";
 		this.entityId = eventPriceId;
@@ -1546,7 +1537,7 @@ public CommandWrapperBuilder createEpg() {
 	return this;
 }
 
-public CommandWrapperBuilder updateAsset(Long assetId) {
+public CommandWrapperBuilder updateMediaAsset(Long assetId) {
 	this.actionName="UPDATE";
 	this.entityName="MEDIAASSET";
 	this.entityId=assetId;
@@ -1554,7 +1545,7 @@ public CommandWrapperBuilder updateAsset(Long assetId) {
 	return this;
 }
 
-public CommandWrapperBuilder deleteAsset(Long assetId) {
+public CommandWrapperBuilder deleteMediaAsset(Long assetId) {
 	this.actionName="DELETE";
 	this.entityName="MEDIAASSET";
 	this.entityId=assetId;
@@ -2002,7 +1993,15 @@ public CommandWrapperBuilder deleteUserChatmessage(Long meesageId) {
 	return this;
 }
 
-public CommandWrapperBuilder updateNewRecord(final String entityType,Long entityId) {
+public CommandWrapperBuilder createLocation(final String entityType) {
+	this.actionName = "CREATE";
+	this.entityName = "LOCATION";
+	this.supportedEntityType=entityType;
+	this.href = "/address/" + entityType;
+	return this;
+}
+
+public CommandWrapperBuilder updateLocation(final String entityType,Long entityId) {
 	this.actionName = "UPDATE";
 	this.entityName = "LOCATION";
 	this.entityId = entityId;
@@ -2011,7 +2010,7 @@ public CommandWrapperBuilder updateNewRecord(final String entityType,Long entity
 	return this;
 }
 
-public CommandWrapperBuilder deleteNewRecord(final String entityType, Long entityId) {
+public CommandWrapperBuilder deleteLocation(final String entityType, Long entityId) {
 	this.actionName = "DELETE";
 	this.entityName = "LOCATION";
 	this.entityId = entityId;
@@ -2072,9 +2071,9 @@ public CommandWrapperBuilder addNewProvisioning(Long clientId) {
 
 public CommandWrapperBuilder createGroupsDetails() {
 	this.actionName = "CREATE";
-	this.entityName = "GROUPS";
+	this.entityName = "GROUPSDETAILS";
 	this.entityId = null;
-	this.href = "/groups";
+	this.href = "/groupsdetails";
 	return this;
 }
 
@@ -2121,7 +2120,7 @@ public CommandWrapperBuilder confirnProvisiongDetails(Long processrequestId) {
     return this;
 }
 
-public CommandWrapperBuilder createGlobalConfiguration() {
+public CommandWrapperBuilder createSmtpConfiguration() {
 	this.actionName = "CREATE";
 	this.entityName = "SMTPCONFIGURATION";
 	//this.entityId=configId;
@@ -2215,9 +2214,9 @@ public CommandWrapperBuilder deleteClientCardDetails(Long id, Long clientId) {
 	return this;	
 }
 
-public CommandWrapperBuilder createprovisioningDetails(Long prepareRequestId) {
+public CommandWrapperBuilder createGroupsDetailsProvision(Long prepareRequestId) {
 	this.actionName = "CREATE";
-	this.entityName = "PROVISION";
+	this.entityName = "GROUPSPROVISION";
 	this.entityId = prepareRequestId;
 	this.href = "/provision/"+prepareRequestId;
 	return this;
@@ -2471,7 +2470,7 @@ public CommandWrapperBuilder updateSelfcarePassword() {
 	return this;
 }
 
-public CommandWrapperBuilder createMediaAssetLocationAttributes(Long assetId) {
+public CommandWrapperBuilder createMediaAssetLocationAttribute(Long assetId) {
 	this.actionName="CREATE";
 	this.entityName="MEDIAASSETLOCATIONATTRIBUTES";
 	this.entityId=assetId;
@@ -2517,6 +2516,15 @@ public CommandWrapperBuilder deleteChildFromParentClient(Long clientId) {
 	this.href = "/parentclient/" +clientId;
 	return this;
   }
+
+public CommandWrapperBuilder updateUploadFile(Long uploadStatusId) {
+	
+	this.actionName = "PROCESS";
+	this.entityName = "DATAUPLOADS";
+	this.entityId = uploadStatusId;
+	this.href = "/dataupload/" +clientId;
+	return this;
+}
 
 }
 

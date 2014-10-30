@@ -3,6 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+
 package org.mifosplatform.useradministration.domain;
 
 import java.util.Collection;
@@ -28,7 +29,12 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @Table(name = "m_role",  uniqueConstraints = { @UniqueConstraint(columnNames = { "name" }, name = "unq_name")})
 public class Role extends AbstractPersistable<Long> {
 
-    @Column(name = "name", unique = true, nullable = false, length = 100)
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Column(name = "name", unique = true, nullable = false, length = 100)
     private String name;
 
     @Column(name = "description", nullable = false, length = 500)
@@ -99,7 +105,7 @@ public class Role extends AbstractPersistable<Long> {
 
     public boolean hasPermissionTo(final String permissionCode) {
         boolean match = false;
-        for (Permission permission : this.permissions) {
+        for (final Permission permission : this.permissions) {
             if (permission.hasCode(permissionCode)) {
                 match = true;
                 break;

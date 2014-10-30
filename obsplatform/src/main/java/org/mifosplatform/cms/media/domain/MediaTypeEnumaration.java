@@ -1,5 +1,5 @@
 package org.mifosplatform.cms.media.domain;
-import org.mifosplatform.finance.paymentsgateway.data.PaymentEnum;
+
 import org.mifosplatform.infrastructure.core.data.MediaEnumoptionData;
 import org.mifosplatform.organisation.message.data.EnumMessageType;
 
@@ -36,6 +36,7 @@ public class MediaTypeEnumaration {
 		}
 		return optionData;
 	}
+	
 	public static MediaEnumoptionData enummessageData(final EnumMessageType mediaEnum) {
 
 		
@@ -61,7 +62,5 @@ public class MediaTypeEnumaration {
 		return optionData;
 
 	}
-
-
 }
 

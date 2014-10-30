@@ -29,29 +29,30 @@ public class OfficeFinancialTransactionReadPlatformServiceImpl implements Office
 	}
 	
 	@Override
-	public Collection<FinancialTransactionsData> retreiveOfficeFinancialTransactionsData(Long officeId) {
+	public Collection<FinancialTransactionsData> retreiveOfficeFinancialTransactionsData(final Long officeId) {
 		
 		context.authenticatedUser();
-		OfficeFinancialTransactionMapper mapper = new OfficeFinancialTransactionMapper(); 
-		String sql = "select v.* from  office_fin_trans_vw v where v.office_id="+officeId+" order by  transDate desc ";
+		final OfficeFinancialTransactionMapper mapper = new OfficeFinancialTransactionMapper(); 
+		final String sql = "select v.* from  office_fin_trans_vw v where v.office_id=" + officeId + " order by  transDate desc ";
 		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
 	}
 	
 	private static final class OfficeFinancialTransactionMapper implements RowMapper<FinancialTransactionsData> {
 
 		@Override
-		public FinancialTransactionsData mapRow(final ResultSet rs, final int rowNum)throws SQLException {
-			 Long officeId = rs.getLong("office_id");
-			Long transactionId = rs.getLong("TransId");
-			String transactionType = rs.getString("TransType");
-			BigDecimal debitAmount = rs.getBigDecimal("Dr_amt");
-			BigDecimal creditAmount =rs.getBigDecimal("Cr_amt");
-			String userName=rs.getString("username");
-			String transactionCategory=rs.getString("tran_type");
-			boolean flag=rs.getBoolean("flag");
-			LocalDate transDate=JdbcSupport.getLocalDate(rs,"TransDate");
+		public FinancialTransactionsData mapRow(final ResultSet resultSet, final int rowNum)throws SQLException {
+			final Long officeId = resultSet.getLong("office_id");
+			final Long transactionId = resultSet.getLong("TransId");
+			final String transactionType = resultSet.getString("TransType");
+			final BigDecimal debitAmount = resultSet.getBigDecimal("Dr_amt");
+			final BigDecimal creditAmount =resultSet.getBigDecimal("Cr_amt");
+			final String userName = resultSet.getString("username");
+			final String transactionCategory = resultSet.getString("tran_type");
+			final boolean flag = resultSet.getBoolean("flag");
+			final LocalDate transDate = JdbcSupport.getLocalDate(resultSet, "TransDate");
 
-			return new FinancialTransactionsData(officeId,transactionId,transDate,transactionType,debitAmount,creditAmount,null,userName,transactionCategory,flag,null,null);
+			return new FinancialTransactionsData(officeId, transactionId, transDate, transactionType, debitAmount, creditAmount, 
+					null, userName, transactionCategory, flag, null, null);
 		}
      }
 }

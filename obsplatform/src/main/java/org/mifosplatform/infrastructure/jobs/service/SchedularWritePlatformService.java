@@ -30,10 +30,6 @@ public interface SchedularWritePlatformService {
 
     public boolean processJobDetailForExecution(String jobKey, String triggerType);
 
-	public CommandProcessingResult createNewJob(JsonCommand command);
-
-	public CommandProcessingResult deleteJob(Long entityId);
-
 	public CommandProcessingResult updateJobParametersDetail(Long entityId,JsonCommand command);
 
 }

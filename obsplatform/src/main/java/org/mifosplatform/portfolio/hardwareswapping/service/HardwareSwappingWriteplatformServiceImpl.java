@@ -14,8 +14,8 @@ import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
@@ -34,16 +34,15 @@ import org.mifosplatform.portfolio.order.domain.Order;
 import org.mifosplatform.portfolio.order.domain.OrderHistory;
 import org.mifosplatform.portfolio.order.domain.OrderHistoryRepository;
 import org.mifosplatform.portfolio.order.domain.OrderRepository;
+import org.mifosplatform.portfolio.order.domain.StatusTypeEnum;
+import org.mifosplatform.portfolio.order.domain.UserActionStatusTypeEnum;
 import org.mifosplatform.portfolio.plan.domain.Plan;
 import org.mifosplatform.portfolio.plan.domain.PlanRepository;
-import org.mifosplatform.portfolio.plan.domain.StatusTypeEnum;
-import org.mifosplatform.portfolio.plan.domain.UserActionStatusTypeEnum;
 import org.mifosplatform.portfolio.transactionhistory.service.TransactionHistoryWritePlatformService;
 import org.mifosplatform.provisioning.provisioning.api.ProvisioningApiConstants;
 import org.mifosplatform.provisioning.provisioning.service.ProvisioningWritePlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class HardwareSwappingWriteplatformServiceImpl implements HardwareSwappingWriteplatformService {
@@ -58,7 +57,7 @@ public class HardwareSwappingWriteplatformServiceImpl implements HardwareSwappin
 	private final HardwareSwappingCommandFromApiJsonDeserializer fromApiJsonDeserializer;
 	private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 	private final OrderHistoryRepository orderHistoryRepository;
-	private final GlobalConfigurationRepository globalConfigurationRepository;
+	private final ConfigurationRepository globalConfigurationRepository;
 	private final OwnedHardwareJpaRepository hardwareJpaRepository;
 	private final HardwareAssociationReadplatformService associationReadplatformService;
 	private final ItemRepository itemRepository;
@@ -69,7 +68,7 @@ public class HardwareSwappingWriteplatformServiceImpl implements HardwareSwappin
 			final InventoryItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService,final PrepareRequestWriteplatformService prepareRequestWriteplatformService,
 			final OrderRepository orderRepository,final PlanRepository planRepository,final TransactionHistoryWritePlatformService historyWritePlatformService,
 			final HardwareSwappingCommandFromApiJsonDeserializer apiJsonDeserializer,final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
-			final OrderHistoryRepository orderHistoryRepository,final GlobalConfigurationRepository configurationRepository,final OwnedHardwareJpaRepository hardwareJpaRepository,
+			final OrderHistoryRepository orderHistoryRepository,final ConfigurationRepository configurationRepository,final OwnedHardwareJpaRepository hardwareJpaRepository,
 			final HardwareAssociationReadplatformService associationReadplatformService,final ItemRepository itemRepository,
 			final ProvisioningWritePlatformService provisioningWritePlatformService) {
  
@@ -114,7 +113,7 @@ public CommandProcessingResult dohardWareSwapping(Long entityId,JsonCommand comm
         Order order=this.orderRepository.findOne(orderId);
 		Plan plan=this.planRepository.findOne(order.getPlanId());
 		
-		GlobalConfigurationProperty configurationProperty=this.globalConfigurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
+		Configuration configurationProperty=this.globalConfigurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
 		
 		
 		if(configurationProperty.getValue().equalsIgnoreCase(ConfigurationConstants.CONFIR_PROPERTY_OWN)){

@@ -1,82 +1,77 @@
 package org.mifosplatform.portfolio.plan.data;
 
 import java.math.BigDecimal;
-import java.util.List;
-
-import org.mifosplatform.infrastructure.core.data.EnumOptionData;
 
 public class ServiceData {
 
 	private final Long id;
-
 	private final String serviceCode;
 	private final String planDescription;
 	private final String planCode;
-	private final List<EnumOptionData> data;
 	private final String discountCode;
 	private final BigDecimal price;
 	private final String chargeCode;
 	private final String chargeVariant;
-	private final String services;
-	private Long serviceId;
-	private Long planId;
-	private String chargeDescription;
-	private String serviceDescription;
-	private String code;
-    private String serviceType;
-	private String priceregion;
-	private String isPrepaid;
-	private Long contractId;
-	private String duration;
-	private String billingFrequency;
+	private final Long planId;
+	private final String serviceDescription;
+	private final String priceregion;
+	private final Long contractId;
+	private final String duration;
+	private final String billingFrequency;
+	private final String isPrepaid;
+	private final String serviceType;
+	private final String chargeDescription;
 
-	public ServiceData(Long id, String planCode, String serviceCode,
-			String planDescription, String chargeCode, String charging_variant,
-			BigDecimal price, String priceregion, Long contractId, String duration, String billingFrequency) {
+	public ServiceData(final Long id, final String planCode,final  String serviceCode,final String planDescription,final  String chargeCode,
+			final String chargingVariant,final BigDecimal price,final String priceregion,final Long contractId,final String duration,final String billingFrequency) {
 
 		this.id = id;
-		this.discountCode = null;
 		this.serviceCode = serviceCode;
 		this.planDescription = planDescription;
 		this.planCode = planCode;
-		this.data = null;
 		this.chargeCode = chargeCode;
-		this.chargeVariant = charging_variant;
+		this.chargeVariant = chargingVariant;
 		this.price = price;
-		this.services = null;
 		this.priceregion=priceregion;
 		this.contractId=contractId;
 		this.duration=duration;
 		this.billingFrequency=billingFrequency;
+		this.planId=null;
+		this.discountCode = null;
+		this.serviceDescription=null;
+		this.serviceType=null;
+		this.isPrepaid=null;
+		this.chargeDescription=null;
+		
+		
 
 	}
 
-	public ServiceData(Long id, Long planId, String planCode,String chargeCode, String serviceCode, 
-			String serviceDescription, String priceRegion) {
+	public ServiceData(final Long id,final Long planId,final String planCode,final String chargeCode,final  String serviceCode,
+			final String serviceDescription,final String chargeDescription, final String priceRegion,final String serviceType,final String isPrepaid) {
+		
 		this.id = id;
 		this.planId = planId;
 		this.discountCode = null;
 		this.serviceCode = serviceCode;
 		this.planDescription = null;
 		this.planCode = planCode;
-		this.data = null;
 		this.chargeCode = chargeCode;
+		this.chargeDescription=chargeDescription;
 		this.chargeVariant = null;
 		this.price = null;
-		this.services = null;
 		this.serviceDescription = serviceDescription;
-		this.code=null;
 		this.priceregion=priceRegion;
-		this.chargeDescription=serviceDescription;
+		this.serviceType=serviceType;
+		this.isPrepaid=isPrepaid;
+		this.contractId=null;
+		this.duration=null;
+		this.billingFrequency=null;
+
 	}
 
 	public Long getId() {
 		return id;
-	}
-
-	
-	public String isPrepaid() {
-		return isPrepaid;
 	}
 
 	public String getServiceCode() {
@@ -95,32 +90,11 @@ public class ServiceData {
 		return planCode;
 	}
 	
-	
-
-	public void setIsPrepaid(String isPrepaid) {
-		this.isPrepaid = isPrepaid;
-	}
-
-	public void setServiceDescription(String serviceDescription) {
-		this.serviceDescription = serviceDescription;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
-	public void setPriceregion(String priceregion) {
-		this.priceregion = priceregion;
-	}
-
 	public String getPriceregion() {
 		return priceregion;
 	}
 
-	public String getServices() {
-		return services;
-	}
-
+	
 	public Long getPlanId() {
 		return planId;
 	}
@@ -129,9 +103,6 @@ public class ServiceData {
 		return planDescription;
 	}
 
-	public List<EnumOptionData> getData() {
-		return data;
-	}
 
 	public BigDecimal getPrice() {
 		return price;
@@ -145,39 +116,33 @@ public class ServiceData {
 		return chargeVariant;
 	}
 
-	public Long getServiceId() {
-		return serviceId;
+	
+
+	public Long getContractId() {
+		return contractId;
+	}
+
+	public String getDuration() {
+		return duration;
+	}
+
+	public String getBillingFrequency() {
+		return billingFrequency;
+	}
+
+	public String getIsPrepaid() {
+		return isPrepaid;
 	}
 
 	public String getChargeDescription() {
 		return chargeDescription;
 	}
 
-	public void setChargeDescription(String chargeDescription) {
-		this.chargeDescription = chargeDescription;
-	}
-
-	public void setServiceId(Long serviceId) {
-		this.serviceId = serviceId;
-	}
-
-	public void setPlanId(Long planId) {
-		this.planId = planId;
-	}
-
-	public String getCode() {
-		return code;
-	}
-
 	public String getServiceType() {
 		return serviceType;
 	}
 
-	public void setServiceType(String serviceType) {
-
-		
-		this.serviceType=serviceType;
-	}
+	
 
 
 

@@ -18,8 +18,8 @@ import org.mifosplatform.accounting.closure.data.LoanStatusEnumData;
 import org.mifosplatform.infrastructure.codes.data.CodeValueData;
 import org.mifosplatform.infrastructure.codes.service.CodeValueReadPlatformService;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.ApiParameterHelper;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
 import org.mifosplatform.infrastructure.core.domain.JdbcSupport;
@@ -51,7 +51,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
     private final JdbcTemplate jdbcTemplate;
     private final PlatformSecurityContext context;
     private final OfficeReadPlatformService officeReadPlatformService;
-    private final GlobalConfigurationRepository configurationRepository;
+    private final ConfigurationRepository configurationRepository;
 
     // data mappers
     private final PaginationHelper<ClientData> paginationHelper = new PaginationHelper<ClientData>();
@@ -63,7 +63,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
 
     @Autowired
     public ClientReadPlatformServiceImpl(final PlatformSecurityContext context, final TenantAwareRoutingDataSource dataSource,
-            final OfficeReadPlatformService officeReadPlatformService,final GlobalConfigurationRepository configurationRepository,
+            final OfficeReadPlatformService officeReadPlatformService,final ConfigurationRepository configurationRepository,
             final CodeValueReadPlatformService codeValueReadPlatformService) {
         this.context = context;
         this.officeReadPlatformService = officeReadPlatformService;
@@ -95,7 +95,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
     public Page<ClientData> retrieveAll(final SearchParameters searchParameters) {
 
         final AppUser currentUser = context.authenticatedUser();
-        final GlobalConfigurationProperty configurationRepository=this.configurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
+        final Configuration configurationRepository=this.configurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
         ClientMapper clientMapper = new ClientMapper(configurationRepository.getValue());
         final String hierarchy = currentUser.getOffice().getHierarchy();
         
@@ -207,7 +207,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             AppUser currentUser = context.authenticatedUser();
             String hierarchy = currentUser.getOffice().getHierarchy();
             String hierarchySearchString = hierarchy + "%";
-            final GlobalConfigurationProperty configurationRepository=this.configurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
+            final Configuration configurationRepository=this.configurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
             ClientMapper clientMapper = new ClientMapper(configurationRepository.getValue());
             String sql = "select " + clientMapper.schema() + " where o.hierarchy like ? and c.id = ? and a.address_key='PRIMARY'";
             ClientData clientData = this.jdbcTemplate.queryForObject(sql,clientMapper,new Object[] { hierarchySearchString, clientId });

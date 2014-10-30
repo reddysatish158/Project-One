@@ -29,7 +29,7 @@ public class OfficeTransactionData {
     @SuppressWarnings("unused")
     private final String toOfficeName;
     @SuppressWarnings("unused")
-    private CurrencyData currency;
+    private final CurrencyData currency;
     @SuppressWarnings("unused")
     private final BigDecimal transactionAmount;
     @SuppressWarnings("unused")
@@ -42,18 +42,21 @@ public class OfficeTransactionData {
     public static OfficeTransactionData instance(final Long id, final LocalDate transactionDate, final Long fromOfficeId,
             final String fromOfficeName, final Long toOfficeId, final String toOfficeName, final CurrencyData currency,
             final BigDecimal transactionAmount, final String description) {
+    	
         return new OfficeTransactionData(id, transactionDate, fromOfficeId, fromOfficeName, toOfficeId, toOfficeName, currency,
                 transactionAmount, description, null, null);
     }
 
     public static OfficeTransactionData template(final LocalDate transactionDate, final Collection<OfficeData> parentLookups,
             final Collection<CurrencyData> currencyOptions) {
+    	
         return new OfficeTransactionData(null, transactionDate, null, null, null, null, null, null, null, parentLookups, currencyOptions);
     }
 
-    private OfficeTransactionData(final Long id, final LocalDate transactionDate, final Long fromOfficeId, final String fromOfficeName,
+    public OfficeTransactionData(final Long id, final LocalDate transactionDate, final Long fromOfficeId, final String fromOfficeName,
             final Long toOfficeId, final String toOfficeName, final CurrencyData currency, final BigDecimal transactionAmount,
             final String description, final Collection<OfficeData> allowedOffices, final Collection<CurrencyData> currencyOptions) {
+    	
         this.id = id;
         this.fromOfficeId = fromOfficeId;
         this.fromOfficeName = fromOfficeName;
@@ -66,4 +69,5 @@ public class OfficeTransactionData {
         this.allowedOffices = allowedOffices;
         this.currencyOptions = currencyOptions;
     }
+    
 }

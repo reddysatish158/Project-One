@@ -79,7 +79,7 @@ public final class InventoryItemCommandFromApiJsonDeserializer {
 		baseDataValidator.reset().parameter("serialNumber").value(serialNumber).notBlank().notNull();
 		baseDataValidator.reset().parameter("provisioningSerialNumber").value(provisioningSerialNumber).notBlank().notNull();
 		baseDataValidator.reset().parameter("status").value(status).notNull();
-		baseDataValidator.reset().parameter("quality").value(quality).notNull();
+		baseDataValidator.reset().parameter("quality").value(quality).notBlank();
 		
 		
 

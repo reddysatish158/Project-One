@@ -29,7 +29,7 @@ public class OfficeAdjustmentsWritePlatformServiceImpl implements
 	
 	@Transactional
 	@Override
-	public CommandProcessingResult createOfficeAdjustment(JsonCommand command) {
+	public CommandProcessingResult createOfficeAdjustment(final JsonCommand command) {
 		
 		try {
 			context.authenticatedUser();

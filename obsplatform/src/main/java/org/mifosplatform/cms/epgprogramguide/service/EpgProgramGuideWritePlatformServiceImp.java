@@ -59,7 +59,7 @@ public class EpgProgramGuideWritePlatformServiceImp implements
        if (realCause.getMessage().contains("serial_no_constraint")){
        	throw new PlatformDataIntegrityException("validation.error.msg.inventory.item.duplicate.serialNumber", "validation.error.msg.inventory.item.duplicate.serialNumber", "validation.error.msg.inventory.item.duplicate.serialNumber","");
        }else if(realCause.getMessage().contains("servicecodes")){
-    	   throw new PlatformDataIntegrityException("foreign.key.constraint.service.code", "Foreign Key Constraint", "channelName","");   	
+    	   throw new PlatformDataIntegrityException("foreign.key.constraint.service.code", "Foreign Key Constraint", "channelName","channelname configuration does not exist");   	
        }
 
 

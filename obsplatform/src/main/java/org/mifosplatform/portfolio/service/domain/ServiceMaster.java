@@ -10,6 +10,7 @@ import javax.persistence.UniqueConstraint;
 
 import org.apache.commons.lang.StringUtils;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
+import org.mifosplatform.portfolio.plan.data.ServiceData;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 @Entity
@@ -56,8 +57,8 @@ public static ServiceMaster fromJson(final JsonCommand command) {
     return new ServiceMaster(serviceCode,serviceDescription,serviceType,status,isOptional,isAutoProvision);
 }
 
-	public ServiceMaster(String serviceCode, String serviceDescription,
-			String serviceType,String  status,boolean isOptional, boolean isAutoProvision) {
+	public ServiceMaster(final String serviceCode, final String serviceDescription,
+			final String serviceType,final String  status,final boolean isOptional, final boolean isAutoProvision) {
 		this.serviceCode = serviceCode;
 		this.serviceDescription = serviceDescription;
 		this.serviceType = serviceType;
@@ -107,7 +108,7 @@ public static ServiceMaster fromJson(final JsonCommand command) {
 	}
 
 
-	public  Map<String, Object> update(JsonCommand command) {
+	public  Map<String, Object> update(final JsonCommand command) {
 		
 		  final Map<String, Object> actualChanges = new LinkedHashMap<String, Object>(1);
 		  final String serviceCodeParamName = "serviceCode";
@@ -162,6 +163,11 @@ public static ServiceMaster fromJson(final JsonCommand command) {
 			this.serviceCode=this.serviceCode+"_"+this.getId();
 			isDeleted="y";
 		}
+	}
+
+
+	public ServiceData todata() {
+		return new ServiceData(getId(),null,null,null,this.serviceCode,this.serviceDescription,null,null,null,null);
 	}
 
 

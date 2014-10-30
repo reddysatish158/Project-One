@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.joda.time.LocalDate;
+import org.mifosplatform.finance.financialtransaction.data.FinancialTransactionsData;
 import org.mifosplatform.infrastructure.core.domain.JdbcSupport;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
@@ -34,7 +35,7 @@ public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService 
     private final JdbcTemplate jdbcTemplate;
     private final PlatformSecurityContext context;
     private final CurrencyReadPlatformService currencyReadPlatformService;
-    private final static String nameDecoratedBaseOnHierarchy = "concat(substring('........................................', 1, ((LENGTH(o.hierarchy) - LENGTH(REPLACE(o.hierarchy, '.', '')) - 1) * 4)), o.name)";
+    private final static String NAMEDECORATEDBASEON_HIERARCHY = "concat(substring('........................................', 1, ((LENGTH(o.hierarchy) - LENGTH(REPLACE(o.hierarchy, '.', '')) - 1) * 4)), o.name)";
 
     @Autowired
     public OfficeReadPlatformServiceImpl(final PlatformSecurityContext context,
@@ -48,41 +49,41 @@ public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService 
 
         public String officeSchema() {
             return "o.id AS id,o.name AS name,"
-            	       +nameDecoratedBaseOnHierarchy+
+            	       +NAMEDECORATEDBASEON_HIERARCHY+
             	       "AS nameDecorated,o.external_id AS externalId,o.opening_date AS openingDate,o.hierarchy AS hierarchy," +
             	       "parent.id AS parentId,parent.name AS parentName,c.code_value as officeType" +
             	       " FROM m_office o LEFT JOIN m_office AS parent ON parent.id = o.parent_id left join m_code_value c on c.id=o.office_type ";
         }
 
         @Override
-        public OfficeData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
+        public OfficeData mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {
 
-            final Long id = rs.getLong("id");
-            final String name = rs.getString("name");
-            final String nameDecorated = rs.getString("nameDecorated");
-            final String externalId = rs.getString("externalId");
-            final LocalDate openingDate = JdbcSupport.getLocalDate(rs, "openingDate");
-            final String hierarchy = rs.getString("hierarchy");
-            final Long parentId = JdbcSupport.getLong(rs, "parentId");
-            final String parentName = rs.getString("parentName");
-            final String officeType = rs.getString("officeType");
+            final Long id = resultSet.getLong("id");
+            final String name = resultSet.getString("name");
+            final String nameDecorated = resultSet.getString("nameDecorated");
+            final String externalId = resultSet.getString("externalId");
+            final LocalDate openingDate = JdbcSupport.getLocalDate(resultSet, "openingDate");
+            final String hierarchy = resultSet.getString("hierarchy");
+            final Long parentId = JdbcSupport.getLong(resultSet, "parentId");
+            final String parentName = resultSet.getString("parentName");
+            final String officeType = resultSet.getString("officeType");
 
-            return new OfficeData(id, name, nameDecorated, externalId, openingDate, hierarchy, parentId, parentName, null,null,officeType);
+            return new OfficeData(id, name, nameDecorated, externalId, openingDate, hierarchy, parentId, parentName, null, null, officeType);
         }
     }
 
     private static final class OfficeDropdownMapper implements RowMapper<OfficeData> {
 
         public String schema() {
-            return " o.id as id, " + nameDecoratedBaseOnHierarchy + " as nameDecorated, o.name as name from m_office o ";
+            return " o.id as id, " + NAMEDECORATEDBASEON_HIERARCHY + " as nameDecorated, o.name as name from m_office o ";
         }
 
         @Override
-        public OfficeData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
+        public OfficeData mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {
 
-            final Long id = rs.getLong("id");
-            final String name = rs.getString("name");
-            final String nameDecorated = rs.getString("nameDecorated");
+            final Long id = resultSet.getLong("id");
+            final String name = resultSet.getString("name");
+            final String nameDecorated = resultSet.getString("nameDecorated");
 
             return OfficeData.dropdown(id, name, nameDecorated);
         }
@@ -101,26 +102,24 @@ public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService 
         }
 
         @Override
-        public OfficeTransactionData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
+        public OfficeTransactionData mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {
 
-            Long id = rs.getLong("id");
-            LocalDate transactionDate = JdbcSupport.getLocalDate(rs, "transactionDate");
-            Long fromOfficeId = JdbcSupport.getLong(rs, "fromOfficeId");
-            String fromOfficeName = rs.getString("fromOfficeName");
-            Long toOfficeId = JdbcSupport.getLong(rs, "toOfficeId");
-            String toOfficeName = rs.getString("toOfficeName");
+            final Long id = resultSet.getLong("id");
+            final LocalDate transactionDate = JdbcSupport.getLocalDate(resultSet, "transactionDate");
+            final Long fromOfficeId = JdbcSupport.getLong(resultSet, "fromOfficeId");
+            final String fromOfficeName = resultSet.getString("fromOfficeName");
+            final Long toOfficeId = JdbcSupport.getLong(resultSet, "toOfficeId");
+            final String toOfficeName = resultSet.getString("toOfficeName");
+            final String currencyCode = resultSet.getString("currencyCode");
+            final String currencyName = resultSet.getString("currencyName");
+            final String currencyNameCode = resultSet.getString("currencyNameCode");
+            final String currencyDisplaySymbol = resultSet.getString("currencyDisplaySymbol");
+            final Integer currencyDigits = JdbcSupport.getInteger(resultSet, "currencyDigits");
 
-            String currencyCode = rs.getString("currencyCode");
-            String currencyName = rs.getString("currencyName");
-            String currencyNameCode = rs.getString("currencyNameCode");
-            String currencyDisplaySymbol = rs.getString("currencyDisplaySymbol");
-            Integer currencyDigits = JdbcSupport.getInteger(rs, "currencyDigits");
+            final CurrencyData currencyData = new CurrencyData(currencyCode, currencyName, currencyDigits, currencyDisplaySymbol, currencyNameCode);
 
-            CurrencyData currencyData = new CurrencyData(currencyCode, currencyName, currencyDigits, currencyDisplaySymbol,
-                    currencyNameCode);
-
-            BigDecimal transactionAmount = rs.getBigDecimal("transactionAmount");
-            String description = rs.getString("description");
+            final BigDecimal transactionAmount = resultSet.getBigDecimal("transactionAmount");
+            final String description = resultSet.getString("description");
 
             return OfficeTransactionData.instance(id, transactionDate, fromOfficeId, fromOfficeName, toOfficeId, toOfficeName,
                     currencyData, transactionAmount, description);
@@ -130,15 +129,15 @@ public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService 
     @Override
     public Collection<OfficeData> retrieveAllOffices() {
 
-        AppUser currentUser = context.authenticatedUser();
+        final AppUser currentUser = context.authenticatedUser();
 
         String hierarchy = currentUser.getOffice().getHierarchy();
         String hierarchySearchString = hierarchy + "%";
 
-        OfficeMapper rm = new OfficeMapper();
-        String sql = "select " + rm.officeSchema() + "where o.hierarchy like ? order by o.hierarchy";
+        final OfficeMapper officeMapper = new OfficeMapper();
+        final String sql = "select " + officeMapper.officeSchema() + "where o.hierarchy like ? order by o.hierarchy";
 
-        return this.jdbcTemplate.query(sql, rm, new Object[] { hierarchySearchString });
+        return this.jdbcTemplate.query(sql, officeMapper , new Object[] { hierarchySearchString });
     }
 
     @Override
@@ -148,10 +147,10 @@ public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService 
         final String hierarchy = currentUser.getOffice().getHierarchy();
         final String hierarchySearchString = hierarchy + "%";
 
-        final OfficeDropdownMapper rm = new OfficeDropdownMapper();
-        final String sql = "select " + rm.schema() + "where o.hierarchy like ? order by o.name";
+        final OfficeDropdownMapper officeDropdownMap = new OfficeDropdownMapper();
+        final String sql = "select " + officeDropdownMap.schema() + "where o.hierarchy like ? order by o.name";
 
-        return this.jdbcTemplate.query(sql, rm, new Object[] { hierarchySearchString });
+        return this.jdbcTemplate.query(sql, officeDropdownMap , new Object[] { hierarchySearchString });
     }
 
     @Override
@@ -160,12 +159,10 @@ public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService 
         try {
             context.authenticatedUser();
 
-            OfficeMapper rm = new OfficeMapper();
-            String sql = "select " + rm.officeSchema() + " where o.id = ?";
+            final OfficeMapper officeMapper = new OfficeMapper();
+            final String sql = "select " + officeMapper.officeSchema() + " where o.id = ?";
 
-            OfficeData selectedOffice = this.jdbcTemplate.queryForObject(sql, rm, new Object[] { officeId });
-
-            return selectedOffice;
+            return this.jdbcTemplate.queryForObject(sql, officeMapper , new Object[] { officeId });
         } catch (EmptyResultDataAccessException e) {
             throw new OfficeNotFoundException(officeId);
         }
@@ -176,19 +173,19 @@ public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService 
 
         context.authenticatedUser();
 
-        return OfficeData.template(null,new LocalDate(),null);
+        return OfficeData.template(null, new LocalDate(), null);
     }
 
     @Override
     public Collection<OfficeData> retrieveAllowedParents(final Long officeId) {
 
         context.authenticatedUser();
-        Collection<OfficeData> filterParentLookups = new ArrayList<OfficeData>();
+        final Collection<OfficeData> filterParentLookups = new ArrayList<OfficeData>();
 
         if (isNotHeadOffice(officeId)) {
-            Collection<OfficeData> parentLookups = retrieveAllOfficesForDropdown();
+            final Collection<OfficeData> parentLookups = retrieveAllOfficesForDropdown();
 
-            for (OfficeData office : parentLookups) {
+            for (final OfficeData office : parentLookups) {
                 if (!office.hasIdentifyOf(officeId)) {
                     filterParentLookups.add(office);
                 }
@@ -205,16 +202,16 @@ public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService 
     @Override
     public Collection<OfficeTransactionData> retrieveAllOfficeTransactions() {
 
-        AppUser currentUser = context.authenticatedUser();
+        final AppUser currentUser = context.authenticatedUser();
 
         String hierarchy = currentUser.getOffice().getHierarchy();
         String hierarchySearchString = hierarchy + "%";
 
-        OfficeTransactionMapper rm = new OfficeTransactionMapper();
-        String sql = "select " + rm.schema()
+        OfficeTransactionMapper officeTransactionMap = new OfficeTransactionMapper();
+        String sql = "select " + officeTransactionMap.schema()
                 + " where (fromoff.hierarchy like ? or tooff.hierarchy like ?) order by ot.transaction_date, ot.id";
 
-        return this.jdbcTemplate.query(sql, rm, new Object[] { hierarchySearchString, hierarchySearchString });
+        return this.jdbcTemplate.query(sql, officeTransactionMap , new Object[] { hierarchySearchString, hierarchySearchString });
     }
 
     @Override
@@ -235,11 +232,39 @@ public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService 
         final String hierarchy = currentUser.getOffice().getHierarchy();
         final String hierarchySearchString = hierarchy + "%";
 
-        final OfficeDropdownMapper rm = new OfficeDropdownMapper();
-        final String sql = "select " + rm.schema() + ", m_code_value c  WHERE o.office_type = c.id AND c.code_value = 'agent' AND o.hierarchy LIKE ? " +
+        final OfficeDropdownMapper officeDropdownMap = new OfficeDropdownMapper();
+        final String sql = "select " + officeDropdownMap.schema() + ", m_code_value c  WHERE o.office_type = c.id AND c.code_value = 'agent' AND o.hierarchy LIKE ? " +
         		" ORDER BY o.name";
 
-        return this.jdbcTemplate.query(sql, rm, new Object[] { hierarchySearchString });
+        return this.jdbcTemplate.query(sql, officeDropdownMap , new Object[] { hierarchySearchString });
     
 	}
+	
+	@Override
+	public Collection<FinancialTransactionsData> retreiveOfficeFinancialTransactionsData(final Long officeId) {
+		
+		context.authenticatedUser();
+		final OfficeFinancialTransactionMapper mapper = new OfficeFinancialTransactionMapper(); 
+		final String sql = "select v.* from  office_fin_trans_vw v where v.office_id=" + officeId + " order by  transDate desc ";
+		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
+	}
+	
+	private static final class OfficeFinancialTransactionMapper implements RowMapper<FinancialTransactionsData> {
+
+		@Override
+		public FinancialTransactionsData mapRow(final ResultSet resultSet, final int rowNum)throws SQLException {
+			final Long officeId = resultSet.getLong("office_id");
+			final Long transactionId = resultSet.getLong("TransId");
+			final String transactionType = resultSet.getString("TransType");
+			final BigDecimal debitAmount = resultSet.getBigDecimal("Dr_amt");
+			final BigDecimal creditAmount =resultSet.getBigDecimal("Cr_amt");
+			final String userName = resultSet.getString("username");
+			final String transactionCategory = resultSet.getString("tran_type");
+			final boolean flag = resultSet.getBoolean("flag");
+			final LocalDate transDate = JdbcSupport.getLocalDate(resultSet, "TransDate");
+
+			return new FinancialTransactionsData(officeId, transactionId, transDate, transactionType, debitAmount, creditAmount, 
+					null, userName, transactionCategory, flag, null, null);
+		}
+     }
 }

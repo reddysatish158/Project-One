@@ -142,6 +142,7 @@ public class ChargeCodeReadPlatformServiceImpl implements
 				+ "where mcv.code_id=mc.id and mc.code_name='Bill Frequency' order by mcv.id";
 
 		return jdbcTemplate.query(sql, frequencyMapper);
+
 	}
 
 	private static final class BillFrequencyMapper implements

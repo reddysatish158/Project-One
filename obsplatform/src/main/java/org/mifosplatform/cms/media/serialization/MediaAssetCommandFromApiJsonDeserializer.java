@@ -32,10 +32,10 @@ public final class MediaAssetCommandFromApiJsonDeserializer {
     /**
      * The parameters supported for this command.
      */
-    private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("mediaTitle","mediatype",
-    		  "catageoryId","genre","releaseDate","overview","subject","mediaImage","duration","contentProvider",
-    		  "rated","mediaRating","ratingCount","status","mediaassetAttributes","mediaAssetLocations","locale",
-    		  "dateFormat","attributeName","formatType","languageId","cpShareValue","mediaTypeCheck","mediaDetailType","location"));
+    private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("mediaTitle", "mediatype",
+    		  "catageoryId", "genre", "releaseDate", "overview", "subject", "mediaImage", "duration", "contentProvider",
+    		  "rated", "mediaRating", "ratingCount", "status", "mediaassetAttributes", "mediaAssetLocations", "locale",
+    		  "dateFormat", "attributeName", "formatType", "languageId", "cpShareValue", "mediaTypeCheck", "mediaDetailType", "location"));
     private final FromJsonHelper fromApiJsonHelper;
 
     @Autowired
@@ -65,13 +65,12 @@ public final class MediaAssetCommandFromApiJsonDeserializer {
         
         final LocalDate releaseDate = fromApiJsonHelper.extractLocalDateNamed("releaseDate", element);
         baseDataValidator.reset().parameter("releaseDate").value(releaseDate).notBlank();
-        
-        
+         
         final String status=fromApiJsonHelper.extractStringNamed("status", element);
         baseDataValidator.reset().parameter("status").value(status).notBlank().notExceedingLengthOf(20);
         
-        final BigDecimal cpShareValue=fromApiJsonHelper.extractBigDecimalWithLocaleNamed("cpShareValue", element);
-        baseDataValidator.reset().parameter("cpShareValue").value(cpShareValue).inMinAndMaxAmountRange(BigDecimal.ZERO,BigDecimal.valueOf(100));
+        final BigDecimal cpShareValue = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("cpShareValue", element);
+        baseDataValidator.reset().parameter("cpShareValue").value(cpShareValue).inMinAndMaxAmountRange(BigDecimal.ZERO, BigDecimal.valueOf(100));
       
         
        /*final String mediaType = fromApiJsonHelper.extractStringNamed("mediatype", element);
@@ -101,24 +100,22 @@ public final class MediaAssetCommandFromApiJsonDeserializer {
         
         final String mediaTypeCheck = fromApiJsonHelper.extractStringNamed("mediaTypeCheck", element);
         
-        if(mediaTypeCheck.equalsIgnoreCase("ADVANCEMEDIA")){
-        final JsonArray mediaassetAttributesArray=fromApiJsonHelper.extractJsonArrayNamed("mediaassetAttributes",element);
+        if("ADVANCEMEDIA".equalsIgnoreCase(mediaTypeCheck)){
+        final JsonArray mediaassetAttributesArray=fromApiJsonHelper.extractJsonArrayNamed("mediaassetAttributes", element);
         
         //baseDataValidator.reset().parameter("mediaassetAttributes").value(mediaassetAttributesArray).
-        String[] mediaassetAttributes =null;
-	    mediaassetAttributes=new String[mediaassetAttributesArray.size()];
-	      int mediaassetAttributeSize=mediaassetAttributesArray.size();
-	      baseDataValidator.reset().parameter("mediaassetAttributes").value(mediaassetAttributeSize).integerGreaterThanZero();
-	    for(int i=0; i<mediaassetAttributesArray.size();i++){
-	    	mediaassetAttributes[i] =mediaassetAttributesArray.get(i).toString();
+        String[] mediaassetAttributes = null;
+	    mediaassetAttributes = new String[mediaassetAttributesArray.size()];
+	    final int mediaassetAttributeSize = mediaassetAttributesArray.size();
+	    baseDataValidator.reset().parameter("mediaassetAttributes").value(mediaassetAttributeSize).integerGreaterThanZero();
+	    for(int i = 0; i < mediaassetAttributesArray.size(); i++){
+	    	mediaassetAttributes[i] = mediaassetAttributesArray.get(i).toString();
 	    	//JsonObject temp = mediaassetAttributesArray.getAsJsonObject();
-	    	
-
 	    }
 	    	/**
 	    	 * For Media Attributes
 	    	 * */
-		 for (String mediaassetAttribute : mediaassetAttributes) {
+		 for (final String mediaassetAttribute : mediaassetAttributes) {
 			
 			     final JsonElement attributeElement = fromApiJsonHelper.parse(mediaassetAttribute);
 			     final String mediaAttributeType = fromApiJsonHelper.extractStringNamed("attributeType", attributeElement);
@@ -127,31 +124,29 @@ public final class MediaAssetCommandFromApiJsonDeserializer {
 			     baseDataValidator.reset().parameter("attributeName").value(attributeName).notBlank();
 			     final String attributevalue = fromApiJsonHelper.extractStringNamed("attributevalue", attributeElement);
 			     baseDataValidator.reset().parameter("attributevalue").value(attributevalue).notBlank();
-			     final String attributeNickname= fromApiJsonHelper.extractStringNamed("attributeNickname", attributeElement);
+			     final String attributeNickname = fromApiJsonHelper.extractStringNamed("attributeNickname", attributeElement);
 			     baseDataValidator.reset().parameter("attributeNickname").value(attributeNickname).notBlank();
-			     final String attributeImage= fromApiJsonHelper.extractStringNamed("attributeImage", attributeElement);
+			     final String attributeImage = fromApiJsonHelper.extractStringNamed("attributeImage", attributeElement);
 			     baseDataValidator.reset().parameter("attributeImage").value(attributeImage).notBlank();
      
 		  }
         
-        final JsonArray mediaAssetLocationsArray=fromApiJsonHelper.extractJsonArrayNamed("mediaAssetLocations",element);
+        final JsonArray mediaAssetLocationsArray = fromApiJsonHelper.extractJsonArrayNamed("mediaAssetLocations", element);
         // baseDataValidator.reset().parameter("mediaAssetLocations").value(mediaAssetLocationsArray).arrayNotEmpty();
-        String[] mediaAssetLocations =null;
-        mediaAssetLocations=new String[mediaAssetLocationsArray.size()];
-        int mediaassetLocationSize=mediaAssetLocationsArray.size();
-	      baseDataValidator.reset().parameter("mediaAssetLocations").value(mediaassetLocationSize).integerGreaterThanZero();
-	    for(int i=0; i<mediaAssetLocationsArray.size();i++){
-	    	mediaAssetLocations[i] =mediaAssetLocationsArray.get(i).toString();
+        String[] mediaAssetLocations = null;
+        mediaAssetLocations = new String[mediaAssetLocationsArray.size()];
+        final int mediaassetLocationSize = mediaAssetLocationsArray.size();
+	    baseDataValidator.reset().parameter("mediaAssetLocations").value(mediaassetLocationSize).integerGreaterThanZero();
+	    for(int i = 0; i < mediaAssetLocationsArray.size(); i++){
+	    	mediaAssetLocations[i] = mediaAssetLocationsArray.get(i).toString();
 	    	//JsonObject temp = mediaassetAttributesArray.getAsJsonObject();
-	    	
-
 	    }
 	    
 	   /**
 	    * For Media Location Validation
 	    * */
 	    
-		 for (String mediaAssetLocation : mediaAssetLocations) {
+		 for (final String mediaAssetLocation : mediaAssetLocations) {
 			 
 			     final JsonElement attributeElement = fromApiJsonHelper.parse(mediaAssetLocation);
 			     final Integer languageId = fromApiJsonHelper.extractIntegerSansLocaleNamed("languageId", attributeElement);
@@ -160,8 +155,6 @@ public final class MediaAssetCommandFromApiJsonDeserializer {
 			     baseDataValidator.reset().parameter("formatType").value(formatType).notBlank();
 			     final String location = fromApiJsonHelper.extractStringNamed("location", attributeElement);
 			     baseDataValidator.reset().parameter("location").value(location).notBlank();
-			  
-     
 		  }
      
         }else{
@@ -185,7 +178,7 @@ public final class MediaAssetCommandFromApiJsonDeserializer {
 	 * This is used for Validating media attributes and location
 	 * whenever you requires use it
 	 * */
-	public void validateForCreateLocationAttributes(String json) {
+	public void validateForCreateLocationAttributes(final String json) {
 		
 		if (StringUtils.isBlank(json)) { throw new InvalidJsonException(); }
 
@@ -196,23 +189,23 @@ public final class MediaAssetCommandFromApiJsonDeserializer {
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("mediaasset");
 
         final JsonElement element = fromApiJsonHelper.parse(json);
-        final String mediaDetailType=fromApiJsonHelper.extractStringNamed("mediaDetailType", element);
+        final String mediaDetailType = fromApiJsonHelper.extractStringNamed("mediaDetailType", element);
         
         /**
          * Validation checking starts from here
          * */
-        if(mediaDetailType.equalsIgnoreCase("ATTRIBUTES")){
+        if("ATTRIBUTES".equalsIgnoreCase(mediaDetailType)){
         	
-        	final JsonArray mediaassetAttributesArray=fromApiJsonHelper.extractJsonArrayNamed("mediaassetAttributes",element);
-        	String[] mediaassetAttributes =null;
-        	mediaassetAttributes=new String[mediaassetAttributesArray.size()];
-        	int mediaassetAttributeSize=mediaassetAttributesArray.size();
+        	final JsonArray mediaassetAttributesArray = fromApiJsonHelper.extractJsonArrayNamed("mediaassetAttributes", element);
+        	String[] mediaassetAttributes = null;
+        	mediaassetAttributes = new String[mediaassetAttributesArray.size()];
+        	final int mediaassetAttributeSize = mediaassetAttributesArray.size();
         	baseDataValidator.reset().parameter("mediaassetAttributes").value(mediaassetAttributeSize).integerGreaterThanZero();
-        	for(int i=0; i<mediaassetAttributesArray.size();i++){
-	    	mediaassetAttributes[i] =mediaassetAttributesArray.get(i).toString();
+        	for(int i = 0; i < mediaassetAttributesArray.size(); i++){
+	    	mediaassetAttributes[i] = mediaassetAttributesArray.get(i).toString();
 	    	}
         	//For Media Attributes
-        	for (String mediaassetAttribute : mediaassetAttributes) {
+        	for (final String mediaassetAttribute : mediaassetAttributes) {
 			
 			     final JsonElement attributeElement = fromApiJsonHelper.parse(mediaassetAttribute);
 			     final String mediaAttributeType = fromApiJsonHelper.extractStringNamed("attributeType", attributeElement);
@@ -221,24 +214,24 @@ public final class MediaAssetCommandFromApiJsonDeserializer {
 			     baseDataValidator.reset().parameter("attributeName").value(attributeName).notBlank();
 			     final String attributevalue = fromApiJsonHelper.extractStringNamed("attributevalue", attributeElement);
 			     baseDataValidator.reset().parameter("attributevalue").value(attributevalue).notBlank();
-			     final String attributeNickname= fromApiJsonHelper.extractStringNamed("attributeNickname", attributeElement);
+			     final String attributeNickname = fromApiJsonHelper.extractStringNamed("attributeNickname", attributeElement);
 			     baseDataValidator.reset().parameter("attributeNickname").value(attributeNickname).notBlank();
-			     final String attributeImage= fromApiJsonHelper.extractStringNamed("attributeImage", attributeElement);
+			     final String attributeImage = fromApiJsonHelper.extractStringNamed("attributeImage", attributeElement);
 			     baseDataValidator.reset().parameter("attributeImage").value(attributeImage).notBlank();
      
         	}
         }
-        if(mediaDetailType.equalsIgnoreCase("LOCATIONS")){
-        	final JsonArray mediaAssetLocationsArray=fromApiJsonHelper.extractJsonArrayNamed("mediaAssetLocations",element);
-        	String[] mediaAssetLocations =null;
-        	mediaAssetLocations=new String[mediaAssetLocationsArray.size()];
-        	int mediaassetLocationSize=mediaAssetLocationsArray.size();
+        if("LOCATIONS".equalsIgnoreCase(mediaDetailType)){
+        	final JsonArray mediaAssetLocationsArray = fromApiJsonHelper.extractJsonArrayNamed("mediaAssetLocations",element);
+        	String[] mediaAssetLocations = null;
+        	mediaAssetLocations = new String[mediaAssetLocationsArray.size()];
+        	final int mediaassetLocationSize = mediaAssetLocationsArray.size();
         	baseDataValidator.reset().parameter("mediaAssetLocations").value(mediaassetLocationSize).integerGreaterThanZero();
-        	for(int i=0; i<mediaAssetLocationsArray.size();i++){
-        		mediaAssetLocations[i] =mediaAssetLocationsArray.get(i).toString();
+        	for(int i = 0; i < mediaAssetLocationsArray.size(); i++){
+        		mediaAssetLocations[i] = mediaAssetLocationsArray.get(i).toString();
         	}
         	//For Media Location Validation
-        	for (String mediaAssetLocation : mediaAssetLocations) {
+        	for (final String mediaAssetLocation : mediaAssetLocations) {
 			 
 			     final JsonElement attributeElement = fromApiJsonHelper.parse(mediaAssetLocation);
 			     final Integer languageId = fromApiJsonHelper.extractIntegerSansLocaleNamed("languageId", attributeElement);

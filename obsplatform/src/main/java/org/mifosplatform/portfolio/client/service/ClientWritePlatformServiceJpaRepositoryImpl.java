@@ -27,8 +27,8 @@ import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformSer
 import org.mifosplatform.infrastructure.codes.domain.CodeValue;
 import org.mifosplatform.infrastructure.codes.domain.CodeValueRepository;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -41,8 +41,8 @@ import org.mifosplatform.logistics.item.domain.StatusTypeEnum;
 import org.mifosplatform.logistics.itemdetails.exception.ActivePlansFoundException;
 import org.mifosplatform.organisation.address.domain.Address;
 import org.mifosplatform.organisation.address.domain.AddressRepository;
-import org.mifosplatform.organisation.groupsDetails.domain.GroupsDetails;
-import org.mifosplatform.organisation.groupsDetails.domain.GroupsDetailsRepository;
+import org.mifosplatform.organisation.groupsdetails.domain.GroupsDetails;
+import org.mifosplatform.organisation.groupsdetails.domain.GroupsDetailsRepository;
 import org.mifosplatform.organisation.office.domain.Office;
 import org.mifosplatform.organisation.office.domain.OfficeRepository;
 import org.mifosplatform.organisation.office.exception.OfficeNotFoundException;
@@ -59,10 +59,10 @@ import org.mifosplatform.portfolio.group.domain.Group;
 import org.mifosplatform.portfolio.order.data.OrderData;
 import org.mifosplatform.portfolio.order.domain.Order;
 import org.mifosplatform.portfolio.order.domain.OrderRepository;
+import org.mifosplatform.portfolio.order.domain.UserActionStatusTypeEnum;
 import org.mifosplatform.portfolio.order.service.OrderReadPlatformService;
 import org.mifosplatform.portfolio.plan.domain.Plan;
 import org.mifosplatform.portfolio.plan.domain.PlanRepository;
-import org.mifosplatform.portfolio.plan.domain.UserActionStatusTypeEnum;
 import org.mifosplatform.portfolio.transactionhistory.service.TransactionHistoryWritePlatformService;
 import org.mifosplatform.provisioning.provisioning.domain.ServiceParameters;
 import org.mifosplatform.provisioning.provisioning.domain.ServiceParametersRepository;
@@ -96,7 +96,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     private final GroupsDetailsRepository groupsDetailsRepository;
     private final OrderReadPlatformService orderReadPlatformService;
     private final ClientReadPlatformService clientReadPlatformService;
-    private final GlobalConfigurationRepository configurationRepository;
+    private final ConfigurationRepository configurationRepository;
     private final ServiceParametersRepository serviceParametersRepository;
     private final AccountNumberGeneratorFactory accountIdentifierGeneratorFactory;
     private final ProvisioningWritePlatformService ProvisioningWritePlatformService;
@@ -118,7 +118,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             final OrderReadPlatformService orderReadPlatformService,final ProvisioningWritePlatformService  ProvisioningWritePlatformService,
             final GroupsDetailsRepository groupsDetailsRepository,final OrderRepository orderRepository,final PlanRepository planRepository,
             final PrepareRequestWriteplatformService prepareRequestWriteplatformService,final ClientReadPlatformService clientReadPlatformService,
-            final SelfCareRepository selfCareRepository,final GlobalConfigurationRepository configurationRepository,
+            final SelfCareRepository selfCareRepository,final ConfigurationRepository configurationRepository,
             final PortfolioCommandSourceWritePlatformService  portfolioCommandSourceWritePlatformService) {
     	
         this.context = context;
@@ -288,7 +288,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                 this.clientRepository.saveAndFlush(newClient);
             }
             
-            GlobalConfigurationProperty configuration=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_IS_SELFCAREUSER);
+            Configuration configuration=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_IS_SELFCAREUSER);
             
             if(configuration !=null && configuration.isEnabled()){
             	

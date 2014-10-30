@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class OfficeWritePlatformServiceJpaRepositoryImpl implements OfficeWritePlatformService {
 
-    private final static Logger logger = LoggerFactory.getLogger(OfficeWritePlatformServiceJpaRepositoryImpl.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(OfficeWritePlatformServiceJpaRepositoryImpl.class);
 
     private final PlatformSecurityContext context;
     private final OfficeCommandFromApiJsonDeserializer fromApiJsonDeserializer;
@@ -50,6 +50,7 @@ public class OfficeWritePlatformServiceJpaRepositoryImpl implements OfficeWriteP
             final OfficeTransactionCommandFromApiJsonDeserializer moneyTransferCommandFromApiJsonDeserializer,
             final OfficeRepository officeRepository, final OfficeTransactionRepository officeMonetaryTransferRepository,
             final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepository) {
+    	
         this.context = context;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.moneyTransferCommandFromApiJsonDeserializer = moneyTransferCommandFromApiJsonDeserializer;
@@ -193,7 +194,7 @@ public class OfficeWritePlatformServiceJpaRepositoryImpl implements OfficeWriteP
      */
     private void handleOfficeDataIntegrityIssues(final JsonCommand command, final DataIntegrityViolationException dve) {
 
-        Throwable realCause = dve.getMostSpecificCause();
+        final Throwable realCause = dve.getMostSpecificCause();
         if (realCause.getMessage().contains("externalid_org")) {
             final String externalId = command.stringValueOfParameterNamed("externalId");
             throw new PlatformDataIntegrityException("error.msg.office.duplicate.externalId", "Office with externalId `" + externalId
@@ -204,7 +205,7 @@ public class OfficeWritePlatformServiceJpaRepositoryImpl implements OfficeWriteP
                     "name", name);
         }
 
-        logger.error(dve.getMessage(), dve);
+        LOGGER.error(dve.getMessage(), dve);
         throw new PlatformDataIntegrityException("error.msg.office.unknown.data.integrity.issue",
                 "Unknown data integrity issue with resource.");
     }
@@ -230,4 +231,5 @@ public class OfficeWritePlatformServiceJpaRepositoryImpl implements OfficeWriteP
 
         return officeToReturn;
     }
+    
 }

@@ -18,7 +18,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import org.mifosplatform.billing.chargecode.data.ChargesData;
-import org.mifosplatform.billing.pricing.service.PriceReadPlatformService;
+import org.mifosplatform.billing.discountmaster.service.DiscountReadPlatformService;
+import org.mifosplatform.billing.planprice.service.PriceReadPlatformService;
 import org.mifosplatform.cms.eventorder.data.EventOrderData;
 import org.mifosplatform.cms.eventorder.service.EventOrderReadplatformServie;
 import org.mifosplatform.commands.domain.CommandWrapper;
@@ -57,7 +58,8 @@ public class OneTimeSalesApiResource {
 	private  final Set<String> RESPONSE_DATA_PARAMETERS=new HashSet<String>(Arrays.asList("itemId","chargedatas","itemDatas",
             "units","unitPrice","saleDate","totalprice","quantity","flag","allocationData","discountMasterDatas","id","eventName","bookedDate",
             "eventPrice","chargeCode","status","contractPeriods"));
-    private final String resourceNameForPermissions = "ONETIMESALE";
+    
+	private final String resourceNameForPermissions = "ONETIMESALE";
     private final PlatformSecurityContext context;
 	private final DefaultToApiJsonSerializer<OneTimeSaleData> toApiJsonSerializer;
 	private final DefaultToApiJsonSerializer<ItemData> defaultToApiJsonSerializer;
@@ -66,7 +68,7 @@ public class OneTimeSalesApiResource {
 	private final OneTimeSaleWritePlatformService oneTimeSaleWritePlatformService;
 	private final OneTimeSaleReadPlatformService oneTimeSaleReadPlatformService;
 	private final  ItemReadPlatformService itemMasterReadPlatformService;
-	private final  PriceReadPlatformService priceReadPlatformService;
+	private final  DiscountReadPlatformService discountReadPlatformService;
 	private final EventOrderReadplatformServie eventOrderReadplatformServie;
 	private final FromJsonHelper fromJsonHelper;
 	private final OfficeReadPlatformService officeReadPlatformService;
@@ -75,7 +77,7 @@ public class OneTimeSalesApiResource {
 	    public OneTimeSalesApiResource(final PlatformSecurityContext context,final DefaultToApiJsonSerializer<OneTimeSaleData> toApiJsonSerializer,
 	    final ApiRequestParameterHelper apiRequestParameterHelper,final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
 	    final OneTimeSaleWritePlatformService oneTimeSaleWritePlatformService,final OneTimeSaleReadPlatformService oneTimeSaleReadPlatformService,
-	    final ItemReadPlatformService itemReadPlatformService,final PriceReadPlatformService priceReadPlatformService,
+	    final ItemReadPlatformService itemReadPlatformService,final DiscountReadPlatformService discountReadPlatformService,
 	    final EventOrderReadplatformServie eventOrderReadplatformServie,final OfficeReadPlatformService officeReadPlatformService,
 	    final DefaultToApiJsonSerializer<ItemData> defaultToApiJsonSerializer,final FromJsonHelper fromJsonHelper,
 	    final ContractPeriodReadPlatformService contractPeriodReadPlatformService) {
@@ -83,11 +85,11 @@ public class OneTimeSalesApiResource {
 			    this.context = context;
 		        this.fromJsonHelper=fromJsonHelper;
 		        this.toApiJsonSerializer = toApiJsonSerializer;
-		        this.priceReadPlatformService=priceReadPlatformService;
 		        this.officeReadPlatformService=officeReadPlatformService;
 		        this.defaultToApiJsonSerializer=defaultToApiJsonSerializer;
 		        this.itemMasterReadPlatformService=itemReadPlatformService;
 		        this.apiRequestParameterHelper = apiRequestParameterHelper;
+		        this.discountReadPlatformService=discountReadPlatformService;
 		        this.eventOrderReadplatformServie=eventOrderReadplatformServie;
 		        this.oneTimeSaleReadPlatformService=oneTimeSaleReadPlatformService;
 		        this.oneTimeSaleWritePlatformService=oneTimeSaleWritePlatformService;
@@ -125,7 +127,7 @@ public class OneTimeSalesApiResource {
 			List<ChargesData> chargeDatas = this.itemMasterReadPlatformService.retrieveChargeCode();
 			List<ItemData> itemData = this.oneTimeSaleReadPlatformService.retrieveItemData();
 			final Collection<OfficeData> offices = officeReadPlatformService.retrieveAllOfficesForDropdown();
-			List<DiscountMasterData> discountdata = this.priceReadPlatformService.retrieveDiscountDetails();
+			List<DiscountMasterData> discountdata = this.discountReadPlatformService.retrieveAllDiscounts();
 			Collection<SubscriptionData> subscriptionDatas=this.contractPeriodReadPlatformService.retrieveAllSubscription();
 			return new OneTimeSaleData(chargeDatas,itemData,salesData,discountdata,offices,subscriptionDatas);
 
@@ -152,7 +154,7 @@ public class OneTimeSalesApiResource {
 	public String retrieveSingleItemDetails(@PathParam("itemId") final Long itemId,@Context final UriInfo uriInfo) {
 		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
 		List<ItemData> itemCodeData = this.oneTimeSaleReadPlatformService.retrieveItemData();
-		List<DiscountMasterData> discountdata = this.priceReadPlatformService.retrieveDiscountDetails();
+		List<DiscountMasterData> discountdata = this.discountReadPlatformService.retrieveAllDiscounts();
 	    ItemData  itemData = this.itemMasterReadPlatformService.retrieveSingleItemDetails(itemId);
 	    List<ChargesData> chargesDatas=this.itemMasterReadPlatformService.retrieveChargeCode();
 		itemData=new ItemData(itemCodeData,itemData,null,null,discountdata,chargesDatas);

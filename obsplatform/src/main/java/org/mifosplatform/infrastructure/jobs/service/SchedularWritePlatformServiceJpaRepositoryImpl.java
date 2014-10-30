@@ -16,11 +16,8 @@ import org.mifosplatform.infrastructure.jobs.domain.SchedulerDetail;
 import org.mifosplatform.infrastructure.jobs.domain.SchedulerDetailRepository;
 import org.mifosplatform.infrastructure.jobs.exception.JobNotFoundException;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
-import org.mifosplatform.scheduledjobs.scheduledjobs.domain.ScheduleJobs;
-import org.mifosplatform.scheduledjobs.scheduledjobs.domain.ScheduledJobRepository;
 import org.mifosplatform.useradministration.domain.AppUser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,28 +25,21 @@ import org.springframework.transaction.annotation.Transactional;
 public class SchedularWritePlatformServiceJpaRepositoryImpl implements SchedularWritePlatformService {
 
     private final ScheduledJobDetailRepository scheduledJobDetailsRepository;
-
     private final ScheduledJobRunHistoryRepository scheduledJobRunHistoryRepository;
-
     private final SchedulerDetailRepository schedulerDetailRepository;
-
     private final JobDetailDataValidator dataValidator;
-    
-    private final ScheduledJobRepository scheduledJobRepository;
-    
     private final PlatformSecurityContext context;
     
 
     @Autowired
     public SchedularWritePlatformServiceJpaRepositoryImpl(final ScheduledJobDetailRepository scheduledJobDetailsRepository,
             final ScheduledJobRunHistoryRepository scheduledJobRunHistoryRepository, final JobDetailDataValidator dataValidator,
-            final SchedulerDetailRepository schedulerDetailRepository,final ScheduledJobRepository scheduledJobRepository,
-            final PlatformSecurityContext context) {
-        this.scheduledJobDetailsRepository = scheduledJobDetailsRepository;
+            final SchedulerDetailRepository schedulerDetailRepository,final PlatformSecurityContext context) {
+
+    	this.scheduledJobDetailsRepository = scheduledJobDetailsRepository;
         this.scheduledJobRunHistoryRepository = scheduledJobRunHistoryRepository;
         this.schedulerDetailRepository = schedulerDetailRepository;
         this.dataValidator = dataValidator;
-        this.scheduledJobRepository=scheduledJobRepository;
         this.context=context;
     }
 
@@ -79,7 +69,7 @@ public class SchedularWritePlatformServiceJpaRepositoryImpl implements Schedular
     @Override
     public Long fetchMaxVersionBy(final String jobKey) {
         Long version = 0L;
-        Long versionFromDB = this.scheduledJobRunHistoryRepository.findMaxVersionByJobKey(jobKey);
+        final Long versionFromDB = this.scheduledJobRunHistoryRepository.findMaxVersionByJobKey(jobKey);
         if (versionFromDB != null) {
             version = versionFromDB;
         }
@@ -87,7 +77,7 @@ public class SchedularWritePlatformServiceJpaRepositoryImpl implements Schedular
     }
 
     @Override
-    public ScheduledJobDetail findByJobId(Long jobId) {
+    public ScheduledJobDetail findByJobId(final Long jobId) {
         return this.scheduledJobDetailsRepository.findByJobId(jobId);
     }
 
@@ -100,7 +90,7 @@ public class SchedularWritePlatformServiceJpaRepositoryImpl implements Schedular
     @Override
     public SchedulerDetail retriveSchedulerDetail() {
         SchedulerDetail schedulerDetail = null;
-        List<SchedulerDetail> schedulerDetailList = schedulerDetailRepository.findAll();
+        final List<SchedulerDetail> schedulerDetailList = schedulerDetailRepository.findAll();
         if (schedulerDetailList != null) {
             schedulerDetail = schedulerDetailList.get(0);
         }
@@ -129,12 +119,12 @@ public class SchedularWritePlatformServiceJpaRepositoryImpl implements Schedular
 
     @Transactional
     @Override
-    public boolean processJobDetailForExecution(String jobKey, String triggerType) {    
+    public boolean processJobDetailForExecution(final String jobKey,final String triggerType) {    
     	
     	boolean isStopExecution = false;
     final ScheduledJobDetail scheduledJobDetail = this.scheduledJobDetailsRepository.findByJobKey(jobKey);
     if (scheduledJobDetail.isCurrentlyRunning()
-            || (triggerType == SchedulerServiceConstants.TRIGGER_TYPE_CRON && (scheduledJobDetail.getNextRunTime().after(new Date())))) {
+            || (triggerType == SchedulerServiceConstants.TRIGGER_TYPE_CRON && scheduledJobDetail.getNextRunTime().after(new Date()))) {
         isStopExecution = true;
     }
     final SchedulerDetail schedulerDetail = retriveSchedulerDetail();
@@ -148,67 +138,8 @@ public class SchedularWritePlatformServiceJpaRepositoryImpl implements Schedular
     return isStopExecution;
 }
 
-
-
 	@Override
-	public CommandProcessingResult createNewJob(JsonCommand command) {
-		
-		try
-		{
-
-			dataValidator.validateForCreate(command.json());
-			
-			ScheduledJobDetail scheduledJobDetail=ScheduledJobDetail.fromJson(command);
-			
-			this.scheduledJobDetailsRepository.save(scheduledJobDetail);
-			
-			ScheduleJobs  scheduleJob=this.scheduledJobRepository.findByBatchName(scheduledJobDetail.getJobName());
-			
-			if(scheduleJob!=null){
-				scheduleJob.update();
-				this.scheduledJobRepository.save(scheduleJob);
-			}
-			
-			
-			
-			return new CommandProcessingResult(scheduledJobDetail.getId());
-			 
-			
-		}catch(DataIntegrityViolationException exception)
-		{
-			return  null;
-		}
-	}
-
-	@Override
-	public CommandProcessingResult deleteJob(Long jobId) {
-		
-		try
-		{
-			
-		    final ScheduledJobDetail scheduledJobDetail = findByJobId(jobId);
-	        if (scheduledJobDetail == null) { throw new JobNotFoundException(String.valueOf(jobId)); }
-	        
-	        this.scheduledJobDetailsRepository.delete(scheduledJobDetail);
-	        
-	        ScheduleJobs scheduleJobs=this.scheduledJobRepository.findByBatchName(scheduledJobDetail.getJobName());
-	        
-	        if(scheduleJobs!=null){
-	        	scheduleJobs.updateActiveState();
-	        	this.scheduledJobRepository.save(scheduleJobs);
-	        }
-	        
-	        
-	        return new CommandProcessingResult(jobId);	
-		}catch(DataIntegrityViolationException exception){
-			return null;
-		}
-		
-	
-	}
-
-	@Override
-	public CommandProcessingResult updateJobParametersDetail(Long jobId,JsonCommand command) {
+	public CommandProcessingResult updateJobParametersDetail(final Long jobId,final JsonCommand command) {
 
         dataValidator.validateForUpdateJobParameters(command.json());
         AppUser user= this.context.authenticatedUser();

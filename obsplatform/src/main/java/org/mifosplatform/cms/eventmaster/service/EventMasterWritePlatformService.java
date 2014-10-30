@@ -11,7 +11,7 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
  * Interface for {@link EventMaster} Write Servcie
  * 
  * @author pavani
- *
+ * @author Rakesh
  */
 public interface EventMasterWritePlatformService {
 

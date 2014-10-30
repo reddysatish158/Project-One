@@ -112,21 +112,22 @@ public class CountryCurrencyWritePlatformServiceImpl implements
 			if (!changes.isEmpty()) {
 				this.countryCurrencyRepository.saveAndFlush(countryCurrency);
 			}
-			return new CommandProcessingResultBuilder() 
-					.withCommandId(command.commandId()) 
-					.withEntityId(countryCurrency.getId()) 
-					.with(changes) 
+			return new CommandProcessingResultBuilder()
+					.withCommandId(command.commandId())
+					.withEntityId(countryCurrency.getId()).with(changes)
 					.build();
 		} catch (DataIntegrityViolationException dve) {
 			if (dve.getCause() instanceof ConstraintViolationException) {
-			handleDataIntegretyIssue(dve, command);
+				handleDataIntegretyIssue(dve, command);
 			}
 			return new CommandProcessingResult(Long.valueOf(-1));
 		}
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see #deleteCountryCurrency(java.lang.Long)
 	 */
 	@Transactional
@@ -140,7 +141,7 @@ public class CountryCurrencyWritePlatformServiceImpl implements
 		return new CommandProcessingResultBuilder().withEntityId(entityId)
 				.build();
 	}
-	
+
 	private CountryCurrency retrieveCodeById(final Long currencyConfigId) {
 		final CountryCurrency countryCurrency = this.countryCurrencyRepository
 				.findOne(currencyConfigId);

@@ -9,7 +9,7 @@ import org.mifosplatform.billing.chargecode.data.DurationTypeData;
 
 /**
  * @author hugo
- *
+ * 
  */
 public interface ChargeCodeReadPlatformService {
 

@@ -17,13 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class OfficePaymentsWritePlatformServiceImpl implements OfficePaymentsWritePlatformService {
 	
-	private final static Logger logger = LoggerFactory.getLogger(OfficePaymentsWritePlatformServiceImpl.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(OfficePaymentsWritePlatformServiceImpl.class);
 	private final PlatformSecurityContext context;
 	private final OfficePaymentsRepository officePaymentsRepository;
 	private final OfficePaymentsCommandFromApiJsonDeserializer fromApiJsonDeserializer;
 	@Autowired
-	public OfficePaymentsWritePlatformServiceImpl(final PlatformSecurityContext context,final OfficePaymentsRepository  officePaymentsRepository,
-			final OfficePaymentsCommandFromApiJsonDeserializer fromApiJsonDeserializer){
+	public OfficePaymentsWritePlatformServiceImpl(final PlatformSecurityContext context, 
+				final OfficePaymentsRepository  officePaymentsRepository,
+				final OfficePaymentsCommandFromApiJsonDeserializer fromApiJsonDeserializer){
 		
 		this.context = context;
 		this.officePaymentsRepository = officePaymentsRepository;
@@ -32,7 +33,7 @@ public class OfficePaymentsWritePlatformServiceImpl implements OfficePaymentsWri
 
 	@Transactional
 	@Override
-	public CommandProcessingResult createOfficePayment(JsonCommand command) {
+	public CommandProcessingResult createOfficePayment(final JsonCommand command) {
 
 		try {
 			context.authenticatedUser();
@@ -46,20 +47,19 @@ public class OfficePaymentsWritePlatformServiceImpl implements OfficePaymentsWri
 		}
 	}
 	
-	private void handleCodeDataIntegrityIssues(JsonCommand command,
-			DataIntegrityViolationException dve) {
-		 Throwable realCause = dve.getMostSpecificCause();
-	        if (realCause.getMessage().contains("receipt_no")) {
-	            final String name = command.stringValueOfParameterNamed("receiptNo");
-	            throw new PlatformDataIntegrityException("error.msg.officePayment_receiptNo.duplicate.name", "A Receipt Number with this Code'"
+	private void handleCodeDataIntegrityIssues(final JsonCommand command, final DataIntegrityViolationException dve) {
+		
+		 final Throwable realCause = dve.getMostSpecificCause();
+	     if (realCause.getMessage().contains("receipt_no")) {
+	    	 final String name = command.stringValueOfParameterNamed("receiptNo");
+	         throw new PlatformDataIntegrityException("error.msg.officePayment_receiptNo.duplicate.name", "A Receipt Number with this Code'"
 	                    + name + "'already exists", "receiptNo", name);
-	        }
+	     }
 
-	        logger.error(dve.getMessage(), dve);
-	        throw new PlatformDataIntegrityException("error.msg.cund.unknown.data.integrity.issue",
+	     LOGGER.error(dve.getMessage(), dve);
+	     throw new PlatformDataIntegrityException("error.msg.cund.unknown.data.integrity.issue",
 	                "Unknown data integrity issue with resource: " + realCause.getMessage());
 		
 	}
-
 
 }

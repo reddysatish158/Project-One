@@ -7,8 +7,8 @@ import java.sql.Types;
 import java.util.List;
 import java.util.Map;
 
-import org.mifosplatform.billing.pricing.data.PriceData;
-import org.mifosplatform.billing.pricing.service.PriceReadPlatformService;
+import org.mifosplatform.billing.planprice.data.PriceData;
+import org.mifosplatform.billing.planprice.service.PriceReadPlatformService;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.portfolio.order.data.CustomValidationData;
@@ -65,14 +65,8 @@ public class OrderDetailsReadPlatformServicesImpl implements OrderDetailsReadPla
 			String serviceType = rs.getString("serviceType");
 			Long serviceid = rs.getLong("serviceId");
 
-			ServiceData serviceData=new ServiceData(id,serviceid,serviceCode, null,null,null, null);
-			
-			serviceData.setServiceType(serviceType);
-
-
-			return serviceData; 
-
-		}
+			return new ServiceData(id,serviceid,serviceCode,null, null,null,null, null,serviceType,null);
+	}
 	}
 	@Override
 		public List<PriceData> retrieveAllPrices(Long plan_code,String billingFreq, Long clientId ) {

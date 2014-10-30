@@ -5,8 +5,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.portfolio.association.data.AssociationData;
@@ -25,11 +25,11 @@ public class HardwareAssociationReadplatformServiceImpl implements HardwareAssoc
 	
 	 private final JdbcTemplate jdbcTemplate;
 	 private final PlatformSecurityContext context;
-	 private final GlobalConfigurationRepository configurationRepository;
+	 private final ConfigurationRepository configurationRepository;
 	
 	  
 	    @Autowired
-	    public HardwareAssociationReadplatformServiceImpl(final PlatformSecurityContext context,final GlobalConfigurationRepository configurationRepository, 
+	    public HardwareAssociationReadplatformServiceImpl(final PlatformSecurityContext context,final ConfigurationRepository configurationRepository, 
 	    		final TenantAwareRoutingDataSource dataSource)
 	    {
 	        this.context = context;
@@ -44,7 +44,7 @@ public class HardwareAssociationReadplatformServiceImpl implements HardwareAssoc
               try
               {
             	  String sql=null;
-            	  GlobalConfigurationProperty configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
+            	  Configuration configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
             	  HarderwareMapper mapper = new HarderwareMapper();
             	  
             	  if(configurationProperty.getValue().equalsIgnoreCase(ConfigurationConstants.CONFIR_PROPERTY_SALE)){
@@ -167,7 +167,7 @@ public class HardwareAssociationReadplatformServiceImpl implements HardwareAssoc
             {
 				
 				  String sql=null;
-			  	  GlobalConfigurationProperty configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
+			  	  Configuration configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
 			  	  AssociationMapper mapper = new AssociationMapper();
 			  	  
 			  	 if(configurationProperty.getValue().equalsIgnoreCase(ConfigurationConstants.CONFIR_PROPERTY_SALE)){
@@ -243,7 +243,7 @@ public class HardwareAssociationReadplatformServiceImpl implements HardwareAssoc
 	            {
 				 
 				 String sql=null;
-			  	  GlobalConfigurationProperty configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
+			  	  Configuration configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
 			  	  Mapper mapper = new Mapper();
 			  	  
 			  	 if(configurationProperty.getValue().equalsIgnoreCase(ConfigurationConstants.CONFIR_PROPERTY_SALE)){
@@ -306,7 +306,7 @@ public class HardwareAssociationReadplatformServiceImpl implements HardwareAssoc
             try
             {
           	  String sql=null;
-          	  GlobalConfigurationProperty configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
+          	  Configuration configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
           	ClientHarderwareMapper mapper = new ClientHarderwareMapper();
           	  
           	  if(configurationProperty.getValue().equalsIgnoreCase(ConfigurationConstants.CONFIR_PROPERTY_SALE)){

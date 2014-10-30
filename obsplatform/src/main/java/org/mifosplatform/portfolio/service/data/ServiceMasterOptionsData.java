@@ -18,15 +18,15 @@ private String serviceUnitType;
 private String isOptional;
 private Collection<EnumValuesData> serviceTypes;
 private List<EnumOptionData> serviceUnitTypes,status;
-private String isAutoProvision;
 
-public ServiceMasterOptionsData(Collection<ServiceMasterData> serviceMasterOptions)
+public ServiceMasterOptionsData(final Collection<ServiceMasterData> serviceMasterOptions)
 {
 	this.serviceMasterOptions=serviceMasterOptions;
 }
 
-public ServiceMasterOptionsData(Long id, String serviceCode,
-		String serviceDescription,String serviceType, String serviceUnitType, String status, String isOptional, String isAutoProvision) {
+public ServiceMasterOptionsData(final Long id, final String serviceCode,
+		final String serviceDescription,final String serviceType, final String serviceUnitType, final String status,
+		final String isOptional, final String isAutoProvision) {
 	this.id=id;
 	this.serviceDescription=serviceDescription;
 	this.serviceCode=serviceCode;
@@ -34,13 +34,12 @@ public ServiceMasterOptionsData(Long id, String serviceCode,
 	this.serviceUnitType=serviceUnitType;
 	this.serviceStatus=status;
 	this.isOptional=isOptional;
-	this.isAutoProvision=isAutoProvision;
 
 }
 
 
-public ServiceMasterOptionsData(Collection<EnumValuesData> serviceType,
-		List<EnumOptionData> serviceUnitType, List<EnumOptionData> status) {
+public ServiceMasterOptionsData(final Collection<EnumValuesData> serviceType,
+		final List<EnumOptionData> serviceUnitType, final List<EnumOptionData> status) {
 	this.serviceTypes=serviceType;
 	this.serviceUnitTypes=serviceUnitType;
 	this.status=status;
@@ -67,47 +66,47 @@ public String getServiceType() {
 }
 
 public void setServiceMasterOptions(
-		Collection<ServiceMasterData> serviceMasterOptions) {
+		final Collection<ServiceMasterData> serviceMasterOptions) {
 	this.serviceMasterOptions = serviceMasterOptions;
 }
 
-public void setId(Long id) {
+public void setId(final Long id) {
 	this.id = id;
 }
 
-public void setServiceCode(String serviceCode) {
+public void setServiceCode(final String serviceCode) {
 	this.serviceCode = serviceCode;
 }
 
-public void setServiceDescription(String serviceDescription) {
+public void setServiceDescription(final String serviceDescription) {
 	this.serviceDescription = serviceDescription;
 }
 
-public void setServiceType(String serviceType) {
+public void setServiceType(final String serviceType) {
 	this.serviceType = serviceType;
 }
 
-public void setServiceStatus(String serviceStatus) {
+public void setServiceStatus(final String serviceStatus) {
 	this.serviceStatus = serviceStatus;
 }
 
-public void setServiceUnitType(String serviceUnitType) {
+public void setServiceUnitType(final String serviceUnitType) {
 	this.serviceUnitType = serviceUnitType;
 }
 
-public void setIsOptional(String isOptional) {
+public void setIsOptional(final String isOptional) {
 	this.isOptional = isOptional;
 }
 
-public void setServiceTypes(Collection<EnumValuesData> serviceTypes) {
+public void setServiceTypes(final Collection<EnumValuesData> serviceTypes) {
 	this.serviceTypes = serviceTypes;
 }
 
-public void setServiceUnitTypes(List<EnumOptionData> serviceUnitTypes) {
+public void setServiceUnitTypes(final List<EnumOptionData> serviceUnitTypes) {
 	this.serviceUnitTypes = serviceUnitTypes;
 }
 
-public void setStatus(List<EnumOptionData> status) {
+public void setStatus(final List<EnumOptionData> status) {
 	this.status = status;
 }
 

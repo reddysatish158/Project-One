@@ -50,8 +50,7 @@ public class UsersApiResource {
     private final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(Arrays.asList("id", "officeId", "officeName", "username",
             "firstname", "lastname", "email", "allowedOffices", "availableRoles", "selectedRoles"));
 
-    private final String resourceNameForPermissions = "USER";
-
+    private static final String RESOURCENAMEFORPERMISSIONS = "USER";
     private final PlatformSecurityContext context;
     private final AppUserReadPlatformService readPlatformService;
     private final OfficeReadPlatformService officeReadPlatformService;
@@ -77,7 +76,7 @@ public class UsersApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveUsers(@Context final UriInfo uriInfo) {
 
-        context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+        context.authenticatedUser().validateHasReadPermission(RESOURCENAMEFORPERMISSIONS);
 
         final Collection<AppUserData> users = this.readPlatformService.retrieveAllUsers();
 
@@ -91,7 +90,7 @@ public class UsersApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveUser(@PathParam("userId") final Long userId, @Context final UriInfo uriInfo) {
 
-        context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+        context.authenticatedUser().validateHasReadPermission(RESOURCENAMEFORPERMISSIONS);
 
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
@@ -108,9 +107,9 @@ public class UsersApiResource {
     @Path("template")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public String newUserDetails(@Context final UriInfo uriInfo) {
+    public String newUserTemplateDetails(@Context final UriInfo uriInfo) {
 
-        context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+        context.authenticatedUser().validateHasReadPermission(RESOURCENAMEFORPERMISSIONS);
 
         final AppUserData user = this.readPlatformService.retrieveNewUserDetails();
 

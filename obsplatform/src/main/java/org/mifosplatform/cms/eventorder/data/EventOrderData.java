@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.joda.time.LocalDate;
 import org.mifosplatform.cms.eventmaster.data.EventMasterData;
-import org.mifosplatform.cms.eventpricing.data.ClientTypeData;
+import org.mifosplatform.cms.eventprice.data.ClientTypeData;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
 import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
 

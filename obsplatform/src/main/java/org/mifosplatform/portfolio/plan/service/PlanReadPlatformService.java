@@ -7,11 +7,9 @@ import org.mifosplatform.portfolio.contract.data.SubscriptionData;
 import org.mifosplatform.portfolio.plan.data.BillRuleData;
 import org.mifosplatform.portfolio.plan.data.PlanData;
 import org.mifosplatform.portfolio.plan.data.ServiceData;
-import org.mifosplatform.portfolio.plan.data.SystemData;
 
 public interface PlanReadPlatformService {
 	
-	List<ServiceData> retrieveAllServices();
 	
 	List<PlanData> retrievePlanData(String planType);
 	
@@ -19,13 +17,9 @@ public interface PlanReadPlatformService {
 	
 	List<EnumOptionData> retrieveNewStatus();
 	
-	List<ServiceData> getselectedService(List<ServiceData> data,List<ServiceData> services);
-	
 	List<BillRuleData> retrievebillRules();
 	
 	PlanData retrievePlanData(Long planCode);
-	
-	List<SystemData> retrieveSystemData();
 	
 	List<ServiceData> retrieveSelectedServices(Long planId);
 	

@@ -7,8 +7,8 @@ import java.util.Map;
 import org.hibernate.exception.ConstraintViolationException;
 import org.joda.time.LocalDate;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
-import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -26,6 +26,7 @@ import org.mifosplatform.logistics.itemdetails.domain.InventoryItemDetailsAlloca
 import org.mifosplatform.logistics.itemdetails.domain.InventoryItemDetailsRepository;
 import org.mifosplatform.logistics.itemdetails.exception.ActivePlansFoundException;
 import org.mifosplatform.logistics.itemdetails.exception.OrderQuantityExceedsException;
+import org.mifosplatform.logistics.itemdetails.exception.SerialNumberAlreadyExistException;
 import org.mifosplatform.logistics.itemdetails.serialization.InventoryItemAllocationCommandFromApiJsonDeserializer;
 import org.mifosplatform.logistics.itemdetails.serialization.InventoryItemCommandFromApiJsonDeserializer;
 import org.mifosplatform.logistics.mrn.domain.InventoryTransactionHistory;
@@ -44,8 +45,8 @@ import org.mifosplatform.portfolio.order.service.OrderDetailsReadPlatformService
 import org.mifosplatform.portfolio.order.service.OrderReadPlatformService;
 import org.mifosplatform.portfolio.transactionhistory.service.TransactionHistoryWritePlatformService;
 import org.mifosplatform.provisioning.provisioning.service.ProvisioningWritePlatformService;
-import org.mifosplatform.scheduledjobs.uploadstatus.domain.UploadStatus;
-import org.mifosplatform.scheduledjobs.uploadstatus.domain.UploadStatusRepository;
+import org.mifosplatform.scheduledjobs.dataupload.domain.DataUpload;
+import org.mifosplatform.scheduledjobs.dataupload.domain.DataUploadRepository;
 import org.mifosplatform.workflow.eventactionmapping.exception.EventActionMappingNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +68,7 @@ public class InventoryItemDetailsWritePlatformServiceImp implements InventoryIte
 	private InventoryItemDetailsRepository inventoryItemDetailsRepository;
 	private InventoryGrnRepository inventoryGrnRepository;
 	private FromJsonHelper fromJsonHelper;
-	private UploadStatusRepository uploadStatusRepository;
+	private DataUploadRepository uploadStatusRepository;
 	private TransactionHistoryWritePlatformService transactionHistoryWritePlatformService;
 	private InventoryItemCommandFromApiJsonDeserializer inventoryItemCommandFromApiJsonDeserializer;
 	private InventoryItemAllocationCommandFromApiJsonDeserializer inventoryItemAllocationCommandFromApiJsonDeserializer;
@@ -75,7 +76,7 @@ public class InventoryItemDetailsWritePlatformServiceImp implements InventoryIte
 	private InventoryItemDetailsReadPlatformService inventoryItemDetailsReadPlatformService;
 	private OneTimeSaleRepository oneTimeSaleRepository;
 	private InventoryTransactionHistoryJpaRepository inventoryTransactionHistoryJpaRepository;
-	private GlobalConfigurationRepository configurationRepository;
+	private ConfigurationRepository configurationRepository;
 	private HardwareAssociationReadplatformService associationReadplatformService;
 	private HardwareAssociationWriteplatformService associationWriteplatformService;
 	private final ItemRepository itemRepository;
@@ -92,8 +93,8 @@ public class InventoryItemDetailsWritePlatformServiceImp implements InventoryIte
 			final InventoryItemCommandFromApiJsonDeserializer inventoryItemCommandFromApiJsonDeserializer,final InventoryItemAllocationCommandFromApiJsonDeserializer inventoryItemAllocationCommandFromApiJsonDeserializer, 
 			final InventoryItemDetailsAllocationRepository inventoryItemDetailsAllocationRepository,final OneTimeSaleReadPlatformService oneTimeSaleReadPlatformService, 
 			final OneTimeSaleRepository oneTimeSaleRepository,final InventoryItemDetailsRepository inventoryItemDetailsRepository,final FromJsonHelper fromJsonHelper, 
-			final UploadStatusRepository uploadStatusRepository,final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,
-			final InventoryTransactionHistoryJpaRepository inventoryTransactionHistoryJpaRepository,final GlobalConfigurationRepository  configurationRepository,
+			final DataUploadRepository uploadStatusRepository,final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,
+			final InventoryTransactionHistoryJpaRepository inventoryTransactionHistoryJpaRepository,final ConfigurationRepository  configurationRepository,
 			final HardwareAssociationReadplatformService associationReadplatformService,final HardwareAssociationWriteplatformService associationWriteplatformService,
 			final ItemRepository itemRepository,final OrderReadPlatformService orderReadPlatformService,final ProvisioningWritePlatformService provisioningWritePlatformService) 
 	{
@@ -147,7 +148,7 @@ public class InventoryItemDetailsWritePlatformServiceImp implements InventoryIte
 			
 			if(itemMasterId.contains(inventoryItemDetails.getItemMasterId())){
 				
-				throw new PlatformDataIntegrityException("validation.error.msg.inventory.item.duplicate.serialNumber", "validation.error.msg.inventory.item.duplicate.serialNumber", "validation.error.msg.inventory.item.duplicate.serialNumber","validation.error.msg.inventory.item.duplicate.serialNumber");
+				throw new SerialNumberAlreadyExistException(inventoryItemDetails.getSerialNumber());
 			}
 			 
 			
@@ -319,7 +320,7 @@ public class InventoryItemDetailsWritePlatformServiceImp implements InventoryIte
 						i++;
 						
 						  //For Plan And HardWare Association
-						GlobalConfigurationProperty configurationProperty=this.configurationRepository.findOneByName(CONFIG_PROPERTY);
+						Configuration configurationProperty=this.configurationRepository.findOneByName(CONFIG_PROPERTY);
 						
 						if(configurationProperty.isEnabled()){
 							configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
@@ -367,7 +368,7 @@ public class InventoryItemDetailsWritePlatformServiceImp implements InventoryIte
 			LocalDate currentDate = new LocalDate();
 			currentDate.toDate();
 			if(uploadStatus.equalsIgnoreCase("UPLOADSTATUS")){
-				UploadStatus uploadStatusObject = this.uploadStatusRepository.findOne(orderId);
+				DataUpload uploadStatusObject = this.uploadStatusRepository.findOne(orderId);
 				uploadStatusObject.update(currentDate,processStatus,processRecords,null,errormessage,null);
 				this.uploadStatusRepository.save(uploadStatusObject);
 			}

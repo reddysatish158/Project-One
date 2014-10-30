@@ -22,8 +22,8 @@ import org.mifosplatform.cms.eventmaster.service.EventMasterReadPlatformService;
 import org.mifosplatform.cms.eventorder.data.EventOrderData;
 import org.mifosplatform.cms.eventorder.data.EventOrderDeviceData;
 import org.mifosplatform.cms.eventorder.service.EventOrderReadplatformServie;
-import org.mifosplatform.cms.eventpricing.data.ClientTypeData;
-import org.mifosplatform.cms.eventpricing.service.EventPricingReadPlatformService;
+import org.mifosplatform.cms.eventprice.data.ClientTypeData;
+import org.mifosplatform.cms.eventprice.service.EventPriceReadPlatformService;
 import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -55,7 +55,7 @@ public class EventOrderApiResource {
 			private final EventOrderReadplatformServie eventOrderReadplatformServie; 
 			private final EventMasterReadPlatformService eventMasterReadPlatformService;
 			private final MCodeReadPlatformService codeReadPlatformService;
-			private final EventPricingReadPlatformService eventPricingReadService;
+			private final EventPriceReadPlatformService eventPricingReadService;
 				
 			@Autowired
 			public EventOrderApiResource(
@@ -67,7 +67,7 @@ public class EventOrderApiResource {
 					final EventOrderReadplatformServie eventOrderReadplatformServie,
 					final EventMasterReadPlatformService eventMasterReadPlatformService,
 					final MCodeReadPlatformService codeReadPlatformService,
-					final EventPricingReadPlatformService eventPricingReadService) {
+					final EventPriceReadPlatformService eventPricingReadService) {
 				this.context = context;
 				this.toApiJsonSerializer = toApiJsonSerializer;
 				this.apiRequestParameterHelper = apiRequestParameterHelper;
