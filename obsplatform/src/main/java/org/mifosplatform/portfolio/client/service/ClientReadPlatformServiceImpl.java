@@ -96,13 +96,13 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
 
         final AppUser currentUser = context.authenticatedUser();
         final Configuration configurationRepository=this.configurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
-        ClientMapper clientMapper = new ClientMapper(configurationRepository.getValue());
+        final ClientMapper clientMapper = new ClientMapper(configurationRepository.getValue());
         final String hierarchy = currentUser.getOffice().getHierarchy();
         
         
         final String hierarchySearchString = hierarchy + "%";
        
-        StringBuilder sqlBuilder = new StringBuilder(200);
+        final StringBuilder sqlBuilder = new StringBuilder(200);
         sqlBuilder.append("select SQL_CALC_FOUND_ROWS ");
         
         sqlBuilder.append(clientMapper.schema());
@@ -153,10 +153,6 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
         	extraCriteria = " and ( display_name like '%" + sqlSearch + "%' OR c.account_no like '%"+sqlSearch+"%' OR g.group_name like '%"+sqlSearch+"%' "
         			+ " OR IFNULL(( Select min(serial_no) from b_allocation ba where c.id=ba.client_id),'No Hardware') LIKE '%"+sqlSearch+"%' )";
             
-/*        	display_name like '%undefined%' OR c.account_no LIKE '%undefined%' 
-        	OR IFNULL(( Select min(serial_no) from b_allocation ba where c.id=ba.client_id),'No Hardware') LIKE '%undefined%'
-            */
-            
         }
 
         if (officeId != null) {
@@ -193,7 +189,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
         }
         
         if(status !=null){
-        	Integer statusValue=ClientStatus.fromStatus(status); 
+        	final Integer statusValue=ClientStatus.fromStatus(status); 
         	extraCriteria += " c.status_enum like " + statusValue;
         }
 
@@ -204,16 +200,16 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
     public ClientData retrieveOne(final Long clientId) {
 
         try {
-            AppUser currentUser = context.authenticatedUser();
-            String hierarchy = currentUser.getOffice().getHierarchy();
-            String hierarchySearchString = hierarchy + "%";
+        	final AppUser currentUser = context.authenticatedUser();
+        	final String hierarchy = currentUser.getOffice().getHierarchy();
+        	final String hierarchySearchString = hierarchy + "%";
             final Configuration configurationRepository=this.configurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
-            ClientMapper clientMapper = new ClientMapper(configurationRepository.getValue());
-            String sql = "select " + clientMapper.schema() + " where o.hierarchy like ? and c.id = ? and a.address_key='PRIMARY'";
-            ClientData clientData = this.jdbcTemplate.queryForObject(sql,clientMapper,new Object[] { hierarchySearchString, clientId });
-            String clientGroupsSql = "select " + this.clientGroupsMapper.parentGroupsSchema();
+            final ClientMapper clientMapper = new ClientMapper(configurationRepository.getValue());
+            final String sql = "select " + clientMapper.schema() + " where o.hierarchy like ? and c.id = ? and a.address_key='PRIMARY'";
+            final ClientData clientData = this.jdbcTemplate.queryForObject(sql,clientMapper,new Object[] { hierarchySearchString, clientId });
+            final String clientGroupsSql = "select " + this.clientGroupsMapper.parentGroupsSchema();
 
-            Collection<GroupGeneralData> parentGroups = this.jdbcTemplate.query(clientGroupsSql, this.clientGroupsMapper,new Object[] { clientId });
+            final Collection<GroupGeneralData> parentGroups = this.jdbcTemplate.query(clientGroupsSql, this.clientGroupsMapper,new Object[] { clientId });
             return ClientData.setParentGroups(clientData, parentGroups);
         } catch (EmptyResultDataAccessException e) {
             throw new ClientNotFoundException(clientId);
@@ -312,9 +308,9 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
 
         private final String schema;
         
-        public ClientMapper(String configProp) {
+        public ClientMapper(final String configProp) {
         	
-            StringBuilder builder = new StringBuilder(400);
+        	final StringBuilder builder = new StringBuilder(400);
 
             builder.append("c.id as id, c.account_no as accountNo,g.group_name as groupName, c.external_id as externalId, c.status_enum as statusEnum, ");
             builder.append("c.office_id as officeId, o.name as officeName, ");
@@ -412,7 +408,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
         private final String schema;
 
         public ClientLookupMapper() {
-            StringBuilder builder = new StringBuilder(200);
+        	final StringBuilder builder = new StringBuilder(200);
 
             builder.append("c.id as id, c.display_name as displayName, ");
             builder.append("c.office_id as officeId, o.name as officeName ");
@@ -447,20 +443,20 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             // Check if client exists
             retrieveOne(clientId);
 
-            List<ClientAccountSummaryData> pendingApprovalLoans = new ArrayList<ClientAccountSummaryData>();
-            List<ClientAccountSummaryData> awaitingDisbursalLoans = new ArrayList<ClientAccountSummaryData>();
-            List<ClientAccountSummaryData> openLoans = new ArrayList<ClientAccountSummaryData>();
-            List<ClientAccountSummaryData> closedLoans = new ArrayList<ClientAccountSummaryData>();
+            final List<ClientAccountSummaryData> pendingApprovalLoans = new ArrayList<ClientAccountSummaryData>();
+            final List<ClientAccountSummaryData> awaitingDisbursalLoans = new ArrayList<ClientAccountSummaryData>();
+            final List<ClientAccountSummaryData> openLoans = new ArrayList<ClientAccountSummaryData>();
+            final List<ClientAccountSummaryData> closedLoans = new ArrayList<ClientAccountSummaryData>();
 
-            ClientLoanAccountSummaryDataMapper rm = new ClientLoanAccountSummaryDataMapper();
+            final ClientLoanAccountSummaryDataMapper rm = new ClientLoanAccountSummaryDataMapper();
 
-            String sql = "select " + rm.loanAccountSummarySchema() + " where l.client_id = ?";
+            final String sql = "select " + rm.loanAccountSummarySchema() + " where l.client_id = ?";
 
-            List<ClientAccountSummaryData> results = this.jdbcTemplate.query(sql, rm, new Object[] { clientId });
+            final List<ClientAccountSummaryData> results = this.jdbcTemplate.query(sql, rm, new Object[] { clientId });
             if (results != null) {
                 for (ClientAccountSummaryData row : results) {
 
-                    LoanStatusMapper statusMapper = new LoanStatusMapper(row.accountStatusId());
+                	final LoanStatusMapper statusMapper = new LoanStatusMapper(row.accountStatusId());
 
                     if (statusMapper.isOpen()) {
                         openLoans.add(row);
@@ -474,19 +470,19 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
                 }
             }
 
-            List<ClientAccountSummaryData> pendingApprovalDepositAccounts = new ArrayList<ClientAccountSummaryData>();
-            List<ClientAccountSummaryData> approvedDepositAccounts = new ArrayList<ClientAccountSummaryData>();
-            List<ClientAccountSummaryData> withdrawnByClientDespositAccounts = new ArrayList<ClientAccountSummaryData>();
-            List<ClientAccountSummaryData> closedDepositAccounts = new ArrayList<ClientAccountSummaryData>();
-            List<ClientAccountSummaryData> rejectedDepositAccounts = new ArrayList<ClientAccountSummaryData>();
-            List<ClientAccountSummaryData> preclosedDepositAccounts = new ArrayList<ClientAccountSummaryData>();
-            List<ClientAccountSummaryData> maturedDepositAccounts = new ArrayList<ClientAccountSummaryData>();
+            final List<ClientAccountSummaryData> pendingApprovalDepositAccounts = new ArrayList<ClientAccountSummaryData>();
+            final List<ClientAccountSummaryData> approvedDepositAccounts = new ArrayList<ClientAccountSummaryData>();
+            final List<ClientAccountSummaryData> withdrawnByClientDespositAccounts = new ArrayList<ClientAccountSummaryData>();
+            final List<ClientAccountSummaryData> closedDepositAccounts = new ArrayList<ClientAccountSummaryData>();
+            final List<ClientAccountSummaryData> rejectedDepositAccounts = new ArrayList<ClientAccountSummaryData>();
+            final List<ClientAccountSummaryData> preclosedDepositAccounts = new ArrayList<ClientAccountSummaryData>();
+            final List<ClientAccountSummaryData> maturedDepositAccounts = new ArrayList<ClientAccountSummaryData>();
 
-            List<ClientAccountSummaryData> pendingApprovalSavingAccounts = new ArrayList<ClientAccountSummaryData>();
-            List<ClientAccountSummaryData> approvedSavingAccounts = new ArrayList<ClientAccountSummaryData>();
-            List<ClientAccountSummaryData> withdrawnByClientSavingAccounts = new ArrayList<ClientAccountSummaryData>();
-            List<ClientAccountSummaryData> rejectedSavingAccounts = new ArrayList<ClientAccountSummaryData>();
-            List<ClientAccountSummaryData> closedSavingAccounts = new ArrayList<ClientAccountSummaryData>();
+            final List<ClientAccountSummaryData> pendingApprovalSavingAccounts = new ArrayList<ClientAccountSummaryData>();
+            final List<ClientAccountSummaryData> approvedSavingAccounts = new ArrayList<ClientAccountSummaryData>();
+            final List<ClientAccountSummaryData> withdrawnByClientSavingAccounts = new ArrayList<ClientAccountSummaryData>();
+            final List<ClientAccountSummaryData> rejectedSavingAccounts = new ArrayList<ClientAccountSummaryData>();
+            final List<ClientAccountSummaryData> closedSavingAccounts = new ArrayList<ClientAccountSummaryData>();
 
             final ClientSavingsAccountSummaryDataMapper savingsAccountSummaryDataMapper = new ClientSavingsAccountSummaryDataMapper();
             final String savingsSql = "select " + savingsAccountSummaryDataMapper.schema() + " where sa.client_id = ?";
@@ -513,11 +509,11 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
         // Check if client exists
         retrieveOne(clientId);
 
-        ClientLoanAccountSummaryDataMapper rm = new ClientLoanAccountSummaryDataMapper();
+        final ClientLoanAccountSummaryDataMapper rm = new ClientLoanAccountSummaryDataMapper();
 
-        String sql = "select " + rm.loanAccountSummarySchema() + " where l.client_id = ? and l.loan_officer_id = ?";
+        final String sql = "select " + rm.loanAccountSummarySchema() + " where l.client_id = ? and l.loan_officer_id = ?";
 
-        List<ClientAccountSummaryData> loanAccounts = this.jdbcTemplate.query(sql, rm, new Object[] { clientId, loanOfficerId });
+        final List<ClientAccountSummaryData> loanAccounts = this.jdbcTemplate.query(sql, rm, new Object[] { clientId, loanOfficerId });
 
         return loanAccounts;
     }
@@ -527,7 +523,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
         final String schemaSql;
 
         public ClientSavingsAccountSummaryDataMapper() {
-            StringBuilder accountsSummary = new StringBuilder();
+        	final StringBuilder accountsSummary = new StringBuilder();
             accountsSummary.append("sa.id as id, sa.account_no as accountNo, sa.external_id as externalId,");
             accountsSummary.append("sa.product_id as productId, p.name as productName ");
             accountsSummary.append("from m_savings_account sa ");
@@ -558,7 +554,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
 
         public String loanAccountSummarySchema() {
 
-            StringBuilder accountsSummary = new StringBuilder("l.id as id, l.account_no as accountNo, l.external_id as externalId,");
+        	final StringBuilder accountsSummary = new StringBuilder("l.id as id, l.account_no as accountNo, l.external_id as externalId,");
             accountsSummary.append("l.product_id as productId, lp.name as productName,").append("l.loan_status_id as statusId ")
                     .append("from m_loan l ").append("LEFT JOIN m_product_loan AS lp ON lp.id = l.product_id ");
 
@@ -573,9 +569,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             final String externalId = rs.getString("externalId");
             final Long productId = JdbcSupport.getLong(rs, "productId");
             final String loanProductName = rs.getString("productName");
-            final Integer loanStatusId = JdbcSupport.getInteger(rs, "statusId");
-        //    final LoanStatusEnumData loanStatus = LoanEnumerations.status(loanStatusId);
-
+            
             return new ClientAccountSummaryData(id, accountNo, externalId, productId, loanProductName, null);
         }
     }
@@ -662,7 +656,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
 	    		
 	    		final GroupDataMapper mapper = new GroupDataMapper();
 	    		
-	    		String sql = "select "+mapper.GroupDataSchema();
+	    		final String sql = "select "+mapper.groupDataSchema();
 	    		
 	    		return jdbcTemplate.query(sql,mapper,new Object[]{});
 	    		
@@ -672,13 +666,13 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
 	    }
 	    private static final class GroupDataMapper implements RowMapper<GroupData>{
 	    	
-	    	public String GroupDataSchema(){
+	    	public String groupDataSchema(){
 	    		
 	    		return "bg.id as id,bg.group_name as groupName from b_group bg";
 	    	}
 	    	
 	    	@Override
-	    	public GroupData mapRow(final ResultSet rs,@SuppressWarnings("unused") final int rowNum)throws SQLException{
+	    	public GroupData mapRow(final ResultSet rs,final int rowNum)throws SQLException{
 	    		
 	    		final Long id = rs.getLong("id");
 	    		final String groupName = rs.getString("groupName");
@@ -702,6 +696,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
 		public ClientCategoryData retrieveClientBillModes(final Long clientId) {
 			
 			try{
+
 				this.context.authenticatedUser();
 				final BillModeMapper mapper=new BillModeMapper();
 				final String sql="select id as id , bill_mode as billMode from m_client where id=?";
@@ -744,6 +739,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
 		 * @see #retrievedParentAndChildData(java.lang.Long, java.lang.Long)
 		 */
 		@Override
+
 		public List<ClientCategoryData> retrievedParentAndChildData(final Long parentClientId,final Long clientId) {
 			
 			   try{
@@ -778,11 +774,11 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
          }
 		
 		@Override
-		public Boolean countChildClients(Long entityId) {
+		public Boolean countChildClients(final Long entityId) {
 			 context.authenticatedUser();
 			 boolean result = false;
 			 final String sql="select count(id) from m_client m where m.parent_id= ? ";
-			 int count=	this.jdbcTemplate.queryForObject(sql, Integer.class,new Object[]{entityId});
+			 final int count=	this.jdbcTemplate.queryForObject(sql, Integer.class,new Object[]{entityId});
 			 if(count > 0){
 				 result = true;
 			 }

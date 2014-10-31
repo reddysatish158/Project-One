@@ -6,6 +6,7 @@ update m_permission set code='CREATE_GROUPSDETAILS',entity_name='GROUPSDETAILS' 
 
 update m_permission set code='READ_GROUPSDETAILS', entity_name='GROUPSDETAILS' where code='READ_GROUPS';
 
+
 insert IGNORE into m_permission values(null, 'organisation', 'CREATE_VOUCHER', 'VOUCHER', 'CREATE', '0');
 insert IGNORE into m_permission values(null, 'organisation', 'PROCESS_VOUCHER', 'VOUCHER', 'PROCESS', '1');
 insert IGNORE into m_permission values(null, 'organisation', 'READ_VOUCHER', 'VOUCHER', 'READ', '1');
