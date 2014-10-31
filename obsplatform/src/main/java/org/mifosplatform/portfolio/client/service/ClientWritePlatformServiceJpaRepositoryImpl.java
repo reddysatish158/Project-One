@@ -148,23 +148,6 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     @Transactional
     @Override
     public CommandProcessingResult deleteClient(final Long clientId,final JsonCommand command) {
-    	/*
-
-        final Client client = this.clientRepository.findOneWithNotFoundDetection(clientId);
-
-        if (client.isNotPending()) { throw new ClientMustBePendingToBeDeletedException(clientId); }
-
-        List<Note> relatedNotes = this.noteRepository.findByClientId(clientId);
-        this.noteRepository.deleteInBatch(relatedNotes);
-
-        this.clientRepository.delete(client);
-
-        return new CommandProcessingResultBuilder() //
-                .withOfficeId(client.officeId()) //
-                .withClientId(clientId) //
-                .withEntityId(clientId) //
-                .build();
-    */
 
         try {
 
@@ -176,7 +159,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             final Long closureReasonId = command.longValueOfParameterNamed(ClientApiConstants.closureReasonIdParamName);
             final CodeValue closureReason = this.codeValueRepository.findByCodeNameAndId(ClientApiConstants.CLIENT_CLOSURE_REASON, closureReasonId);
             
-            List<OrderData> orderDatas=this.orderReadPlatformService.getActivePlans(clientId, null);
+            final List<OrderData> orderDatas=this.orderReadPlatformService.getActivePlans(clientId, null);
             
             if(!orderDatas.isEmpty()){
             	
@@ -198,7 +181,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             this.clientRepository.saveAndFlush(client);
             
             if(client.getEmail() != null){
-            	SelfCare selfCare=this.selfCareRepository.findOneByEmail(client.getEmail());
+            	final SelfCare selfCare=this.selfCareRepository.findOneByEmail(client.getEmail());
             	 if(selfCare != null){
             		 selfCare.setIsDeleted(true);
             		 this.selfCareRepository.save(selfCare);
@@ -207,7 +190,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             }
             
             
-            List<ActionDetaislData> actionDetaislDatas=this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_CLOSE_CLIENT);
+            final List<ActionDetaislData> actionDetaislDatas=this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_CLOSE_CLIENT);
 			if(actionDetaislDatas.size() != 0){
 			this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,command.entityId(), clientId.toString(),null);
 			}
@@ -230,7 +213,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
      */
     private void handleDataIntegrityIssues(final JsonCommand command, final DataIntegrityViolationException dve) {
 
-        Throwable realCause = dve.getMostSpecificCause();
+    	final Throwable realCause = dve.getMostSpecificCause();
         if (realCause.getMessage().contains("external_id")) {
 
             final String externalId = command.stringValueOfParameterNamed("externalId");
@@ -258,7 +241,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 
     
     @Override
-    public CommandProcessingResult createClient(final JsonCommand command,boolean mailNotification) {
+    public CommandProcessingResult createClient(final JsonCommand command,final boolean mailNotification) {
 
         try {
             context.authenticatedUser();
@@ -270,11 +253,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             if (clientOffice == null) { throw new OfficeNotFoundException(officeId); }
 
             final Long groupId = command.longValueOfParameterNamed(ClientApiConstants.groupIdParamName);
-            Group clientParentGroup = null;
-           /* if (groupId != null) {
-                clientParentGroup = this.groupRepository.findOne(groupId);
-                if (clientParentGroup == null) { throw new GroupNotFoundException(groupId); }
-            }*/
+            final Group clientParentGroup = null;
 
             final Client newClient = Client.createNew(clientOffice, clientParentGroup, command);
             this.clientRepository.save(newClient);
@@ -288,11 +267,11 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                 this.clientRepository.saveAndFlush(newClient);
             }
             
-            Configuration configuration=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_IS_SELFCAREUSER);
+            final Configuration configuration=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_IS_SELFCAREUSER);
             
             if(configuration !=null && configuration.isEnabled()){
             	
-            		JSONObject selfcarecreation = new JSONObject();
+            		final JSONObject selfcarecreation = new JSONObject();
             		selfcarecreation.put("userName", newClient.getFirstname());
     				selfcarecreation.put("uniqueReference", newClient.getEmail());
     				selfcarecreation.put("clientId", newClient.getId());
@@ -300,11 +279,11 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     				selfcarecreation.put("mailNotification",mailNotification);
     				
     				final CommandWrapper selfcareCommandRequest = new CommandWrapperBuilder().createSelfCare().withJson(selfcarecreation.toString()).build();
-    				final CommandProcessingResult selfcareCommandresult = this.portfolioCommandSourceWritePlatformService.logCommandSource(selfcareCommandRequest);
+    				this.portfolioCommandSourceWritePlatformService.logCommandSource(selfcareCommandRequest);
             	}
             
             
-            List<ActionDetaislData> actionDetailsDatas=this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_CREATE_CLIENT);
+            final List<ActionDetaislData> actionDetailsDatas=this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_CREATE_CLIENT);
             if(!actionDetailsDatas.isEmpty()){
             this.actiondetailsWritePlatformService.AddNewActions(actionDetailsDatas,newClient.getId(),newClient.getId().toString(),null);
             }
@@ -312,13 +291,13 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             transactionHistoryWritePlatformService.saveTransactionHistory(newClient.getId(), "New Client", newClient.getActivationDate(),
             		"Name:"+newClient.getName(),"ImageKey:"+newClient.imageKey(),"AccountNumber:"+newClient.getAccountNo());
             
-            return new CommandProcessingResultBuilder() //
-                    .withCommandId(command.commandId()) //
-                    .withOfficeId(clientOffice.getId()) //
+            return new CommandProcessingResultBuilder() 
+                    .withCommandId(command.commandId()) 
+                    .withOfficeId(clientOffice.getId()) 
                     .withClientId(newClient.getId())
-                    .withResourceIdAsString(newClient.getId().toString())//
-                    .withGroupId(groupId) //
-                    .withEntityId(newClient.getId()) //
+                    .withResourceIdAsString(newClient.getId().toString())
+                    .withGroupId(groupId) 
+                    .withEntityId(newClient.getId()) 
                     .build();
         } catch (DataIntegrityViolationException dve) {
             handleDataIntegrityIssues(command, dve);
@@ -347,18 +326,18 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             
             if (changes.containsKey(ClientApiConstants.groupParamName)) {
             	
-            	   List<ServiceParameters> serviceParameters=this.serviceParametersRepository.findGroupNameByclientId(clientId);
+            		final List<ServiceParameters> serviceParameters=this.serviceParametersRepository.findGroupNameByclientId(clientId);
             	   String newGroup=null;
             	   if(clientForUpdate.getGroupName() != null){
-            		   GroupsDetails groupsDetails=this.groupsDetailsRepository.findOne(clientForUpdate.getGroupName());
+            		   final GroupsDetails groupsDetails=this.groupsDetailsRepository.findOne(clientForUpdate.getGroupName());
             		   newGroup=groupsDetails.getGroupName();
             	   }
             		   for(ServiceParameters serviceParameter:serviceParameters){
             		   
-            		   Order  order=this.orderRepository.findOne(serviceParameters.get(0).getOrderId());
+            			 final Order  order=this.orderRepository.findOne(serviceParameters.get(0).getOrderId());
             		   
-            		   Plan plan=this.planRepository.findOne(order.getPlanId());
-            		   String oldGroup=serviceParameter.getParameterValue();
+            			 final Plan plan=this.planRepository.findOne(order.getPlanId());
+            			 final String oldGroup=serviceParameter.getParameterValue();
             		   if(newGroup == null){
             			   newGroup=plan.getPlanCode();
             		   }
@@ -366,7 +345,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             		   this.serviceParametersRepository.saveAndFlush(serviceParameter);
             		   
                       if(order.getStatus().equals(StatusTypeEnum.ACTIVE.getValue().longValue())){
-            		    CommandProcessingResult processingResult=this.prepareRequestWriteplatformService.prepareNewRequest(order, plan, UserActionStatusTypeEnum.CHANGE_GROUP.toString());
+                    	  final CommandProcessingResult processingResult=this.prepareRequestWriteplatformService.prepareNewRequest(order, plan, UserActionStatusTypeEnum.CHANGE_GROUP.toString());
                	        this.ProvisioningWritePlatformService.postOrderDetailsForProvisioning(order,plan.getCode(),UserActionStatusTypeEnum.CHANGE_GROUP.toString(),
                			processingResult.resourceId(),oldGroup,null,order.getId());
                       }
@@ -376,12 +355,12 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
            
             transactionHistoryWritePlatformService.saveTransactionHistory(clientForUpdate.getId(), "Update Client", clientForUpdate.getActivationDate(),
             		"Changes:"+changes.toString(),"Name:"+clientForUpdate.getName(),"ImageKey:"+clientForUpdate.imageKey(),"AccountNumber:"+clientForUpdate.getAccountNo());
-            return new CommandProcessingResultBuilder() //
-                    .withCommandId(command.commandId()) //
-                    .withOfficeId(clientForUpdate.officeId()) //
-                    .withClientId(clientId) //
-                    .withEntityId(clientId) //
-                    .with(changes) //
+            return new CommandProcessingResultBuilder() 
+                    .withCommandId(command.commandId()) 
+                    .withOfficeId(clientForUpdate.officeId()) 
+                    .withClientId(clientId) 
+                    .withEntityId(clientId) 
+                    .with(changes) 
                     .build();
         } catch (DataIntegrityViolationException dve) {
             handleDataIntegrityIssues(command, dve);
@@ -424,9 +403,9 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     public CommandProcessingResult saveOrUpdateClientImage(final Long clientId, final String imageName, final InputStream inputStream) {
         try {
             final Client client = this.clientRepository.findOneWithNotFoundDetection(clientId);
-            String imageUploadLocation = setupForClientImageUpdate(clientId, client);
+            final String imageUploadLocation = setupForClientImageUpdate(clientId, client);
 
-            String imageLocation = FileUtils.saveToFileSystem(inputStream, imageUploadLocation, imageName);
+            final String imageLocation = FileUtils.saveToFileSystem(inputStream, imageUploadLocation, imageName);
 
             return updateClientImage(clientId, client, imageLocation);
         } catch (IOException ioe) {
@@ -492,7 +471,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 
     @Transactional
 	@Override
-	public CommandProcessingResult updateClientTaxExemption(Long clientId,JsonCommand command) {
+	public CommandProcessingResult updateClientTaxExemption(final Long clientId,final JsonCommand command) {
 		
 		Client clientTaxStatus=null;
 		
@@ -517,7 +496,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 
     @Transactional
 	@Override
-	public CommandProcessingResult updateClientBillMode(Long clientId,JsonCommand command) {
+	public CommandProcessingResult updateClientBillMode(final Long clientId,final JsonCommand command) {
 		
 		Client clientBillMode=null;
 	
@@ -541,7 +520,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 
     @Transactional
 	@Override
-	public CommandProcessingResult createClientParent(Long entityId,JsonCommand command) {
+	public CommandProcessingResult createClientParent(final Long entityId,final JsonCommand command) {
 			Client childClient=null;
 			Client parentClient=null;
 		
@@ -550,7 +529,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 					final String parentAcntId=command.stringValueOfParameterNamed("accountNo");
 					childClient = this.clientRepository.findOneWithNotFoundDetection(entityId);
 					//count no of childs for a given client 
-					Boolean count =this.clientReadPlatformService.countChildClients(entityId);
+					final Boolean count =this.clientReadPlatformService.countChildClients(entityId);
 					parentClient=this.clientRepository.findOneWithAccountId(parentAcntId);
 					
 						if(parentClient.getParentId() == null && !parentClient.getId().equals(childClient.getId())&&count.equals(false)){	
@@ -577,11 +556,11 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 	
 	@Transactional
 	@Override
-	public CommandProcessingResult deleteChildFromParentClient(Long clientId, JsonCommand command) {
+	public CommandProcessingResult deleteChildFromParentClient(final Long clientId, final JsonCommand command) {
 		Long parentId=null;
 		try {
 			context.authenticatedUser();
-			Client childClient = this.clientRepository.findOneWithNotFoundDetection(clientId);
+			final Client childClient = this.clientRepository.findOneWithNotFoundDetection(clientId);
 			parentId=childClient.getParentId();
 			childClient.setParentId(null);
 			this.clientRepository.saveAndFlush(childClient);

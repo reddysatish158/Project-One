@@ -34,7 +34,6 @@ final public class ClientData implements Comparable<ClientData> {
     private final String externalId;
 
     private final EnumOptionData status;
-    @SuppressWarnings("unused")
     private final Boolean active;
     private final LocalDate activationDate;
 
@@ -203,9 +202,9 @@ final public class ClientData implements Comparable<ClientData> {
         this.taxExemption=taxExemption;
         this.entryType=entryType;
        if(balanceCheck !=null && balanceCheck.equalsIgnoreCase("Y"))
-    	   this.balanceCheck=true;
+    	   this.setBalanceCheck(true);
        else
-    	   this.balanceCheck=false;
+    	   this.setBalanceCheck(false);
    
 
     }
@@ -290,7 +289,7 @@ final public class ClientData implements Comparable<ClientData> {
     }
 
 	public void setAddressTemplate(AddressData data) {
-		this.addressTemplateData=data;
+		this.setAddressTemplateData(data);
 		
 	}
 
@@ -302,7 +301,7 @@ final public class ClientData implements Comparable<ClientData> {
 		this.configurationProperty = configurationProperty;
 	}
 	public void setConfigurationPropertyForIos(Configuration configurationPropertyforIos) {
-		this.configurationPropertyforIos = configurationPropertyforIos;
+		this.setConfigurationPropertyforIos(configurationPropertyforIos);
 	}
 
 	public void setBalanceCheck(boolean isEnabled) {
@@ -332,6 +331,35 @@ final public class ClientData implements Comparable<ClientData> {
 
 	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
+	}
+
+	public AddressData getAddressTemplateData() {
+		return addressTemplateData;
+	}
+
+	public void setAddressTemplateData(AddressData addressTemplateData) {
+		this.addressTemplateData = addressTemplateData;
+	}
+
+	public Configuration getConfigurationPropertyforIos() {
+		return configurationPropertyforIos;
+	}
+
+	public void setConfigurationPropertyforIos(
+			Configuration configurationPropertyforIos) {
+		this.configurationPropertyforIos = configurationPropertyforIos;
+	}
+
+	public Collection<CodeValueData> getClosureReasons() {
+		return closureReasons;
+	}
+
+	public Boolean getBalanceCheck() {
+		return balanceCheck;
+	}
+
+	public void setBalanceCheck(Boolean balanceCheck) {
+		this.balanceCheck = balanceCheck;
 	}
 	
 	
