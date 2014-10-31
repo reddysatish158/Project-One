@@ -3,7 +3,7 @@ package org.mifosplatform.workflow.eventactionmapping.service;
 import java.util.List;
 import java.util.Map;
 
-import org.mifosplatform.billing.discountmaster.exceptions.DiscountNotFoundException;
+import org.mifosplatform.billing.discountmaster.exception.DiscountMasterNotFoundException;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
@@ -23,7 +23,8 @@ import org.springframework.stereotype.Service;
 public class EventActionMappingWritePlatformServiceImpl implements
 		EventActionMappingWritePlatformService {
 
-	private final static Logger LOGGER = LoggerFactory.getLogger(EventActionMappingWritePlatformServiceImpl.class);
+	private final static Logger LOGGER = LoggerFactory
+			.getLogger(EventActionMappingWritePlatformServiceImpl.class);
 	private final PlatformSecurityContext context;
 	private final EventActionMappingCommandFromApiJsonDeserializer apiJsonDeserializer;
 	private final EventActionMappingRepository eventActionMappingRepository;
@@ -47,19 +48,22 @@ public class EventActionMappingWritePlatformServiceImpl implements
 		try {
 			this.context.authenticatedUser();
 			this.apiJsonDeserializer.validateForCreate(command.json());
-			final EventActionMapping eventActionMapping = EventActionMapping.fromJson(command);
+			final EventActionMapping eventActionMapping = EventActionMapping
+					.fromJson(command);
 			final List<EventActionMappingData> datas = this.eventActionMappingReadPlatformService
 					.retrieveEvents(eventActionMapping.getEventName());
-			
+
 			for (EventActionMappingData data : datas) {
 
-				if (data.getActionName().equalsIgnoreCase(eventActionMapping.getActionName())) {
-					throw new EventNameDuplicateException(eventActionMapping.getActionName());
+				if (data.getActionName().equalsIgnoreCase(
+						eventActionMapping.getActionName())) {
+					throw new EventNameDuplicateException(
+							eventActionMapping.getActionName());
 				}
 			}
-			
+
 			this.eventActionMappingRepository.save(eventActionMapping);
-			
+
 			return new CommandProcessingResult(eventActionMapping.getId());
 
 		} catch (DataIntegrityViolationException dve) {
@@ -72,20 +76,18 @@ public class EventActionMappingWritePlatformServiceImpl implements
 	private void handleCodeDataIntegrityIssues(final JsonCommand command,
 			final DataIntegrityViolationException dve) {
 		final Throwable realCause = dve.getMostSpecificCause();
-		if (realCause.getMessage().contains("discountcode")) {
-			final String name = command.stringValueOfParameterNamed("discountcode");
-			throw new PlatformDataIntegrityException("error.msg.discount.duplicate.name",
-					"A discount with Code'" + name + "'already exists");
-		}
 
 		LOGGER.error(dve.getMessage(), dve);
-		throw new PlatformDataIntegrityException("error.msg.cund.unknown.data.integrity.issue",
-				"Unknown data integrity issue with resource: " + realCause.getMessage());
+		throw new PlatformDataIntegrityException(
+				"error.msg.cund.unknown.data.integrity.issue",
+				"Unknown data integrity issue with resource: "
+						+ realCause.getMessage());
 
 	}
 
 	@Override
-	public CommandProcessingResult updateEventActionMapping(Long id, JsonCommand command) {
+	public CommandProcessingResult updateEventActionMapping(Long id,
+			JsonCommand command) {
 		try {
 
 			this.context.authenticatedUser();
@@ -109,12 +111,14 @@ public class EventActionMappingWritePlatformServiceImpl implements
 
 	private EventActionMapping eventActionretrieveById(final Long id) {
 
-		final EventActionMapping eventAction = this.eventActionMappingRepository.findOne(id);
-		
+		final EventActionMapping eventAction = this.eventActionMappingRepository
+				.findOne(id);
+
 		if (eventAction == null) {
-			throw new DiscountNotFoundException(id.toString());
+			throw new DiscountMasterNotFoundException(id);
 		}
 		return eventAction;
+
 	}
 
 	@Override
@@ -122,10 +126,11 @@ public class EventActionMappingWritePlatformServiceImpl implements
 
 		try {
 			this.context.authenticatedUser();
-			final EventActionMapping event = this.eventActionMappingRepository.findOne(id);
+			final EventActionMapping event = this.eventActionMappingRepository
+					.findOne(id);
 
 			if (event == null) {
-				throw new DiscountNotFoundException(id.toString());
+				throw new DiscountMasterNotFoundException(id);
 			}
 
 			event.delete();
@@ -135,5 +140,6 @@ public class EventActionMappingWritePlatformServiceImpl implements
 		} catch (Exception exception) {
 			return null;
 		}
+
 	}
 }

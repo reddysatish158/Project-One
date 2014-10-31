@@ -5,12 +5,16 @@ import java.util.List;
 
 import org.mifosplatform.billing.currency.data.CountryCurrencyData;
 
+/**
+ * @author hugo
+ *
+ */
 public interface CountryCurrencyReadPlatformService {
 
-	List<CountryCurrencyData> getTheCountryCurrencyDetaiils(String string);
+	List<CountryCurrencyData> getCountryCurrencyDetailsByName(String string);
 
-	Collection<CountryCurrencyData> retrieveCurrencyConfigurationDetails();
+	Collection<CountryCurrencyData> retrieveAllCurrencyConfigurationDetails();
 
-	CountryCurrencyData retrieveCurrencyConfigurationDetails(Long id);
+	CountryCurrencyData retrieveSingleCurrencyConfigurationDetails(Long id);
 
 }

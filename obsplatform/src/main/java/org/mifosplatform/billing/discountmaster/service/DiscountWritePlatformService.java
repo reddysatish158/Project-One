@@ -3,6 +3,10 @@ package org.mifosplatform.billing.discountmaster.service;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 
+/**
+ * @author hugo
+ * 
+ */
 public interface DiscountWritePlatformService {
 
 	CommandProcessingResult createNewDiscount(JsonCommand command);

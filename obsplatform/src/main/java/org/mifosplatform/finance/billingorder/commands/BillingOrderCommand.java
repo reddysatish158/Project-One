@@ -3,12 +3,11 @@ package org.mifosplatform.finance.billingorder.commands;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import org.mifosplatform.billing.discountmaster.data.DiscountMasterData;
 
-import org.mifosplatform.finance.data.DiscountMasterData;
+
 
 public class BillingOrderCommand {
-
-
 
 	private final Long clientOrderId;
 	private final Long orderPriceId;
@@ -30,16 +29,16 @@ public class BillingOrderCommand {
 	private final DiscountMasterData discountMasterData;
 	private final Integer taxInclusive;
 
-
-
 	public BillingOrderCommand(Long clientOrderId, Long oderPriceId,
 			Long clientId, Date startDate, Date nextBillableDate, Date endDate,
 			String billingFrequency, String chargeCode, String chargeType,
-			Integer chargeDuration,String durationType, Date invoiceTillDate, BigDecimal price,
-			String billingAlign,final List<InvoiceTaxCommand> listOfTax,final Date billStartDate,
-			final Date billEndDate,final DiscountMasterData discountMasterData,Integer taxInclusive) {
+			Integer chargeDuration, String durationType, Date invoiceTillDate,
+			BigDecimal price, String billingAlign,
+			final List<InvoiceTaxCommand> listOfTax, final Date billStartDate,
+			final Date billEndDate,
+			final DiscountMasterData discountMasterData, Integer taxInclusive) {
 		this.clientOrderId = clientOrderId;
-		this.orderPriceId = (oderPriceId !=null) ? oderPriceId : new Long(0);
+		this.orderPriceId = (oderPriceId != null) ? oderPriceId : new Long(0);
 		this.clientId = clientId;
 		this.startDate = startDate;
 		this.nextBillableDate = nextBillableDate;
@@ -54,9 +53,9 @@ public class BillingOrderCommand {
 		this.billingAlign = billingAlign;
 		this.billStartDate = billStartDate;
 		this.billEndDate = billEndDate;
-		this.listOfTax =listOfTax;
+		this.listOfTax = listOfTax;
 		this.discountMasterData = discountMasterData;
-		this.taxInclusive =  taxInclusive;
+		this.taxInclusive = taxInclusive;
 	}
 
 	public Long getClientId() {
@@ -130,7 +129,7 @@ public class BillingOrderCommand {
 	public void setBillEndDate(Date billEndDate) {
 		this.billEndDate = billEndDate;
 	}
-	
+
 	public DiscountMasterData getDiscountMasterData() {
 		return discountMasterData;
 	}
@@ -141,7 +140,5 @@ public class BillingOrderCommand {
 	public Integer getTaxInclusive() {
 		return taxInclusive;
 	}
-	
-	
-	
+
 }

@@ -10,15 +10,19 @@ import java.util.List;
 import org.mifosplatform.infrastructure.dataqueries.data.GenericResultsetData;
 import org.mifosplatform.infrastructure.dataqueries.data.ResultsetColumnHeaderData;
 
+/**
+ * @author hugo
+ * 
+ */
 public interface GenericDataService {
 
-    GenericResultsetData fillGenericResultSet(final String sql);
+	GenericResultsetData fillGenericResultSet(final String sql);
 
-    String generateJsonFromGenericResultsetData(GenericResultsetData grs);
+	String generateJsonFromGenericResultsetData(GenericResultsetData grs);
 
-    String replace(String str, String pattern, String replace);
+	String replace(String str, String pattern, String replace);
 
-    String wrapSQL(String sql);
+	String wrapSQL(String sql);
 
-    List<ResultsetColumnHeaderData> fillResultsetColumnHeaders(String datatable);
+	List<ResultsetColumnHeaderData> fillResultsetColumnHeaders(String datatable);
 }

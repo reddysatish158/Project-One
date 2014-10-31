@@ -1,4 +1,4 @@
-package org.mifosplatform.billing.discountmaster.commands;
+package org.mifosplatform.billing.discountmaster.data;
 
 public class DiscountValues {
 	public String discountType;

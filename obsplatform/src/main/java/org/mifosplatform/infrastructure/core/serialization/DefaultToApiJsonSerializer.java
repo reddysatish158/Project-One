@@ -50,7 +50,7 @@ public final class DefaultToApiJsonSerializer<T> implements ToApiJsonSerializer<
     }
     
     @Override
-    public String serializePretty(boolean prettyOn, final Object object) {
+	public String serializePretty(boolean prettyOn, final Object object) {
         String json = "";
         
         if (prettyOn) {

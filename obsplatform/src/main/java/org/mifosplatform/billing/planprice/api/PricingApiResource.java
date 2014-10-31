@@ -26,7 +26,7 @@ import org.mifosplatform.billing.planprice.service.PriceReadPlatformService;
 import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
-import org.mifosplatform.finance.data.DiscountMasterData;
+import org.mifosplatform.billing.discountmaster.data.DiscountMasterData;
 import org.mifosplatform.infrastructure.core.api.ApiRequestParameterHelper;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
@@ -110,7 +110,7 @@ public class PricingApiResource {
 	    	
 	    	context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
 	    	List<ServiceData> serviceData = this.priceReadPlatformService.retrieveServiceDetails(planId);
-	    	List<ChargeCodeData> chargeCode = this.chargeCodeReadPlatformService.getChargeCodes();
+	    	List<ChargeCodeData> chargeCode = this.chargeCodeReadPlatformService.retrieveAllChargeCodes();
 	    	List<EnumOptionData> datas = this.priceReadPlatformService.retrieveChargeVariantData();
 	    	List<DiscountMasterData> discountMasterDatas= this.discountReadPlatformService.retrieveAllDiscounts();
 	    	List<PriceRegionData> priceRegionData = this.regionalPriceReadplatformService.getThePriceregionsDetails();

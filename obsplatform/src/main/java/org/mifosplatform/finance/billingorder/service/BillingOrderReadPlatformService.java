@@ -6,7 +6,7 @@ import org.joda.time.LocalDate;
 import org.mifosplatform.billing.taxmaster.data.TaxMappingRateData;
 import org.mifosplatform.finance.billingorder.data.BillingOrderData;
 import org.mifosplatform.finance.billingorder.data.GenerateInvoiceData;
-import org.mifosplatform.finance.data.DiscountMasterData;
+import org.mifosplatform.billing.discountmaster.data.DiscountMasterData;
 import org.mifosplatform.portfolio.order.data.OrderPriceData;
 
 public interface BillingOrderReadPlatformService {
