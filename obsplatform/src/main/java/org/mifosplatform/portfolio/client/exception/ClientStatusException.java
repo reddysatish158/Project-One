@@ -12,7 +12,12 @@ import org.mifosplatform.infrastructure.core.exception.AbstractPlatformDomainRul
  */
 public class ClientStatusException extends AbstractPlatformDomainRuleException {
 
-    public ClientStatusException(final Long clientId) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public ClientStatusException(final Long clientId) {
         super("error.msg.client.is.Already.actvie", "Client with identifier " + clientId + "is already active", clientId);
     }
     
