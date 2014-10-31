@@ -13,8 +13,8 @@ public class ClientCategoryData {
 	private Boolean count;
 	private List<ClientCategoryData> parentClientData;
 
-	public ClientCategoryData(Long id,String categoryType,String billMode,String accountNo,String displayName,
-			List<ClientCategoryData> parentClientData,Boolean count) {
+	public ClientCategoryData(final Long id,final String categoryType,final String billMode,final String accountNo,final String displayName,
+			final List<ClientCategoryData> parentClientData,final Boolean count) {
            this.id=id;
            this.categoryType=categoryType;
            this.billMode = billMode;
@@ -26,7 +26,7 @@ public class ClientCategoryData {
         	   this.displayLabel = null; 
            }
            this.count=count;
-           this.parentClientData=parentClientData;
+           this.setParentClientData(parentClientData);
 	}
 
 	private String generateLabelName() {
@@ -65,6 +65,14 @@ public class ClientCategoryData {
     
 	public Boolean setCount(Boolean count){
 		return this.count=count;
+	}
+
+	public List<ClientCategoryData> getParentClientData() {
+		return parentClientData;
+	}
+	
+	public void setParentClientData(List<ClientCategoryData> parentClientData) {
+		this.parentClientData = parentClientData;
 	}
 	
 }

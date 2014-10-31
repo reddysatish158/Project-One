@@ -1,6 +1,7 @@
 package org.mifosplatform.billing.taxmapping.api;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -28,113 +29,123 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.mifosplatform.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
+import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
+import org.mifosplatform.organisation.mcodevalues.service.MCodeReadPlatformService;
 import org.mifosplatform.organisation.priceregion.data.PriceRegionData;
 import org.mifosplatform.organisation.priceregion.service.RegionalPriceReadplatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-
-
-
+/**
+ * @author hugo
+ *
+ *this api class use to create,update taxes for different charge codes
+ */
 @Path("taxmap")
 @Component
 @Scope("singleton")
 public class TaxMapApiResource {
 
-	private final Set<String> RESPONSE_TAXMAPPING_PARAMETERS = new HashSet<String>(Arrays.asList("id","chargeCode","taxCode","startDate","type","rate","TaxRegionId",
-			"priceRegionData","TaxRegion"));
-	
-	
+	private final Set<String> RESPONSE_TAXMAPPING_PARAMETERS = new HashSet<String>(
+			Arrays.asList("id", "chargeCode", "taxCode", "startDate", "type",
+					"rate", "taxRegionId", "taxRegion", "priceRegionData"));
+
 	private String resourceNameForPermissions = "TAXMAPPING";
 	private final ApiRequestParameterHelper apiRequestParameterHelper;
 	private final PlatformSecurityContext context;
-	private final DefaultToApiJsonSerializer<ChargeCodeData> apiJsonSerializer;
-	private final DefaultToApiJsonSerializer<TaxMapData> apiJsonSerializerForTaxMap;
-	private final PortfolioCommandSourceWritePlatformService portfolioCommandSourceWritePlatformService;
+	private final DefaultToApiJsonSerializer<TaxMapData> apiJsonSerializer;
+	private final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService;
 	private final TaxMapReadPlatformService taxMapReadPlatformService;
 	private final RegionalPriceReadplatformService regionalPriceReadplatformService;
-	
+	private final MCodeReadPlatformService mCodeReadPlatformService;
+
 	@Autowired
-	public TaxMapApiResource(ApiRequestParameterHelper apiRequestParameterHelper, PlatformSecurityContext context,
-			DefaultToApiJsonSerializer<ChargeCodeData> apiJsonSerializer,PortfolioCommandSourceWritePlatformService portfolioCommandSourceWritePlatformService,
-			TaxMapReadPlatformService taxMapReadPlatformService,DefaultToApiJsonSerializer<TaxMapData> apiJsonSerializerForTaxMap,
-			final RegionalPriceReadplatformService regionalPriceReadplatformService) {
-	this.context = context;
-	this.apiJsonSerializer = apiJsonSerializer;
-	this.apiRequestParameterHelper = apiRequestParameterHelper;
-	this.portfolioCommandSourceWritePlatformService = portfolioCommandSourceWritePlatformService;
-	this.taxMapReadPlatformService = taxMapReadPlatformService;
-	this.apiJsonSerializerForTaxMap = apiJsonSerializerForTaxMap;
-	this.regionalPriceReadplatformService=regionalPriceReadplatformService;
+	public TaxMapApiResource(
+			final ApiRequestParameterHelper apiRequestParameterHelper,
+			final PlatformSecurityContext context,
+			final DefaultToApiJsonSerializer<TaxMapData> apiJsonSerializer,
+			final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService,
+			final TaxMapReadPlatformService taxMapReadPlatformService,
+			final RegionalPriceReadplatformService regionalPriceReadplatformService,
+			final MCodeReadPlatformService mCodeReadPlatformService) {
+		this.context = context;
+		this.apiJsonSerializer = apiJsonSerializer;
+		this.apiRequestParameterHelper = apiRequestParameterHelper;
+		this.commandSourceWritePlatformService = commandSourceWritePlatformService;
+		this.taxMapReadPlatformService = taxMapReadPlatformService;
+		this.regionalPriceReadplatformService = regionalPriceReadplatformService;
+		this.mCodeReadPlatformService = mCodeReadPlatformService;
 	}
-	
+
 	@GET
 	@Path("template")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retriveTaxTemplate(@QueryParam("chargeCode") final String chargeCode,@Context final UriInfo uriInfo){
-		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+	public String retriveTaxMapTemplate(@QueryParam("chargeCode") final String chargeCode,@Context final UriInfo uriInfo) {
 		
-		List<TaxMapData> tmd = taxMapReadPlatformService.retriveTaxMapTypeData();
-		List<PriceRegionData> priceRegionData = this.regionalPriceReadplatformService.getThePriceregionsDetails();
-		ChargeCodeData chargeCodeData  = new ChargeCodeData(tmd);
-		
-		chargeCodeData.setRegionalTaxData(priceRegionData);
-		chargeCodeData.setChargeCode(chargeCode);
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-		return this.apiJsonSerializer.serialize(settings,chargeCodeData,RESPONSE_TAXMAPPING_PARAMETERS);
-	}
-	
-	
-	@GET
-	@Path("{chargCode}/chargeTax")
-	@Consumes({MediaType.APPLICATION_JSON})
-	@Produces({MediaType.APPLICATION_JSON})
-	public String retriveTaxDetails(@PathParam("chargCode") final String chargeCode,@Context final UriInfo uriInfo){
 		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		List<TaxMapData> taxMapData = taxMapReadPlatformService.retriveTaxMapData(chargeCode);
+		final Collection<MCodeData> taxTypeData = this.mCodeReadPlatformService.getCodeValue("type");
+		final List<PriceRegionData> priceRegionData = this.regionalPriceReadplatformService.getPriceRegionsDetails();
+		final TaxMapData taxMapData=new TaxMapData(taxTypeData,priceRegionData,chargeCode);
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-		return this.apiJsonSerializerForTaxMap.serialize(settings,taxMapData,RESPONSE_TAXMAPPING_PARAMETERS);
+		return this.apiJsonSerializer.serialize(settings, taxMapData,RESPONSE_TAXMAPPING_PARAMETERS);
 	}
-	
+
 	@POST
 	@Path("{chargCode}")
-	@Consumes({MediaType.APPLICATION_JSON})
-	@Produces({MediaType.APPLICATION_JSON})
-	public String createTaxMap(@PathParam("chargeCode")final String chargeCode,final String jsonRequestBody){
-		
-		CommandWrapper command = new CommandWrapperBuilder().createTaxMap(chargeCode).withJson(jsonRequestBody).build();
-		CommandProcessingResult result = portfolioCommandSourceWritePlatformService.logCommandSource(command);
-		return apiJsonSerializerForTaxMap.serialize(result);
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String createTaxMap(@PathParam("chargeCode") final String chargeCode,final String jsonRequestBody) {
+
+	final CommandWrapper command = new CommandWrapperBuilder().createTaxMap(chargeCode).withJson(jsonRequestBody).build();
+	final CommandProcessingResult result = commandSourceWritePlatformService.logCommandSource(command);
+	return apiJsonSerializer.serialize(result);
 	}
 	
 	@GET
-	@Path("{taxMapId}")
-	@Consumes({MediaType.APPLICATION_JSON})
-	@Produces({MediaType.APPLICATION_JSON})
-	public String getTaxMapForUpdate(@PathParam("taxMapId") final Long taxMapId, @Context final UriInfo uriInfo){
-		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		TaxMapData taxMapData = taxMapReadPlatformService.retriveTaxMapDataForUpdate(taxMapId);
-		List<ChargeCodeData> ccd = taxMapReadPlatformService.retriveTemplateData();
-		List<TaxMapData> tmd = taxMapReadPlatformService.retriveTaxMapTypeData();
-		List<PriceRegionData> priceRegionData = this.regionalPriceReadplatformService.getThePriceregionsDetails();
-		taxMapData.setChargeCodeForTax(ccd);
-		taxMapData.setTaxMapData(tmd);
-		taxMapData.setRegionalTaxData(priceRegionData);
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-		return this.apiJsonSerializerForTaxMap.serialize(settings,taxMapData,RESPONSE_TAXMAPPING_PARAMETERS);
+	@Path("{chargCode}/chargetax")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String retriveTaxDetailsForChargeCode(@PathParam("chargCode") final String chargeCode,	@Context final UriInfo uriInfo) {
 		
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		final List<TaxMapData> taxMapData = taxMapReadPlatformService.retriveTaxMapData(chargeCode);
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		return this.apiJsonSerializer.serialize(settings, taxMapData,RESPONSE_TAXMAPPING_PARAMETERS);
 	}
-	
+
+
+	@GET
+	@Path("{taxMapId}")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String retrievedSingleTaxMap(@PathParam("taxMapId") final Long taxMapId,@Context final UriInfo uriInfo) {
+		
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		TaxMapData taxMapData = taxMapReadPlatformService.retrievedSingleTaxMapData(taxMapId);
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		if(settings.isTemplate()){
+		final List<ChargeCodeData> chargeCodeData = this.taxMapReadPlatformService.retrivedChargeCodeTemplateData();
+		final Collection<MCodeData> taxTypeData = this.mCodeReadPlatformService.getCodeValue("type");
+		final List<PriceRegionData> priceRegionData = this.regionalPriceReadplatformService.getPriceRegionsDetails();
+		taxMapData.setChargeCodesForTax(chargeCodeData);
+		taxMapData.setTaxTypeData(taxTypeData);
+		taxMapData.setPriceRegionData(priceRegionData);
+		}
+		return this.apiJsonSerializer.serialize(settings, taxMapData,RESPONSE_TAXMAPPING_PARAMETERS);
+
+	}
+
 	@PUT
 	@Path("{taxMapId}")
-	@Consumes({MediaType.APPLICATION_JSON})
-	@Produces({MediaType.APPLICATION_JSON})
-	public String updateTaxMapData(@PathParam("taxMapId") final Long taxMapId, final String jsonRequestBody){
-	
-		CommandWrapper commandRequest = new CommandWrapperBuilder().updateTaxMap(taxMapId).withJson(jsonRequestBody).build();
-		CommandProcessingResult result = portfolioCommandSourceWritePlatformService.logCommandSource(commandRequest);	
-		return apiJsonSerializerForTaxMap.serialize(result);
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String updateTaxMapData(@PathParam("taxMapId") final Long taxMapId,final String jsonRequestBody) {
+
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().updateTaxMap(taxMapId).withJson(jsonRequestBody).build();
+		final CommandProcessingResult result = commandSourceWritePlatformService.logCommandSource(commandRequest);
+		return apiJsonSerializer.serialize(result);
 	}
 }

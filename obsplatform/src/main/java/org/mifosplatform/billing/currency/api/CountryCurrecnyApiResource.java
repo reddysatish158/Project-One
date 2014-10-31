@@ -46,8 +46,7 @@ import org.springframework.stereotype.Component;
 @Scope("singleton")
 public class CountryCurrecnyApiResource {
 
-	private final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(
-			Arrays.asList("id", "country", "currency", "status",
+	private final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(Arrays.asList("id", "country", "currency", "status",
 					"baseCurrency", "conversionRate"));
 
 	private final String resorceNameForPermission = "COUNTRYCURRENCY";
@@ -90,14 +89,10 @@ public class CountryCurrecnyApiResource {
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String retrieveCurrencyConfigurationDetails(
 			@Context final UriInfo uriInfo) {
-		context.authenticatedUser().validateHasReadPermission(
-				resorceNameForPermission);
-		final Collection<CountryCurrencyData> currencyDatas = this.countryCurrencyReadPlatformService
-				.retrieveAllCurrencyConfigurationDetails();
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper
-				.process(uriInfo.getQueryParameters());
-		return this.toApiJsonSerializer.serialize(settings, currencyDatas,
-				RESPONSE_DATA_PARAMETERS);
+		context.authenticatedUser().validateHasReadPermission(resorceNameForPermission);
+		final Collection<CountryCurrencyData> currencyDatas = this.countryCurrencyReadPlatformService.retrieveAllCurrencyConfigurationDetails();
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		return this.toApiJsonSerializer.serialize(settings,currencyDatas,RESPONSE_DATA_PARAMETERS);
 	}
 
 	/**
@@ -108,22 +103,15 @@ public class CountryCurrecnyApiResource {
 	@Path("template")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrieveCurrencyConfigTemplateDetails(
-			@Context final UriInfo uriInfo) {
-		context.authenticatedUser().validateHasReadPermission(
-				resorceNameForPermission);
-		final ApplicationCurrencyConfigurationData configurationData = this.currencyReadPlatformService
-				.retrieveCurrencyConfiguration();
-		final List<String> countryData = this.addressReadPlatformService
-				.retrieveCountryDetails();
-		final List<EnumOptionData> statusData = this.planReadPlatformService
-				.retrieveNewStatus();
-		final CountryCurrencyData currencyData = new CountryCurrencyData(null,
-				configurationData, countryData, statusData);
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper
-				.process(uriInfo.getQueryParameters());
-		return this.toApiJsonSerializer.serialize(settings, currencyData,
-				RESPONSE_DATA_PARAMETERS);
+	public String retrieveCurrencyConfigTemplateDetails(@Context final UriInfo uriInfo) {
+		
+		context.authenticatedUser().validateHasReadPermission(resorceNameForPermission);
+		final ApplicationCurrencyConfigurationData configurationData = this.currencyReadPlatformService.retrieveCurrencyConfiguration();
+		final List<String> countryData = this.addressReadPlatformService.retrieveCountryDetails();
+		final List<EnumOptionData> statusData = this.planReadPlatformService.retrieveNewStatus();
+		final CountryCurrencyData currencyData = new CountryCurrencyData(null,configurationData, countryData, statusData);
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		return this.toApiJsonSerializer.serialize(settings,currencyData,RESPONSE_DATA_PARAMETERS);
 	}
 
 	/**
@@ -133,12 +121,11 @@ public class CountryCurrecnyApiResource {
 	@POST
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String createCountryCurrencyConfigurationDetails(
-			final String apiRequestBodyAsJson) {
-		final CommandWrapper commandRequest = new CommandWrapperBuilder()
-				.createCountryCurrency().withJson(apiRequestBodyAsJson).build();
-		final CommandProcessingResult result = this.commandsSourceWritePlatformService
-				.logCommandSource(commandRequest);
+	public String createCountryCurrencyConfigurationDetails(final String apiRequestBodyAsJson) {
+		
+		context.authenticatedUser().validateHasReadPermission(resorceNameForPermission);
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().createCountryCurrency().withJson(apiRequestBodyAsJson).build();
+		final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 
 	}
@@ -152,25 +139,16 @@ public class CountryCurrecnyApiResource {
 	@Path("{currencyId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String getSingleCurrencyConfigurationDetails(
-			@PathParam("currencyId") final Long currencyId,
-			@Context final UriInfo uriInfo) {
-		context.authenticatedUser().validateHasReadPermission(
-				resorceNameForPermission);
-		final CountryCurrencyData currencyDatas = this.countryCurrencyReadPlatformService
-				.retrieveSingleCurrencyConfigurationDetails(currencyId);
-		final ApplicationCurrencyConfigurationData configurationData = this.currencyReadPlatformService
-				.retrieveCurrencyConfiguration();
-		final List<String> countryData = this.addressReadPlatformService
-				.retrieveCountryDetails();
-		final List<EnumOptionData> statusData = this.planReadPlatformService
-				.retrieveNewStatus();
-		CountryCurrencyData currencyData = new CountryCurrencyData(
-				currencyDatas, configurationData, countryData, statusData);
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper
-				.process(uriInfo.getQueryParameters());
-		return this.toApiJsonSerializer.serialize(settings, currencyData,
-				RESPONSE_DATA_PARAMETERS);
+	public String getSingleCurrencyConfigurationDetails(@PathParam("currencyId") final Long currencyId, @Context final UriInfo uriInfo) {
+		
+		context.authenticatedUser().validateHasReadPermission(resorceNameForPermission);
+		final CountryCurrencyData currencyDatas = this.countryCurrencyReadPlatformService.retrieveSingleCurrencyConfigurationDetails(currencyId);
+		final ApplicationCurrencyConfigurationData configurationData = this.currencyReadPlatformService.retrieveCurrencyConfiguration();
+		final List<String> countryData = this.addressReadPlatformService.retrieveCountryDetails();
+		final List<EnumOptionData> statusData = this.planReadPlatformService.retrieveNewStatus();
+		CountryCurrencyData currencyData = new CountryCurrencyData(currencyDatas, configurationData, countryData, statusData);
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		return this.toApiJsonSerializer.serialize(settings, currencyData,RESPONSE_DATA_PARAMETERS);
 	}
 
 	/**
@@ -182,15 +160,11 @@ public class CountryCurrecnyApiResource {
 	@Path("{currencyId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String updateSingleCurrencyConfigurationDetails(
-			@PathParam("currencyId") final Long currencyId,
-			final String apiRequestBodyAsJson) {
+	public String updateSingleCurrencyConfigurationDetails(@PathParam("currencyId") final Long currencyId,final String apiRequestBodyAsJson) {
 
-		final CommandWrapper commandRequest = new CommandWrapperBuilder()
-				.updateCountryCurrency(currencyId)
-				.withJson(apiRequestBodyAsJson).build();
-		final CommandProcessingResult result = this.commandsSourceWritePlatformService
-				.logCommandSource(commandRequest);
+		context.authenticatedUser().validateHasReadPermission(resorceNameForPermission);
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().updateCountryCurrency(currencyId).withJson(apiRequestBodyAsJson).build();
+		final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 	}
 
@@ -202,12 +176,11 @@ public class CountryCurrecnyApiResource {
 	@Path("{currencyId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String deleteSingleCurrencyConfigurationDetails(
-			@PathParam("currencyId") final Long currencyId) {
-		final CommandWrapper commandRequest = new CommandWrapperBuilder()
-				.deleteCountryCurrency(currencyId).build();
-		final CommandProcessingResult result = this.commandsSourceWritePlatformService
-				.logCommandSource(commandRequest);
+	public String deleteSingleCurrencyConfigurationDetails(@PathParam("currencyId") final Long currencyId) {
+		
+		context.authenticatedUser().validateHasReadPermission(resorceNameForPermission);
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteCountryCurrency(currencyId).build();
+		final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 
 	}

@@ -10,103 +10,106 @@ import org.mifosplatform.billing.chargecode.data.ChargeCodeData;
 import org.mifosplatform.billing.taxmapping.data.TaxMapData;
 import org.mifosplatform.infrastructure.core.domain.JdbcSupport;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
-import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
+/**
+ * @author hugo
+ *
+ */
 @Service
-public class TaxMapReadPlatformServiceImp implements TaxMapReadPlatformService{
+public class TaxMapReadPlatformServiceImp implements TaxMapReadPlatformService {
 
 	private final JdbcTemplate jdbcTemplate;
-	private final PlatformSecurityContext context;
-	
 	
 	@Autowired
-	public TaxMapReadPlatformServiceImp(final TenantAwareRoutingDataSource dataSource,PlatformSecurityContext context) {
-		this.context = context;
+	public TaxMapReadPlatformServiceImp(final TenantAwareRoutingDataSource dataSource) {
+		
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
-		 
+
 	}
 
-
+	/* (non-Javadoc)
+	 * @see #retriveTaxMapData(java.lang.String)
+	 * based on charge code
+	 */
 	@Override
-	public List<TaxMapData> retriveTaxMapData(String chargeCode) {
+	public List<TaxMapData> retriveTaxMapData(final String chargeCode) {
+
+		final TaxMapDataMapper mapper = new TaxMapDataMapper();
+		final String sql = "Select " + mapper.schema()+ " and tmr.charge_code= ?";
+		return jdbcTemplate.query(sql,mapper,new Object[]{chargeCode});
+	}
+
+	/* (non-Javadoc)
+	 * @see #retrievedSingleTaxMapData(java.lang.Long)
+	 */
+	@Override
+	public TaxMapData retrievedSingleTaxMapData(final Long id) {
 		
-		String sql = "SELECT tmr.id AS id,tmr.charge_code AS chargeCode,tmr.tax_code AS taxCode,tmr.start_date AS startDate,tmr.type," +
-				"tmr.rate AS rate,tmr.tax_region_id as TaxRegionId," +
-				" pr.priceregion_name as region  FROM b_tax_mapping_rate tmr,b_priceregion_master pr  where tmr.tax_region_id=pr.id and tmr.charge_code=?";
-		TaxMapDataMapper rowMapper = new TaxMapDataMapper();
-		return jdbcTemplate.query(sql, rowMapper,new Object[]{chargeCode});
+		try{
+			
+        final TaxMapDataMapper mapper = new TaxMapDataMapper();
+		final String sql = "Select " + mapper.schema()+ " and tmr.id = ?";
+		return jdbcTemplate.queryForObject(sql, mapper, new Object[] { id });
+		
+		}catch (EmptyResultDataAccessException accessException) {
+			return null;
+		}
+		
+	}
+
+	private class TaxMapDataMapper implements RowMapper<TaxMapData> {
+		
+		
+		public String schema(){
+			
+			return "tmr.id AS id,tmr.charge_code AS chargeCode,tmr.tax_code AS taxCode,tmr.start_date AS startDate,tmr.type as taxType,"
+				+ "tmr.rate AS rate,tmr.tax_region_id as taxRegionId, pr.priceregion_name as region  FROM b_tax_mapping_rate tmr,"
+				+ "b_priceregion_master pr  where tmr.tax_region_id=pr.id";
+		}
+
+		@Override
+		public TaxMapData mapRow(ResultSet rs, int rowNum) throws SQLException {
+			
+			final Long id = rs.getLong("id");
+			final String chargeCode = rs.getString("chargeCode");
+			final String taxCode = rs.getString("taxCode");
+			final LocalDate startDate = JdbcSupport.getLocalDate(rs, "startDate");
+			final String taxType = rs.getString("taxType");
+			final BigDecimal rate = rs.getBigDecimal("rate");
+			final String region = rs.getString("region");
+			final Long taxRegionId = rs.getLong("taxRegionId");
+			return new TaxMapData(id, chargeCode, taxCode, startDate, taxType,
+					              rate, region, taxRegionId);
+		}
+
 	}
 	
+	/* (non-Javadoc)
+	 * @see #retrivedChargeCodeTemplateData()
+	 */
 	@Override
-	public TaxMapData retriveTaxMapDataForUpdate(final Long id) {
-		
-		String sql = "select tmr.id as id, tmr.charge_code as chargeCode, tmr.tax_code as taxCode, tmr.start_date as startDate, tmr.type, " +
-				"tmr.rate as rate, tmr.tax_region_id as TaxRegionId,pr.priceregion_name as region" +
-				" from b_tax_mapping_rate tmr,b_priceregion_master pr  where tmr.tax_region_id=pr.id and tmr.id = ?";
-		TaxMapDataMapper rowMapper = new TaxMapDataMapper();
-		return jdbcTemplate.queryForObject(sql, rowMapper,new Object[]{id});
-	}
+	public List<ChargeCodeData> retrivedChargeCodeTemplateData() {
 
-
-
-	@Override
-	public List<ChargeCodeData> retriveTemplateData() {
-
-		String sql = "select cc.charge_code as chargeCode, cc.charge_description as chargeDescription from b_charge_codes cc";
-		TaxMapper rowMapper = new TaxMapper();
+		final TaxMapper rowMapper = new TaxMapper();
+		final String sql = "select cc.charge_code as chargeCode, cc.charge_description as chargeDescription from b_charge_codes cc";
 		return jdbcTemplate.query(sql, rowMapper);
 	}
-	
-	@Override
-	public List<TaxMapData> retriveTaxMapTypeData(){
-		String sql = "select mcv.id as id,mcv.code_value as type from m_code_value mcv,m_code mc where mcv.code_id=mc.id and mc.code_name='Type' order by mcv.id";
-		TaxMapTypeMapper rowMapper = new TaxMapTypeMapper();
-		return jdbcTemplate.query(sql,rowMapper);
-	}
-	
-	private class TaxMapper implements RowMapper<ChargeCodeData>{
+
+	private class TaxMapper implements RowMapper<ChargeCodeData> {
 		@Override
 		public ChargeCodeData mapRow(ResultSet rs, int rowNum)
 				throws SQLException {
-			String chargeCode = rs.getString("chargeCode");
-			String chargeDescription = rs.getString("chargeDescription");
-			return new ChargeCodeData(chargeCode,chargeDescription);
+			final String chargeCode = rs.getString("chargeCode");
+			final String chargeDescription = rs.getString("chargeDescription");
+			return new ChargeCodeData(chargeCode, chargeDescription);
 		}
 	}
-	
-	private class TaxMapDataMapper implements RowMapper<TaxMapData>{
 
-		@Override
-		public TaxMapData mapRow(ResultSet rs, int rowNum) throws SQLException {
-			Long id = rs.getLong("id");
-			String chargeCode = rs.getString("chargeCode");
-			String taxCode = rs.getString("taxCode");
-			LocalDate startDate = JdbcSupport.getLocalDate(rs,"startDate");
-			
-			String type = rs.getString("type");
-			BigDecimal rate = rs.getBigDecimal("rate"); 
-			String region=rs.getString("region");
-			Long TaxRegionId=rs.getLong("TaxRegionId");
-			return new TaxMapData(id,chargeCode,taxCode,startDate,type,rate,region,TaxRegionId);
-		}
-		
 	}
-	
-	private class TaxMapTypeMapper implements RowMapper<TaxMapData>{
 
-		@Override
-		public TaxMapData mapRow(ResultSet rs, int rowNum) throws SQLException {
-			String type = rs.getString("type");
-			Long id = rs.getLong("id");
-			return new TaxMapData(id, type);
-		}
-		
-	}
-	
-	
 
-}

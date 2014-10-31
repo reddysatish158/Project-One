@@ -27,7 +27,7 @@ public RegionalPriceReadplatformServiceImpl(final TenantAwareRoutingDataSource d
 }
 
 	@Override
-	public List<PriceRegionData> getThePriceregionsDetails() {
+	public List<PriceRegionData> getPriceRegionsDetails() {
 	
 		try{
 			this.context.authenticatedUser();
@@ -57,8 +57,7 @@ public RegionalPriceReadplatformServiceImpl(final TenantAwareRoutingDataSource d
 		}
 
 		@Override
-		public PriceRegionData mapRow(final ResultSet rs,
-				@SuppressWarnings("unused") final int rowNum)
+		public PriceRegionData mapRow(final ResultSet rs, final int rowNum)
 				throws SQLException {
 			Long id = rs.getLong("id");
 			String priceregionCode = rs.getString("priceregionCode");
@@ -96,8 +95,7 @@ public RegionalPriceReadplatformServiceImpl(final TenantAwareRoutingDataSource d
 		}
 
 		@Override
-		public PriceRegionData mapRow(final ResultSet rs,
-				@SuppressWarnings("unused") final int rowNum)
+		public PriceRegionData mapRow(final ResultSet rs, final int rowNum)
 				throws SQLException {
 			Long id = rs.getLong("id");
 			String priceRegion = rs.getString("priceRegion");

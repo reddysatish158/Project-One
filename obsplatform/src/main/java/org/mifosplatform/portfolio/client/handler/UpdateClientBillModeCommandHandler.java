@@ -23,7 +23,7 @@ public class UpdateClientBillModeCommandHandler implements NewCommandSourceHandl
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
 
-        return this.clientWritePlatformService.updateClientBillMode(command.entityId(), command);
+        return this.clientWritePlatformService.updateClientBillModes(command.entityId(), command);
     }
 }
 

@@ -66,7 +66,7 @@ public class ItemSaleWriteplatformServiceImpl implements ItemSaleWriteplatformSe
             if(taxMap != null){
             	taxrate=taxMap.getRate();
             	//taxPercentage=taxMap.get
-            	if(taxMap.getType().equalsIgnoreCase("percentage")){
+            	if(taxMap.getTaxType().equalsIgnoreCase("percentage")){
             		taxAmount=invoice.getChargeAmount().multiply(taxrate.divide(new BigDecimal(100)));
             		
 

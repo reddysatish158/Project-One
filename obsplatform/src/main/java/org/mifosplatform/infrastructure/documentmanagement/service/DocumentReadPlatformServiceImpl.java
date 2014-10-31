@@ -20,6 +20,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
+/**
+ * @author hugo
+ *
+ */
 @Service
 public class DocumentReadPlatformServiceImpl implements DocumentReadPlatformService {
 
@@ -78,7 +82,7 @@ public class DocumentReadPlatformServiceImpl implements DocumentReadPlatformServ
         }
 
         @Override
-        public DocumentData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
+        public DocumentData mapRow(final ResultSet rs, final int rowNum) throws SQLException {
 
             final Long id = JdbcSupport.getLong(rs, "id");
             final Long parentEntityId = JdbcSupport.getLong(rs, "parentEntityId");

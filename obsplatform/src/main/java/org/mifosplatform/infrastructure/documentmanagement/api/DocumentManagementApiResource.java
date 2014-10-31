@@ -48,6 +48,12 @@ import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataParam;
 
+/**
+ * @author hugo
+ * 
+ * this api class used to upload ,download and delete different  Documents of a client
+ *
+ */
 @Path("{entityType}/{entityId}/documents")
 @Component
 @Scope("singleton")
@@ -98,6 +104,7 @@ public class DocumentManagementApiResource {
             @HeaderParam("Content-Length") final Long fileSize, @FormDataParam("file") final InputStream inputStream,
             @FormDataParam("file") final FormDataContentDisposition fileDetails, @FormDataParam("file") final FormDataBodyPart bodyPart,
             @FormDataParam("name") final String name, @FormDataParam("description") final String description) {
+    	
 
         FileUtils.validateFileSizeWithinPermissibleRange(fileSize, name, ApiConstants.MAX_FILE_UPLOAD_SIZE_IN_MB);
 
@@ -189,9 +196,8 @@ public class DocumentManagementApiResource {
         final DocumentData documentData = this.documentReadPlatformService.retrieveDocument(entityType, entityId, documentId);
         final File file = new File(documentData.fileLocation());
         final ResponseBuilder response = Response.ok(file);
-        response.header("Content-Disposition", "attachment; filename=\"" + documentData.fileName() + "\"");
+        response.header("Content-Disposition", "attachment; filename=\"" + documentData.fileLocation() + "\"");
         response.header("Content-Type", documentData.contentType());
-
         return response.build();
     }
 
@@ -209,9 +215,10 @@ public class DocumentManagementApiResource {
 
         return this.toApiJsonSerializer.serialize(documentIdentifier);
     }
+    
     @POST
     @Path("{ticketId}/attachment")
-   @Consumes({ MediaType.MULTIPART_FORM_DATA })
+    @Consumes({ MediaType.MULTIPART_FORM_DATA })
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String addTicketDetails(@PathParam("ticketId") Long ticketId,@PathParam("entityType") String entityType, @PathParam("entityId") Long entityId,
             @HeaderParam("Content-Length") Long fileSize, @FormDataParam("file") InputStream inputStream,
@@ -243,7 +250,7 @@ public class DocumentManagementApiResource {
         }
 
 					Long detailId = this.ticketMasterWritePlatformService.upDateTicketDetails(ticketMasterCommand,documentCommand,ticketId,inputStream,ticketURL);
-					//return this.toApiJsonSerializer.serialize(detailId);
+				
 					return this.toApiJsonSerializer.serialize(CommandProcessingResult.resourceResult(detailId, null));
 	}
 }

@@ -695,19 +695,21 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
 	    }
 	    
 	    
+	    /* (non-Javadoc)
+	     * @see #retrieveClientBillModes(java.lang.Long)
+	     */
 	    @Override
-		public ClientCategoryData retrieveClientBillModes(Long clientId) {
+		public ClientCategoryData retrieveClientBillModes(final Long clientId) {
 			
-			context.authenticatedUser();
 			try{
-				BillModeMapper mapper=new BillModeMapper();
+				this.context.authenticatedUser();
+				final BillModeMapper mapper=new BillModeMapper();
 				final String sql="select id as id , bill_mode as billMode from m_client where id=?";
 				return this.jdbcTemplate.queryForObject(sql, mapper,new Object[]{clientId});
 				
-			}catch(EmptyResultDataAccessException e){
+			  }catch(EmptyResultDataAccessException e){
 				return null;
 			}
-			
 		}
 		
 		private static final class BillModeMapper implements RowMapper<ClientCategoryData> {
@@ -721,42 +723,33 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
 	      }
 	}
 
+		/* (non-Javadoc)
+		 * @see #retrievingParentClients(java.lang.String)
+		 */
 		@Override
-		public List<ClientCategoryData> retrievingParentClients(String query) {
+		public List<ClientCategoryData> retrievingParentClients(final String query) {
 			
-			context.authenticatedUser();
 			try{
-				parentClientMapper mapper=new parentClientMapper();
-				final String sql="select id as id , account_no as accountNo,display_name as displayName from m_client where parent_id is null" +
-						          " and display_name like '%"+query+"%' ORDER BY id LIMIT 20 ";
+				this.context.authenticatedUser();
+				final parentClientMapper mapper=new parentClientMapper();
+				final String sql="select id as id , account_no as accountNo,display_name as displayName from m_client where parent_id is null" 
+			 			         + " and display_name like '%"+query+"%' ORDER BY id LIMIT 20 ";
 				return this.jdbcTemplate.query(sql, mapper,new Object[]{});
 			}catch(EmptyResultDataAccessException e){
 			return null;
 		  }
 		}
 		
-		private static final class parentClientMapper implements RowMapper<ClientCategoryData> {
-			
-			public String parentChildSchema(){
-	    		
-	    		return "select id,account_no as accountNo,display_name as displayName from m_client m ";
-	    	}
-
-			  @Override
-		      public ClientCategoryData mapRow(final ResultSet rs,final int rowNum) throws SQLException {
-		          final Long id = rs.getLong("id");
-		          final String  accountNo = rs.getString("accountNo");
-		          final String displayName = rs.getString("displayName");
-		         return new  ClientCategoryData(id,null,null,accountNo, displayName,null,null);
-		          
-		      }
-
-}
+		/* (non-Javadoc)
+		 * @see #retrievedParentAndChildData(java.lang.Long, java.lang.Long)
+		 */
 		@Override
-		public List<ClientCategoryData> retrievingClientParentData(Long parentClientId,Long clientId) {
-			   context.authenticatedUser();
+		public List<ClientCategoryData> retrievedParentAndChildData(final Long parentClientId,final Long clientId) {
+			
 			   try{
-				   parentClientMapper mapper=new parentClientMapper();
+				   this.context.authenticatedUser();
+				  final parentClientMapper mapper=new parentClientMapper();
+				  //check parentClient information
 				   if(parentClientId !=null){
 					   final String sql=mapper.parentChildSchema()+" where m.id= ? ";
 					   return this.jdbcTemplate.query(sql, mapper,new Object[]{parentClientId});
@@ -768,7 +761,22 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
 			return null;
 		  }
 		}
-
+		
+       private static final class parentClientMapper implements RowMapper<ClientCategoryData> {
+			
+			public String parentChildSchema(){
+	    		return "select id,account_no as accountNo,display_name as displayName from m_client m ";
+	    	}
+			  @Override
+		      public ClientCategoryData mapRow(final ResultSet rs,final int rowNum) throws SQLException {
+		          final Long id = rs.getLong("id");
+		          final String  accountNo = rs.getString("accountNo");
+		          final String displayName = rs.getString("displayName");
+		         return new  ClientCategoryData(id,null,null,accountNo, displayName,null,null);
+		          
+		      }
+         }
+		
 		@Override
 		public Boolean countChildClients(Long entityId) {
 			 context.authenticatedUser();
