@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -43,38 +44,53 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-
+/**
+ * 
+ * @author Praveen/Rahman
+ *
+ */
 @Path("/prospects")
 @Component
 @Scope("singleton")
 public class ClientProspectApiResource {
 
-	private final String resourceType = "PROSPECT";
+	private final String RESOURCETYPE = "PROSPECT";
+
+	private final PlatformSecurityContext context;
+	private final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService;
+	private final ClientProspectReadPlatformService clientProspectReadPlatformService;
+	private final ApiRequestParameterHelper apiRequestParameterHelper;
+	private final MCodeReadPlatformService codeReadPlatformService;
+	private final AddressReadPlatformService addressReadPlatformService;
+	private final ToApiJsonSerializer<ClientProspectData> apiJsonSerializerString;
+
+	private final Set<String> PROSPECT_RESPONSE_DATA_PARAMETER = new HashSet<String>(Arrays.asList("id", "type", "firstName", "middleName",
+			"lastName","homePhoneNumber", "workPhoneNumber", "mobileNumber","email", "address", "area", "district", "city", "region",
+			"zipCode", "sourceOfPublicity", "plan","preferredCallingTime", "note", "status", "callStatus","assignedTo", "notes"));
 	
-	final private PlatformSecurityContext context;
-	final private PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService;
-	final private ClientProspectReadPlatformService clientProspectReadPlatformService;
-	final private ApiRequestParameterHelper apiRequestParameterHelper;
-	final private MCodeReadPlatformService codeReadPlatformService;
-	final private AddressReadPlatformService addressReadPlatformService;
-	final private ToApiJsonSerializer<ClientProspectData> apiJsonSerializerString;
+	private final Set<String> PROSPECTDETAIL_RESPONSE_DATA_PARAMETER = new HashSet<String>(
+			Arrays.asList("callStatus", "preferredCallingTime", "assignedTo", "notes", "locale", "prospectId"));
 	
-	final private Set<String> PROSPECT_RESPONSE_DATA_PARAMETER = new HashSet<String>(Arrays.asList("id","type","firstName","middleName","lastName","homePhoneNumber","workPhoneNumber","mobileNumber","email","address","area","district","city","region","zipCode","sourceOfPublicity","plan","preferredCallingTime","note","status","callStatus","assignedTo","notes"));
-	final private Set<String> PROSPECTDETAIL_RESPONSE_DATA_PARAMETER = new HashSet<String>(Arrays.asList("callStatus","preferredCallingTime","assignedTo","notes","locale","prospectId"));
-	final private Set<String> PROSPECTDETAILREMARK_RESPONSE_DATA_PARAMETER = new HashSet<String>(Arrays.asList("statusRemarkId","statusRemark"));
-	
-	final private ToApiJsonSerializer<ClientProspectData> apiJsonSerializer;
-	final private ToApiJsonSerializer<ProspectDetailData> apiJsonSerializerForProspectDetail;
-	final private ToApiJsonSerializer<ProspectStatusRemarkData> apiJsonSerializerForStatusRemark;
-	
-	
+	private final Set<String> PROSPECTDETAILREMARK_RESPONSE_DATA_PARAMETER = new HashSet<String>(
+			Arrays.asList("statusRemarkId", "statusRemark"));
+
+	private final ToApiJsonSerializer<ClientProspectData> apiJsonSerializer;
+	private final ToApiJsonSerializer<ProspectDetailData> apiJsonSerializerForProspectDetail;
+	private final ToApiJsonSerializer<ProspectStatusRemarkData> apiJsonSerializerForStatusRemark;
+
 	@Autowired
-	public ClientProspectApiResource(final PlatformSecurityContext context, final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService,
-			final ToApiJsonSerializer<ClientProspectData> apiJsonSerializer,final ClientProspectReadPlatformService clientProspectReadPlatformService,
-			final ApiRequestParameterHelper apiRequestParameterHelper, final MCodeReadPlatformService codeReadPlatformService,
-			final ToApiJsonSerializer<ProspectDetailData> apiJsonSerializerForProspectDetail,final ToApiJsonSerializer<ClientProspectData> apiJsonSerializerString,
-			final ToApiJsonSerializer<ProspectStatusRemarkData> apiJsonSerializerForStatusRemark, final AddressReadPlatformService addressReadPlatformService) {
-		this.context = context;	
+	public ClientProspectApiResource(
+			final PlatformSecurityContext context,
+			final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService,
+			final ToApiJsonSerializer<ClientProspectData> apiJsonSerializer,
+			final ClientProspectReadPlatformService clientProspectReadPlatformService,
+			final ApiRequestParameterHelper apiRequestParameterHelper,
+			final MCodeReadPlatformService codeReadPlatformService,
+			final ToApiJsonSerializer<ProspectDetailData> apiJsonSerializerForProspectDetail,
+			final ToApiJsonSerializer<ClientProspectData> apiJsonSerializerString,
+			final ToApiJsonSerializer<ProspectStatusRemarkData> apiJsonSerializerForStatusRemark,
+			final AddressReadPlatformService addressReadPlatformService) {
+		this.context = context;
 		this.commandSourceWritePlatformService = commandSourceWritePlatformService;
 		this.clientProspectReadPlatformService = clientProspectReadPlatformService;
 		this.apiJsonSerializer = apiJsonSerializer;
@@ -83,197 +99,271 @@ public class ClientProspectApiResource {
 		this.apiJsonSerializerForProspectDetail = apiJsonSerializerForProspectDetail;
 		this.apiJsonSerializerForStatusRemark = apiJsonSerializerForStatusRemark;
 		this.addressReadPlatformService = addressReadPlatformService;
-		this.apiJsonSerializerString=apiJsonSerializerString;
+		this.apiJsonSerializerString = apiJsonSerializerString;
 	}
-	
-	
-	
-	
-	@GET
-	@Produces({MediaType.APPLICATION_JSON})
-	@Consumes({MediaType.APPLICATION_JSON})
-	public String retriveProspects(@Context final UriInfo uriInfo){
-		context.authenticatedUser().validateHasReadPermission(resourceType);
-		Collection<ClientProspectData> clientProspectData = null;	
-		//Collection<MCodeData> sourceOfPublicityData = codeReadPlatformService.getCodeValue("Source Type");
-		clientProspectData = this.clientProspectReadPlatformService.retriveClientProspect();
-		//clientProspectData.setSourceOfPublicityData(sourceOfPublicityData);
-        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-        return this.apiJsonSerializer.serialize(settings, clientProspectData,PROSPECT_RESPONSE_DATA_PARAMETER);
-	}
-	
-	
-	@GET
-	@Path("allprospects")
-	@Produces({MediaType.APPLICATION_JSON})
-	@Consumes({MediaType.APPLICATION_JSON})
-	public String retriveProspectsForNewClient(@Context final UriInfo uriInfo,@QueryParam("sqlSearch") final String sqlSearch,  @QueryParam("limit") final Integer limit, @QueryParam("offset") final Integer offset){
-		context.authenticatedUser().validateHasReadPermission(resourceType);
-		
-		final SearchSqlQuery searchClientProspect =SearchSqlQuery.forSearch(sqlSearch, offset,limit );
-		Page<ClientProspectData> clientProspectData = null;	
-		//Collection<MCodeData> sourceOfPublicityData = codeReadPlatformService.getCodeValue("Source Type");
-		clientProspectData = this.clientProspectReadPlatformService.retriveClientProspect(searchClientProspect);
-		//clientProspectData.setSourceOfPublicityData(sourceOfPublicityData);
-        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-        return this.apiJsonSerializer.serialize(clientProspectData);
-	}
-	
-	@GET
-	@Path("{clientProspectId}")
-	@Produces({MediaType.APPLICATION_JSON})
-	@Consumes({MediaType.APPLICATION_JSON})
-	public String retriveProspects(@Context final UriInfo uriInfo, @QueryParam("clientProspectId") final Long clientProspectId){
-		context.authenticatedUser().validateHasReadPermission(resourceType);
-		ProspectDetailData clientProspectData = null;	
-		clientProspectData = this.clientProspectReadPlatformService.retriveClientProspect(clientProspectId);
-		Collection<MCodeData> mCodeData = codeReadPlatformService.getCodeValue("Call Status");
-		List<ProspectDetailCallStatus> callStatusData = new ArrayList<ProspectDetailCallStatus>();
-		List<ProspectDetailAssignedToData> assignedToData = clientProspectReadPlatformService.retrieveUsers();
-		for(MCodeData code:mCodeData){
-			ProspectDetailCallStatus p = new ProspectDetailCallStatus(code.getId(), code.getmCodeValue());
-			callStatusData.add(p);
-		}	
-		clientProspectData.setCallStatusData(callStatusData);
-		clientProspectData.setAssignedToData(assignedToData);
-        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-        return this.apiJsonSerializerForProspectDetail.serialize(settings, clientProspectData,PROSPECTDETAIL_RESPONSE_DATA_PARAMETER);
-	}
-		
-	@GET
-	@Path("cancel/{prospectId}")
-	@Consumes({MediaType.APPLICATION_JSON})
-	@Produces({MediaType.APPLICATION_JSON})
-	public String retriveDataForCancle(@Context final UriInfo uriInfo, @QueryParam("prospectId") final Long prospectId){
-		context.authenticatedUser().validateHasReadPermission(resourceType);
-		Collection<MCodeData> mCodeData = codeReadPlatformService.getCodeValue("Status Remark");
-		List<ProspectStatusRemarkData> statusRemarkData = new ArrayList<ProspectStatusRemarkData>();
-		for(MCodeData codeData:mCodeData){
-			statusRemarkData.add(new ProspectStatusRemarkData(codeData.getId(), codeData.getmCodeValue()));
-		}
-		ProspectStatusRemarkData data = new ProspectStatusRemarkData();
-		data.setStatusRemarkData(statusRemarkData);
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-		return this.apiJsonSerializerForStatusRemark.serialize(settings,data ,PROSPECTDETAILREMARK_RESPONSE_DATA_PARAMETER);
-		
-	}
-	
 
 	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	@Consumes({ MediaType.APPLICATION_JSON })
+	public String retriveProspects(@Context final UriInfo uriInfo) {
+		
+		context.authenticatedUser().validateHasReadPermission(RESOURCETYPE);
+		final Collection<ClientProspectData> clientProspectData = this.clientProspectReadPlatformService.retriveClientProspect();
+		// Collection<MCodeData> sourceOfPublicityData = codeReadPlatformService.getCodeValue("Source Type");
+		// clientProspectData.setSourceOfPublicityData(sourceOfPublicityData);
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		return this.apiJsonSerializer.serialize(settings, clientProspectData, PROSPECT_RESPONSE_DATA_PARAMETER);
+	}
+
+	/**
+	 * during Leads click
+	 * @param uriInfo
+	 * @param sqlSearch
+	 * @param limit
+	 * @param offset
+	 * @return
+	 */
+	@GET
+	@Path("allprospects")
+	@Produces({ MediaType.APPLICATION_JSON })
+	@Consumes({ MediaType.APPLICATION_JSON })
+	public String retriveProspectsForNewClient(@Context final UriInfo uriInfo, @QueryParam("sqlSearch") final String sqlSearch, 
+			@QueryParam("limit") final Integer limit, @QueryParam("offset") final Integer offset) {
+
+		context.authenticatedUser().validateHasReadPermission(RESOURCETYPE);
+		final SearchSqlQuery clientProspect = SearchSqlQuery.forSearch(sqlSearch, offset, limit);
+		final Page<ClientProspectData> clientProspectData = this.clientProspectReadPlatformService.retriveClientProspect(clientProspect);
+		return this.apiJsonSerializer.serialize(clientProspectData);
+	}
+	
+	/**
+	 * During click on New Prospect/Prospect Creation
+	 * @param uriInfo
+	 * @return
+	 */
+	@GET
 	@Path("template")
-	@Produces({MediaType.APPLICATION_JSON})
-	@Consumes({MediaType.APPLICATION_JSON})
-	public String retriveProspectsTemplate(@Context final UriInfo uriInfo){
-		context.authenticatedUser().validateHasReadPermission(resourceType);
-		ClientProspectData clientProspectData = null;	
-		Collection<MCodeData> sourceOfPublicityData = codeReadPlatformService.getCodeValue("Source Type");
-		clientProspectData = new ClientProspectData();//.clientProspectReadPlatformService.retriveClientProspectTemplate();
-		Collection<ProspectPlanCodeData> planData = clientProspectReadPlatformService.retrivePlans();
+	@Produces({ MediaType.APPLICATION_JSON })
+	@Consumes({ MediaType.APPLICATION_JSON })
+	public String retriveProspectsTemplate(@Context final UriInfo uriInfo) {
+		
+		context.authenticatedUser().validateHasReadPermission(RESOURCETYPE);
+		
+		final Collection<MCodeData> sourceOfPublicityData = codeReadPlatformService.getCodeValue("Source Type");
+		final ClientProspectData clientProspectData = new ClientProspectData();// .clientProspectReadPlatformService.retriveClientProspectTemplate();
+		final Collection<ProspectPlanCodeData> planData = clientProspectReadPlatformService.retrivePlans();
 		clientProspectData.setPlanData(planData);
 		clientProspectData.setSourceOfPublicityData(sourceOfPublicityData);
 		clientProspectData.setStatus("New");
-		
-		List<String> countryData = this.addressReadPlatformService.retrieveCountryDetails();
-	    List<String> statesData = this.addressReadPlatformService.retrieveStateDetails();
-	    List<String> citiesData = this.addressReadPlatformService.retrieveCityDetails();
-		clientProspectData.setCountryData(countryData);
-		clientProspectData.setStateData(statesData);
+
+		//final List<String> countryData = this.addressReadPlatformService.retrieveCountryDetails();
+		//final List<String> statesData = this.addressReadPlatformService.retrieveStateDetails();
+		final List<String> citiesData = this.addressReadPlatformService.retrieveCityDetails();
+		//clientProspectData.setCountryData(countryData);
+		//clientProspectData.setStateData(statesData);
 		clientProspectData.setCityData(citiesData);
-        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-        return this.apiJsonSerializer.serialize(settings, clientProspectData,PROSPECT_RESPONSE_DATA_PARAMETER);
-	}
-	
-	
-	@POST
-	@Produces({MediaType.APPLICATION_JSON})
-	@Consumes({MediaType.APPLICATION_JSON})
-	public String createProspects(final String jsonRequestBody){
-	
-		CommandWrapper commandRequest = new CommandWrapperBuilder().createProspect().withJson(jsonRequestBody).build();
-		final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
-		return apiJsonSerializer.serialize(result);
-	}
-	
-	@POST
-	@Path("converttoclient/{deleteProspectId}")
-	@Produces({MediaType.APPLICATION_JSON})
-	@Consumes({MediaType.APPLICATION_JSON})
-	public String convertProspecttoClient(@PathParam("deleteProspectId") final Long deleteProspectId, final String jsonRequestBody){
-		
-		CommandWrapper commandRequest = new CommandWrapperBuilder().convertProspectToClient(deleteProspectId).build();
-		final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
-		return apiJsonSerializer.serialize(result);
-	}
-	
-	
-	@PUT
-	@Path("{prospectId}/template")
-	@Produces({MediaType.APPLICATION_JSON})
-	@Consumes({MediaType.APPLICATION_JSON})
-	public String updateProspect(@PathParam("prospectId") final Long prospectId,final String jasonRequestBody){
-		
-		CommandWrapper commandRequest = new CommandWrapperBuilder().updateProspect(prospectId).withJson(jasonRequestBody).build();
-		final CommandProcessingResult result = commandSourceWritePlatformService.logCommandSource(commandRequest);
-		return apiJsonSerializer.serialize(result);
-	}
-	
-	@PUT
-	@Path("{deleteProspectId}")
-	@Produces({MediaType.APPLICATION_JSON})
-	@Consumes({MediaType.APPLICATION_JSON})
-	public String deleteProspect(@PathParam("deleteProspectId") final Long deleteProspectId, final String jsonRequestBody){
-		
-		CommandWrapper commandRequest = new CommandWrapperBuilder().deleteProspect(deleteProspectId).withJson(jsonRequestBody).build();
-		final CommandProcessingResult result = commandSourceWritePlatformService.logCommandSource(commandRequest);
-		return apiJsonSerializer.serialize(result);
-	}
-	
-	@PUT
-	@Path("edit/{prospectId}")
-	@Produces({MediaType.APPLICATION_JSON})
-	@Consumes({MediaType.APPLICATION_JSON})
-	public String updateProspectDetails(@PathParam("prospectId") final Long id,final String jsonRequestBody){
-		CommandWrapper commandRequest = new CommandWrapperBuilder().editProspectDetails(id).withJson(jsonRequestBody).build();
-		final CommandProcessingResult result = commandSourceWritePlatformService.logCommandSource(commandRequest);
-		return apiJsonSerializer.serialize(result);
-	}
-	
-	
-	@GET
-	@Path("{prospectdetailid}/history")
-	@Consumes({MediaType.APPLICATION_JSON})
-	@Produces({MediaType.APPLICATION_JSON})
-	public String history(@Context final UriInfo uriInfo, @PathParam("prospectdetailid") final Long prospectdetailid){
-		context.authenticatedUser().validateHasReadPermission(resourceType);
-		List<ProspectDetailData> prospectDetailData = this.clientProspectReadPlatformService.retriveProspectDetailHistory(prospectdetailid);
-		ProspectDetailData data = new ProspectDetailData(prospectDetailData);
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-        return this.apiJsonSerializerForProspectDetail.serialize(settings, data,PROSPECT_RESPONSE_DATA_PARAMETER);
+		return this.apiJsonSerializer.serialize(settings, clientProspectData, PROSPECT_RESPONSE_DATA_PARAMETER);
 	}
+	
+	/**
+	 * During Prospect Creation
+	 * @param jsonRequestBody
+	 * @return
+	 */
+	@POST
+	@Produces({ MediaType.APPLICATION_JSON })
+	@Consumes({ MediaType.APPLICATION_JSON })
+	public String createProspects(final String jsonRequestBody) {
+
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().createProspect().withJson(jsonRequestBody).build();
+		final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
+		return apiJsonSerializer.serialize(result);
+	}
+	
+	/**
+	 * calling for specific Prospect
+	 * @param uriInfo
+	 * @param id
+	 * @return
+	 */
 	@GET
-	@Path("edit/{id}")
-	@Produces({MediaType.APPLICATION_JSON})
-	@Consumes({MediaType.APPLICATION_JSON})
-	public String getSingleClient(@Context final UriInfo uriInfo, @PathParam("id") final Long id){
-		
-		context.authenticatedUser().validateHasReadPermission(resourceType);
-		ClientProspectData clientData = clientProspectReadPlatformService.retriveSingleClient(id);
-		
-		Collection<MCodeData> sourceOfPublicityData = codeReadPlatformService.getCodeValue("Source Type");
-		Collection<ProspectPlanCodeData> planData = clientProspectReadPlatformService.retrivePlans();
+	@Path("{prospectId}")
+	@Produces({ MediaType.APPLICATION_JSON })
+	@Consumes({ MediaType.APPLICATION_JSON })
+	public String getSingleClient(@Context final UriInfo uriInfo,
+			@PathParam("prospectId") final Long prospectId) {
+
+		context.authenticatedUser().validateHasReadPermission(RESOURCETYPE);
+		final ClientProspectData clientData = clientProspectReadPlatformService.retriveSingleClient(prospectId);
+		final Collection<MCodeData> sourceOfPublicityData = codeReadPlatformService.getCodeValue("Source Type");
+		final Collection<ProspectPlanCodeData> planData = clientProspectReadPlatformService.retrivePlans();
 		clientData.setPlanData(planData);
 		clientData.setSourceOfPublicityData(sourceOfPublicityData);
-	//	clientData.setStatus("New");
 		
-		List<String> countryData = this.addressReadPlatformService.retrieveCountryDetails();
-	    List<String> statesData = this.addressReadPlatformService.retrieveStateDetails();
-	    List<String> citiesData = this.addressReadPlatformService.retrieveCityDetails();
-	    clientData.setCountryData(countryData);
-	    clientData.setStateData(statesData);
-	    clientData.setCityData(citiesData);
-		
+		final List<String> countryData = this.addressReadPlatformService.retrieveCountryDetails();
+		final List<String> statesData = this.addressReadPlatformService.retrieveStateDetails();
+		final List<String> citiesData = this.addressReadPlatformService.retrieveCityDetails();
+		clientData.setCountryData(countryData);
+		clientData.setStateData(statesData);
+		clientData.setCityData(citiesData);
+
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 		return this.apiJsonSerializerString.serialize(settings, clientData, PROSPECT_RESPONSE_DATA_PARAMETER);
 	}
+	
+	/**
+	 * During Update Prospect
+	 * @param prospectId
+	 * @param jsonRequestBody
+	 * @return
+	 */
+	@PUT
+	@Path("{prospectId}")
+	@Produces({ MediaType.APPLICATION_JSON })
+	@Consumes({ MediaType.APPLICATION_JSON })
+	public String updateProspectDetails(@PathParam("prospectId") final Long prospectId,
+			final String jsonRequestBody) {
+		
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().updateProspect(prospectId).withJson(jsonRequestBody).build();
+		final CommandProcessingResult result = commandSourceWritePlatformService.logCommandSource(commandRequest);
+		return apiJsonSerializer.serialize(result);
+	}
+	
+	/**
+	 * During cancel/delete Prospect
+	 * @param uriInfo
+	 * @param prospectId
+	 * @return
+	 */
+	@GET
+	@Path("cancel/{prospectId}")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String retriveDataForCancle(@Context final UriInfo uriInfo,
+			@PathParam("prospectId") final Long prospectId) {
+		
+		context.authenticatedUser().validateHasReadPermission(RESOURCETYPE);
+		final Collection<MCodeData> mCodeData = codeReadPlatformService.getCodeValue("Status Remark");
+		final List<ProspectStatusRemarkData> statusRemarkData = new ArrayList<ProspectStatusRemarkData>();
+		
+		for (MCodeData codeData : mCodeData) {
+			statusRemarkData.add(new ProspectStatusRemarkData(codeData.getId(), codeData.getmCodeValue()));
+		}
+		
+		final ProspectStatusRemarkData data = new ProspectStatusRemarkData();
+		data.setStatusRemarkData(statusRemarkData);
+		
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		return this.apiJsonSerializerForStatusRemark.serialize(settings, data, PROSPECTDETAILREMARK_RESPONSE_DATA_PARAMETER);
+
+	}
+	
+	/**
+	 * During Deleteion of a prospect
+	 * @param prospectId
+	 * @param jsonRequestBody
+	 * @return
+	 */
+	@DELETE
+	@Path("{prospectId}")
+	@Produces({ MediaType.APPLICATION_JSON })
+	@Consumes({ MediaType.APPLICATION_JSON })
+	public String deleteProspect(@PathParam("prospectId") final Long prospectId,
+			final String jsonRequestBody) {
+
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteProspect(prospectId).withJson(jsonRequestBody).build();
+		final CommandProcessingResult result = commandSourceWritePlatformService.logCommandSource(commandRequest);
+		return apiJsonSerializer.serialize(result);
+	}
+
+	/**
+	 * During Followup
+	 * @param uriInfo
+	 * @param prospectId
+	 * @return
+	 */
+	@GET
+	@Path("followup/{prospectId}")
+	@Produces({ MediaType.APPLICATION_JSON })
+	@Consumes({ MediaType.APPLICATION_JSON })
+	public String retriveProspects(@Context final UriInfo uriInfo, @PathParam("prospectId") final Long prospectId) {
+		
+		context.authenticatedUser().validateHasReadPermission(RESOURCETYPE);
+		
+		final ProspectDetailData clientProspectData = this.clientProspectReadPlatformService.retriveClientProspect(prospectId);
+		final Collection<MCodeData> mCodeData = codeReadPlatformService.getCodeValue("Call Status");
+		final List<ProspectDetailCallStatus> callStatusData = new ArrayList<ProspectDetailCallStatus>();
+		final List<ProspectDetailAssignedToData> assignedToData = clientProspectReadPlatformService.retrieveUsers();
+		
+		for (MCodeData code : mCodeData) {
+			final ProspectDetailCallStatus p = new ProspectDetailCallStatus(code.getId(), code.getmCodeValue());
+			callStatusData.add(p);
+		}
+		
+		clientProspectData.setCallStatusData(callStatusData);
+		clientProspectData.setAssignedToData(assignedToData);
+		
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		return this.apiJsonSerializerForProspectDetail.serialize(settings, clientProspectData, PROSPECTDETAIL_RESPONSE_DATA_PARAMETER);
+	}
+	
+	/**
+	 * during Followup saving
+	 * @param prospectId
+	 * @param jasonRequestBody
+	 * @return
+	 */
+	@PUT
+	@Path("followup/{prospectId}")
+	@Produces({ MediaType.APPLICATION_JSON })
+	@Consumes({ MediaType.APPLICATION_JSON })
+	public String followUpProspect(@PathParam("prospectId") final Long prospectId,
+			final String jasonRequestBody) {
+
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().followUpProspect(prospectId).withJson(jasonRequestBody).build();
+		final CommandProcessingResult result = commandSourceWritePlatformService.logCommandSource(commandRequest);
+		return apiJsonSerializer.serialize(result);
+	}
+	
+	/** 
+	 * Convert to Client
+	 * @param prospectId
+	 * @param jsonRequestBody
+	 * @return
+	 */
+	@POST
+	@Path("converttoclient/{prospectId}")
+	@Produces({ MediaType.APPLICATION_JSON })
+	@Consumes({ MediaType.APPLICATION_JSON })
+	public String convertProspecttoClientCreation(@PathParam("prospectId") final Long prospectId,
+			final String jsonRequestBody) {
+
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().convertProspectToClient(prospectId).build();
+		final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
+		return apiJsonSerializer.serialize(result);
+	}
+
+	/**
+	 * calling on specific prospect 
+	 * @param uriInfo
+	 * @param prospectdetailid
+	 * @return
+	 */
+	@GET
+	@Path("{prospectdetailid}/history")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String history(@Context final UriInfo uriInfo,
+			@PathParam("prospectdetailid") final Long prospectdetailid) {
+		
+		context.authenticatedUser().validateHasReadPermission(RESOURCETYPE);
+		final List<ProspectDetailData> prospectDetailData = this.clientProspectReadPlatformService.retriveProspectDetailHistory(prospectdetailid);
+		final ProspectDetailData data = new ProspectDetailData(prospectDetailData);
+		
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		return this.apiJsonSerializerForProspectDetail.serialize(settings, data, PROSPECT_RESPONSE_DATA_PARAMETER);
+	}
+
 	
 }

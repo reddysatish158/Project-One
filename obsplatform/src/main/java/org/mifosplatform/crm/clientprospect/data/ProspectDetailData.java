@@ -4,26 +4,25 @@ import java.util.Collection;
 import java.util.List;
 
 public class ProspectDetailData {
-	
-	
+
 	private Long id;
 	private Long prospectId;
 	private String callStatus;
 	private String nextTime;
 	private String notes;
 	private String assignedTo;
-	
-	
+
 	private Collection<ProspectDetailAssignedToData> assignedToData;
 	private Collection<ProspectDetailCallStatus> callStatusData;
 	private Collection<ProspectDetailData> prospectDetailData;
-	
-	
+
 	public ProspectDetailData() {
-	
+
 	}
-	
-	public ProspectDetailData(Long id, Long prospectId, String callStatus, String string, String notes, String assignedTo){
+
+	public ProspectDetailData(final Long id, final Long prospectId,
+			final String callStatus, final String string, final String notes,
+			final String assignedTo) {
 		this.id = id;
 		this.prospectId = prospectId;
 		this.callStatus = callStatus;
@@ -31,8 +30,12 @@ public class ProspectDetailData {
 		this.notes = notes;
 		this.assignedTo = assignedTo;
 	}
-	
-	public ProspectDetailData(Long id, Long prospectId, String callStatus, String nextTime, String notes, String assignedTo, Collection<ProspectDetailAssignedToData> assignedToData, Collection<ProspectDetailCallStatus> callStatusData){
+
+	public ProspectDetailData(final Long id, final Long prospectId,
+			final String callStatus, final String nextTime, final String notes,
+			final String assignedTo,
+			final Collection<ProspectDetailAssignedToData> assignedToData,
+			final Collection<ProspectDetailCallStatus> callStatusData) {
 		this.id = id;
 		this.prospectId = prospectId;
 		this.callStatus = callStatus;
@@ -42,46 +45,55 @@ public class ProspectDetailData {
 		this.assignedToData = assignedToData;
 		this.callStatusData = callStatusData;
 	}
-	
-	
-	
-	public ProspectDetailData(List<ProspectDetailData> prospectDetailData2) {
-		this.prospectDetailData = prospectDetailData2;
+
+	public ProspectDetailData(final List<ProspectDetailData> prospectDetailData) {
+		this.prospectDetailData = prospectDetailData;
 	}
 
 	public Long getId() {
 		return id;
 	}
+
 	public void setId(Long id) {
 		this.id = id;
 	}
+
 	public Long getProspectId() {
 		return prospectId;
 	}
+
 	public void setProspectId(Long prospectId) {
 		this.prospectId = prospectId;
 	}
+
 	public String getCallStatus() {
 		return callStatus;
 	}
+
 	public void setCallStatus(String callStatus) {
 		this.callStatus = callStatus;
 	}
+
 	public String getNextTime() {
 		return nextTime;
 	}
+
 	public void setNextTime(String nextTime) {
 		this.nextTime = nextTime;
 	}
+
 	public String getNotes() {
 		return notes;
 	}
+
 	public void setNotes(String notes) {
 		this.notes = notes;
 	}
+
 	public String getAssignedTo() {
 		return assignedTo;
 	}
+
 	public void setAssignedTo(String assignedTo) {
 		this.assignedTo = assignedTo;
 	}
@@ -90,7 +102,8 @@ public class ProspectDetailData {
 		return assignedToData;
 	}
 
-	public void setAssignedToData(Collection<ProspectDetailAssignedToData> assignedToData) {
+	public void setAssignedToData(
+			Collection<ProspectDetailAssignedToData> assignedToData) {
 		this.assignedToData = assignedToData;
 	}
 
@@ -98,7 +111,8 @@ public class ProspectDetailData {
 		return callStatusData;
 	}
 
-	public void setCallStatusData(Collection<ProspectDetailCallStatus> callStatusData) {
+	public void setCallStatusData(
+			Collection<ProspectDetailCallStatus> callStatusData) {
 		this.callStatusData = callStatusData;
 	}
 
@@ -110,9 +124,5 @@ public class ProspectDetailData {
 			Collection<ProspectDetailData> prospectDetailData) {
 		this.prospectDetailData = prospectDetailData;
 	}
-	
-	
-	
-	
 
 }
