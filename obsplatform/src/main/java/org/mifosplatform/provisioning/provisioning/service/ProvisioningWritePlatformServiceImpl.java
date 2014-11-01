@@ -27,8 +27,8 @@ import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
-import org.mifosplatform.logistics.itemdetails.domain.InventoryItemDetails;
-import org.mifosplatform.logistics.itemdetails.domain.InventoryItemDetailsRepository;
+import org.mifosplatform.logistics.itemdetails.domain.ItemDetails;
+import org.mifosplatform.logistics.itemdetails.domain.ItemDetailsRepository;
 import org.mifosplatform.logistics.itemdetails.exception.ActivePlansFoundException;
 import org.mifosplatform.organisation.ippool.data.IpGeneration;
 import org.mifosplatform.organisation.ippool.domain.IpPoolManagementDetail;
@@ -91,7 +91,7 @@ public class ProvisioningWritePlatformServiceImpl implements
 	private final ServiceParametersRepository serviceParametersRepository;
 	private final ProvisioningCommandRepository provisioningCommandRepository;
 	private final IpPoolManagementJpaRepository ipPoolManagementJpaRepository;
-	private final InventoryItemDetailsRepository inventoryItemDetailsRepository;
+	private final ItemDetailsRepository inventoryItemDetailsRepository;
 	private final ProvisioningReadPlatformService provisioningReadPlatformService;
 	private final ProvisioningCommandFromApiJsonDeserializer fromApiJsonDeserializer;
 	private final ProcessRequestReadplatformService processRequestReadplatformService;
@@ -104,7 +104,7 @@ public class ProvisioningWritePlatformServiceImpl implements
 	@Autowired
 	public ProvisioningWritePlatformServiceImpl(
 			final PlatformSecurityContext context,
-			final InventoryItemDetailsRepository inventoryItemDetailsRepository,
+			final ItemDetailsRepository inventoryItemDetailsRepository,
 			final ProvisioningCommandFromApiJsonDeserializer fromApiJsonDeserializer,
 			final FromJsonHelper fromApiJsonHelper,
 			final OrderReadPlatformService orderReadPlatformService,
@@ -262,7 +262,7 @@ public class ProvisioningWritePlatformServiceImpl implements
 			final Long subnet = command.longValueOfParameterNamed("subnet");
 			String[] ipAddressArray = null;
 
-			final InventoryItemDetails inventoryItemDetails = this.inventoryItemDetailsRepository.getInventoryItemDetailBySerialNum(macId);
+			final ItemDetails inventoryItemDetails = this.inventoryItemDetailsRepository.getInventoryItemDetailBySerialNum(macId);
 			final HardwareAssociation hardwareAssociation = this.associationRepository.findOneByOrderId(orderId);
 			
 			if (hardwareAssociation == null || inventoryItemDetails == null) {
@@ -432,7 +432,7 @@ public class ProvisioningWritePlatformServiceImpl implements
 					throw new PairingNotExistException(order.getId());
 				}
 
-				InventoryItemDetails inventoryItemDetails = this.inventoryItemDetailsRepository
+				ItemDetails inventoryItemDetails = this.inventoryItemDetailsRepository
 						.getInventoryItemDetailBySerialNum(hardwareAssociation.getSerialNo());
 
 				if (inventoryItemDetails == null) {

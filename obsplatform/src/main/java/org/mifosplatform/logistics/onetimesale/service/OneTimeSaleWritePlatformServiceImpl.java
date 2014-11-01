@@ -16,7 +16,7 @@ import org.mifosplatform.logistics.item.domain.ItemMaster;
 import org.mifosplatform.logistics.item.domain.ItemRepository;
 import org.mifosplatform.logistics.item.service.ItemReadPlatformService;
 import org.mifosplatform.logistics.itemdetails.exception.ActivePlansFoundException;
-import org.mifosplatform.logistics.itemdetails.service.InventoryItemDetailsWritePlatformService;
+import org.mifosplatform.logistics.itemdetails.service.ItemDetailsWritePlatformService;
 import org.mifosplatform.logistics.onetimesale.data.OneTimeSaleData;
 import org.mifosplatform.logistics.onetimesale.domain.OneTimeSale;
 import org.mifosplatform.logistics.onetimesale.domain.OneTimeSaleRepository;
@@ -48,7 +48,7 @@ public class OneTimeSaleWritePlatformServiceImpl implements
 	private final DiscountReadPlatformService discountReadPlatformService;
 	private final OneTimeSaleReadPlatformService oneTimeSaleReadPlatformService;
 	private final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService;
-	private final InventoryItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService;
+	private final ItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService;
 	private final OrderDetailsReadPlatformServices orderDetailsReadPlatformServices;
 
 	@Autowired
@@ -62,7 +62,7 @@ public class OneTimeSaleWritePlatformServiceImpl implements
 			final FromJsonHelper fromJsonHelper,
 			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,
 			final OneTimeSaleReadPlatformService oneTimeSaleReadPlatformService,
-			final InventoryItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService,
+			final ItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService,
 			final OrderDetailsReadPlatformServices orderDetailsReadPlatformServices,
 			final DiscountReadPlatformService discountReadPlatformService) {
 		this.context = context;

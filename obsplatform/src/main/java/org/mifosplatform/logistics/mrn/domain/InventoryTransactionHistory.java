@@ -91,24 +91,9 @@ public class InventoryTransactionHistory extends AbstractAuditableCustom<AppUser
 		this.toOffice = toOffice;
 	}
 
-
-	/*public static InventoryTransactionHistory logTransaction(
-			MRNMoveDetailsData mrnMoveDetailsData, MRNDetails mrnDetails,
-			List<Long> itemMasterId) {
-		
-		final Date transactionDate = mrnMoveDetailsData.getMovedDate();
-		final Long mrnId = mrnMoveDetailsData.getMrnId();
-		final Long iMasterId = itemMasterId.get(0);
-		final Long fromOffice = mrnDetails.getFromOffice();
-		final Long toOffice = mrnDetails.getToOffice();
-		final String serialNumber = mrnMoveDetailsData.getSerialNumber();
-		return new InventoryTransactionHistory(transactionDate, mrnId,"MRN", iMasterId, fromOffice, toOffice, serialNumber) ;
-	}*/
-
 	public static InventoryTransactionHistory logTransaction(Date transactionDate,
 			Long refId, String refType, String serialNumber, Long itemMasterId, Long fromOffice, Long toOffice) {
 				
-		
 		return new InventoryTransactionHistory(transactionDate, refId, refType, serialNumber, itemMasterId, fromOffice, toOffice);
 	}
 	

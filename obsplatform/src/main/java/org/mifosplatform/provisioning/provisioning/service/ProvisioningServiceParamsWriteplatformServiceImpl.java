@@ -13,8 +13,8 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
-import org.mifosplatform.logistics.itemdetails.domain.InventoryItemDetails;
-import org.mifosplatform.logistics.itemdetails.domain.InventoryItemDetailsRepository;
+import org.mifosplatform.logistics.itemdetails.domain.ItemDetails;
+import org.mifosplatform.logistics.itemdetails.domain.ItemDetailsRepository;
 import org.mifosplatform.organisation.ippool.data.IpGeneration;
 import org.mifosplatform.organisation.ippool.domain.IpPoolManagementDetail;
 import org.mifosplatform.organisation.ippool.domain.IpPoolManagementJpaRepository;
@@ -57,7 +57,7 @@ public class ProvisioningServiceParamsWriteplatformServiceImpl implements
 	private final ProcessRequestRepository processRequestRepository;
 	private final ServiceParametersRepository serviceParametersRepository;
 	private final IpPoolManagementJpaRepository ipPoolManagementJpaRepository;
-	private final InventoryItemDetailsRepository inventoryItemDetailsRepository;
+	private final ItemDetailsRepository inventoryItemDetailsRepository;
 	private final IpPoolManagementReadPlatformService ipPoolManagementReadPlatformService;
 	private final ConfigurationRepository globalConfigurationRepository;
 
@@ -69,7 +69,7 @@ public class ProvisioningServiceParamsWriteplatformServiceImpl implements
 			final PrepareRequsetRepository prepareRequsetRepository,
 			final ProcessRequestRepository processRequestRepository,
 			final OrderRepository orderRepository,
-			final InventoryItemDetailsRepository detailsRepository,
+			final ItemDetailsRepository detailsRepository,
 			final IpPoolManagementJpaRepository ipPoolManagementJpaRepository,
 			final ServiceMasterRepository masterRepository,
 			final IpPoolManagementReadPlatformService ipPoolManagementReadPlatformService,
@@ -226,7 +226,7 @@ public class ProvisioningServiceParamsWriteplatformServiceImpl implements
 			}
 			Order order = this.orderRepository.findOne(orderId);
 			PrepareRequest prepareRequest = this.prepareRequsetRepository.getLatestRequestByOrderId(orderId);
-			InventoryItemDetails inventoryItemDetails = this.inventoryItemDetailsRepository.getInventoryItemDetailBySerialNum(command
+			ItemDetails inventoryItemDetails = this.inventoryItemDetailsRepository.getInventoryItemDetailBySerialNum(command
 							.stringValueOfParameterNamed("macId"));
 			ProcessRequest processRequest = new ProcessRequest(prepareRequest.getId(), order.getClientId(), orderId,
 					ProvisioningApiConstants.PROV_PACKETSPAN, "CHANGE_PROVISIONING", 'N', 'N');

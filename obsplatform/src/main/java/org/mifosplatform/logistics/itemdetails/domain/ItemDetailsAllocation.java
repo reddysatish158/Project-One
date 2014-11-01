@@ -16,7 +16,7 @@ import com.google.gson.JsonElement;
 
 @Entity
 @Table(name="b_allocation")
-public class InventoryItemDetailsAllocation extends AbstractAuditableCustom<AppUser,Long>{
+public class ItemDetailsAllocation extends AbstractAuditableCustom<AppUser,Long>{
 
 	/**
 	 * 
@@ -46,9 +46,9 @@ public class InventoryItemDetailsAllocation extends AbstractAuditableCustom<AppU
 	@Column(name="is_deleted")
 	private String isDeleted="N";
 	
-	public InventoryItemDetailsAllocation(){}
+	public ItemDetailsAllocation(){}
 
-	public InventoryItemDetailsAllocation(final Long orderId,final Long clientId,final Long itemMasterId,final String serialNumber,Date allocationDate,String status){
+	public ItemDetailsAllocation(final Long orderId,final Long clientId,final Long itemMasterId,final String serialNumber,Date allocationDate,String status){
 		this.orderId = orderId;
 		this.clientId = clientId;
 		this.itemMasterId = itemMasterId;
@@ -110,7 +110,7 @@ public class InventoryItemDetailsAllocation extends AbstractAuditableCustom<AppU
 		return serialVersionUID;
 	}
 
-	public static InventoryItemDetailsAllocation fromJson(JsonElement j, FromJsonHelper fromJsonHelper) {
+	public static ItemDetailsAllocation fromJson(JsonElement j, FromJsonHelper fromJsonHelper) {
 		 
 		final Long orderId = fromJsonHelper.extractLongNamed("orderId",j);
 		final Long clientId = fromJsonHelper.extractLongNamed("clientId", j);
@@ -118,7 +118,7 @@ public class InventoryItemDetailsAllocation extends AbstractAuditableCustom<AppU
 		final String serialNumber = fromJsonHelper.extractStringNamed("serialNumber", j);
 		final Date allocationDate = new Date();
 		final String status = fromJsonHelper.extractStringNamed("status", j);
-		return new InventoryItemDetailsAllocation(orderId,clientId,itemMasterId,serialNumber,allocationDate,status);
+		return new ItemDetailsAllocation(orderId,clientId,itemMasterId,serialNumber,allocationDate,status);
 	}
 
 	public void deAllocate() {

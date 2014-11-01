@@ -1,4 +1,4 @@
-package org.mifosplatform.logistics.item.service;
+package org.	mifosplatform.logistics.item.service;
 
 import java.util.Map;
 
@@ -21,15 +21,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ItemWritePlatformServiceImpl implements ItemWritePlatformService{
 
-	private ItemCommandFromApiJsonDeserializer itemCommandFromApiJsonDeserializer; 
-	private final PlatformSecurityContext context;
 	private final ItemRepository itemRepository;
+	private final PlatformSecurityContext context;
 	private final ItemAuditRepository itemAuditRepository;
+	private final ItemCommandFromApiJsonDeserializer itemCommandFromApiJsonDeserializer; 
 	
  @Autowired
- public ItemWritePlatformServiceImpl(final PlatformSecurityContext context,
-		 final ItemRepository itemrepository,final ItemCommandFromApiJsonDeserializer itemCommandFromApiJsonDeserializer,
-		 final ItemAuditRepository itemAuditRepository){
+ public ItemWritePlatformServiceImpl(final PlatformSecurityContext context,final ItemRepository itemrepository,
+		 final ItemCommandFromApiJsonDeserializer itemCommandFromApiJsonDeserializer,final ItemAuditRepository itemAuditRepository){
+
 	 this.context=context;
 	 this.itemRepository=itemrepository;
 	 this.itemCommandFromApiJsonDeserializer = itemCommandFromApiJsonDeserializer;
@@ -38,24 +38,21 @@ public class ItemWritePlatformServiceImpl implements ItemWritePlatformService{
 	
     @Transactional
 	@Override
-	public CommandProcessingResult createItem(JsonCommand command) {
-  
-    try{	 
-    this.context.authenticatedUser();
-    this.itemCommandFromApiJsonDeserializer.validateForCreate(command.json());
-    ItemMaster itemMaster=new ItemMaster(command.stringValueOfParameterNamed("itemCode"),command.stringValueOfParameterNamed("itemDescription"),
-    		command.stringValueOfParameterNamed("itemClass"),command.bigDecimalValueOfParameterNamed("unitPrice"),command.stringValueOfParameterNamed("units"),
-    		command.longValueOfParameterNamed("warranty"),command.stringValueOfParameterNamed("chargeCode"),command.longValueOfParameterNamed("reorderLevel")); 
-    this.itemRepository.save(itemMaster);
-    return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(itemMaster.getId()).build();
-    } catch (DataIntegrityViolationException dve) {
-    	handleItemDataIntegrityIssues(command, dve);
-        return CommandProcessingResult.empty();
-    }
-    }
+	public CommandProcessingResult createItem(final JsonCommand command) {
+    	
+    	try{	 
+    		this.context.authenticatedUser();
+    		this.itemCommandFromApiJsonDeserializer.validateForCreate(command.json());
+    		ItemMaster itemMaster=ItemMaster.fromJson(command);
+    		this.itemRepository.save(itemMaster);
+    		return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(itemMaster.getId()).build();
+    
+    	} catch (DataIntegrityViolationException dve) {
+    		handleItemDataIntegrityIssues(command, dve);
+    		return CommandProcessingResult.empty();
+    	}
+	}
 
-
-	
     private void handleItemDataIntegrityIssues(final JsonCommand command, final DataIntegrityViolationException dve) {
         Throwable realCause = dve.getMostSpecificCause();
         if (realCause.getMessage().contains("code_name_org")) {
@@ -71,29 +68,25 @@ public class ItemWritePlatformServiceImpl implements ItemWritePlatformService{
         throw new PlatformDataIntegrityException("error.msg.cund.unknown.data.integrity.issue",
                 "Unknown data integrity issue with resource: " + realCause.getMessage());
     }
+     @Transactional
+     @Override
+     public CommandProcessingResult updateItem(final JsonCommand command,final Long itemId) {
 
-	@Override
-	public CommandProcessingResult updateItem(JsonCommand command, Long itemId) {
-   try{
-	   
-	   this.context.authenticatedUser();
-	   this.itemCommandFromApiJsonDeserializer.validateForCreate(command.json());
-	   
-	   ItemMaster itemMaster = retrieveCodeBy(itemId);
-	   final int unitPrice = command.integerValueOfParameterNamed("unitPrice");
-	   int existingUnitPrice = itemMaster.getUnitPrice().intValueExact();
-	   if(unitPrice!=existingUnitPrice){
-		   
-		   ItemMasterAudit itemMasterAudit = new ItemMasterAudit(itemId,existingUnitPrice,command);
-		   this.itemAuditRepository.save(itemMasterAudit);
-		  
-	   }
-	   final Map<String, Object> changes = itemMaster.update(command);
-	   
-	   if(changes.isEmpty()){
-		   itemRepository.save(itemMaster);
-	   }
-	 
+    	 try{
+    		 this.context.authenticatedUser();
+    		 this.itemCommandFromApiJsonDeserializer.validateForCreate(command.json());
+    		 ItemMaster itemMaster = retrieveCodeBy(itemId);
+    		 final int unitPrice = command.integerValueOfParameterNamed("unitPrice");
+    		 final int existingUnitPrice = itemMaster.getUnitPrice().intValueExact();
+    		 
+    		 if(unitPrice!=existingUnitPrice){
+    			 final ItemMasterAudit itemMasterAudit = new ItemMasterAudit(itemId,existingUnitPrice,command);
+    			 this.itemAuditRepository.save(itemMasterAudit);
+    		 }
+    		 final Map<String, Object> changes = itemMaster.update(command);
+    		 if(changes.isEmpty()){
+    			 itemRepository.save(itemMaster);
+    		 }
 	   return new CommandProcessingResultBuilder() //
        .withCommandId(command.commandId()) //
        .withEntityId(itemId) //

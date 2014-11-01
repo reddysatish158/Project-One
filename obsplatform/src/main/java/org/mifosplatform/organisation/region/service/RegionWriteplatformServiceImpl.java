@@ -10,7 +10,7 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
-import org.mifosplatform.logistics.itemdetails.service.InventoryItemDetailsWritePlatformServiceImp;
+import org.mifosplatform.logistics.itemdetails.service.ItemDetailsWritePlatformServiceImp;
 import org.mifosplatform.organisation.region.data.RegionDetailsData;
 import org.mifosplatform.organisation.region.domain.RegionDetails;
 import org.mifosplatform.organisation.region.domain.RegionJpaRepository;
@@ -30,7 +30,7 @@ import com.google.gson.JsonArray;
 @Service
 public class RegionWriteplatformServiceImpl implements RegionWriteplatformService{
 	
-	private final static Logger logger = (Logger) LoggerFactory.getLogger(InventoryItemDetailsWritePlatformServiceImp.class);
+	private final static Logger logger = (Logger) LoggerFactory.getLogger(ItemDetailsWritePlatformServiceImp.class);
 	private final PlatformSecurityContext context;
 	private final RegionJpaRepository regionJpaRepository;
 	private final  RegionFromApiJsonDeserializer apiJsonDeserializer;

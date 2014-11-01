@@ -110,49 +110,51 @@ public class ItemMaster extends AbstractPersistable<Long>{
 		
 		final Map<String, Object> actualChanges = new LinkedHashMap<String, Object>(1);
 		
-		final String firstnameParamName = "itemCode";
-		final String secondnameParamName = "itemDescription";
-		final String thirdnamedParamName = "itemClass";
-		final String fourthnamedParamName = "chargeCode";
-		final String fifthnamedParamName = "units";
-		final String sixthnamedParamName = "warranty";
-		final String seventhnamedParamName = "unitPrice";
-		
-		if(command.isChangeInStringParameterNamed(firstnameParamName, this.itemCode)){
-			final String newValue = command.stringValueOfParameterNamed(firstnameParamName);
-			actualChanges.put(fifthnamedParamName, newValue);
+		final String itemCodeParamName = "itemCode";
+		if(command.isChangeInStringParameterNamed(itemCodeParamName, this.itemCode)){
+			final String newValue = command.stringValueOfParameterNamed(itemCodeParamName);
+			actualChanges.put(itemCodeParamName, newValue);
 			this.itemCode = StringUtils.defaultIfEmpty(newValue,null);
 		}
-		if(command.isChangeInStringParameterNamed(secondnameParamName, this.itemDescription)){
-			final String newValue = command.stringValueOfParameterNamed(secondnameParamName);
-			actualChanges.put(secondnameParamName, newValue);
+		final String itemDescriptionParamName = "itemDescription";
+		if(command.isChangeInStringParameterNamed(itemDescriptionParamName, this.itemDescription)){
+			final String newValue = command.stringValueOfParameterNamed(itemDescriptionParamName);
+			actualChanges.put(itemDescriptionParamName, newValue);
 			this.itemDescription = StringUtils.defaultIfEmpty(newValue, null);
 		}
-		if(command.isChangeInStringParameterNamed(thirdnamedParamName,this.itemClass)){
-			final String newValue = command.stringValueOfParameterNamed(thirdnamedParamName);
-			actualChanges.put(thirdnamedParamName, newValue);
+		
+		final String itemClassParamName = "itemClass";
+		if(command.isChangeInStringParameterNamed(itemClassParamName,this.itemClass)){
+			final String newValue = command.stringValueOfParameterNamed(itemClassParamName);
+			actualChanges.put(itemClassParamName, newValue);
 			this.itemClass =StringUtils.defaultIfEmpty(newValue,null);
 		}
-		if(command.isChangeInStringParameterNamed(fourthnamedParamName,this.chargeCode)){
-			final String newValue = command.stringValueOfParameterNamed(fourthnamedParamName);
-			actualChanges.put(fourthnamedParamName, newValue);
+		
+		final String chargeCodeParamName = "chargeCode";
+		if(command.isChangeInStringParameterNamed(chargeCodeParamName,this.chargeCode)){
+			final String newValue = command.stringValueOfParameterNamed(chargeCodeParamName);
+			actualChanges.put(chargeCodeParamName, newValue);
 			this.chargeCode = StringUtils.defaultIfEmpty(newValue,null);
 		}
-		if(command.isChangeInStringParameterNamed(fifthnamedParamName,this.units)){
-			final String newValue = command.stringValueOfParameterNamed(fifthnamedParamName);
-			actualChanges.put(fifthnamedParamName, newValue);
+		
+		final String unitsParamName = "units";
+		if(command.isChangeInStringParameterNamed(unitsParamName,this.units)){
+			final String newValue = command.stringValueOfParameterNamed(unitsParamName);
+			actualChanges.put(unitsParamName, newValue);
 			this.units = StringUtils.defaultIfEmpty(newValue,null); 
 		}
 		
-		if(command.isChangeInLongParameterNamed(sixthnamedParamName, this.warranty)){
-			final Long newValue = command.longValueOfParameterNamed(sixthnamedParamName);
-			actualChanges.put(sixthnamedParamName, newValue);
+		final String warrantyParamName = "warranty";
+		if(command.isChangeInLongParameterNamed(warrantyParamName, this.warranty)){
+			final Long newValue = command.longValueOfParameterNamed(warrantyParamName);
+			actualChanges.put(warrantyParamName, newValue);
 			this.warranty = newValue;
 		}
 		
-		if(command.isChangeInBigDecimalParameterNamed(seventhnamedParamName, this.unitPrice)){
-			final BigDecimal newValue = command.bigDecimalValueOfParameterNamed(seventhnamedParamName);
-			actualChanges.put(seventhnamedParamName,newValue);
+		final String unitPriceParamName = "unitPrice";
+		if(command.isChangeInBigDecimalParameterNamed(unitPriceParamName, this.unitPrice)){
+			final BigDecimal newValue = command.bigDecimalValueOfParameterNamed(unitPriceParamName);
+			actualChanges.put(unitPriceParamName,newValue);
 			this.unitPrice = newValue;
 		}
 		
@@ -165,6 +167,18 @@ public class ItemMaster extends AbstractPersistable<Long>{
 	public void delete() {
 		this.deleted='Y';
 		
+	}
+
+	public static ItemMaster fromJson(JsonCommand command) {
+		final String itemCode=command.stringValueOfParameterNamed("itemCode");
+		final String itemDescription=command.stringValueOfParameterNamed("itemDescription");
+		final String itemClass=command.stringValueOfParameterNamed("itemClass");
+		final BigDecimal unitPrice=command.bigDecimalValueOfParameterNamed("unitPrice");
+		final String units=command.stringValueOfParameterNamed("units");
+		final Long warranty=command.longValueOfParameterNamed("warranty");
+		final String chargeCode=command.stringValueOfParameterNamed("chargeCode");
+		final Long reorderLevel=command.longValueOfParameterNamed("reorderLevel");
+		return new ItemMaster(itemCode, itemDescription, itemClass, unitPrice, units, warranty, chargeCode, reorderLevel);
 	}
 	
 	

@@ -1,9 +1,6 @@
 package org.mifosplatform.logistics.supplier.api;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -40,49 +37,32 @@ import org.springframework.stereotype.Component;
 @Scope("singleton")
 public class SupplierApiResource {
 	
-	private final Set<String> RESPONSE_PARAMETERS = new HashSet<String>(Arrays.asList("id","supplierCode","supplierDescription","supplierAddress"));
 	private final static String resourceType = "SUPPLIER";
-	
 	final private PlatformSecurityContext context;
 	final private PortfolioCommandSourceWritePlatformService portfolioCommandSourceWritePlatformService;
-	final private ApiRequestParameterHelper apiRequestParameterHelper;
 	final private ToApiJsonSerializer<SupplierData> apiJsonSerializer;
 	final private SupplierReadPlatformService supplierReadPlatformService;
 	
 	@Autowired
-	public SupplierApiResource(final PlatformSecurityContext context, final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService
-			, final ApiRequestParameterHelper apiRequestParameterHelper
-			, final ToApiJsonSerializer<SupplierData> apiJsonSerializer
-			, final SupplierReadPlatformService supplierReadPlatformService) {
+	public SupplierApiResource(final PlatformSecurityContext context, final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService,
+			final ToApiJsonSerializer<SupplierData> apiJsonSerializer,final SupplierReadPlatformService supplierReadPlatformService) {
 		
 		this.context = context;
-		this.portfolioCommandSourceWritePlatformService = commandSourceWritePlatformService;
 		this.apiJsonSerializer = apiJsonSerializer;
-		this.apiRequestParameterHelper = apiRequestParameterHelper;
 		this.supplierReadPlatformService = supplierReadPlatformService;
+		this.portfolioCommandSourceWritePlatformService = commandSourceWritePlatformService;
 		
 	}
 	
-	
-	/*@GET
-	@Consumes({MediaType.APPLICATION_JSON})
-	@Produces({MediaType.APPLICATION_JSON})
-	public String retriveSupplierDetails(@Context final UriInfo uriInfo ){
-		context.authenticatedUser().validateHasReadPermission(resourceType);
-		final List<SupplierData> mrnDetailsDatas = supplierReadPlatformService.retrieveSupplier();
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-		return apiJsonSerializer.serialize(settings,mrnDetailsDatas,RESPONSE_PARAMETERS);
-	}*/
-
-
 	@GET
 	@Consumes({MediaType.APPLICATION_JSON})
 	@Produces({MediaType.APPLICATION_JSON})
-	public String retriveSupplierDetails(@Context final UriInfo uriInfo , @QueryParam("sqlSearch") final String sqlSearch, @QueryParam("limit") final Integer limit, @QueryParam("offset") final Integer offset){
+	public String retriveSupplierDetails(@Context final UriInfo uriInfo , @QueryParam("sqlSearch") final String sqlSearch,
+			      @QueryParam("limit") final Integer limit, @QueryParam("offset") final Integer offset){
+		
 		context.authenticatedUser().validateHasReadPermission(resourceType);
 		final SearchSqlQuery searchSupplier =SearchSqlQuery.forSearch(sqlSearch, offset,limit );
 		final Page<SupplierData> mrnDetailsDatas = supplierReadPlatformService.retrieveSupplier(searchSupplier);
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 		return apiJsonSerializer.serialize(mrnDetailsDatas);
 	}
 	
@@ -112,7 +92,6 @@ public class SupplierApiResource {
 	public String retriveSupplierDetails(@Context final UriInfo uriInfo ,@PathParam("supplierId") final Long supplierId){
 		context.authenticatedUser().validateHasReadPermission(resourceType);
 		final List<SupplierData> mrnDetailsDatas = supplierReadPlatformService.retrieveSupplier(supplierId);
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 		return apiJsonSerializer.serialize(mrnDetailsDatas);
 	}
 	

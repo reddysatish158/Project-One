@@ -1,9 +1,9 @@
-package org.mifosplatform.logistics.itemdetails.service;
+package org.mifosplatform.logistics.grn.service;
 
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 
-public interface InventoryGrnDetailsWritePlatformService {
+public interface GrnDetailsWritePlatformService {
 
 
 	CommandProcessingResult addGrnDetails(JsonCommand command);

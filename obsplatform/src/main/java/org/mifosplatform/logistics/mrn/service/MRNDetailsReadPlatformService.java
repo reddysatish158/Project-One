@@ -12,19 +12,9 @@ public interface MRNDetailsReadPlatformService {
 
 	List<MRNDetailsData> retriveMRNDetails();
 
-	List<MRNDetailsData> retriveMrnDetailsTemplate();
-
-	List<MRNDetailsData> retriveItemMasterDetails();
-
 	Collection<MRNDetailsData> retriveMrnIds();
-	
-	List<Long> retriveItemMasterId(Long mrnId);
 
-	List<Long> retriveItemDetailsId(String serialNumber, Long itemMasterId);
-
-	MRNDetailsData retriveFromAndToOffice(Long mrnId);
-
-	List<String> retriveSerialNumbers(Long fromOffice, Long toOffice);
+	List<String> retriveSerialNumbers(Long fromOffice);
 
 	Page<InventoryTransactionHistoryData> retriveHistory(SearchSqlQuery searchItemHistory);
 	
@@ -34,9 +24,6 @@ public interface MRNDetailsReadPlatformService {
 
 	InventoryTransactionHistoryData retriveSingleMovedMrn(Long mrnId);
 
-	MRNDetailsData retriveAgentId(Long itemsaleId);
+	List<String> retriveSerialNumbersForItems(Long officeId, String serialNumber);
 
-	List<String> retriveSerialNumbersForItems(Long officeId, Long itemsaleId, String serialNumber);
-
-	List<Long> retriveItemMasterIdForSale(Long mrnId);
 }

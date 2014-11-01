@@ -10,7 +10,7 @@ import org.mifosplatform.infrastructure.core.domain.JdbcSupport;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.logistics.item.data.ItemData;
-import org.mifosplatform.logistics.itemdetails.domain.InventoryItemDetailsAllocation;
+import org.mifosplatform.logistics.itemdetails.domain.ItemDetailsAllocation;
 import org.mifosplatform.logistics.onetimesale.data.AllocationDetailsData;
 import org.mifosplatform.logistics.onetimesale.data.OneTimeSaleData;
 import org.pentaho.reporting.engine.classic.core.EmptyReportException;
@@ -37,17 +37,17 @@ public class OneTimeSaleReadPlatformServiceImpl implements	OneTimeSaleReadPlatfo
 	public List<ItemData> retrieveItemData() {
 		context.authenticatedUser();
 
-		TicketDataMapper mapper = new TicketDataMapper();
+		ItemMapper mapper = new ItemMapper();
 
-		String sql = "select " + mapper.schema() + " where i.is_deleted='n'";
+		String sql = "select " + mapper.schema();
 
 		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
 	}
 
-	private static final class TicketDataMapper implements RowMapper<ItemData> {
+	private static final class ItemMapper implements RowMapper<ItemData> {
 
 		public String schema() {
-			return "i.id AS id,i.item_description AS itemCode,i.units AS units,i.unit_price AS unitPrice FROM b_item_master i  ";
+			return "i.id AS id,i.item_description AS itemCode,i.units AS units,i.unit_price AS unitPrice FROM b_item_master i  where i.is_deleted='N'";
 
 		}
 
