@@ -27,8 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ChargeCodeWritePlatformServiceImp implements
 		ChargeCodeWritePlatformService {
 
-	private final static Logger LOGGER = (Logger) LoggerFactory
-			.getLogger(ChargeCodeWritePlatformServiceImp.class);
+	private final static Logger LOGGER = (Logger) LoggerFactory.getLogger(ChargeCodeWritePlatformServiceImp.class);
 
 	private PlatformSecurityContext context;
 	private ChargeCodeRepository chargeCodeRepository;
@@ -61,10 +60,9 @@ public class ChargeCodeWritePlatformServiceImp implements
 			this.apiJsonDeserializer.validaForCreate(command.json());
 			chargeCode = ChargeCodeMaster.fromJson(command);
 			this.chargeCodeRepository.save(chargeCode);
-			return new CommandProcessingResultBuilder()
-					.withCommandId(command.commandId())
-					.withEntityId(chargeCode.getId()).build();
-		} catch (DataIntegrityViolationException dve) {
+			return new CommandProcessingResultBuilder().withCommandId(command.commandId())
+					  .withEntityId(chargeCode.getId()).build();
+		} catch (final DataIntegrityViolationException dve) {
 			handleDataIntegrityIssues(command, dve);
 			return new CommandProcessingResult(Long.valueOf(-1L));
 		}

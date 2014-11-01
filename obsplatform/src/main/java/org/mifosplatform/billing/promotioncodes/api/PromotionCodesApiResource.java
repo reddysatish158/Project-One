@@ -45,10 +45,8 @@ import org.springframework.stereotype.Component;
 @Scope("singleton")
 public class PromotionCodesApiResource {
 
-	private final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(
-			Arrays.asList("id", "promotionCode", "promotionDescription",
-					"durationType", "duration", "discountType", "discountRate",
-					"startDate"));
+	private final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(Arrays.asList("id", "promotionCode", "promotionDescription",
+					"durationType", "duration", "discountType", "discountRate","startDate"));
 	private final String resourceNameForPermissions = "PROMOTIONCODE";
 	private final PlatformSecurityContext context;
 	private final DefaultToApiJsonSerializer<PromotionCodeData> toApiJsonSerializer;
@@ -86,14 +84,10 @@ public class PromotionCodesApiResource {
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String retrieveAllPromotionCodeDetails(@Context final UriInfo uriInfo) {
 
-		context.authenticatedUser().validateHasReadPermission(
-				resourceNameForPermissions);
-		final List<PromotionCodeData> promotionDatas = this.promotionCodeReadPlatformService
-				.retrieveAllPromotionCodes();
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper
-				.process(uriInfo.getQueryParameters());
-		return this.toApiJsonSerializer.serialize(settings, promotionDatas,
-				RESPONSE_DATA_PARAMETERS);
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		final List<PromotionCodeData> promotionDatas = this.promotionCodeReadPlatformService.retrieveAllPromotionCodes();
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		return this.toApiJsonSerializer.serialize(settings,promotionDatas,RESPONSE_DATA_PARAMETERS);
 	}
 
 	/**
@@ -106,19 +100,12 @@ public class PromotionCodesApiResource {
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String retrievePromotionTemplateData(@Context final UriInfo uriInfo) {
 
-		context.authenticatedUser().validateHasReadPermission(
-				resourceNameForPermissions);
-		final Collection<MCodeData> discountTypeData = mCodeReadPlatformService
-				.getCodeValue("type");
-		final List<PeriodData> contractTypedata = contractPeriodReadPlatformService
-				.retrieveAllPlatformPeriod();
-		final PromotionCodeData data = new PromotionCodeData(discountTypeData,
-				contractTypedata);
-
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper
-				.process(uriInfo.getQueryParameters());
-		return this.toApiJsonSerializer.serialize(settings, data,
-				RESPONSE_DATA_PARAMETERS);
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		final Collection<MCodeData> discountTypeData = mCodeReadPlatformService.getCodeValue("type");
+		final List<PeriodData> contractTypedata = contractPeriodReadPlatformService.retrieveAllPlatformPeriod();
+		final PromotionCodeData data = new PromotionCodeData(discountTypeData,contractTypedata);
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		return this.toApiJsonSerializer.serialize(settings,data,RESPONSE_DATA_PARAMETERS);
 
 	}
 
@@ -131,12 +118,9 @@ public class PromotionCodesApiResource {
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String createPromotionCode(final String apiRequestBodyAsJson) {
 
-		context.authenticatedUser().validateHasReadPermission(
-				resourceNameForPermissions);
-		final CommandWrapper commandRequest = new CommandWrapperBuilder()
-				.createPromotionCode().withJson(apiRequestBodyAsJson).build();
-		final CommandProcessingResult result = this.commandSourceWritePlatformService
-				.logCommandSource(commandRequest);
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().createPromotionCode().withJson(apiRequestBodyAsJson).build();
+		final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 	}
 
@@ -149,24 +133,18 @@ public class PromotionCodesApiResource {
 	@Path("{promotionId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrieveSinglePromotionCodeDetails(
-			@PathParam("promotionId") final Long promotionId,
-			@Context final UriInfo uriInfo) {
+	public String retrieveSinglePromotionCodeDetails(@PathParam("promotionId") final Long promotionId, @Context final UriInfo uriInfo) {
 
-		context.authenticatedUser().validateHasReadPermission(
-				resourceNameForPermissions);
-		PromotionCodeData promotionCodeData = this.promotionCodeReadPlatformService
-				.retriveSinglePromotionCodeDetails(promotionId);
-		Collection<MCodeData> discountTypeData = mCodeReadPlatformService
-				.getCodeValue("type");
-		List<PeriodData> contractTypedata = contractPeriodReadPlatformService
-				.retrieveAllPlatformPeriod();
-		promotionCodeData.setDiscounTypeData(discountTypeData);
-		promotionCodeData.setContractTypedata(contractTypedata);
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper
-				.process(uriInfo.getQueryParameters());
-		return this.toApiJsonSerializer.serialize(settings, promotionCodeData,
-				RESPONSE_DATA_PARAMETERS);
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		PromotionCodeData promotionCodeData = this.promotionCodeReadPlatformService.retriveSinglePromotionCodeDetails(promotionId);
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		if(settings.isTemplate()){
+			final Collection<MCodeData> discountTypeData = mCodeReadPlatformService.getCodeValue("type");
+			final List<PeriodData> contractTypedata = contractPeriodReadPlatformService.retrieveAllPlatformPeriod();
+			promotionCodeData.setDiscounTypeData(discountTypeData);
+			promotionCodeData.setContractTypedata(contractTypedata);
+		}
+		return this.toApiJsonSerializer.serialize(settings,promotionCodeData,RESPONSE_DATA_PARAMETERS);
 	}
 
 	/**
@@ -178,17 +156,11 @@ public class PromotionCodesApiResource {
 	@Path("{promotionId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String updateSinglePromotionCode(
-			@PathParam("promotionId") final Long promotionId,
-			final String apiRequestBodyAsJson) {
+	public String updateSinglePromotionCode(@PathParam("promotionId") final Long promotionId,final String apiRequestBodyAsJson) {
 
-		context.authenticatedUser().validateHasReadPermission(
-				resourceNameForPermissions);
-		final CommandWrapper commandRequest = new CommandWrapperBuilder()
-				.updatePromotionCode(promotionId)
-				.withJson(apiRequestBodyAsJson).build();
-		final CommandProcessingResult result = this.commandSourceWritePlatformService
-				.logCommandSource(commandRequest);
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().updatePromotionCode(promotionId).withJson(apiRequestBodyAsJson).build();
+		final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 	}
 
@@ -203,12 +175,9 @@ public class PromotionCodesApiResource {
 	public String deleteSinglePromotionCode(
 			@PathParam("promotionId") final Long promotionId) {
 
-		context.authenticatedUser().validateHasReadPermission(
-				resourceNameForPermissions);
-		final CommandWrapper commandRequest = new CommandWrapperBuilder()
-				.deletePromotionCode(promotionId).build();
-		final CommandProcessingResult result = this.commandSourceWritePlatformService
-				.logCommandSource(commandRequest);
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().deletePromotionCode(promotionId).build();
+		final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 
 	}

@@ -21,8 +21,8 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.logistics.item.domain.ItemMaster;
 import org.mifosplatform.logistics.item.domain.ItemRepository;
-import org.mifosplatform.logistics.itemdetails.domain.InventoryItemDetailsAllocation;
-import org.mifosplatform.logistics.itemdetails.service.InventoryItemDetailsWritePlatformService;
+import org.mifosplatform.logistics.itemdetails.domain.ItemDetailsAllocation;
+import org.mifosplatform.logistics.itemdetails.service.ItemDetailsWritePlatformService;
 import org.mifosplatform.logistics.ownedhardware.data.OwnedHardware;
 import org.mifosplatform.logistics.ownedhardware.domain.OwnedHardwareJpaRepository;
 import org.mifosplatform.portfolio.association.data.HardwareAssociationData;
@@ -49,7 +49,7 @@ public class HardwareSwappingWriteplatformServiceImpl implements HardwareSwappin
 
 	private final PlatformSecurityContext context;
 	private final HardwareAssociationWriteplatformService associationWriteplatformService;
-	private final InventoryItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService;
+	private final ItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService;
 	private final PrepareRequestWriteplatformService prepareRequestWriteplatformService;
 	private final OrderRepository orderRepository;
 	private final PlanRepository  planRepository;
@@ -65,7 +65,7 @@ public class HardwareSwappingWriteplatformServiceImpl implements HardwareSwappin
 	  
 	@Autowired
 	public HardwareSwappingWriteplatformServiceImpl(final PlatformSecurityContext context,final HardwareAssociationWriteplatformService associationWriteplatformService,
-			final InventoryItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService,final PrepareRequestWriteplatformService prepareRequestWriteplatformService,
+			final ItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService,final PrepareRequestWriteplatformService prepareRequestWriteplatformService,
 			final OrderRepository orderRepository,final PlanRepository planRepository,final TransactionHistoryWritePlatformService historyWritePlatformService,
 			final HardwareSwappingCommandFromApiJsonDeserializer apiJsonDeserializer,final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
 			final OrderHistoryRepository orderHistoryRepository,final ConfigurationRepository configurationRepository,final OwnedHardwareJpaRepository hardwareJpaRepository,
@@ -140,7 +140,7 @@ public CommandProcessingResult dohardWareSwapping(Long entityId,JsonCommand comm
 		}else{
 		
 		//DeAllocate HardWare
-		InventoryItemDetailsAllocation inventoryItemDetailsAllocation=this.inventoryItemDetailsWritePlatformService.deAllocateHardware(serialNo, entityId);
+		ItemDetailsAllocation inventoryItemDetailsAllocation=this.inventoryItemDetailsWritePlatformService.deAllocateHardware(serialNo, entityId);
 		
 	
 		

@@ -17,7 +17,6 @@ public class UpdateTaxMapCommandHandler implements NewCommandSourceHandler{
 		this.taxMapWritePlatformService = taxMapWritePlatformService;
 	}
 	
-	
 	@Override
 	public CommandProcessingResult processCommand(JsonCommand command) {
 		return taxMapWritePlatformService.updateTaxMap(command, command.entityId());

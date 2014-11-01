@@ -10,18 +10,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class CreateClientParentHandler implements NewCommandSourceHandler {
+public class CreateParentClientHandler implements NewCommandSourceHandler {
 
 	private final ClientWritePlatformService clientWritePlatformService;
 
     @Autowired
-    public CreateClientParentHandler(final ClientWritePlatformService clientWritePlatformService) {
+    public CreateParentClientHandler(final ClientWritePlatformService clientWritePlatformService) {
         this.clientWritePlatformService = clientWritePlatformService;
     }
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-        return this.clientWritePlatformService.createClientParent(command.entityId(),command);
+        return this.clientWritePlatformService.createParentClient(command.entityId(),command);
     }
 }

@@ -8,8 +8,10 @@ package org.mifosplatform.infrastructure.documentmanagement.exception;
 import org.mifosplatform.infrastructure.core.exception.AbstractPlatformDomainRuleException;
 
 public class DocumentManagementException extends AbstractPlatformDomainRuleException {
+	
+	private static final long serialVersionUID = 1L;
 
-    public DocumentManagementException(final String name) {
+	public DocumentManagementException(final String name) {
         super("error.msg.document.save", "Error while manipulating file " + name + " due to a File system / Amazon S3 issue", name);
     }
 

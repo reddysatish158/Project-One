@@ -2,6 +2,7 @@ package org.mifosplatform.billing.taxmapping.service;
 
 import java.util.Map;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.mifosplatform.billing.taxmapping.domain.TaxMap;
 import org.mifosplatform.billing.taxmapping.domain.TaxMapRepository;
 import org.mifosplatform.billing.taxmapping.serialization.TaxMapCommandFromApiJsonDeserializer;
@@ -17,78 +18,101 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * @author hugo
+ *
+ */
 @Service
 public class TaxMapWritePlatformServiceImp implements TaxMapWritePlatformService{
 
-	private final static Logger logger = (Logger) LoggerFactory.getLogger(TaxMapWritePlatformService.class);
+	private final static Logger LOGGER = (Logger) LoggerFactory.getLogger(TaxMapWritePlatformService.class);
 	
 	private final PlatformSecurityContext context;
 	private final TaxMapRepository taxMapRepository;
-	private final TaxMapCommandFromApiJsonDeserializer taxMapCommandFromApiJsonDeserializer;
+	private final TaxMapCommandFromApiJsonDeserializer apiJsonDeserializer;
 	
 	@Autowired
-	public TaxMapWritePlatformServiceImp(final PlatformSecurityContext context,final TaxMapRepository taxMapRepository,final TaxMapCommandFromApiJsonDeserializer taxMapCommandFromApiJsonDeserializer){
+	public TaxMapWritePlatformServiceImp(final PlatformSecurityContext context,final TaxMapRepository taxMapRepository,
+			final TaxMapCommandFromApiJsonDeserializer apiJsonDeserializer){
 		this.context = context;
 		this.taxMapRepository = taxMapRepository;
-		this.taxMapCommandFromApiJsonDeserializer = taxMapCommandFromApiJsonDeserializer;
+		this.apiJsonDeserializer = apiJsonDeserializer;
 		
 	}
 	
-	@Override
+	/* (non-Javadoc)
+	 * @see #createTaxMap(org.mifosplatform.infrastructure.core.api.JsonCommand)
+	 */
 	@Transactional
-	public CommandProcessingResult createTaxMap(JsonCommand command){
-		TaxMap entity = null;
+	@Override
+	public CommandProcessingResult createTaxMap(final JsonCommand command){
+		TaxMap  taxmap = null;
 		try{
-			context.authenticatedUser();
-			taxMapCommandFromApiJsonDeserializer.validateForCreate(command);
-			entity = TaxMap.fromJson(command);
-			taxMapRepository.save(entity);
-		}catch(DataIntegrityViolationException dve){
+			this.context.authenticatedUser();
+			this.apiJsonDeserializer.validateForCreate(command);
+			taxmap = TaxMap.fromJson(command);
+			this.taxMapRepository.save(taxmap);
+		}catch(final DataIntegrityViolationException dve){
 			handleDataIntegrityIssues(command, dve);
-			//throw new PlatformDataIntegrityException(globalisationMessageCode, defaultUserMessage, defaultUserMessageArgs);
 			return new CommandProcessingResult(Long.valueOf(-1));
 		}
-		return new CommandProcessingResultBuilder().withEntityId(entity.getId()).build();
+		return new CommandProcessingResultBuilder().withEntityId(taxmap.getId()).build();
 	}
 	
-	 private TaxMap retrieveTaxMapBy(final Long taxMapId) {
+	/* (non-Javadoc)
+	 * @see #updateTaxMap(org.mifosplatform.infrastructure.core.api.JsonCommand, java.lang.Long)
+	 */
+	@Transactional
+	@Override
+	public CommandProcessingResult updateTaxMap(final JsonCommand command,final Long taxMapId){
+		TaxMap taxMap = null;
+		try{
+			this.context.authenticatedUser();
+			this.apiJsonDeserializer.validateForCreate(command);
+			taxMap = retrieveTaxMapById(taxMapId);
+			final Map<String, Object> changes = taxMap.update(command);
+			
+			if(!changes.isEmpty()){
+				this.taxMapRepository.saveAndFlush(taxMap);
+			}
+			
+			return new CommandProcessingResultBuilder().withCommandId(command.commandId())
+					.withEntityId(taxMap.getId())
+					.with(changes).build();
+		}catch(final DataIntegrityViolationException dve){
+			if (dve.getCause() instanceof ConstraintViolationException) {
+			handleDataIntegrityIssues(command, dve);
+		  }
+			return new CommandProcessingResult(Long.valueOf(-1));
+		}
+	
+	}
+	
+	 private TaxMap retrieveTaxMapById(final Long taxMapId) {
+		 
 	        final TaxMap taxMap = this.taxMapRepository.findOne(taxMapId);
-	        if (taxMap == null) { throw new PlatformDataIntegrityException("validation.error.msg.taxmap.taxcode.doesnotexist","validation.error.msg.taxmap.taxcode.doesnotexist",taxMapId.toString(),"validation.error.msg.taxmap.taxcode.doesnotexist"); }
+	        if (taxMap == null) { 
+	        	throw new PlatformDataIntegrityException("validation.error.msg.taxmap.taxcode.doesnotexist",
+	        	"validation.error.msg.taxmap.taxcode.doesnotexist",taxMapId.toString(),
+	        	"validation.error.msg.taxmap.taxcode.doesnotexist");
+	        	}
 	        return taxMap;
 	    }
 	
 	
-	@Override
-	@Transactional
-	public CommandProcessingResult updateTaxMap(final JsonCommand command,final Long taxMapId){
-		TaxMap taxMap = null;
-		try{
-			context.authenticatedUser();
-			taxMapCommandFromApiJsonDeserializer.validateForCreate(command);
-			taxMap = retrieveTaxMapBy(taxMapId);
-			final Map<String, Object> changes = taxMap.update(command);
-			if(!changes.isEmpty()){
-				taxMapRepository.save(taxMap);
-			}
-			
-			return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(command.entityId()).with(changes).build();
-		}catch(DataIntegrityViolationException dve){
-			handleDataIntegrityIssues(command, dve);
-			return CommandProcessingResult.empty();
-		}
-	
-	}
-	
-	
 	private void handleDataIntegrityIssues(final JsonCommand command, final DataIntegrityViolationException dve) {
 
-        Throwable realCause = dve.getMostSpecificCause();
+      final Throwable realCause = dve.getMostSpecificCause();
+      
+      LOGGER.error(dve.getMessage(), dve);   
        if (realCause.getMessage().contains("taxcode")){
-       	throw new PlatformDataIntegrityException("validation.error.msg.taxmap.taxcode.duplicate", "validation.error.msg.taxmap.taxcode.duplicate", "validation.error.msg.taxmap.taxcode.duplicate","");
-       	
+       	throw new PlatformDataIntegrityException("validation.error.msg.taxmap.taxcode.duplicate",
+       			"A taxcode with name'"+ command.stringValueOfParameterNamed("taxCode")+"'already exists",
+       			command.stringValueOfParameterNamed("taxCode"));
+       }else{
+    	   throw new PlatformDataIntegrityException("error.msg.could.unknown.data.integrity.issue",
+					"Unknown data integrity issue with resource: "+ dve.getMessage());
        }
-
-
-       logger.error(dve.getMessage(), dve);   	
-}
+       
+    }
 }

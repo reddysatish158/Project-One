@@ -5,17 +5,12 @@ import java.util.Date;
 import java.util.List;
 
 import org.joda.time.LocalDate;
-import org.mifosplatform.billing.paymode.data.McodeData;
 import org.mifosplatform.logistics.item.data.ItemData;
 import org.mifosplatform.logistics.supplier.data.SupplierData;
 import org.mifosplatform.organisation.office.data.OfficeData;
 
 public class InventoryGrnData {
 
-
-	
-	
-	
 	private Long id;
 	private LocalDate purchaseDate;
 	private Long supplierId;
@@ -35,7 +30,6 @@ public class InventoryGrnData {
 	private String itemDescription;
 	private String supplierName;
 	private String officeName;
-	private List<McodeData> quality;
 	private String purchaseNo;
 	private Long officeId;
 	
@@ -52,12 +46,6 @@ public class InventoryGrnData {
 	public InventoryGrnData(Long testId, final String itemDescription) {
 		this.testId = testId;
 		this.itemDescription = itemDescription;
-	}
-	
-	public InventoryGrnData(List<McodeData> quality) {
-		// TODO Auto-generated constructor stub
-		this.quality=quality;
-		
 	}
 	
 	public InventoryGrnData(Long id,LocalDate purchaseDate,Long supplierId,Long itemMasterId,Long orderedQuantity,Long receivedQuantity){

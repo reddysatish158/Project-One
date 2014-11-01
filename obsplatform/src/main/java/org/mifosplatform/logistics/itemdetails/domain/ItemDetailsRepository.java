@@ -6,9 +6,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface ItemDetailsRepository extends JpaRepository<ItemDetails, Long>, JpaSpecificationExecutor<ItemDetails>{
-	
-	@Query("from ItemDetails itemdetails where itemdetails.serialNumber =:serialNumber")
-	ItemDetails findOneBySerialNo(@Param("serialNumber")String serialNumber);
+
+	@Query("from ItemDetails item where item.serialNumber = :macId")
+	ItemDetails getInventoryItemDetailBySerialNum(@Param("macId") String macId);
 
 }
 

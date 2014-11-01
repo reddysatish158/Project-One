@@ -5,10 +5,6 @@ import java.util.List;
 
 import org.mifosplatform.billing.currency.data.CountryCurrencyData;
 
-/**
- * @author hugo
- *
- */
 public interface CountryCurrencyReadPlatformService {
 
 	List<CountryCurrencyData> getCountryCurrencyDetailsByName(String string);

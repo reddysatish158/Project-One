@@ -298,7 +298,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 								 deviceStatusConfiguration.getValue().equalsIgnoreCase(ConfigurationConstants.CONFIR_PROPERTY_SALE)){
 						
 						device = command.stringValueOfParameterNamed("device");
-						ItemDetails detail = itemDetailsRepository.findOneBySerialNo(device);
+						ItemDetails detail = itemDetailsRepository.getInventoryItemDetailBySerialNum(device);
 
 						if (detail == null) {
 							throw new SerialNumberNotFoundException(device);

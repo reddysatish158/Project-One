@@ -1,6 +1,5 @@
 package org.mifosplatform.logistics.supplier.domain;
 
-import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -12,7 +11,6 @@ import javax.persistence.UniqueConstraint;
 import org.apache.commons.lang.StringUtils;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
-import org.mifosplatform.logistics.item.exception.ItemNotFoundException;
 import org.mifosplatform.useradministration.domain.AppUser;
 
 

@@ -9,7 +9,7 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
-import org.mifosplatform.logistics.itemdetails.service.InventoryItemDetailsWritePlatformServiceImp;
+import org.mifosplatform.logistics.itemdetails.service.ItemDetailsWritePlatformServiceImp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class EpgProgramGuideWritePlatformServiceImp implements
 		EpgProgramGuideWritePlatformService {
 
-	private final static Logger logger = (Logger) LoggerFactory.getLogger(InventoryItemDetailsWritePlatformServiceImp.class);
+	private final static Logger logger = (Logger) LoggerFactory.getLogger(ItemDetailsWritePlatformServiceImp.class);
 	private PlatformSecurityContext context;
 	private EpgProgramGuideJpaRepository epgProgramGuideJpaRepository;
 	private FromJsonHelper fromJsonHelper;

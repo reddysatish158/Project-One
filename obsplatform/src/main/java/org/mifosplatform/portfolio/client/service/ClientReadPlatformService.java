@@ -44,7 +44,7 @@ public interface ClientReadPlatformService {
 
 	List<ClientCategoryData> retrievingParentClients(String query);
 
-	List<ClientCategoryData> retrievingClientParentData(Long parentClientId,Long clientId);
+	List<ClientCategoryData> retrievedParentAndChildData(Long parentClientId,Long clientId);
 
 	Boolean countChildClients(Long entityId);
 

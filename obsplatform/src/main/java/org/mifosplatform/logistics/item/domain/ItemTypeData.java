@@ -1,4 +1,4 @@
-package org.mifosplatform.logistics.item.data;
+package org.mifosplatform.logistics.item.domain;
 
 
 
