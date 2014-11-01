@@ -1469,8 +1469,8 @@ public CommandWrapperBuilder createProspect() {
 	this.href = "/prospects";
 	return this;
 }
-public CommandWrapperBuilder updateProspect(final Long prospectId){
-	this.actionName = "UPDATE";
+public CommandWrapperBuilder followUpProspect(final Long prospectId){
+	this.actionName = "FOLLOWUP";
 	this.entityName = "PROSPECT";
 	this.entityId = prospectId;
 	this.href = "/prospects/"+prospectId;
@@ -1717,8 +1717,8 @@ public CommandWrapperBuilder createBalance() {
 	    return this;
 }
 
-public CommandWrapperBuilder editProspectDetails(Long id) {
-	this.actionName = "EDIT";
+public CommandWrapperBuilder updateProspect(Long id) {
+	this.actionName = "UPDATE";
 	this.entityName = "PROSPECT";
 	this.entityId = id;
 	this.href = "/prospects/edit/"+id;

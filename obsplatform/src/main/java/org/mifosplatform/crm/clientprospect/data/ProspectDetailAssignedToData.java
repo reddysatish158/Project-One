@@ -4,14 +4,13 @@ public class ProspectDetailAssignedToData {
 
 	private Long assignId;
 	private String assignedTo;
-	
-	
+
 	public ProspectDetailAssignedToData() {
-		// TODO Auto-generated constructor stub
 	}
-	
-	public ProspectDetailAssignedToData(Long assignedId,String assignedTo){
-		
+
+	public ProspectDetailAssignedToData(final Long assignedId,
+			final String assignedTo) {
+
 		this.assignId = assignedId;
 		this.assignedTo = assignedTo;
 	}
@@ -31,5 +30,5 @@ public class ProspectDetailAssignedToData {
 	public void setAssignedTo(String assignedTo) {
 		this.assignedTo = assignedTo;
 	}
-	
+
 }

@@ -6,13 +6,13 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 public interface ClientProspectWritePlatformService {
 
 	public CommandProcessingResult createProspect(JsonCommand command);
-	
-	public CommandProcessingResult updateProspect(JsonCommand command, final Long prospectId);
-	
+
+	public CommandProcessingResult followUpProspect(JsonCommand command, final Long prospectId);
+
 	public CommandProcessingResult deleteProspect(JsonCommand command);
-	
+
 	public CommandProcessingResult convertToClient(Long entityId);
-	
-	public CommandProcessingResult editProspectDetails(JsonCommand command);
-	
+
+	public CommandProcessingResult updateProspect(JsonCommand command);
+
 }

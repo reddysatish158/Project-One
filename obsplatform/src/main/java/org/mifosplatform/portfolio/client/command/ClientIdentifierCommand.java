@@ -40,9 +40,9 @@ public class ClientIdentifierCommand {
     }
 
     public void validateForCreate() {
-        List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
+    	final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
 
-        DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("clientIdentifier");
+    	final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("clientIdentifier");
 
         baseDataValidator.reset().parameter("documentTypeId").value(this.documentTypeId).notNull().integerGreaterThanZero();
         baseDataValidator.reset().parameter("documentKey").value(this.documentKey).notBlank();
@@ -52,16 +52,11 @@ public class ClientIdentifierCommand {
     }
 
     public void validateForUpdate() {
-        List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
+    	final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
 
-        DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("clientIdentifier");
+    	final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("clientIdentifier");
 
         baseDataValidator.reset().parameter("documentKey").value(this.documentKey).ignoreIfNull().notBlank();
-
-        // FIXME - KW - add in validation
-        // if (command.isDocumentTypeChanged()) {
-        // baseDataValidator.reset().parameter("documentTypeId").value(command.getDocumentTypeId()).notNull().integerGreaterThanZero();
-        // }
 
         baseDataValidator.reset().anyOfNotNull(this.documentTypeId, this.documentKey);
 
