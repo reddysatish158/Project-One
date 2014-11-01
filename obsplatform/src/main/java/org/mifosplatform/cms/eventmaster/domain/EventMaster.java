@@ -319,7 +319,7 @@ public class EventMaster extends AbstractPersistable<Long> {
 			actualChanges.put(statusNamedParamName, newStatusValue);
 			this.status=newStatusValue;
 		}
-		if(command.isChangeInStringParameterNamed(eventStartDateNamedParamName, this.eventStartDate.toString())){
+		if(command.isChangeInDateParameterNamed(eventStartDateNamedParamName, this.eventStartDate)){
 			final String startDate = command.stringValueOfParameterNamed("eventStartDate"); 
 			if(startDate.equalsIgnoreCase("")){
 				this.eventStartDate = null;
@@ -328,9 +328,9 @@ public class EventMaster extends AbstractPersistable<Long> {
 			}
 			actualChanges.put(eventStartDateNamedParamName, startDate);
 		}
-		if(command.isChangeInStringParameterNamed(eventEndDateNamedParamName, this.eventEndDate.toString())){
+		if(command.isChangeInDateParameterNamed(eventEndDateNamedParamName, this.eventEndDate)){
 			final String endDate = command.stringValueOfParameterNamed("eventEndDate");
-			if(endDate.equalsIgnoreCase("")){
+			if(endDate == null){
 				this.eventEndDate = null;
 			}else{
 				this.eventEndDate = dateFormat.parse(endDate);
