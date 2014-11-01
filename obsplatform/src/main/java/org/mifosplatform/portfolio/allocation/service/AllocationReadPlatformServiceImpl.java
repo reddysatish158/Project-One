@@ -159,7 +159,7 @@ public class AllocationReadPlatformServiceImpl implements AllocationReadPlatform
 						}
 
 						@Override
-						public String mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
+						public String mapRow(final ResultSet rs, final int rowNum) throws SQLException {
 
 							final String serialNum = rs.getString("serialNo");
 						

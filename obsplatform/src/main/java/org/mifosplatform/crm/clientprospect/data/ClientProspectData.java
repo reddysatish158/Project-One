@@ -8,9 +8,9 @@ import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
 
 /**
  * @author Praveen
- *
+ * 
  */
-public class ClientProspectData{
+public class ClientProspectData {
 
 	private static final long serialVersionUID = 1L;
 	private Long id;
@@ -35,18 +35,23 @@ public class ClientProspectData{
 	private String country;
 	private String status;
 	private String isDeleted;
-	private Collection<MCodeData> sourceOfPublicityData; 
+	private Collection<MCodeData> sourceOfPublicityData;
 	private Collection<ProspectPlanCodeData> planData;
-	private List<String> countryData,stateData,cityData;
+	private List<String> countryData, stateData, cityData;
 	private String statusRemark;
 	private String zipCode;
+
 	public ClientProspectData() {
-		
+
 	}
-	
-	public ClientProspectData(final Short prospectType, final String firstName, final String middleName, final String lastName, final String homePhoneNumber, 
-			final String workPhoneNumber, final String mobileNumber, final String email, final String sourceOfPublicity, final Date preferredCallingTime, 
-			final String note, final String address, final String streetArea, final String cityDistrict, final String state, final String country){
+
+	public ClientProspectData(final Short prospectType, final String firstName,
+			final String middleName, final String lastName,
+			final String homePhoneNumber, final String workPhoneNumber,
+			final String mobileNumber, final String email,
+			final String sourceOfPublicity, final Date preferredCallingTime,
+			final String note, final String address, final String streetArea,
+			final String cityDistrict, final String state, final String country) {
 		this.prospectType = prospectType;
 		this.firstName = firstName;
 		this.middleName = middleName;
@@ -64,10 +69,18 @@ public class ClientProspectData{
 		this.state = state;
 		this.country = country;
 	}
-	
-	public ClientProspectData(final Long id,final Short prospectType, final String firstName, final String middleName, final String lastName, final String homePhoneNumber,
-			final String workPhoneNumber, final String mobileNumber, final String email, final String sourceOfPublicity, final Date preferredCallingTime, final String note, final String address, final String streetArea, final String cityDistrict, final String state, final String country, final String preferredPlan,
-			final String status, final String statusRemark, final String isDeleted){
+
+	public ClientProspectData(final Long id, final Short prospectType,
+			final String firstName, final String middleName,
+			final String lastName, final String homePhoneNumber,
+			final String workPhoneNumber, final String mobileNumber,
+			final String email, final String sourceOfPublicity,
+			final Date preferredCallingTime, final String note,
+			final String address, final String streetArea,
+			final String cityDistrict, final String state,
+			final String country, final String preferredPlan,
+			final String status, final String statusRemark,
+			final String isDeleted) {
 		this.id = id;
 		this.prospectType = prospectType;
 		this.firstName = firstName;
@@ -90,7 +103,18 @@ public class ClientProspectData{
 		this.statusRemark = statusRemark;
 		this.isDeleted = isDeleted;
 	}
-	public ClientProspectData(final Long id,final Short prospectType, final String firstName, final String middleName, final String lastName, final String homePhoneNumber, final String workPhoneNumber, final String mobileNumber, final String email, final String sourceOfPublicity, final Date preferredCallingTime, final String note, final String address, final String streetArea, final String cityDistrict, final String state, final String country, final Long preferredPlan, final String status, final String statusRemark, final String isDeleted, final String zipCode){
+
+	public ClientProspectData(final Long id, final Short prospectType,
+			final String firstName, final String middleName,
+			final String lastName, final String homePhoneNumber,
+			final String workPhoneNumber, final String mobileNumber,
+			final String email, final String sourceOfPublicity,
+			final Date preferredCallingTime, final String note,
+			final String address, final String streetArea,
+			final String cityDistrict, final String state,
+			final String country, final Long preferredPlan,
+			final String status, final String statusRemark,
+			final String isDeleted, final String zipCode) {
 		this.id = id;
 		this.prospectType = prospectType;
 		this.firstName = firstName;
@@ -114,7 +138,6 @@ public class ClientProspectData{
 		this.isDeleted = isDeleted;
 		this.zipCode = zipCode;
 	}
-	
 
 	public Short getProspectType() {
 		return prospectType;
@@ -247,7 +270,7 @@ public class ClientProspectData{
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
-	
+
 	public String getPreferredPlan() {
 		return preferredPlan;
 	}
@@ -263,12 +286,13 @@ public class ClientProspectData{
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	
+
 	public Collection<MCodeData> getSourceOfPublicityData() {
 		return sourceOfPublicityData;
 	}
 
-	public void setSourceOfPublicityData(Collection<MCodeData> sourceOfPublicityData) {
+	public void setSourceOfPublicityData(
+			Collection<MCodeData> sourceOfPublicityData) {
 		this.sourceOfPublicityData = sourceOfPublicityData;
 	}
 
@@ -303,7 +327,7 @@ public class ClientProspectData{
 	public void setIsDeleted(String isDeleted) {
 		this.isDeleted = isDeleted;
 	}
-	
+
 	public List<String> getCountryData() {
 		return countryData;
 	}
@@ -336,6 +360,14 @@ public class ClientProspectData{
 		this.zipCode = zipCode;
 	}
 
-}
+	public String getSourceOfPublicityInt() {
+		return sourceOfPublicityInt;
+	}
 
-		
+	public Long getPreferredPlanInt() {
+		return preferredPlanInt;
+	}
+	
+	
+
+}

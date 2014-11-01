@@ -10,9 +10,9 @@ package org.mifosplatform.portfolio.client.domain;
  */
 public enum ClientStatus {
 
-    INVALID(0, "clientStatusType.invalid"), //
-    NEW(100, "clientStatusType.pending"), //
-    ACTIVE(300, "clientStatusType.active"), //
+    INVALID(0, "clientStatusType.invalid"), 
+    NEW(100, "clientStatusType.pending"), 
+    ACTIVE(300, "clientStatusType.active"), 
     DEACTIVE(600, "clientStatusType.closed"),
     CLOSED(400, "clientStatusType.closed");
 

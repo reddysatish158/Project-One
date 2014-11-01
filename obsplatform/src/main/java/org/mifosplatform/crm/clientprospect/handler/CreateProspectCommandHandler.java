@@ -5,23 +5,19 @@ import org.mifosplatform.crm.clientprospect.service.ClientProspectWritePlatformS
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-
 @Service
-public class CreateClientProspectCommandHandler implements NewCommandSourceHandler{
+public class CreateProspectCommandHandler implements NewCommandSourceHandler {
 
-	
 	private final ClientProspectWritePlatformService prospectWritePlatformService;
-	
+
 	@Autowired
-	public CreateClientProspectCommandHandler(final ClientProspectWritePlatformService prospectWritePlatformService) {
+	public CreateProspectCommandHandler(final ClientProspectWritePlatformService prospectWritePlatformService) {
 		this.prospectWritePlatformService = prospectWritePlatformService;
-		
+
 	}
-	
-	
+
 	@Override
 	public CommandProcessingResult processCommand(JsonCommand command) {
 		return prospectWritePlatformService.createProspect(command);

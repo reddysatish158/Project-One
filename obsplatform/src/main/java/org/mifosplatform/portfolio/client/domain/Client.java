@@ -48,7 +48,13 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 		@UniqueConstraint(columnNames = { "email" }, name = "email_key"),@UniqueConstraint(columnNames = { "login" }, name = "login_key")})
 public final class Client extends AbstractPersistable<Long> {
 
-    @Column(name = "account_no", length = 20, unique = true, nullable = false)
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Column(name = "account_no", length = 20, unique = true, nullable = false)
     private String accountNumber;
 
     @ManyToOne
@@ -77,7 +83,6 @@ public final class Client extends AbstractPersistable<Long> {
     @Column(name = "fullname", length = 100)
     private String fullname;
 
-    @SuppressWarnings("unused")
     @Column(name = "display_name", length = 100, nullable = false)
     private String displayName;
 
@@ -157,10 +162,10 @@ public final class Client extends AbstractPersistable<Long> {
         final String homePhoneNumber = command.stringValueOfParameterNamed(ClientApiConstants.homePhoneNumberParamName);
 	    String email = command.stringValueOfParameterNamed(ClientApiConstants.emailParamName);
 	    String login=command.stringValueOfParameterNamed(ClientApiConstants.loginParamName);
-	    String entryType = command.stringValueOfParameterNamed(ClientApiConstants.entryTypeParamName);
+	    final String entryType = command.stringValueOfParameterNamed(ClientApiConstants.entryTypeParamName);
 
 	    final String password=command.stringValueOfParameterNamed(ClientApiConstants.passwordParamName);
-	     Long groupName=command.longValueOfParameterNamed(ClientApiConstants.groupParamName);
+	    final Long groupName=command.longValueOfParameterNamed(ClientApiConstants.groupParamName);
 
 	    if(email.isEmpty()){
 	    	email=null;
@@ -172,13 +177,13 @@ public final class Client extends AbstractPersistable<Long> {
 	    	groupName=null;
 	    }*/
 	    ClientStatus status =  ClientStatus.NEW;
-        boolean active = true;
+	    final boolean active = true;
        
 
         LocalDate activationDate = null;
         if (active) {
             status = ClientStatus.NEW;
-            activationDate =new LocalDate(); //command.localDateValueOfParameterNamed(ClientApiConstants.activationDateParamName);
+            activationDate =new LocalDate(); 
         }
 
         return new Client(status, clientOffice, clientParentGroup, accountNo, firstname, middlename, lastname, fullname, activationDate,
@@ -191,7 +196,8 @@ public final class Client extends AbstractPersistable<Long> {
 
     private Client(final ClientStatus status, final Office office, final Group clientParentGroup, final String accountNo,
             final String firstname, final String middlename, final String lastname, final String fullname, final LocalDate activationDate,
-            final String externalId, Long categoryType, String email, String phone,String homePhoneNumber, String login, String password,Long groupName,String entryType) {
+            final String externalId, final Long categoryType, final String email, final String phone,final String homePhoneNumber,
+            final String login, final String password,final Long groupName,final String entryType) {
         
     	if (StringUtils.isBlank(accountNo)) {
             this.accountNumber = new RandomPasswordGenerator(19).generate();
@@ -469,7 +475,7 @@ public final class Client extends AbstractPersistable<Long> {
         if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException(dataValidationErrors); }
     }
 
-    private void deriveDisplayName(String entryType) {
+    private void deriveDisplayName(final String entryType) {
     	 
     	StringBuilder nameBuilder = new StringBuilder();
     	
@@ -545,11 +551,11 @@ public final class Client extends AbstractPersistable<Long> {
     	return displayName;
     }
     public Date getActivationDate() {
-    	Date date=new Date();
+    	final Date date=new Date();
 		return date;
 	}
     public String getAccountNo(){
-    	String accountno=this.accountNumber;
+    	final String accountno=this.accountNumber;
     	return accountno;
     }
 
@@ -623,11 +629,11 @@ public final class Client extends AbstractPersistable<Long> {
 	public Set<Group> getGroups() {
 		return groups;
 	}
-	public void setOffice(Office office) {
+	public void setOffice(final Office office) {
 		this.office = office;
 	}
 
-	public void setStatus(Integer status) {
+	public void setStatus(final Integer status) {
 		this.status=status;
 		
 	}
@@ -636,7 +642,7 @@ public final class Client extends AbstractPersistable<Long> {
 		return taxExemption;
 	}
 
-	public void setTaxExemption(char taxExemption) {
+	public void setTaxExemption(final char taxExemption) {
 		this.taxExemption = taxExemption;
 	}
 	
@@ -646,7 +652,7 @@ public final class Client extends AbstractPersistable<Long> {
 	
 	
 
-	public void setBillMode(String billMode) {
+	public void setBillMode(final String billMode) {
 		this.billMode = billMode;
 	}
 
@@ -661,7 +667,7 @@ public final class Client extends AbstractPersistable<Long> {
 		return parentId;
 	}
 
-	public void setParentId(Long parentId) {
+	public void setParentId(final Long parentId) {
 		this.parentId = parentId;
 	}
    

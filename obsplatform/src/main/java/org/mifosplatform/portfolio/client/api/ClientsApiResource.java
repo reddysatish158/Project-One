@@ -25,7 +25,6 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.commons.lang.StringUtils;
 import org.mifosplatform.billing.selfcare.domain.SelfCare;
 import org.mifosplatform.billing.selfcare.service.SelfCareRepository;
-import org.mifosplatform.cms.mediadevice.service.MediaDeviceReadPlatformService;
 import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -63,7 +62,6 @@ public class ClientsApiResource {
     private final ClientReadPlatformService clientReadPlatformService;
     private final OfficeReadPlatformService officeReadPlatformService;
     private final ToApiJsonSerializer<ClientData> toApiJsonSerializer;
-    private final MediaDeviceReadPlatformService mediaDeviceReadPlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final AddressReadPlatformService addressReadPlatformService;
@@ -74,9 +72,9 @@ public class ClientsApiResource {
     @Autowired
     public ClientsApiResource(final PlatformSecurityContext context, final ClientReadPlatformService readPlatformService,
             final OfficeReadPlatformService officeReadPlatformService, final ToApiJsonSerializer<ClientData> toApiJsonSerializer,
-            final ApiRequestParameterHelper apiRequestParameterHelper,AddressReadPlatformService addressReadPlatformService,
+            final ApiRequestParameterHelper apiRequestParameterHelper,final AddressReadPlatformService addressReadPlatformService,
             final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,final AllocationReadPlatformService allocationReadPlatformService,
-            final ConfigurationRepository configurationRepository,final MediaDeviceReadPlatformService deviceReadPlatformService, 
+            final ConfigurationRepository configurationRepository, 
             final SelfCareRepository selfCareRepository) {
         this.context = context;
         this.clientReadPlatformService = readPlatformService;
@@ -87,10 +85,12 @@ public class ClientsApiResource {
         this.addressReadPlatformService=addressReadPlatformService;
         this.allocationReadPlatformService=allocationReadPlatformService;
         this.configurationRepository=configurationRepository;
-        this.mediaDeviceReadPlatformService=deviceReadPlatformService;
         this.selfCareRepository = selfCareRepository;
     }
-
+    
+    /**
+     * this method is using for getting template data to create a client
+     */
     @GET
     @Path("template")
     @Consumes({ MediaType.APPLICATION_JSON })
@@ -103,19 +103,19 @@ public class ClientsApiResource {
         	
         clientData = this.clientReadPlatformService.retrieveAllClosureReasons(ClientApiConstants.CLIENT_CLOSURE_REASON);
         }
-        Configuration configurationProperty=this.configurationRepository.findOneByName("LOGIN");
+        final Configuration configurationProperty=this.configurationRepository.findOneByName("LOGIN");
         clientData.setConfigurationProperty(configurationProperty);
         clientData=handleAddressTemplateData(clientData);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, clientData, ClientApiConstants.CLIENT_RESPONSE_DATA_PARAMETERS);
     }
 
-    private ClientData handleAddressTemplateData(ClientData clientData) {
-    	 List<String> countryData = this.addressReadPlatformService.retrieveCountryDetails();
-         List<String> statesData = this.addressReadPlatformService.retrieveStateDetails();
-         List<String> citiesData = this.addressReadPlatformService.retrieveCityDetails();
-         List<EnumOptionData> enumOptionDatas = this.addressReadPlatformService.addressType();
-         AddressData data=new AddressData(null,countryData,statesData,citiesData,enumOptionDatas);
+    private ClientData handleAddressTemplateData(final ClientData clientData) {
+    	 final List<String> countryData = this.addressReadPlatformService.retrieveCountryDetails();
+         final List<String> statesData = this.addressReadPlatformService.retrieveStateDetails();
+         final List<String> citiesData = this.addressReadPlatformService.retrieveCityDetails();
+         final List<EnumOptionData> enumOptionDatas = this.addressReadPlatformService.addressType();
+         final AddressData data=new AddressData(null,countryData,statesData,citiesData,enumOptionDatas);
          clientData.setAddressTemplate(data);
          return clientData;
 	}
@@ -138,6 +138,9 @@ public class ClientsApiResource {
         return this.toApiJsonSerializer.serialize(clientData);
     }
 
+	/**
+     * this method is using for getting template data in editing a client
+     */
     @GET
     @Path("{clientId}")
     @Consumes({ MediaType.APPLICATION_JSON })
@@ -147,7 +150,7 @@ public class ClientsApiResource {
         context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_RESOURCE_NAME);
 
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-        Configuration configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_BALANCE_CHECK);
+        final Configuration configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_BALANCE_CHECK);
         ClientData clientData = this.clientReadPlatformService.retrieveOne(clientId);
         String balanceCheck="N";
         if(configurationProperty.isEnabled()){
@@ -158,49 +161,55 @@ public class ClientsApiResource {
             final List<OfficeData> allowedOffices = new ArrayList<OfficeData>(officeReadPlatformService.retrieveAllOfficesForDropdown());
             final Collection<ClientCategoryData> categoryDatas=this.clientReadPlatformService.retrieveClientCategories();
             final Collection<GroupData> groupDatas = this.clientReadPlatformService.retrieveGroupData();
-            List<String> allocationDetailsDatas=this.allocationReadPlatformService.retrieveHardWareDetails(clientId);
+            final List<String> allocationDetailsDatas=this.allocationReadPlatformService.retrieveHardWareDetails(clientId);
             clientData = ClientData.templateOnTop(clientData, allowedOffices,categoryDatas,groupDatas,allocationDetailsDatas,null);
         }else{
-        	 List<String> allocationDetailsDatas=this.allocationReadPlatformService.retrieveHardWareDetails(clientId);
+        	final List<String> allocationDetailsDatas=this.allocationReadPlatformService.retrieveHardWareDetails(clientId);
              clientData = ClientData.templateOnTop(clientData, null,null,null,allocationDetailsDatas,balanceCheck);
 
         }
         
-        SelfCare selfcare = this.selfCareRepository.findOneByClientId(clientId);
+        final SelfCare selfcare = this.selfCareRepository.findOneByClientId(clientId);
         clientData.setSelfcare(selfcare);
-        Configuration paypalconfigurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_PAYPAL_CHECK);
+        final Configuration paypalconfigurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_PAYPAL_CHECK);
         clientData.setConfigurationProperty(paypalconfigurationProperty);
-        Configuration paypalconfigurationPropertyForIos=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_PAYPAL_CHECK_IOS);
+        final Configuration paypalconfigurationPropertyForIos=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_PAYPAL_CHECK_IOS);
         clientData.setConfigurationPropertyForIos(paypalconfigurationPropertyForIos);
         
         return this.toApiJsonSerializer.serialize(settings, clientData, ClientApiConstants.CLIENT_RESPONSE_DATA_PARAMETERS);
     }
-
+    
+    /**
+     * this method is using for create a new client
+     */
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String create(final String apiRequestBodyAsJson) {
 
-        final CommandWrapper commandRequest = new CommandWrapperBuilder() //
-                .createClient() //
-                .withJson(apiRequestBodyAsJson) //
-                .build(); //
+        final CommandWrapper commandRequest = new CommandWrapperBuilder() 
+                .createClient() 
+                .withJson(apiRequestBodyAsJson) 
+                .build(); 
 
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 
         return this.toApiJsonSerializer.serialize(result);
     }
 
+    /**
+     * this method is using for edit a client
+     */
     @PUT
     @Path("{clientId}")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String update(@PathParam("clientId") final Long clientId, final String apiRequestBodyAsJson) {
 
-        final CommandWrapper commandRequest = new CommandWrapperBuilder() //
-                .updateClient(clientId) //
-                .withJson(apiRequestBodyAsJson) //
-                .build(); //
+        final CommandWrapper commandRequest = new CommandWrapperBuilder() 
+                .updateClient(clientId) 
+                .withJson(apiRequestBodyAsJson) 
+                .build(); 
 
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 
@@ -222,6 +231,9 @@ public class ClientsApiResource {
         return this.toApiJsonSerializer.serialize(result);
     }
 
+    /**
+     * this method is using for closing a client
+     */
     @POST
     @Path("{clientId}")
     @Consumes({ MediaType.APPLICATION_JSON })
@@ -238,10 +250,10 @@ public class ClientsApiResource {
         
         }else  if (is(commandParam, "close")) {
 
-        	 final CommandWrapper commandRequest = new CommandWrapperBuilder() //
-             .deleteClient(clientId) //
-             .withJson(apiRequestBodyAsJson) //
-             .build(); //
+        	 final CommandWrapper commandRequest = new CommandWrapperBuilder() 
+             .deleteClient(clientId) 
+             .withJson(apiRequestBodyAsJson) 
+             .build(); 
 
 
            result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);

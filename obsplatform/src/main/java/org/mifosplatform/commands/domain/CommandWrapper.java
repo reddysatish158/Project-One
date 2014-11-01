@@ -709,10 +709,10 @@ public class CommandWrapper {
 		public boolean isClientProspect(){
 			return this.entityName.equalsIgnoreCase("PROSPECT");
 		}
-		public boolean isUpdateClientProspect(){
-			return this.entityName.equalsIgnoreCase("PROSPECT") && this.actionName.equalsIgnoreCase("UPDATE");
+		public boolean isFollowUpProspect(){
+			return this.entityName.equalsIgnoreCase("PROSPECT") && this.actionName.equalsIgnoreCase("FOLLOWUP");
 		}
-		public boolean isDeleteClientProspect(){
+		public boolean isDeleteProspect(){
 			return this.entityName.equalsIgnoreCase("PROSPECT") && this.actionName.equalsIgnoreCase("DELETE");
 		}
 

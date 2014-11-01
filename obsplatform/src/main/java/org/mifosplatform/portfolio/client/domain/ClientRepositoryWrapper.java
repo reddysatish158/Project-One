@@ -43,7 +43,7 @@ public class ClientRepositoryWrapper {
         this.repository.delete(client);
     }
 
-	public Client findOneWithAccountId(String accountId) {
+	public Client findOneWithAccountId(final String accountId) {
 	  final Client client = this.repository.findwithAccountNo(accountId);
 	  if (client == null) { throw new ClientNotFoundException(Long.valueOf(accountId)); }
          return client;
