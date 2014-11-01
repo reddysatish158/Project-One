@@ -30,16 +30,16 @@ public class DiscountMasterData {
 	private String discountStatus;
 
 	public DiscountMasterData(final Long id, final String discountCode,
-			final String discountDescription, final String discounType,
+			final String discountDescription, final String discountType,
 			final BigDecimal discountRate, final LocalDate startDate,
 			final String discountStatus) {
 		this.id = id;
 		this.discountCode = discountCode;
 		this.discountDescription = discountDescription;
-		this.discountType = discounType;
+		this.discountType = discountType;
 		this.discountRate = discountRate;
-		this.discountStatus = discountStatus;
 		this.discountStartDate = startDate;
+		this.discountStatus = discountStatus;
 
 	}
 
@@ -94,7 +94,7 @@ public class DiscountMasterData {
 		return discountType;
 	}
 
-	public void setDiscounType(final String discountType) {
+	public void setDiscountType(final String discountType) {
 		this.discountType = discountType;
 	}
 
@@ -166,7 +166,7 @@ public class DiscountMasterData {
 		return discountTypeData;
 	}
 
-	public void setDiscounTypeData(final Collection<MCodeData> discountTypeData) {
+	public void setDiscountTypeData(final Collection<MCodeData> discountTypeData) {
 		this.discountTypeData = discountTypeData;
 	}
 

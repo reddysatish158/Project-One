@@ -25,18 +25,15 @@ import org.springframework.transaction.annotation.Transactional;
  * 
  */
 @Service
-public class CountryCurrencyWritePlatformServiceImpl implements
-		CountryCurrencyWritePlatformService {
+public class CountryCurrencyWritePlatformServiceImpl implements CountryCurrencyWritePlatformService {
 
-	private final static Logger LOGGER = LoggerFactory
-			.getLogger(ChargeCodeWritePlatformServiceImp.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(ChargeCodeWritePlatformServiceImp.class);
 	private final PlatformSecurityContext context;
 	private final CountryCurrencyCommandFromApiJsonDeserializer fromApiJsonDeserializer;
 	private final CountryCurrencyRepository countryCurrencyRepository;
 
 	@Autowired
-	public CountryCurrencyWritePlatformServiceImpl(
-			final PlatformSecurityContext context,
+	public CountryCurrencyWritePlatformServiceImpl(final PlatformSecurityContext context,
 			final CountryCurrencyCommandFromApiJsonDeserializer apiJsonDeserializer,
 			final CountryCurrencyRepository countryCurrencyRepository) {
 
@@ -54,19 +51,17 @@ public class CountryCurrencyWritePlatformServiceImpl implements
 	 */
 	@Transactional
 	@Override
-	public CommandProcessingResult createCountryCurrency(
-			final JsonCommand command) {
+	public CommandProcessingResult createCountryCurrency(final JsonCommand command) {
 
 		try {
 
 			this.context.authenticatedUser();
 			this.fromApiJsonDeserializer.validateForCreate(command.json());
-			final CountryCurrency countryCurrency = CountryCurrency
-					.fromJson(command);
+			final CountryCurrency countryCurrency = CountryCurrency.fromJson(command);
 			this.countryCurrencyRepository.save(countryCurrency);
 			return new CommandProcessingResult(countryCurrency.getId());
 
-		} catch (DataIntegrityViolationException dve) {
+		} catch (final DataIntegrityViolationException dve) {
 			handleDataIntegretyIssue(dve, command);
 			return new CommandProcessingResult(Long.valueOf(-1L));
 
@@ -74,8 +69,7 @@ public class CountryCurrencyWritePlatformServiceImpl implements
 
 	}
 
-	private void handleDataIntegretyIssue(
-			final DataIntegrityViolationException dve, final JsonCommand command) {
+	private void handleDataIntegretyIssue(final DataIntegrityViolationException dve, final JsonCommand command) {
 
 		final Throwable realCause = dve.getMostSpecificCause();
 		if (realCause.getMessage().contains("country_key")) {
@@ -102,8 +96,7 @@ public class CountryCurrencyWritePlatformServiceImpl implements
 	 */
 	@Transactional
 	@Override
-	public CommandProcessingResult updateCountryCurrency(final Long entityId,
-			final JsonCommand command) {
+	public CommandProcessingResult updateCountryCurrency(final Long entityId,final JsonCommand command) {
 		try {
 			this.context.authenticatedUser();
 			this.fromApiJsonDeserializer.validateForCreate(command.json());
@@ -112,8 +105,7 @@ public class CountryCurrencyWritePlatformServiceImpl implements
 			if (!changes.isEmpty()) {
 				this.countryCurrencyRepository.saveAndFlush(countryCurrency);
 			}
-			return new CommandProcessingResultBuilder()
-					.withCommandId(command.commandId())
+			return new CommandProcessingResultBuilder().withCommandId(command.commandId())
 					.withEntityId(countryCurrency.getId()).with(changes)
 					.build();
 		} catch (DataIntegrityViolationException dve) {
@@ -138,13 +130,11 @@ public class CountryCurrencyWritePlatformServiceImpl implements
 		final CountryCurrency countryCurrency = retrieveCodeById(entityId);
 		countryCurrency.delete();
 		this.countryCurrencyRepository.save(countryCurrency);
-		return new CommandProcessingResultBuilder().withEntityId(entityId)
-				.build();
+		return new CommandProcessingResultBuilder().withEntityId(entityId).build();
 	}
 
 	private CountryCurrency retrieveCodeById(final Long currencyConfigId) {
-		final CountryCurrency countryCurrency = this.countryCurrencyRepository
-				.findOne(currencyConfigId);
+		final CountryCurrency countryCurrency = this.countryCurrencyRepository.findOne(currencyConfigId);
 		if (countryCurrency == null) {
 			throw new DuplicateCurrencyConfigurationException(currencyConfigId);
 		}

@@ -47,8 +47,7 @@ import org.springframework.stereotype.Component;
 @Scope("singleton")
 public class TaxMapApiResource {
 
-	private final Set<String> RESPONSE_TAXMAPPING_PARAMETERS = new HashSet<String>(
-			Arrays.asList("id", "chargeCode", "taxCode", "startDate", "type",
+	private final Set<String> RESPONSE_TAXMAPPING_PARAMETERS = new HashSet<String>(Arrays.asList("id", "chargeCode", "taxCode", "startDate", "type",
 					"rate", "taxRegionId", "taxRegion", "priceRegionData"));
 
 	private String resourceNameForPermissions = "TAXMAPPING";

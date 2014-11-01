@@ -112,7 +112,7 @@ public class ClientParentApiResource {
 	}
 
 	@DELETE
-	@Path("{parentclientId/childId}")
+	@Path("{parentclientId}/{childId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String deleteChilds(@PathParam("parentclientId") final Long parentclientId,@PathParam("childId") final Long childId) {

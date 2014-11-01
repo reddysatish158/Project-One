@@ -24,11 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
  * 
  */
 @Service
-public class PromotionCodeWritePlatformServiceImpl implements
-		PromotionCodeWritePlatformService {
+public class PromotionCodeWritePlatformServiceImpl implements PromotionCodeWritePlatformService {
 
-	private final static Logger LOGGER = LoggerFactory
-			.getLogger(PromotionCodeWritePlatformServiceImpl.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(PromotionCodeWritePlatformServiceImpl.class);
 	private final PlatformSecurityContext context;
 	private final PromotionCodeCommandFromApiJsonDeserializer apiJsonDeserializer;
 	private final PromotionCodeRepository promotionCodeRepository;
@@ -39,9 +37,8 @@ public class PromotionCodeWritePlatformServiceImpl implements
 	 * @param promotionMappingRepository
 	 */
 	@Autowired
-	public PromotionCodeWritePlatformServiceImpl(
-			final PlatformSecurityContext context,
-			PromotionCodeCommandFromApiJsonDeserializer apiJsonDeserializer,
+	public PromotionCodeWritePlatformServiceImpl(final PlatformSecurityContext context,
+			final PromotionCodeCommandFromApiJsonDeserializer apiJsonDeserializer,
 			final PromotionCodeRepository promotionMappingRepository) {
 		this.context = context;
 		this.apiJsonDeserializer = apiJsonDeserializer;
@@ -63,8 +60,7 @@ public class PromotionCodeWritePlatformServiceImpl implements
 
 			this.context.authenticatedUser();
 			this.apiJsonDeserializer.validateForCreate(command.json());
-			PromotionCodeMaster promotioncode = PromotionCodeMaster
-					.fromJson(command);
+			PromotionCodeMaster promotioncode = PromotionCodeMaster.fromJson(command);
 			this.promotionCodeRepository.save(promotioncode);
 			return new CommandProcessingResult(promotioncode.getId());
 
@@ -75,14 +71,12 @@ public class PromotionCodeWritePlatformServiceImpl implements
 
 	}
 
-	private void handleCodeDataIntegrityIssues(final JsonCommand command,
-			final DataIntegrityViolationException dve) {
+	private void handleCodeDataIntegrityIssues(final JsonCommand command,final DataIntegrityViolationException dve) {
 		final Throwable realCause = dve.getMostSpecificCause();
 		if (realCause.getMessage().contains("promotioncode")) {
-			final String name = command
-					.stringValueOfParameterNamed("promotionCode");
+			final String name = command.stringValueOfParameterNamed("promotionCode");
 			throw new PlatformDataIntegrityException(
-					"error.msg.promotionCode.duplicate.name",
+		             "error.msg.promotionCode.duplicate.name",
 					"A promotion code with'" + name + "'already exists",
 					name, name);
 		}
@@ -102,23 +96,19 @@ public class PromotionCodeWritePlatformServiceImpl implements
 	 */
 	@Transactional
 	@Override
-	public CommandProcessingResult updatePromotionCode(final Long id,
-			final JsonCommand command) {
+	public CommandProcessingResult updatePromotionCode(final Long id,final JsonCommand command) {
 
 		try {
 
 			this.context.authenticatedUser();
 			PromotionCodeMaster promotionCode = PromotionCodeRetrieveById(id);
-			final Map<String, Object> changes = promotionCode
-					.updatePromotion(command);
-
+			final Map<String, Object> changes = promotionCode.updatePromotion(command);
 			if (!changes.isEmpty()) {
 				this.promotionCodeRepository.saveAndFlush(promotionCode);
 			}
 			
-			return new CommandProcessingResultBuilder()
-			.withCommandId(command.commandId())
-					.withEntityId(promotionCode.getId()).with(changes).build();
+			return new CommandProcessingResultBuilder().withCommandId(command.commandId())
+					    .withEntityId(promotionCode.getId()).with(changes).build();
 
 		} catch (DataIntegrityViolationException dve) {
 
@@ -141,8 +131,7 @@ public class PromotionCodeWritePlatformServiceImpl implements
 
 		try {
 			this.context.authenticatedUser();
-			PromotionCodeMaster promotionCode = this
-					.PromotionCodeRetrieveById(id);
+			PromotionCodeMaster promotionCode = this.PromotionCodeRetrieveById(id);
 			promotionCode.delete();
 			this.promotionCodeRepository.save(promotionCode);
 			return new CommandProcessingResult(id);
@@ -154,8 +143,7 @@ public class PromotionCodeWritePlatformServiceImpl implements
 
 	private PromotionCodeMaster PromotionCodeRetrieveById(Long id) {
 
-		PromotionCodeMaster promotionCode = this.promotionCodeRepository
-				.findOne(id);
+		PromotionCodeMaster promotionCode = this.promotionCodeRepository.findOne(id);
 		if (promotionCode == null) {
 			throw new PromotionCodeNotFoundException(id.toString());
 		}

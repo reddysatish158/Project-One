@@ -60,12 +60,11 @@ public class CountryCurrecnyApiResource {
 	private final PlanReadPlatformService planReadPlatformService;
 
 	@Autowired
-	public CountryCurrecnyApiResource(
-			final PlatformSecurityContext context,
+	public CountryCurrecnyApiResource(final PlatformSecurityContext context,
 			final DefaultToApiJsonSerializer<CountryCurrencyData> toApiJsonSerializer,
 			final ApiRequestParameterHelper apiRequestParameterHelper,
 			final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
-			CountryCurrencyReadPlatformService countryCurrencyReadPlatformService,
+			final CountryCurrencyReadPlatformService countryCurrencyReadPlatformService,
 			final OrganisationCurrencyReadPlatformService currencyReadPlatformService,
 			final AddressReadPlatformService addressReadPlatformService,
 			final PlanReadPlatformService planReadPlatformService) {
@@ -87,8 +86,8 @@ public class CountryCurrecnyApiResource {
 	@GET
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrieveCurrencyConfigurationDetails(
-			@Context final UriInfo uriInfo) {
+	public String retrieveCurrencyConfigurationDetails(@Context final UriInfo uriInfo) {
+		
 		context.authenticatedUser().validateHasReadPermission(resorceNameForPermission);
 		final Collection<CountryCurrencyData> currencyDatas = this.countryCurrencyReadPlatformService.retrieveAllCurrencyConfigurationDetails();
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -143,11 +142,11 @@ public class CountryCurrecnyApiResource {
 		
 		context.authenticatedUser().validateHasReadPermission(resorceNameForPermission);
 		final CountryCurrencyData currencyDatas = this.countryCurrencyReadPlatformService.retrieveSingleCurrencyConfigurationDetails(currencyId);
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 		final ApplicationCurrencyConfigurationData configurationData = this.currencyReadPlatformService.retrieveCurrencyConfiguration();
 		final List<String> countryData = this.addressReadPlatformService.retrieveCountryDetails();
 		final List<EnumOptionData> statusData = this.planReadPlatformService.retrieveNewStatus();
 		CountryCurrencyData currencyData = new CountryCurrencyData(currencyDatas, configurationData, countryData, statusData);
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 		return this.toApiJsonSerializer.serialize(settings, currencyData,RESPONSE_DATA_PARAMETERS);
 	}
 
