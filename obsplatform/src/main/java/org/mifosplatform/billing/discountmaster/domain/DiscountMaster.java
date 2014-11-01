@@ -136,20 +136,15 @@ public class DiscountMaster extends AbstractPersistable<Long> {
 	 * @return DiscountMaster
 	 */
 	public static DiscountMaster fromJson(final JsonCommand command) {
-		final String discountCode = command
-				.stringValueOfParameterNamed("discountCode");
-		final String discountDescription = command
-				.stringValueOfParameterNamed("discountDescription");
-		final LocalDate startDate = command
-				.localDateValueOfParameterNamed("startDate");
-		final String discountType = command
-				.stringValueOfParameterNamed("discountType");
-		final BigDecimal discountRate = command
-				.bigDecimalValueOfParameterNamed("discountRate");
-		final String status = command.stringValueOfParameterNamed("status");
+		
+		final String discountCode = command.stringValueOfParameterNamed("discountCode");
+		final String discountDescription = command.stringValueOfParameterNamed("discountDescription");
+		final LocalDate startDate = command.localDateValueOfParameterNamed("startDate");
+		final String discountType = command.stringValueOfParameterNamed("discountType");
+		final BigDecimal discountRate = command.bigDecimalValueOfParameterNamed("discountRate");
+		final String discountStatus = command.stringValueOfParameterNamed("discountStatus");
 
-		return new DiscountMaster(discountCode, discountDescription,
-				discountType, discountRate, startDate, status);
+		return new DiscountMaster(discountCode, discountDescription,discountType, discountRate, startDate, discountStatus);
 	}
 
 	/**
@@ -160,56 +155,43 @@ public class DiscountMaster extends AbstractPersistable<Long> {
 		final Map<String, Object> actualChanges = new ConcurrentHashMap<String, Object>(
 				1);
 		final String discountCodeParamName = "discountCode";
-		if (command.isChangeInStringParameterNamed(discountCodeParamName,
-				this.discountCode)) {
-			final String newValue = command
-					.stringValueOfParameterNamed(discountCodeParamName);
+		if (command.isChangeInStringParameterNamed(discountCodeParamName,this.discountCode)) {
+			final String newValue = command.stringValueOfParameterNamed(discountCodeParamName);
 			actualChanges.put(discountCodeParamName, newValue);
 			this.discountCode = StringUtils.defaultIfEmpty(newValue, null);
 		}
 
 		final String descriptionParamName = "discountDescription";
-		if (command.isChangeInStringParameterNamed(descriptionParamName,
-				this.discountDescription)) {
-			final String newValue = command
-					.stringValueOfParameterNamed(descriptionParamName);
+		if (command.isChangeInStringParameterNamed(descriptionParamName,this.discountDescription)) {
+			final String newValue = command.stringValueOfParameterNamed(descriptionParamName);
 			actualChanges.put(descriptionParamName, newValue);
-			this.discountDescription = StringUtils.defaultIfEmpty(newValue,
-					null);
+			this.discountDescription = StringUtils.defaultIfEmpty(newValue,null);
 		}
 
 		final String discountTypeParamName = "discountType";
-		if (command.isChangeInStringParameterNamed(discountTypeParamName,
-				this.discountType)) {
-			final String newValue = command
-					.stringValueOfParameterNamed(discountTypeParamName);
+		if (command.isChangeInStringParameterNamed(discountTypeParamName,this.discountType)) {
+			final String newValue = command.stringValueOfParameterNamed(discountTypeParamName);
 			actualChanges.put(discountTypeParamName, newValue);
 			this.discountType = StringUtils.defaultIfEmpty(newValue, null);
 		}
 
 		final String startDateParamName = "startDate";
-		if (command.isChangeInLocalDateParameterNamed(startDateParamName,
-				new LocalDate(this.startDate))) {
-			final LocalDate newValue = command
-					.localDateValueOfParameterNamed(startDateParamName);
+		if (command.isChangeInLocalDateParameterNamed(startDateParamName,new LocalDate(this.startDate))) {
+			final LocalDate newValue = command.localDateValueOfParameterNamed(startDateParamName);
 			actualChanges.put(startDateParamName, newValue);
 			this.startDate = newValue.toDate();
 		}
 
 		final String discountRateParamName = "discountRate";
-		if (command.isChangeInBigDecimalParameterNamed(discountRateParamName,
-				this.discountRate)) {
-			final BigDecimal newValue = command
-					.bigDecimalValueOfParameterNamed(discountRateParamName);
+		if (command.isChangeInBigDecimalParameterNamed(discountRateParamName,this.discountRate)) {
+			final BigDecimal newValue = command.bigDecimalValueOfParameterNamed(discountRateParamName);
 			actualChanges.put(discountRateParamName, newValue);
 			this.discountRate = newValue;
 		}
 
-		final String statusParamName = "status";
-		if (command.isChangeInStringParameterNamed(statusParamName,
-				this.discountStatus)) {
-			final String newValue = command
-					.stringValueOfParameterNamed(statusParamName);
+		final String statusParamName = "discountStatus";
+		if (command.isChangeInStringParameterNamed(statusParamName, this.discountStatus)) {
+			final String newValue = command.stringValueOfParameterNamed(statusParamName);
 			actualChanges.put(statusParamName, newValue);
 			this.discountStatus = newValue;
 		}

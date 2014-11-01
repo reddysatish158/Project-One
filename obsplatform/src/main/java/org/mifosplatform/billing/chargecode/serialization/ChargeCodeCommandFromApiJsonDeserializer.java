@@ -29,9 +29,7 @@ public class ChargeCodeCommandFromApiJsonDeserializer {
 	/**
 	 * The parameters supported for this command.
 	 */
-	final private Set<String> supportedParameters = new HashSet<String>(
-			Arrays.asList("billFrequencyCode", "chargeCode",
-					"chargeDescription", "chargeDuration", "chargeType",
+	final private Set<String> supportedParameters = new HashSet<String>(Arrays.asList("billFrequencyCode", "chargeCode","chargeDescription", "chargeDuration", "chargeType",
 					"dateFormat", "durationType", "locale", "taxInclusive"));
 	private final FromJsonHelper fromApiJsonHelper;
 
@@ -64,44 +62,29 @@ public class ChargeCodeCommandFromApiJsonDeserializer {
 
 		final JsonElement element = fromApiJsonHelper.parse(json);
 
-		final String billFrequencyCode = fromApiJsonHelper.extractStringNamed(
-				"billFrequencyCode", element);
-		// if(billFrequencyCode.contains("-1"))
-		baseDataValidator.reset().parameter("billFrequencyCode")
-				.value(billFrequencyCode).notBlank();
+		final String billFrequencyCode = fromApiJsonHelper.extractStringNamed("billFrequencyCode", element);
+		baseDataValidator.reset().parameter("billFrequencyCode").value(billFrequencyCode).notBlank();
 		/*
 		 * else baseDataValidator.reset().parameter("billFrequencyCode").value(
 		 * billFrequencyCode).notBlank();
 		 */
-		final String chargeCode = fromApiJsonHelper.extractStringNamed(
-				"chargeCode", element);
-		baseDataValidator.reset().parameter("chargeCode").value(chargeCode)
-				.notBlank();
+		final String chargeCode = fromApiJsonHelper.extractStringNamed("chargeCode", element);
+		baseDataValidator.reset().parameter("chargeCode").value(chargeCode).notBlank();
 
-		final String chargeDescription = fromApiJsonHelper.extractStringNamed(
-				"chargeDescription", element);
-		baseDataValidator.reset().parameter("chargeDescription")
-				.value(chargeDescription).notBlank();
+		final String chargeDescription = fromApiJsonHelper.extractStringNamed("chargeDescription", element);
+		baseDataValidator.reset().parameter("chargeDescription").value(chargeDescription).notBlank();
 
-		final Integer chargeDuration = fromApiJsonHelper
-				.extractIntegerWithLocaleNamed("chargeDuration", element);
-		baseDataValidator.reset().parameter("chargeDuration")
-				.value(chargeDuration).notBlank().integerGreaterThanZero();
+		final Integer chargeDuration = fromApiJsonHelper.extractIntegerWithLocaleNamed("chargeDuration", element);
+		baseDataValidator.reset().parameter("chargeDuration").value(chargeDuration).notBlank().integerGreaterThanZero();
 
-		final String chargeType = fromApiJsonHelper.extractStringNamed(
-				"chargeType", element);
-		baseDataValidator.reset().parameter("chargeType").value(chargeType)
-				.notBlank();
+		final String chargeType = fromApiJsonHelper.extractStringNamed("chargeType", element);
+		baseDataValidator.reset().parameter("chargeType").value(chargeType).notBlank();
 	
-		final String durationType = fromApiJsonHelper.extractStringNamed(
-				"durationType", element);
-		baseDataValidator.reset().parameter("durationType").value(durationType)
-				.notBlank();
+		final String durationType = fromApiJsonHelper.extractStringNamed("durationType", element);
+		baseDataValidator.reset().parameter("durationType").value(durationType).notBlank();
 
-		final boolean taxInclusive = fromApiJsonHelper.extractBooleanNamed(
-				"taxInclusive", element);
-		baseDataValidator.reset().parameter("taxInclusive").value(taxInclusive)
-				.notBlank();
+		final boolean taxInclusive = fromApiJsonHelper.extractBooleanNamed("taxInclusive", element);
+		baseDataValidator.reset().parameter("taxInclusive").value(taxInclusive).notBlank();
 
 		throwExceptionIfValidationWarningsExist(dataValidationErrors);
 

@@ -13,11 +13,17 @@ import org.apache.commons.lang.StringUtils;
 import org.mifosplatform.infrastructure.documentmanagement.command.DocumentCommand;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
+/**
+ * @author hugo
+ *
+ */
 @Entity
 @Table(name = "m_document")
 public class Document extends AbstractPersistable<Long> {
 
-    @Column(name = "parent_entity_type", length = 50)
+	private static final long serialVersionUID = 1L;
+
+	@Column(name = "parent_entity_type", length = 50)
     private String parentEntityType;
 
     @Column(name = "parent_entity_id", length = 1000)

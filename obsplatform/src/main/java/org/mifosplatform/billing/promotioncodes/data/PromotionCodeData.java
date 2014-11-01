@@ -22,7 +22,7 @@ public class PromotionCodeData {
 	private String discountType;
 	private LocalDate startDate;
 	private BigDecimal discountRate;
-	private Collection<MCodeData> discounTypeData;
+	private Collection<MCodeData> discountTypeData;
 	private List<PeriodData> contractTypedata;
 
 	public PromotionCodeData(Long id, String promotionCode,
@@ -46,7 +46,7 @@ public class PromotionCodeData {
 	public PromotionCodeData(final Collection<MCodeData> discountTypeData,
 			final List<PeriodData> contractTypedata) {
 
-		this.discounTypeData = discountTypeData;
+		this.discountTypeData = discountTypeData;
 		this.contractTypedata = contractTypedata;
 
 	}
@@ -83,12 +83,12 @@ public class PromotionCodeData {
 		return discountRate;
 	}
 
-	public Collection<MCodeData> getDiscounTypeData() {
-		return discounTypeData;
+	public Collection<MCodeData> getDiscountTypeData() {
+		return discountTypeData;
 	}
 
-	public void setDiscounTypeData(final Collection<MCodeData> discounTypeData) {
-		this.discounTypeData = discounTypeData;
+	public void setDiscounTypeData(final Collection<MCodeData> discountTypeData) {
+		this.discountTypeData = discountTypeData;
 	}
 
 	public List<PeriodData> getContractTypedata() {

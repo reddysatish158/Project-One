@@ -34,7 +34,7 @@ public final class TaxMapCommandFromApiJsonDeserializer {
      * The parameters supported for this command.
      */
 	
-	private final Set<String> supportedParams = new HashSet<String>(Arrays.asList("chargeCode","taxCode","startDate","type","rate","locale","dateFormat","taxRegion"));
+	private final Set<String> supportedParams = new HashSet<String>(Arrays.asList("chargeCode","taxCode","startDate","taxType","rate","locale","dateFormat","taxRegion"));
 	
 	private final FromJsonHelper fromJsonHelper;
 	
@@ -57,17 +57,18 @@ public final class TaxMapCommandFromApiJsonDeserializer {
 		
 		
 		final String taxCode = command.stringValueOfParameterNamed("taxCode");
-		final LocalDate startDate = command.localDateValueOfParameterNamed("startDate");
-		final String type = command.stringValueOfParameterNamed("type");
-		final BigDecimal rate = command.bigDecimalValueOfParameterNamed("rate"); 
-
 		baseDataValidator.reset().parameter("taxCode").value(taxCode).notBlank().notExceedingLengthOf(10);
-		baseDataValidator.reset().parameter("startDate").value(startDate).notBlank();
-		if(type.contains("-1"))
-			baseDataValidator.reset().parameter("type").value(type).notBlank().notExceedingLengthOf(15).zeroOrPositiveAmount();
-		else
-			baseDataValidator.reset().parameter("type").value(type).notBlank().notExceedingLengthOf(15);
 		
+		final LocalDate startDate = command.localDateValueOfParameterNamed("startDate");
+		baseDataValidator.reset().parameter("startDate").value(startDate).notBlank();
+		
+		final String taxType = command.stringValueOfParameterNamed("taxType");
+		if(taxType.contains("-1"))
+			baseDataValidator.reset().parameter("taxType").value(taxType).notBlank().notExceedingLengthOf(15).zeroOrPositiveAmount();
+		else
+			baseDataValidator.reset().parameter("taxType").value(taxType).notBlank().notExceedingLengthOf(15);
+		
+		final BigDecimal rate = command.bigDecimalValueOfParameterNamed("rate"); 
 		baseDataValidator.reset().parameter("rate").value(rate).notBlank();
 	
 		throwExceptionIfValidationWarningsExist(dataValidationErrors);

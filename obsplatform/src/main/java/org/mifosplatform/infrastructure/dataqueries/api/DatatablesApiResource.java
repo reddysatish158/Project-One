@@ -68,15 +68,11 @@ public class DatatablesApiResource {
 	@GET
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrieveDatatables(
-			@QueryParam("apptable") final String apptable,
+	public String retrieveDatatables(@QueryParam("apptable") final String apptable,
 			@Context final UriInfo uriInfo) {
 
-		final List<DatatableData> result = this.readWriteNonCoreDataService
-				.retrieveDatatableNames(apptable);
-
-		final boolean prettyPrint = ApiParameterHelper.prettyPrint(uriInfo
-				.getQueryParameters());
+		final List<DatatableData> result = this.readWriteNonCoreDataService.retrieveDatatableNames(apptable);
+		final boolean prettyPrint = ApiParameterHelper.prettyPrint(uriInfo	.getQueryParameters());
 		return this.toApiJsonSerializer.serializePretty(prettyPrint, result);
 	}
 
@@ -89,12 +85,8 @@ public class DatatablesApiResource {
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String createNewDatatable(final String apiRequestBodyAsJson) {
 
-		final CommandWrapper commandRequest = new CommandWrapperBuilder()
-				.createDatatable(apiRequestBodyAsJson).build();
-
-		final CommandProcessingResult result = this.commandSourceWritePlatformService
-				.logCommandSource(commandRequest);
-
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().createDatatable(apiRequestBodyAsJson).build();
+		final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 	}
 
@@ -107,15 +99,10 @@ public class DatatablesApiResource {
 	@Path("{datatable}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrieveSingleDatatable(
-			@PathParam("datatable") final String datatable,
-			@Context final UriInfo uriInfo) {
+	public String retrieveSingleDatatable(@PathParam("datatable") final String datatable,@Context final UriInfo uriInfo) {
 
-		final DatatableData result = this.readWriteNonCoreDataService
-				.retrieveSingleDatatable(datatable);
-
-		final boolean prettyPrint = ApiParameterHelper.prettyPrint(uriInfo
-				.getQueryParameters());
+		final DatatableData result = this.readWriteNonCoreDataService.retrieveSingleDatatable(datatable);
+		final boolean prettyPrint = ApiParameterHelper.prettyPrint(uriInfo.getQueryParameters());
 		return this.toApiJsonSerializer.serializePretty(prettyPrint, result);
 	}
 

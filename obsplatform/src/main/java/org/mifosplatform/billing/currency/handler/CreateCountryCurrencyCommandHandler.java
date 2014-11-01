@@ -15,16 +15,15 @@ public class CreateCountryCurrencyCommandHandler implements
 	CountryCurrencyWritePlatformService countryCurrencyWritePlatformService;
 
 	@Autowired
-	public CreateCountryCurrencyCommandHandler(
-			final CountryCurrencyWritePlatformService countryCurrencyWritePlatformService) {
+	public CreateCountryCurrencyCommandHandler(final CountryCurrencyWritePlatformService countryCurrencyWritePlatformService) {
 		this.countryCurrencyWritePlatformService = countryCurrencyWritePlatformService;
 	}
 
 	@Transactional
 	@Override
 	public CommandProcessingResult processCommand(final JsonCommand command) {
-		return countryCurrencyWritePlatformService
-				.createCountryCurrency(command);
+		
+		return countryCurrencyWritePlatformService.createCountryCurrency(command);
 	}
 
 }

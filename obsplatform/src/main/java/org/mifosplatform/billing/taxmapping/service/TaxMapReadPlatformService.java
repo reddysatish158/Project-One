@@ -5,10 +5,16 @@ import java.util.List;
 import org.mifosplatform.billing.chargecode.data.ChargeCodeData;
 import org.mifosplatform.billing.taxmapping.data.TaxMapData;
 
+/**
+ * @author hugo
+ * 
+ */
 public interface TaxMapReadPlatformService {
 
-	public List<TaxMapData> retriveTaxMapData(String chargeCode);
-	public TaxMapData retriveTaxMapDataForUpdate(final Long id);
-	public List<ChargeCodeData> retriveTemplateData();
-	public List<TaxMapData> retriveTaxMapTypeData();
+	List<TaxMapData> retriveTaxMapData(String chargeCode);
+
+	TaxMapData retrievedSingleTaxMapData(Long id);
+
+	List<ChargeCodeData> retrivedChargeCodeTemplateData();
+
 }

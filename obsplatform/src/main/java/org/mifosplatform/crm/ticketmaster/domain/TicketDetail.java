@@ -17,6 +17,7 @@ import org.mifosplatform.infrastructure.core.api.JsonCommand;
 @Entity
 @Table(name = "b_ticket_details")
 public class TicketDetail {
+	
 	@Id
 	@GeneratedValue
 	@Column(name = "id")
@@ -24,8 +25,6 @@ public class TicketDetail {
 
 	@Column(name = "ticket_id", length = 65536)
 	private Long ticketId;
-
-	
 
 	@Column(name = "comments")
 	private String comments;
@@ -44,48 +43,44 @@ public class TicketDetail {
 
 	
 	public TicketDetail() {
-		// TODO Auto-generated constructor stub
+		
 	}
 	
-public static TicketDetail fromJson(final JsonCommand command) throws ParseException {
+	public static TicketDetail fromJson(final JsonCommand command) throws ParseException {
 	
-	Integer assignedTo = command.integerValueOfParameterNamed("assignedTo");
-	String description  = command.stringValueOfParameterNamed("description");
+		final Integer assignedTo = command.integerValueOfParameterNamed("assignedTo");
+		final String description  = command.stringValueOfParameterNamed("description");
 	
-	LocalDate startDateString0=command.localDateValueOfParameterNamed("ticketDate");
-	String startDateString =startDateString0.toString()+command.stringValueOfParameterNamed("ticketTime");
-	DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	Date ticketDate = df.parse(startDateString);
+		final LocalDate startDate = command.localDateValueOfParameterNamed("ticketDate");
+		final String startDateString = startDate.toString() + command.stringValueOfParameterNamed("ticketTime");
+		final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		final Date ticketDate = df.parse(startDateString);
 	
-	
-	return new TicketDetail(assignedTo,description,ticketDate);
-}
-
-public TicketDetail(Integer assignedTo, String description, Date ticketDate) {
-	this.assignedTo =assignedTo;
-	this.comments = description;
-	this.createdDate=ticketDate;
-}
-
-
-
-	public TicketDetail(Long ticketId, String comments, String fileLocation,
-			Integer assignedTo,Long createdbyId) {
-                   this.ticketId=ticketId;
-                   this.comments=comments;
-                   this.attachments=fileLocation;
-                   this.assignedTo=assignedTo;
-                   this.createdDate=new LocalDate().toDate();
-                   this.createdbyId = createdbyId;	
+		return new TicketDetail(assignedTo, description, ticketDate);
 	}
 
+	public TicketDetail(final Integer assignedTo, final String description, final Date ticketDate) {
+		this.assignedTo = assignedTo;
+		this.comments = description;
+		this.createdDate = ticketDate;
+	}
 
-	
+	public TicketDetail(final Long ticketId, final String comments, final String fileLocation,
+			final Integer assignedTo, final Long createdbyId) {
+    
+		this.ticketId = ticketId;
+        this.comments = comments;
+        this.attachments = fileLocation;
+        this.assignedTo = assignedTo;
+        this.createdDate = new LocalDate().toDate();
+        this.createdbyId = createdbyId;	
+	}
+
 	public Long getId() {
 		return id;
 	}
 	
-	public void setTicketId(Long ticketId) {
+	public void setTicketId(final Long ticketId) {
 		this.ticketId = ticketId;
 	}
 
@@ -97,21 +92,20 @@ public TicketDetail(Integer assignedTo, String description, Date ticketDate) {
 		return comments;
 	}
 
-
 	public String getAttachments() {
 		return attachments;
 	}
-
 
 	public Integer getAssignedTo() {
 		return assignedTo;
 	}
 
-	public void setCreatedbyId(Long createdbyId) {
+	public void setCreatedbyId(final Long createdbyId) {
 		this.createdbyId = createdbyId;
 	}
 	
 	public Long getCreatedbyId() {
 		return createdbyId;
 	}
+	
 }

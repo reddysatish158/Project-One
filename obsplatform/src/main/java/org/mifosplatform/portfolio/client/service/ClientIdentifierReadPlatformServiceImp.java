@@ -22,18 +22,25 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
+/**
+ * @author hugo
+ *
+ */
 @Service
-public class ClientIdentifierReadPlatformServiceImpl implements ClientIdentifierReadPlatformService {
+public class ClientIdentifierReadPlatformServiceImp implements ClientIdentifierReadPlatformService {
 
     private final JdbcTemplate jdbcTemplate;
     private final PlatformSecurityContext context;
 
     @Autowired
-    public ClientIdentifierReadPlatformServiceImpl(final PlatformSecurityContext context, final TenantAwareRoutingDataSource dataSource) {
+    public ClientIdentifierReadPlatformServiceImp(final PlatformSecurityContext context, final TenantAwareRoutingDataSource dataSource) {
         this.context = context;
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
+    /* (non-Javadoc)
+     * @see #retrieveClientIdentifiers(java.lang.Long)
+     */
     @Override
     public Collection<ClientIdentifierData> retrieveClientIdentifiers(final Long clientId) {
 
@@ -50,6 +57,9 @@ public class ClientIdentifierReadPlatformServiceImpl implements ClientIdentifier
         return this.jdbcTemplate.query(sql, rm, new Object[] { clientId, hierarchySearchString });
     }
 
+    /* (non-Javadoc)
+     * @see #retrieveClientIdentifier(java.lang.Long, java.lang.Long)
+     */
     @Override
     public ClientIdentifierData retrieveClientIdentifier(final Long clientId, final Long clientIdentifierId) {
         try {
@@ -86,7 +96,7 @@ public class ClientIdentifierReadPlatformServiceImpl implements ClientIdentifier
         }
 
         @Override
-        public ClientIdentifierData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
+        public ClientIdentifierData mapRow(final ResultSet rs, final int rowNum) throws SQLException {
 
             final Long id = JdbcSupport.getLong(rs, "id");
             final Long clientId = JdbcSupport.getLong(rs, "clientId");

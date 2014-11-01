@@ -6,62 +6,64 @@ import java.util.List;
 
 import org.joda.time.LocalDate;
 import org.mifosplatform.billing.chargecode.data.ChargeCodeData;
+import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
 import org.mifosplatform.organisation.priceregion.data.PriceRegionData;
 
 public class TaxMapData {
-	
+
 	private Long id;
 	private String chargeCode;
-	
-	
 	private String taxCode;
-	
-	
 	private LocalDate startDate;
-	
-	
-	private String type;
-	
-	
+	private String taxType;
 	private BigDecimal rate;
 
-	private Collection<ChargeCodeData> chargeCodeForTax;
-	private Collection<TaxMapData> taxMapData;
-	private String TaxRegion;
-	private Long TaxRegionId;
+	private Collection<ChargeCodeData> chargeCodesForTax;
+	private Collection<MCodeData> taxTypeData;
+	private String taxRegion;
+	private Long taxRegionId;
 	private List<PriceRegionData> priceRegionData;
-	
-	
-	public TaxMapData(){}
-	
-	public TaxMapData(String chargeCode,String taxCode,LocalDate startDate,String type,BigDecimal rate){
-		this.chargeCode = chargeCode;
-		this.taxCode = taxCode;
-		this.startDate = startDate;
-		this.type = type;
-		this.rate = rate;
-	}
-	
-	public TaxMapData(Long id, String chargeCode,String taxCode,LocalDate startDate,String type,BigDecimal rate,String region,Long TaxRegionId){
-		this.id=id;
-		this.chargeCode = chargeCode;
-		this.taxCode = taxCode;
-		this.startDate = startDate;
-		this.type = type;
-		this.rate = rate;
-		this.TaxRegion=region;
-		this.TaxRegionId=TaxRegionId;
-	}
-	
-	public TaxMapData(Long id, String type){
-		this.type = type;
-		this.id = id;
+
+	public TaxMapData() {
 	}
 
-	public TaxMapData(Collection<ChargeCodeData> ccd, Collection<TaxMapData> tmd,Collection<TaxMapData> taxMapData) {
-		this.chargeCodeForTax = ccd;
-		this.taxMapData = tmd;
+	public TaxMapData(final String chargeCode, final String taxCode,  final LocalDate startDate,
+			final String taxType, final BigDecimal rate) {
+		this.chargeCode = chargeCode;
+		this.taxCode = taxCode;
+		this.startDate = startDate;
+		this.taxType = taxType;
+		this.rate = rate;
 	}
+
+	public TaxMapData(final Long id, final String chargeCode,
+			final String taxCode, final LocalDate startDate,
+			final String taxType, final BigDecimal rate, final String region,
+			final Long taxRegionId) {
+		this.id = id;
+		this.chargeCode = chargeCode;
+		this.taxCode = taxCode;
+		this.startDate = startDate;
+		this.taxType = taxType;
+		this.rate = rate;
+		this.taxRegion = region;
+		this.taxRegionId = taxRegionId;
+	}
+
+	public TaxMapData(final Collection<MCodeData> taxTypeData,
+			final List<PriceRegionData> priceRegionData,final String chargeCode) {
+		this.priceRegionData = priceRegionData;
+		this.taxTypeData = taxTypeData;
+		this.chargeCode = chargeCode;
+	}
+
+	/**
+	 * @return the id
+	 */
+	public Long getId() {
+		return id;
+	}
+
 	/**
 	 * @return the chargeCode
 	 */
@@ -69,9 +71,6 @@ public class TaxMapData {
 		return chargeCode;
 	}
 
-	/**
-	 * @param chargeCode the chargeCode to set
-	 */
 	public void setChargeCode(String chargeCode) {
 		this.chargeCode = chargeCode;
 	}
@@ -83,10 +82,7 @@ public class TaxMapData {
 		return taxCode;
 	}
 
-	/**
-	 * @param taxCode the taxCode to set
-	 */
-	public void setTaxCode(String taxCode) {
+	public void setTaxCode(final String taxCode) {
 		this.taxCode = taxCode;
 	}
 
@@ -97,25 +93,19 @@ public class TaxMapData {
 		return startDate;
 	}
 
-	/**
-	 * @param startDate the startDate to set
-	 */
-	public void setStartDate(LocalDate startDate) {
+	public void setStartDate(final LocalDate startDate) {
 		this.startDate = startDate;
 	}
 
 	/**
 	 * @return the type
 	 */
-	public String getType() {
-		return type;
+	public String getTaxType() {
+		return taxType;
 	}
 
-	/**
-	 * @param type the type to set
-	 */
-	public void setType(String type) {
-		this.type = type;
+	public void setTaxType(final String taxType) {
+		this.taxType = taxType;
 	}
 
 	/**
@@ -125,59 +115,65 @@ public class TaxMapData {
 		return rate;
 	}
 
-	/**
-	 * @param rate the rate to set
-	 */
-	public void setRate(BigDecimal rate) {
+	public void setRate(final BigDecimal rate) {
 		this.rate = rate;
 	}
 
 	/**
-	 * @return the id
+	 * @return the chargeCodesForTax
 	 */
-	public Long getId() {
-		return id;
+	public Collection<ChargeCodeData> getChargeCodesForTax() {
+		return chargeCodesForTax;
+	}
+
+	public void setChargeCodesForTax(final Collection<ChargeCodeData> chargeCodesForTax) {
+		this.chargeCodesForTax = chargeCodesForTax;
 	}
 
 	/**
-	 * @param id the id to set
+	 * @return the taxRegion
 	 */
-	public void setId(Long id) {
-		this.id = id;
+	public String getTaxRegion() {
+		return taxRegion;
+	}
+
+	public void setTaxRegion(String taxRegion) {
+		this.taxRegion = taxRegion;
 	}
 
 	/**
-	 * @return the chargeCodeForTax
+	 * @return the taxRegionId
 	 */
-	public Collection<ChargeCodeData> getChargeCodeForTax() {
-		return chargeCodeForTax;
-	}
-
-	/**
-	 * @param chargeCodeForTax the chargeCodeForTax to set
-	 */
-	public void setChargeCodeForTax(Collection<ChargeCodeData> chargeCodeForTax) {
-		this.chargeCodeForTax = chargeCodeForTax;
-	}
-
-	/**
-	 * @return the taxMapData
-	 */
-	public Collection<TaxMapData> getTaxMapData() {
-		return taxMapData;
-	}
-
-	/**
-	 * @param taxMapData the taxMapData to set
-	 */
-	public void setTaxMapData(Collection<TaxMapData> taxMapData) {
-		this.taxMapData = taxMapData;
-	}
-
-	public void setRegionalTaxData(List<PriceRegionData> priceRegionData) {
-	  
-		this.priceRegionData=priceRegionData;
-		
+	public Long getTaxRegionId() {
+		return taxRegionId;
 	}
 	
+	public void setTaxRegionId(Long taxRegionId) {
+		this.taxRegionId = taxRegionId;
+	}
+
+	/**
+	 * @return the priceRegionData
+	 */
+	public List<PriceRegionData> getPriceRegionData() {
+		return priceRegionData;
+	}
+
+	public void setPriceRegionData(List<PriceRegionData> priceRegionData) {
+		this.priceRegionData = priceRegionData;
+	}
+
+	/**
+	 * @return the taxTypeData
+	 */
+	public Collection<MCodeData> getTaxTypeData() {
+		return taxTypeData;
+	}
+	
+	public void setTaxTypeData(final Collection<MCodeData> taxTypeData) {
+		this.taxTypeData = taxTypeData;
+
+	}
+
+
 }

@@ -6,8 +6,7 @@ public enum PriorityType {
 		LOW(1, "CategoryType.low"), //
 		MEDIUM(2, "CategoryType.medium"),
 		HIGH(3, "CategoryType.high"),
-		  INVALID(4, "CategoryType.invalid");
-
+		INVALID(4, "CategoryType.invalid");
 
 	    private final Integer value;
 		private final String code;
@@ -40,13 +39,11 @@ public enum PriorityType {
 				priorityType = PriorityType.HIGH;
 				break;
 
-
 			default:
 				priorityType = PriorityType.INVALID;
 				break;
 			}
+			
 			return priorityType;
 		}
-	}
-
-
+}

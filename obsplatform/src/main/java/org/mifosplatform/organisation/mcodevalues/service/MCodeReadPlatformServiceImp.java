@@ -27,15 +27,13 @@ public class MCodeReadPlatformServiceImp implements MCodeReadPlatformService {
 	
 	
 	@Override
-	public Collection<MCodeData> getCodeValue(String codeName) {
+	public Collection<MCodeData> getCodeValue(final String codeName) {
 		
 		MCodeDataMapper rowMapper = new MCodeDataMapper();
-		
 		  
 		String sql = "select " + rowMapper.codeScheme()+" and code_name=? order by id";
 		return jdbcTemplate.query(sql, rowMapper,new Object[]{codeName});
-	  
-		
+	  	
 	}
 	
 	private final class MCodeDataMapper implements RowMapper<MCodeData>{
@@ -51,8 +49,17 @@ public class MCodeReadPlatformServiceImp implements MCodeReadPlatformService {
 		public String codeScheme(){
 			return "b.id,code_value from m_code a, m_code_value b where a.id = b.code_id ";
 		}
+		
 	}
 	
-	
+	@Override
+	public Collection<MCodeData> getCodeValue(final String codeName, final String orderPosition) {
+		
+		MCodeDataMapper rowMapper = new MCodeDataMapper();
+		  
+		String sql = "select " + rowMapper.codeScheme()+" and code_name=? and order_position = ? order by id";
+		return jdbcTemplate.query(sql, rowMapper,new Object[]{codeName,orderPosition});
+	  	
+	}
 
 }

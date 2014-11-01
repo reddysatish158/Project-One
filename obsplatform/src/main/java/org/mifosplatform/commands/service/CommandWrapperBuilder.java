@@ -1266,7 +1266,7 @@ public class CommandWrapperBuilder {
 		return this;
 	}
 
-	public CommandWrapperBuilder closeTicketMaster(final Long ticketId) {
+	public CommandWrapperBuilder deleteTicketMaster(final Long ticketId) {
 		this.actionName = "CLOSE";
 		this.entityName = "TICKET";
 		this.entityId = ticketId;
@@ -2245,7 +2245,7 @@ public CommandWrapperBuilder updateIpPoolManagement(Long id) {
 }
 
 
-public CommandWrapperBuilder updateBillMode(Long clientId) {
+public CommandWrapperBuilder updateClientBillMode(Long clientId) {
 	this.actionName = "UPDATE";
 	this.entityName = "CLIENTBILLMODE";
 	this.entityId = clientId;
@@ -2395,13 +2395,23 @@ public CommandWrapperBuilder editGrn(Long id) {
 	return this;
 }
 
-public CommandWrapperBuilder createClientParent(Long clientId) {
+public CommandWrapperBuilder createParentClient(Long clientId) {
 	this.actionName = "CREATE";
 	this.entityName = "PARENTCLIENT";
 	this.entityId = clientId;
 	this.href = "/parentclient/" +clientId;
 	return this;
   }
+
+public CommandWrapperBuilder deleteChildFromParentClient(Long childId) {
+	this.actionName = "DELETE";
+	this.entityName = "PARENTCLIENT";
+	this.entityId = childId;
+	this.href = "/parentclient/" +childId;
+	return this;
+  
+}
+
 public CommandWrapperBuilder updateIpAddressStatus() {
 	this.actionName = "UPDATEIPSTATUS";
 	this.entityName = "IPPOOLMANAGEMENT";
@@ -2507,13 +2517,6 @@ public CommandWrapperBuilder cancelBill(Long billId) {
 	return this;
 	
     }
-public CommandWrapperBuilder deleteChildFromParentClient(Long clientId) {
-	this.actionName = "DELETE";
-	this.entityName = "PARENTCLIENT";
-	this.entityId = clientId;
-	this.href = "/parentclient/" +clientId;
-	return this;
-  }
 
 public CommandWrapperBuilder updateUploadFile(Long uploadStatusId) {
 	

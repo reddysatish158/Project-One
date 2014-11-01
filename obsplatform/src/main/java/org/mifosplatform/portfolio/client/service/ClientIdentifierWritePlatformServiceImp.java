@@ -30,36 +30,42 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * @author hugo
+ *
+ */
 @Service
-public class ClientIdentifierWritePlatformServiceJpaRepositoryImpl implements ClientIdentifierWritePlatformService {
+public class ClientIdentifierWritePlatformServiceImp implements ClientIdentifierWritePlatformService {
 
-    private final static Logger logger = LoggerFactory.getLogger(ClientIdentifierWritePlatformServiceJpaRepositoryImpl.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(ClientIdentifierWritePlatformServiceImp.class);
 
     private final PlatformSecurityContext context;
     private final ClientRepositoryWrapper clientRepository;
     private final ClientIdentifierRepository clientIdentifierRepository;
     private final CodeValueRepositoryWrapper codeValueRepository;
-    private final ClientIdentifierCommandFromApiJsonDeserializer clientIdentifierCommandFromApiJsonDeserializer;
+    private final ClientIdentifierCommandFromApiJsonDeserializer apiJsonDeserializer;
 
     @Autowired
-    public ClientIdentifierWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
+    public ClientIdentifierWritePlatformServiceImp(final PlatformSecurityContext context,
             final ClientRepositoryWrapper clientRepository, final ClientIdentifierRepository clientIdentifierRepository,
             final CodeValueRepositoryWrapper codeValueRepository,
-            final ClientIdentifierCommandFromApiJsonDeserializer clientIdentifierCommandFromApiJsonDeserializer) {
+            final ClientIdentifierCommandFromApiJsonDeserializer apiJsonDeserializer) {
         this.context = context;
         this.clientRepository = clientRepository;
         this.clientIdentifierRepository = clientIdentifierRepository;
         this.codeValueRepository = codeValueRepository;
-        this.clientIdentifierCommandFromApiJsonDeserializer = clientIdentifierCommandFromApiJsonDeserializer;
+        this.apiJsonDeserializer = apiJsonDeserializer;
     }
 
+    /* (non-Javadoc)
+     * @see #addClientIdentifier(java.lang.Long, org.mifosplatform.infrastructure.core.api.JsonCommand)
+     */
     @Transactional
     @Override
     public CommandProcessingResult addClientIdentifier(final Long clientId, final JsonCommand command) {
 
         this.context.authenticatedUser();
-        final ClientIdentifierCommand clientIdentifierCommand = this.clientIdentifierCommandFromApiJsonDeserializer
-                .commandFromApiJson(command.json());
+        final ClientIdentifierCommand clientIdentifierCommand = this.apiJsonDeserializer.commandFromApiJson(command.json());
         clientIdentifierCommand.validateForCreate();
 
         final String documentKey = clientIdentifierCommand.getDocumentKey();
@@ -89,13 +95,15 @@ public class ClientIdentifierWritePlatformServiceJpaRepositoryImpl implements Cl
         }
     }
 
+    /* (non-Javadoc)
+     * @see #updateClientIdentifier(java.lang.Long, java.lang.Long, org.mifosplatform.infrastructure.core.api.JsonCommand)
+     */
     @Transactional
     @Override
     public CommandProcessingResult updateClientIdentifier(final Long clientId, final Long identifierId, final JsonCommand command) {
 
         this.context.authenticatedUser();
-        final ClientIdentifierCommand clientIdentifierCommand = this.clientIdentifierCommandFromApiJsonDeserializer
-                .commandFromApiJson(command.json());
+        final ClientIdentifierCommand clientIdentifierCommand = this.apiJsonDeserializer.commandFromApiJson(command.json());
         clientIdentifierCommand.validateForUpdate();
 
         String documentTypeLabel = null;
@@ -147,6 +155,9 @@ public class ClientIdentifierWritePlatformServiceJpaRepositoryImpl implements Cl
         }
     }
 
+    /* (non-Javadoc)
+     * @see #deleteClientIdentifier(java.lang.Long, java.lang.Long, java.lang.Long)
+     */
     @Transactional
     @Override
     public CommandProcessingResult deleteClientIdentifier(final Long clientId, final Long identifierId, final Long commandId) {
@@ -179,6 +190,6 @@ public class ClientIdentifierWritePlatformServiceJpaRepositoryImpl implements Cl
     }
 
     private void logAsErrorUnexpectedDataIntegrityException(final DataIntegrityViolationException dve) {
-        logger.error(dve.getMessage(), dve);
+    	LOGGER.error(dve.getMessage(), dve);
     }
 }

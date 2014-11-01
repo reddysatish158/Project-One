@@ -113,7 +113,7 @@ public class PricingApiResource {
 	    	List<ChargeCodeData> chargeCode = this.chargeCodeReadPlatformService.retrieveAllChargeCodes();
 	    	List<EnumOptionData> datas = this.priceReadPlatformService.retrieveChargeVariantData();
 	    	List<DiscountMasterData> discountMasterDatas= this.discountReadPlatformService.retrieveAllDiscounts();
-	    	List<PriceRegionData> priceRegionData = this.regionalPriceReadplatformService.getThePriceregionsDetails();
+	    	List<PriceRegionData> priceRegionData = this.regionalPriceReadplatformService.getPriceRegionsDetails();
 	    	List<SubscriptionData> contractPeriods = this.planReadPlatformService.retrieveSubscriptionData(null,null);
 			
 	    		for(int i=0;i<contractPeriods.size();i++){
