@@ -10,8 +10,8 @@ public class ProblemsData {
 	
 	public ProblemsData(final Long problemCode,final String problemDesc, final String status,
 						final Integer statusCode){
-		this.problemCode=problemCode;
-		this.problemDescription=problemDesc;
+		this.problemCode = problemCode;
+		this.problemDescription = problemDesc;
 		this.satus = status;
 		this.statusCode = statusCode;
 	}
@@ -43,6 +43,5 @@ public class ProblemsData {
 	public Integer getStatusCode() {
 		return statusCode;
 	}
-	
-	
+		
 }

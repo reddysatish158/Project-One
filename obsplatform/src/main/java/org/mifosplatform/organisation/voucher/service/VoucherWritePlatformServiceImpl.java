@@ -12,6 +12,7 @@ import org.mifosplatform.organisation.voucher.domain.VoucherDetails;
 import org.mifosplatform.organisation.voucher.domain.VoucherDetailsRepository;
 import org.mifosplatform.organisation.voucher.domain.VoucherRepository;
 import org.mifosplatform.organisation.voucher.exception.AlreadyProcessedException;
+import org.mifosplatform.organisation.voucher.exception.VoucherLengthMatchException;
 import org.mifosplatform.organisation.voucher.serialization.VoucherCommandFromApiJsonDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -69,6 +70,16 @@ public class VoucherWritePlatformServiceImpl implements
 		try {
 			context.authenticatedUser();
 			this.fromApiJsonDeserializer.validateForCreate(command.json());
+			
+			final Long length = command.bigDecimalValueOfParameterNamed("length").longValue();
+			final String beginWith = command.stringValueOfParameterNamed("beginWith");
+			final int bwLength = beginWith.trim().length();
+			
+			if(bwLength == length.intValue()){
+				
+				throw new VoucherLengthMatchException();
+			}
+				
 			Voucher voucherpin = Voucher.fromJson(command);
 			this.randomGeneratorRepository.save(voucherpin);	
 			return new CommandProcessingResult(voucherpin.getId());
@@ -142,6 +153,11 @@ public class VoucherWritePlatformServiceImpl implements
 		final int beginKeyLength = voucher.getBeginWith().length();
 		
 		remainingKeyLength = length - beginKeyLength;
+		
+		if(remainingKeyLength == 0){
+			
+			throw new VoucherLengthMatchException();
+		}
 		
 		final Long serialNo = voucher.getSerialNo();
 		

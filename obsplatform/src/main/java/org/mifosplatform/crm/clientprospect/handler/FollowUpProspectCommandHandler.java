@@ -6,23 +6,20 @@ import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class CreateClientProspectConvertCommandHandler implements NewCommandSourceHandler{
+public class FollowUpProspectCommandHandler implements NewCommandSourceHandler {
 
-private final ClientProspectWritePlatformService prospectWritePlatformService;
-	
+	private ClientProspectWritePlatformService clientProspectWritePlatformService;
+
 	@Autowired
-	public CreateClientProspectConvertCommandHandler(final ClientProspectWritePlatformService prospectWritePlatformService) {
-		this.prospectWritePlatformService = prospectWritePlatformService;
-		
+	public FollowUpProspectCommandHandler(final ClientProspectWritePlatformService clientProspectWritePlatformService) {
+		this.clientProspectWritePlatformService = clientProspectWritePlatformService;
 	}
-	
-	@Transactional
+
 	@Override
 	public CommandProcessingResult processCommand(JsonCommand command) {
-		return prospectWritePlatformService.convertToClient(command.entityId());
+		return clientProspectWritePlatformService.followUpProspect(command, command.entityId());
 	}
-	
+
 }

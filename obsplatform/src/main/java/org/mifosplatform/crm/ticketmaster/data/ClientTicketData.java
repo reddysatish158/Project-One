@@ -18,40 +18,40 @@ public class ClientTicketData {
 	private final String createUser;
 	private final String closedByuser;
 	
-	public ClientTicketData( Long id, String priority, String status, Long assignedTo, LocalDate ticketDate,
-			String lastComment,String problemDescription,String userName, Long clientId) {
-	this.id=id;
-	this.priority=priority;
-	this.status=status;
-	this.userId=assignedTo;
-	this.ticketDate=ticketDate;
-	this.lastComment=lastComment;
-	this.problemDescription=problemDescription;
-	this.userName=userName;
-	this.clientId=clientId;
-	this.closedByuser=null;
-	this.createUser=null;
+	public ClientTicketData(final Long id, final String priority, final String status, final Long assignedTo, final LocalDate ticketDate,
+			final String lastComment, final String problemDescription, final String userName, final Long clientId) {
+		
+		this.id = id;
+		this.priority = priority;
+		this.status = status;
+		this.userId = assignedTo;
+		this.ticketDate = ticketDate;
+		this.lastComment = lastComment;
+		this.problemDescription = problemDescription;
+		this.userName = userName;
+		this.clientId = clientId;
+		this.closedByuser = null;
+		this.createUser = null;
 	
-}
-	public ClientTicketData( Long id, String priority, String status, Long assignedTo, LocalDate ticketDate,
-			String lastComment,String problemDescription,String userName, Long clientId,
-			final String timeElapsed, final String clientName,String createUser,String closedByuser) {
-	this.id=id;
-	this.priority=priority;
-	this.status=status;
-	this.userId=assignedTo;
-	this.ticketDate=ticketDate;
-	this.lastComment=lastComment;
-	this.problemDescription=problemDescription;
-	this.userName=userName;
-	this.clientId=clientId;
-	this.timeElapsed = timeElapsed;
-	this.clientName = clientName;
-	this.createUser=createUser;
-	this.closedByuser=closedByuser;
-}
-
-
+	}
+	public ClientTicketData(final Long id, final String priority, final String status, final Long assignedTo, final LocalDate ticketDate,
+			final String lastComment, final String problemDescription, final String userName, final Long clientId,
+			final String timeElapsed, final String clientName, final String createUser, final String closedByuser) {
+	
+		this.id = id;
+		this.priority = priority;
+		this.status = status;
+		this.userId = assignedTo;
+		this.ticketDate = ticketDate;
+		this.lastComment = lastComment;
+		this.problemDescription = problemDescription;
+		this.userName = userName;
+		this.clientId = clientId;
+		this.timeElapsed = timeElapsed;
+		this.clientName = clientName;
+		this.createUser = createUser;
+		this.closedByuser = closedByuser;
+	}
 
 	/**
 	 * @return the id
@@ -60,14 +60,12 @@ public class ClientTicketData {
 		return id;
 	}
 
-
 	/**
 	 * @return the priority
 	 */
 	public String getPriority() {
 		return priority;
 	}
-
 
 	/**
 	 * @return the status
@@ -76,14 +74,12 @@ public class ClientTicketData {
 		return status;
 	}
 
-
 	/**
 	 * @return the userId
 	 */
 	public Long getUserId() {
 		return userId;
 	}
-
 
 	/**
 	 * @return the ticketDate
@@ -92,14 +88,12 @@ public class ClientTicketData {
 		return ticketDate;
 	}
 
-
 	/**
 	 * @return the lastComment
 	 */
 	public String getLastComment() {
 		return lastComment;
 	}
-
 
 	/**
 	 * @return the problemDescription
@@ -108,7 +102,6 @@ public class ClientTicketData {
 		return problemDescription;
 	}
 
-
 	/**
 	 * @return the userName
 	 */
@@ -116,12 +109,35 @@ public class ClientTicketData {
 		return userName;
 	}
 
-
 	/**
 	 * @return the clientId
 	 */
 	public Long getClientId() {
 		return clientId;
+	}
+	
+	public String getTimeElapsed() {
+		return timeElapsed;
+	}
+	
+	public void setTimeElapsed(final String timeElapsed) {
+		this.timeElapsed = timeElapsed;
+	}
+	
+	public Object getClientName() {
+		return clientName;
+	}
+	
+	public void setClientName(final Object clientName) {
+		this.clientName = clientName;
+	}
+	
+	public String getCreateUser() {
+		return createUser;
+	}
+	
+	public String getClosedByuser() {
+		return closedByuser;
 	}
 
 }

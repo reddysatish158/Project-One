@@ -763,16 +763,16 @@ public class SynchronousCommandProcessingService implements
 						}
 		    } else if (wrapper.isClientProspect()) {
 						if(wrapper.isCreate()){
-							handler = applicationContext.getBean("createClientProspectCommandHandler",NewCommandSourceHandler.class);
-						} if(wrapper.isUpdateClientProspect()){
-							handler = applicationContext.getBean("updateClientProspectCommandHandler",NewCommandSourceHandler.class);
-						} if(wrapper.isDeleteClientProspect()){
-							handler =applicationContext.getBean("deleteClientProspectCommandHandler",NewCommandSourceHandler.class);
-						} if(wrapper.isConvertClientProspect()){
-							handler = applicationContext.getBean("createClientProspectConvertCommandHandler",NewCommandSourceHandler.class);
-						} if(wrapper.isEditClientProspect()){
-							handler = applicationContext.getBean("editClientProspectCommandHandler",NewCommandSourceHandler.class);
-						}
+							handler = applicationContext.getBean("createProspectCommandHandler",NewCommandSourceHandler.class);
+						} if(wrapper.isUpdate()){
+							handler = applicationContext.getBean("updateProspectCommandHandler",NewCommandSourceHandler.class);
+						} if(wrapper.isDeleteProspect()){
+							handler =applicationContext.getBean("deleteProspectCommandHandler",NewCommandSourceHandler.class);
+						} if(wrapper.isFollowUpProspect()){
+							handler = applicationContext.getBean("followUpProspectCommandHandler",NewCommandSourceHandler.class);
+						}  if(wrapper.isConvertClientProspect()){
+							handler = applicationContext.getBean("convertProspectToClientCommandHandler",NewCommandSourceHandler.class);
+						} 
 			} else if (wrapper.isClientBalance()) {
 						if(wrapper.isCreate()){
 							handler = applicationContext.getBean("createClientBalanceCommandHandler",NewCommandSourceHandler.class);
