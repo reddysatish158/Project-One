@@ -48,20 +48,7 @@ public class AddressData {
 
 	public AddressData(final List<AddressData> addressdata, final List<String> countryData, final List<String> statesData,
 						final List<String> citiesData, final List<EnumOptionData> enumOptionDatas) {
-		if(addressdata!=null && addressdata.size()!=0){
-		this.id=addressdata.get(0).getAddressId();
-	
-		this.clientId=addressdata.get(0).getClientId();
-		this.addressNo=addressdata.get(0).getAddressNo();
-		this.street=addressdata.get(0).getStreet();
-		this.zip=addressdata.get(0).getZip();
-		this.city=addressdata.get(0).getCity();
-		this.state=addressdata.get(0).getState();
-		this.country=addressdata.get(0).getCountry();
-		this.addressTypeId=addressdata.get(0).getAddressTypeId();
-		this.addressType=addressdata.get(0).getAddressType();
 		
-		}
 	this.datas=addressdata;
 	this.countryData=countryData;
 	this.stateData=statesData;

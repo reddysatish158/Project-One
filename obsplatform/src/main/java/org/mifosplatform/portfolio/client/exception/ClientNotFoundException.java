@@ -12,7 +12,12 @@ import org.mifosplatform.infrastructure.core.exception.AbstractPlatformDomainRul
  */
 public class ClientNotFoundException extends AbstractPlatformDomainRuleException {
 
-    public ClientNotFoundException(final Long clientId) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public ClientNotFoundException(final Long clientId) {
         super("error.msg.client.id.invalid", "Client with identifier " + clientId + " does not exist", clientId);
     }
     

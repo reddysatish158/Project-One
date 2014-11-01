@@ -7,9 +7,7 @@ update m_permission set code='CREATE_GROUPSDETAILS',entity_name='GROUPSDETAILS' 
 update m_permission set code='READ_GROUPSDETAILS', entity_name='GROUPSDETAILS' where code='READ_GROUPS';
 
 insert IGNORE into m_permission values(null, 'organisation', 'CREATE_VOUCHER', 'VOUCHER', 'CREATE', '0');
-
 insert IGNORE into m_permission values(null, 'organisation', 'PROCESS_VOUCHER', 'VOUCHER', 'PROCESS', '1');
-
 insert IGNORE into m_permission values(null, 'organisation', 'READ_VOUCHER', 'VOUCHER', 'READ', '1');
 
 delete from m_permission where entity_name Like '%RANDOMGENERATOR%';
@@ -24,3 +22,4 @@ insert IGNORE into m_permission values(null, 'Crm', 'DELETE_PROSPECT', 'PROSPECT
 insert IGNORE into m_permission values(null, 'Crm', 'FOLLOWUP_PROSPECT', 'PROSPECT', 'FOLLOWUP', '3');
 insert IGNORE into m_permission values(null, 'Crm', 'CONVERT_PROSPECT', 'PROSPECT', 'CONVERT', '4');
 insert IGNORE into m_permission values(null, 'Crm', 'READ_PROSPECT', 'PROSPECT', 'READ', '5');
+

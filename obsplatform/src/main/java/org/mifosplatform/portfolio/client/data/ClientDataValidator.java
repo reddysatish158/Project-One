@@ -144,7 +144,7 @@ public final class ClientDataValidator {
             baseDataValidator.reset().parameter(ClientApiConstants.emailParamName).value(email).notNull();
                  
             if(email!=null){
-            	 Boolean isValid = email.matches(ClientApiConstants.EMAIL_REGEX);
+            	final Boolean isValid = email.matches(ClientApiConstants.EMAIL_REGEX);
             	if(!isValid)
             dataValidationErrors.add(ApiParameterError.parameterError("Invalid Email Address","Invalid Email Address", "email",email));
             
@@ -204,7 +204,7 @@ public final class ClientDataValidator {
       //      baseDataValidator.reset().parameter(ClientApiConstants.emailParamName).value(email).notNull();
                  
             if(email!=null){
-            	 Boolean isValid = email.matches(ClientApiConstants.EMAIL_REGEX);
+            	final Boolean isValid = email.matches(ClientApiConstants.EMAIL_REGEX);
             	if(!isValid)
             dataValidationErrors.add(ApiParameterError.parameterError("Invalid Email Address","Invalid Email Address", "email",email));
             
@@ -302,7 +302,7 @@ public final class ClientDataValidator {
         throwExceptionIfValidationWarningsExist(dataValidationErrors);
     }
 
-	public void ValidateBillMode(JsonCommand command) {
+	public void ValidateBillMode(final JsonCommand command) {
 		
 		 final String json = command.json();
 		
@@ -323,7 +323,7 @@ public final class ClientDataValidator {
 		throwExceptionIfValidationWarningsExist(dataValidationErrors);
 	}
 
-	public void ValidateParent(JsonCommand command) {
+	public void ValidateParent(final JsonCommand command) {
 		
 		 final String json = command.json();
 			
