@@ -9,6 +9,7 @@ public class PriorityTypeEnum {
 		}
 
 		public static EnumOptionData priorityType(final PriorityType type) {
+			
 			final String codePrefix = "deposit.interest.compounding.period.";
 			EnumOptionData optionData = null;
 			switch (type) {
@@ -30,7 +31,4 @@ public class PriorityTypeEnum {
 			return optionData;
 		}
 
-	}
-
-
-
+}

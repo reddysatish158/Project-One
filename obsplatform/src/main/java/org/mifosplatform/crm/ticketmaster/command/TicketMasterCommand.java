@@ -18,57 +18,57 @@ public class TicketMasterCommand {
 	private final Long createdbyId;
 	private final Integer statusCode;
 	
-	public TicketMasterCommand(final Long clientId,final String priority,
-								final String description,final String problemCode,final String status,
-								final String resolutionDescription, final Integer assignedTo,final LocalDate ticketDate,
+	public TicketMasterCommand(final Long clientId, final String priority,
+								final String description, final String problemCode, final String status,
+								final String resolutionDescription, final Integer assignedTo, final LocalDate ticketDate,
 								final Long createdbyId, final Integer statusCode){		
 		
-		this.id=null;
-		this.clientId=clientId;
-		this.priority=priority;
-		this.ticketDate=ticketDate;
-		this.problemCode=problemCode;
-		this.description=description;
-		this.status=status;
-		this.resolutionDescription=resolutionDescription;
-		this.assignedTo=assignedTo;
-		this.comments=null;
-		this.ticketId=null;
+		this.id = null;
+		this.clientId = clientId;
+		this.priority = priority;
+		this.ticketDate = ticketDate;
+		this.problemCode = problemCode;
+		this.description = description;
+		this.status = status;
+		this.resolutionDescription = resolutionDescription;
+		this.assignedTo = assignedTo;
+		this.comments = null;
+		this.ticketId = null;
 		this.createdbyId = createdbyId;
 		this.statusCode = null;
 	}
-	public TicketMasterCommand(Long ticketId, String comments, String status,
-								Integer assignedTo,Long createdbyId,Integer statusCode) {
+	public TicketMasterCommand(final Long ticketId, final String comments, final String status,
+			final Integer assignedTo, final Long createdbyId, final Integer statusCode) {
 		
-		this.id=null;
-		this.clientId=null;
-		this.priority=null;
-		this.ticketDate=null;
-		this.problemCode=null;
-		this.description=null;
-		this.status=status;
-		this.resolutionDescription=null;
-		this.assignedTo=assignedTo;
-		this.comments=comments;
-		this.ticketId=ticketId;
+		this.id = null;
+		this.clientId = null;
+		this.priority = null;
+		this.ticketDate = null;
+		this.problemCode = null;
+		this.description = null;
+		this.status = status;
+		this.resolutionDescription = null;
+		this.assignedTo = assignedTo;
+		this.comments = comments;
+		this.ticketId = ticketId;
 		this.createdbyId = createdbyId;
 		this.statusCode = statusCode;
 		
 	}
-	public TicketMasterCommand(String status, String resolutionDescription,Integer statusCode) {
-		this.id=null;
-		this.clientId=null;
-		this.priority=null;
-		this.ticketDate=null;
-		this.problemCode=null;
-		this.description=null;
-		this.assignedTo=null;
-		this.comments=null;
-		this.ticketId=null;
+	public TicketMasterCommand(final String status, final String resolutionDescription, final Integer statusCode) {
+		this.id = null;
+		this.clientId = null;
+		this.priority = null;
+		this.ticketDate = null;
+		this.problemCode = null;
+		this.description = null;
+		this.assignedTo = null;
+		this.comments = null;
+		this.ticketId = null;
 		this.createdbyId = null;
 		this.statusCode = statusCode;
-		this.status="CLOSED";
-		this.resolutionDescription=resolutionDescription;
+		this.status = "CLOSED";
+		this.resolutionDescription = resolutionDescription;
 	}
 	public Long getId() {
 		return id;

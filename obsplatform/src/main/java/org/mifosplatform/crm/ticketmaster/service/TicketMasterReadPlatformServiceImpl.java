@@ -7,12 +7,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.mifosplatform.crm.clientprospect.service.SearchSqlQuery;
 import org.mifosplatform.crm.ticketmaster.data.ClientTicketData;
-import org.mifosplatform.crm.ticketmaster.data.ProblemsData;
 import org.mifosplatform.crm.ticketmaster.data.TicketMasterData;
 import org.mifosplatform.crm.ticketmaster.data.UsersData;
 import org.mifosplatform.crm.ticketmaster.domain.PriorityType;
@@ -28,8 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -47,88 +42,12 @@ public class TicketMasterReadPlatformServiceImpl  implements TicketMasterReadPla
 	}
 
 	@Override
-	public List<TicketMasterData> retrieveTicketStatusData() {
-		context.authenticatedUser();
-
-		statusMapper mapper = new statusMapper();
-
-		String sql = "select" + mapper.schema()+" where mc.code_name='Ticket Status' and order_position = 1";
-
-		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
-	}
-
-	private static final class statusMapper implements
-			RowMapper<TicketMasterData> {
-
-		public String schema() {
-			return " mcv.id as statusCode, mcv.code_value as statusDesc from m_code_value mcv " +
-					"inner join m_code mc on mc.id = mcv.code_id";
-
-		}
-
-		@Override
-		public TicketMasterData mapRow(ResultSet rs, int rowNum)
-				throws SQLException {
-
-			Integer statusCode = rs.getInt("statusCode");
-			String statusDesc = rs.getString("statusDesc");
-	
-			TicketMasterData data = new TicketMasterData(statusCode,statusDesc);
-			return data;
-
-		}
-
-	}
-
-
-	@Override
-	public List<ProblemsData> retrieveProblemData() {
-
-		//context.authenticatedUser();
-		SecurityContext context = SecurityContextHolder.getContext();
-    	if (context.getAuthentication() != null) {
-    		this.context.authenticatedUser();
-    	}
-
-		DataMapper mapper = new DataMapper();
-
-		String sql = "select " + mapper.schema();
-
-		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
-	}
-
-	private static final class DataMapper implements
-			RowMapper<ProblemsData> {
-
-		public String schema() {
-			return  "mcv.id  as problemCode,mcv.code_value as problemDescription from m_code_value mcv"
-					  +" inner join m_code mc on mc.id = mcv.code_id"
-				   +" where mc.code_name='Problem Code' order by mcv.order_position";
-
-		}
-
-		@Override
-		public ProblemsData mapRow(ResultSet rs, int rowNum)
-				throws SQLException {
-
-			Long  problemCode = rs.getLong("problemCode");
-			String problemDescription = rs.getString("problemDescription");
-
-			ProblemsData data = new ProblemsData(problemCode,problemDescription,null,null);
-
-			return data;
-
-		}
-
-	}
-
-	@Override
 	public List<UsersData> retrieveUsers() {
 		context.authenticatedUser();
 
-		UserMapper mapper = new UserMapper();
+		final UserMapper mapper = new UserMapper();
 
-		String sql = "select " + mapper.schema();
+		final String sql = "select " + mapper.schema();
 
 		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
 	}
@@ -142,13 +61,13 @@ public class TicketMasterReadPlatformServiceImpl  implements TicketMasterReadPla
 		}
 
 		@Override
-		public UsersData mapRow(ResultSet rs, int rowNum)
+		public UsersData mapRow(ResultSet resultSet, int rowNum)
 				throws SQLException {
 
-			Long id = rs.getLong("id");
-			String username = rs.getString("username");
+			final Long id = resultSet.getLong("id");
+			final String username = resultSet.getString("username");
 
-			UsersData data = new UsersData(id, username);
+			final UsersData data = new UsersData(id, username);
 
 			return data;
 
@@ -157,13 +76,11 @@ public class TicketMasterReadPlatformServiceImpl  implements TicketMasterReadPla
 	}
 	
 	@Override
-	public Page<ClientTicketData> retrieveAssignedTicketsForNewClient(SearchSqlQuery searchTicketMaster,String statusType) {
-		AppUser user = this.context.authenticatedUser();
+	public Page<ClientTicketData> retrieveAssignedTicketsForNewClient(SearchSqlQuery searchTicketMaster, String statusType) {
+		final AppUser user = this.context.authenticatedUser();
 		
 		final UserTicketsMapperForNewClient mapper = new UserTicketsMapperForNewClient();
-		//final String sql = "select " + mapper.userTicketSchema();
-
-		
+				
 		StringBuilder sqlBuilder = new StringBuilder(200);
         sqlBuilder.append("select ");
         sqlBuilder.append(mapper.userTicketSchema());
@@ -172,22 +89,17 @@ public class TicketMasterReadPlatformServiceImpl  implements TicketMasterReadPla
         String sqlSearch = searchTicketMaster.getSqlSearch();
         String extraCriteria = "";
 	    if (sqlSearch != null) {
-	    	sqlSearch=sqlSearch.trim();
+	    	sqlSearch = sqlSearch.trim();
 	    	extraCriteria = " and ((select display_name from m_client where id = tckt.client_id) like '%"+sqlSearch+"%' OR" 
 	    			+ " (select mcv.code_value from m_code_value mcv where mcv.id = tckt.problem_code) like '%"+sqlSearch+"%' OR"
 	    			+ " tckt.status like '%"+sqlSearch+"%' OR"
 	    			+ " (select user.username from m_appuser user where tckt.assigned_to = user.id) like '%"+sqlSearch+"%')";
 	    }
 	    if(statusType != null){
-	    	extraCriteria=" and tckt.status='"+statusType+"'";
+	    	extraCriteria =" and tckt.status='"+statusType+"'";
 	    }
 	    sqlBuilder.append(extraCriteria);
 	    
-        /*if (StringUtils.isNotBlank(extraCriteria)) {
-            sqlBuilder.append(extraCriteria);
-        }*/
-
-
         if (searchTicketMaster.isLimited()) {
             sqlBuilder.append(" limit ").append(searchTicketMaster.getLimit());
         }
@@ -196,31 +108,30 @@ public class TicketMasterReadPlatformServiceImpl  implements TicketMasterReadPla
             sqlBuilder.append(" offset ").append(searchTicketMaster.getOffset());
         }
 		
-		return this.paginationHelper.fetchPage(this.jdbcTemplate, "SELECT FOUND_ROWS()",sqlBuilder.toString(),
+		return this.paginationHelper.fetchPage(this.jdbcTemplate, "SELECT FOUND_ROWS()", sqlBuilder.toString(),
 	            new Object[] {}, mapper);
 		
 	}
 	
-
 	@Override
-	public List<TicketMasterData> retrieveClientTicketDetails(Long clientId) {
+	public List<TicketMasterData> retrieveClientTicketDetails(final Long clientId) {
 		try {
-			final ClientTicketMapper mapper = new ClientTicketMapper();
+				final ClientTicketMapper mapper = new ClientTicketMapper();
 
-			final String sql = "select " + mapper.clientOrderLookupSchema()+" and tckt.client_id= ? order by tckt.id DESC ";
+				final String sql = "select " + mapper.clientOrderLookupSchema() + " and tckt.client_id= ? order by tckt.id DESC ";
 
-			return jdbcTemplate.query(sql, mapper, new Object[] { clientId});
+				return jdbcTemplate.query(sql, mapper, new Object[] { clientId});
 			} catch (EmptyResultDataAccessException e) {
-			return null;
-			}
+				return null;
+			  }
 
-			}
+	}
 
-			private static final class ClientTicketMapper implements RowMapper<TicketMasterData> {
+	private static final class ClientTicketMapper implements RowMapper<TicketMasterData> {
 
-			public String clientOrderLookupSchema() {
+		public String clientOrderLookupSchema() {
 				
-			return "tckt.id as id, tckt.priority as priority, tckt.ticket_date as ticketDate, tckt.assigned_to as userId,tckt.source_of_ticket as sourceOfTicket, "
+		return "tckt.id as id, tckt.priority as priority, tckt.ticket_date as ticketDate, tckt.assigned_to as userId,tckt.source_of_ticket as sourceOfTicket, "
 					+" tckt.due_date as dueDate,tckt.description as description,tckt.resolution_description as resolutionDescription, "
 			        + " (select code_value from m_code_value mcv where tckt.problem_code=mcv.id)as problemDescription," 
 					+ " tckt.status as status, "
@@ -230,155 +141,95 @@ public class TicketMasterReadPlatformServiceImpl  implements TicketMasterReadPla
 			        + " (select comments FROM b_ticket_details details where details.ticket_id =tckt.id and "
 			        + " details.id=(select max(id) from b_ticket_details where b_ticket_details.ticket_id = tckt.id)) as lastComment"
 			        + " from b_ticket_master tckt, m_appuser user where tckt.assigned_to = user.id"; 
-			}
+		}
 
-			@Override
-			public TicketMasterData mapRow(final ResultSet rs, final int rowNum) throws SQLException {
+		@Override
+		public TicketMasterData mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {
 
-			final Long id = rs.getLong("id");
-			final String priority = rs.getString("priority");
-			final String status = rs.getString("status");
-			final String LastComment = rs.getString("LastComment");
-			final String problemDescription = rs.getString("problemDescription");
-			final String assignedTo = rs.getString("assignedTo");
-			final String usersId = rs.getString("userId");
-			LocalDate ticketDate=JdbcSupport.getLocalDate(rs,"ticketDate");
-			int userId=new Integer(usersId);
-			String sourceOfTicket=rs.getString("sourceOfTicket");
-			Date dueDate = rs.getTimestamp("dueDate");
-			String description = rs.getString("description");
-			String resolutionDescription = rs.getString("resolutionDescription");
-			return new TicketMasterData(id, priority, status, userId, ticketDate,LastComment,problemDescription,assignedTo,sourceOfTicket,dueDate,description,resolutionDescription);
-			}
-			}
+			final Long id = resultSet.getLong("id");
+			final String priority = resultSet.getString("priority");
+			final String status = resultSet.getString("status");
+			final String LastComment = resultSet.getString("LastComment");
+			final String problemDescription = resultSet.getString("problemDescription");
+			final String assignedTo = resultSet.getString("assignedTo");
+			final String usersId = resultSet.getString("userId");
+			final LocalDate ticketDate = JdbcSupport.getLocalDate(resultSet, "ticketDate");
+			final int userId = new Integer(usersId);
+			final String sourceOfTicket = resultSet.getString("sourceOfTicket");
+			final Date dueDate = resultSet.getTimestamp("dueDate");
+			final String description = resultSet.getString("description");
+			final String resolutionDescription = resultSet.getString("resolutionDescription");
+			return new TicketMasterData(id, priority, status, userId, ticketDate, LastComment, problemDescription, assignedTo, sourceOfTicket,
+					dueDate, description, resolutionDescription);
+		}
+	}
 
-			@Override
-			public TicketMasterData retrieveSingleTicketDetails(Long clientId, Long ticketId) {
-				try {
-					final ClientTicketMapper mapper = new ClientTicketMapper();
-
-					final String sql = "select " + mapper.clientOrderLookupSchema()+" and tckt.client_id= ? and tckt.id=?";
-
-					return jdbcTemplate.queryForObject(sql, mapper, new Object[] {clientId,ticketId});
-					} catch (EmptyResultDataAccessException e) {
+	@Override
+	public TicketMasterData retrieveSingleTicketDetails(final Long clientId, final Long ticketId) {
+		try {
+				final ClientTicketMapper mapper = new ClientTicketMapper();
+				final String sql = "select " + mapper.clientOrderLookupSchema() + " and tckt.client_id= ? and tckt.id=?";
+				return jdbcTemplate.queryForObject(sql, mapper, new Object[] {clientId, ticketId});
+			} catch (EmptyResultDataAccessException e) {
 					return null;
-					}
-
-					}
-
-			@Override
-			public List<EnumOptionData> retrievePriorityData() {
-				EnumOptionData low=PriorityTypeEnum.priorityType(PriorityType.LOW);
-				EnumOptionData medium=PriorityTypeEnum.priorityType(PriorityType.MEDIUM);
-				EnumOptionData high=PriorityTypeEnum.priorityType(PriorityType.HIGH);
-				List<EnumOptionData> priorityType=Arrays.asList(low,medium,high);
-				return priorityType;
 			}
 
-			@Override
-			public List<TicketMasterData> retrieveTicketCloseStatusData() {
-				statusMapper mapper = new statusMapper();
-				String sql = "select " + mapper.schema()+" where mc.code_name='Ticket Status' and order_position = 2 order by mcv.id ";
-				return this.jdbcTemplate.query(sql, mapper, new Object[] {});
-			}
+	}
 
-			@Override
-			public List<TicketMasterData> retrieveClientTicketHistory(
-					Long ticketId) {
-				context.authenticatedUser();
+	@Override
+	public List<EnumOptionData> retrievePriorityData() {
+		EnumOptionData low = PriorityTypeEnum.priorityType(PriorityType.LOW);
+		EnumOptionData medium = PriorityTypeEnum.priorityType(PriorityType.MEDIUM);
+		EnumOptionData high = PriorityTypeEnum.priorityType(PriorityType.HIGH);
+		List<EnumOptionData> priorityType = Arrays.asList(low, medium, high);
+		return priorityType;
+	}
 
-				TicketDataMapper mapper = new TicketDataMapper();
-
-				String sql = "select " + mapper.schema()+" where t.ticket_id=tm.id and t.ticket_id=? order by t.id DESC";
-
-				return this.jdbcTemplate.query(sql, mapper, new Object[] { ticketId});
-			}
-
-			private static final class TicketDataMapper implements
+	@Override
+	public List<TicketMasterData> retrieveClientTicketHistory(final Long ticketId) {
+		
+		context.authenticatedUser();
+		final TicketDataMapper mapper = new TicketDataMapper();
+		String sql = "select " + mapper.schema() + " where t.ticket_id=tm.id and t.ticket_id=? order by t.id DESC";
+		return this.jdbcTemplate.query(sql, mapper, new Object[] { ticketId});
+	}
+	
+	private static final class TicketDataMapper implements
 					RowMapper<TicketMasterData> {
 
-				public String schema() {
-					return " t.id AS id,t.created_date AS createDate,user.username AS assignedTo,t.comments as description," +
-							" t.attachments AS attachments  FROM b_ticket_master tm , b_ticket_details t  "
-						   +" inner join m_appuser user on user.id = t.assigned_to ";
+		public String schema() {
+				return " t.id AS id,t.created_date AS createDate,user.username AS assignedTo,t.comments as description," +
+						" t.attachments AS attachments  FROM b_ticket_master tm , b_ticket_details t  "
+						+" inner join m_appuser user on user.id = t.assigned_to ";
 
-				}
+		}
 
-				@Override
-				public TicketMasterData mapRow(ResultSet rs, int rowNum)
+		@Override
+		public TicketMasterData mapRow(ResultSet resultSet, int rowNum)
 						throws SQLException {
 
-					Long id = rs.getLong("id");
-					LocalDate createdDate=JdbcSupport.getLocalDate(rs,"createDate");
-					String assignedTo = rs.getString("assignedTo");
-					String description = rs.getString("description");
-					String attachments = rs.getString("attachments");
-					String fileName=null;
-					if(attachments!=null){
-					File file=new File(attachments);
-					 fileName=file.getName();
-					}
-					TicketMasterData data = new TicketMasterData(id,createdDate, assignedTo,description,fileName);
-
-					return data;
-
-				}
-
+			final Long id = resultSet.getLong("id");
+			final LocalDate createdDate = JdbcSupport.getLocalDate(resultSet, "createDate");
+			final String assignedTo = resultSet.getString("assignedTo");
+			final String description = resultSet.getString("description");
+			final String attachments = resultSet.getString("attachments");
+			String fileName=null;
+			if(attachments!=null){
+				File file=new File(attachments);
+				fileName=file.getName();
 			}
+			final TicketMasterData data = new TicketMasterData(id, createdDate, assignedTo, description, fileName);
 
+			return data;
+		}
 
-			@Override
-			public List<ClientTicketData> retrieveAssignedTickets() {
-				AppUser user = this.context.authenticatedUser();
+	}
 				
-				final UserTicketsMapper mapper = new UserTicketsMapper();
-
-				final String sql = "select " + mapper.userTicketSchema();
-
-				return jdbcTemplate.query(sql, mapper, new Object[] { });
+	private static final class UserTicketsMapperForNewClient implements RowMapper<ClientTicketData> {
 				
-			}
-			
-			private static final class UserTicketsMapper implements RowMapper<ClientTicketData> {
-				
-				public String userTicketSchema() {
-					return "tckt.client_id as clientId,(select display_name from m_client where id = tckt.client_id) as clientName, tckt.priority as priority, tckt.status as status, tckt.ticket_date as ticketDate, tckt.assigned_to as userId,"+
-							""+"(Select comments from b_ticket_details x where tckt.id=x.ticket_id and x.id=(select max(id) from b_ticket_details y where tckt.id=y.ticket_id)) as LastComment,"+
-							""+"(select mcv.code_value from m_code_value mcv where mcv.id = tckt.problem_code) as problemDescription,"+
-							""+"(select user.username from m_appuser user where tckt.assigned_to = user.id) as assignedTo,"+
-							""+"CONCAT(TIMESTAMPDIFF(day,tckt.ticket_date,Now()) , ' d ',MOD(TIMESTAMPDIFF(hour,tckt.ticket_date,Now()), 24), ' hr ',MOD( TIMESTAMPDIFF(minute,tckt.ticket_date,Now()), 60), ' min ')as timeElapsed,"+
-							""+"tckt.client_id as clientId from b_ticket_master tckt";
-					}
-
-				@Override
-				public ClientTicketData mapRow(ResultSet rs, int rowNum) throws SQLException {
+		public String userTicketSchema() {
 					
-					final String priority = rs.getString("priority");
-					final String status = rs.getString("status");
-					final Long userId = rs.getLong("userId");
-					final LocalDate ticketDate=JdbcSupport.getLocalDate(rs,"ticketDate");
-					final String lastComment = rs.getString("LastComment");
-					final String problemDescription = rs.getString("problemDescription");
-					final String assignedTo = rs.getString("assignedTo");
-					final Long clientId = rs.getLong("clientId");
-					final String timeElapsed = rs.getString("timeElapsed");
-					final String clientName = rs.getString("clientName");
-					
-					return new ClientTicketData(0L, priority, status, userId, ticketDate, lastComment, problemDescription, assignedTo, clientId,timeElapsed,clientName,null,null);
-				}
-				
-			}
-			
-private static final class UserTicketsMapperForNewClient implements RowMapper<ClientTicketData> {
-				
-				public String userTicketSchema() {
-					/*return " SQL_CALC_FOUND_ROWS tckt.id as id, tckt.client_id as clientId,(select display_name from m_client where id = tckt.client_id) as clientName, tckt.priority as priority, tckt.status as status, tckt.ticket_date as ticketDate, tckt.assigned_to as userId,"+
-							""+"(Select comments from b_ticket_details x where tckt.id=x.ticket_id and x.id=(select max(id) from b_ticket_details y where tckt.id=y.ticket_id)) as LastComment,"+
-							""+"(select mcv.code_value from m_code_value mcv where mcv.id = tckt.problem_code) as problemDescription,"+
-							""+"(select user.username from m_appuser user where tckt.assigned_to = user.id) as assignedTo,"+
-							""+"CONCAT(TIMESTAMPDIFF(day,tckt.ticket_date,Now()) , ' d ',MOD(TIMESTAMPDIFF(hour,tckt.ticket_date,Now()), 24), ' hr ',MOD( TIMESTAMPDIFF(minute,tckt.ticket_date,Now()), 60), ' min ')as timeElapsed,"+
-							""+"tckt.client_id as clientId from b_ticket_master tckt ";*/
-					return " SQL_CALC_FOUND_ROWS tckt.id AS id,tckt.client_id AS clientId,mct.display_name as clientName,tckt.priority AS priority,"+
+			return " SQL_CALC_FOUND_ROWS tckt.id AS id,tckt.client_id AS clientId,mct.display_name as clientName,tckt.priority AS priority,"+
 							"tckt.status AS status,tckt.ticket_date AS ticketDate,"+
 							"(SELECT user.username FROM m_appuser user WHERE tckt.createdby_id = user.id) AS created_user,"+
 							"tckt.assigned_to AS userId,"+
@@ -390,46 +241,42 @@ private static final class UserTicketsMapperForNewClient implements RowMapper<Cl
 							"IFNull((SELECT user.username FROM m_appuser user WHERE tckt.lastmodifiedby_id = user.id),'Null') AS closedby_user "+
 							"FROM b_ticket_master tckt left join m_client mct on mct.id = tckt.client_id";
       
-					}
+		}
 
-				@Override
-				public ClientTicketData mapRow(ResultSet rs, int rowNum) throws SQLException {
+		@Override
+		public ClientTicketData mapRow(ResultSet resultSet, int rowNum) throws SQLException {
 					
-					final Long id = rs.getLong("id");
-					final String priority = rs.getString("priority");
-					final String status = rs.getString("status");
-					final Long userId = rs.getLong("userId");
-					final LocalDate ticketDate=JdbcSupport.getLocalDate(rs,"ticketDate");
-					final String lastComment = rs.getString("LastComment");
-					final String problemDescription = rs.getString("problemDescription");
-					final String assignedTo = rs.getString("assignedTo");
-					final Long clientId = rs.getLong("clientId");
-					final String timeElapsed = rs.getString("timeElapsed");
-					final String clientName = rs.getString("clientName");
-					final String createUser=rs.getString("created_user");
-					final String closedByuser=rs.getString("closedby_user");
+			final Long id = resultSet.getLong("id");
+			final String priority = resultSet.getString("priority");
+			final String status = resultSet.getString("status");
+			final Long userId = resultSet.getLong("userId");
+			final LocalDate ticketDate = JdbcSupport.getLocalDate(resultSet, "ticketDate");
+			final String lastComment = resultSet.getString("LastComment");
+			final String problemDescription = resultSet.getString("problemDescription");
+			final String assignedTo = resultSet.getString("assignedTo");
+			final Long clientId = resultSet.getLong("clientId");
+			final String timeElapsed = resultSet.getString("timeElapsed");
+			final String clientName = resultSet.getString("clientName");
+			final String createUser = resultSet.getString("created_user");
+			final String closedByuser = resultSet.getString("closedby_user");
 					
-					return new ClientTicketData(id, priority, status, userId, ticketDate, lastComment, problemDescription, assignedTo, clientId,timeElapsed,clientName,createUser,closedByuser);
-				}
+			return new ClientTicketData(id, priority, status, userId, ticketDate, lastComment, problemDescription,
+					assignedTo, clientId, timeElapsed, clientName, createUser, closedByuser);
+		}
 				
-			}
-			
-			@Override
-			public TicketMasterData retrieveTicket(Long clientId, Long ticketId) {
-
-				try {
-					final ClientTicketMapper mapper = new ClientTicketMapper();
-
-					final String sql = "select " + mapper.clientOrderLookupSchema()+" and tckt.client_id= ? and tckt.id=?";
-
-					return jdbcTemplate.queryForObject(sql, mapper, new Object[] { clientId,ticketId});
-					} catch (EmptyResultDataAccessException e) {
-					return null;
-					}
-
-					
-			}
-
 	}
+			
+	@Override
+	public TicketMasterData retrieveTicket(final Long clientId, final Long ticketId) {
 
-
+		try {
+				final ClientTicketMapper mapper = new ClientTicketMapper();
+				final String sql = "select " + mapper.clientOrderLookupSchema() + " and tckt.client_id= ? and tckt.id=?";
+				
+				return jdbcTemplate.queryForObject(sql, mapper, new Object[] { clientId, ticketId});
+			} catch (EmptyResultDataAccessException e) {
+					return null;
+			}
+	}
+	
+}

@@ -12,33 +12,18 @@ import org.mifosplatform.infrastructure.core.service.Page;
 
 public interface TicketMasterReadPlatformService {
 
-	List<ProblemsData> retrieveProblemData();
-	
-	/*List<ProblemsData> retrieveStatusData();*/
-
-
 	List<UsersData> retrieveUsers();
 
 	List<TicketMasterData> retrieveClientTicketDetails(Long clientId);
 
 	TicketMasterData retrieveSingleTicketDetails(Long clientId, Long ticketId);
 
-	List<TicketMasterData> retrieveTicketStatusData();
-
-
 	List<EnumOptionData> retrievePriorityData();
-
-
-	List<TicketMasterData> retrieveTicketCloseStatusData();
-
 
 	List<TicketMasterData> retrieveClientTicketHistory(Long ticketId);
 
-
-	List<ClientTicketData> retrieveAssignedTickets();
-
 	TicketMasterData retrieveTicket(Long clientId, Long ticketId);
-	Page<ClientTicketData> retrieveAssignedTicketsForNewClient(SearchSqlQuery searchTicketMaster, String statusType);
 	
+	Page<ClientTicketData> retrieveAssignedTicketsForNewClient(SearchSqlQuery searchTicketMaster, String statusType);
 	
 }

@@ -9,9 +9,6 @@ import org.mifosplatform.infrastructure.documentmanagement.command.DocumentComma
 
 public interface TicketMasterWritePlatformService {
 
-	/*CommandProcessingResult createTicketMaster(TicketMasterCommand command,
-			Long clieniId);*/
-	
 	CommandProcessingResult createTicketMaster(JsonCommand command);
 
 	Long upDateTicketDetails(TicketMasterCommand ticketMasterCommand,DocumentCommand documentCommand, Long ticketId,InputStream inputStream,String ticketURL);

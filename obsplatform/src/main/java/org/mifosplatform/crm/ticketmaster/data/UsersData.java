@@ -5,10 +5,9 @@ public class UsersData {
 	private Long id;
 	private String userName;
 
-	public UsersData(Long id, String username) {
-           this.id=id;
-           this.userName=username;
-	
+	public UsersData(final Long id, final String username) {
+		this.id = id;
+		this.userName = username;
 	}
 
 	public Long getId() {
@@ -18,6 +17,12 @@ public class UsersData {
 	public String getUserName() {
 		return userName;
 	}
-
 	
 }
+
+
+
+
+
+
+
