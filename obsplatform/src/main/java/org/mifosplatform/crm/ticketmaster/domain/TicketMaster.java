@@ -14,12 +14,11 @@ import javax.persistence.Table;
 import org.joda.time.LocalDate;
 import org.mifosplatform.crm.ticketmaster.command.TicketMasterCommand;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
-import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
-import org.mifosplatform.useradministration.domain.AppUser;
 
 @Entity
 @Table(name = "b_ticket_master")
 public class TicketMaster {
+	
 	@Id
 	@GeneratedValue
 	@Column(name = "id")
@@ -43,7 +42,7 @@ public class TicketMaster {
 	@Column(name = "status")
 	private String status;
 	
-	@Column(name="status_code")
+	@Column(name = "status_code")
 	private Integer statusCode;
 
 	@Column(name = "resolution_description")
@@ -67,132 +66,112 @@ public class TicketMaster {
 	@Column(name="source_of_ticket", length=50 )
 	private String sourceOfTicket;
 	
-	@Column(name="due_date")
+	@Column(name = "due_date")
 	private Date dueDate;
 	
-	@Column(name="lastmodifiedby_id")
+	@Column(name = "lastmodifiedby_id")
 	private Long lastModifyId;
 	
-	@Column(name="lastmodified_date")
+	@Column(name = "lastmodified_date")
 	private Date lastModifydate;
 
-	
 	public TicketMaster() {
-		// TODO Auto-generated constructor stub
-	}
-	
-public static TicketMaster fromJson(final JsonCommand command) throws ParseException {
-	
-	String priority = command.stringValueOfParameterNamed("priority");
-	Integer problemCode = command.integerValueOfParameterNamed("problemCode");
-	String description = command.stringValueOfParameterNamed("description");
-	Integer assignedTo = command.integerValueOfParameterNamed("assignedTo");
-	
-	
-//	String startDateString = command.stringValueOfParameterNamed("ticketDate");
-	LocalDate startDateString0=command.localDateValueOfParameterNamed("ticketDate");
-	String startDateString =startDateString0.toString()+command.stringValueOfParameterNamed("ticketTime");
-	DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	Date ticketDate = df.parse(startDateString);
-	
-	String statusCode = command.stringValueOfParameterNamed("problemDescription");
-	Long clientId = command.getClientId();
-	String sourceOfTicket = command.stringValueOfParameterNamed("sourceOfTicket");
-	String dueDate = command.stringValueOfParameterNamed("dueTime");
-	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	Date dueTime;
-	if(dueDate.equalsIgnoreCase("")){
-		dueTime=null;
 		
-	}else{
-		dueTime = dateFormat.parse(dueDate);
 	}
 	
-	/*Integer createdbyId = command.getI*/
-	return new TicketMaster(clientId, priority,ticketDate, problemCode,description,statusCode, null, assignedTo,null,null,null,sourceOfTicket,dueTime);
-}
+	public static TicketMaster fromJson(final JsonCommand command) throws ParseException {
+	
+		final String priority = command.stringValueOfParameterNamed("priority");
+		final Integer problemCode = command.integerValueOfParameterNamed("problemCode");
+		final String description = command.stringValueOfParameterNamed("description");
+		final Integer assignedTo = command.integerValueOfParameterNamed("assignedTo");
+		
+		final LocalDate startDate = command.localDateValueOfParameterNamed("ticketDate");
+		final String startDateString = startDate.toString() + command.stringValueOfParameterNamed("ticketTime");
+		final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		final Date ticketDate = df.parse(startDateString);
+	
+		final String statusCode = command.stringValueOfParameterNamed("problemDescription");
+		final Long clientId = command.getClientId();
+		final String sourceOfTicket = command.stringValueOfParameterNamed("sourceOfTicket");
+		final String dueDate = command.stringValueOfParameterNamed("dueTime");
+		final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Date dueTime;
+		if(dueDate.equalsIgnoreCase("")){
+				dueTime=null;
+		}else{
+			dueTime = dateFormat.parse(dueDate);
+		}
+	
+		return new TicketMaster(clientId, priority,ticketDate, problemCode,description,statusCode, null, 
+					assignedTo, null, null, null, sourceOfTicket, dueTime);
+	}
 
-	public TicketMaster(Integer statusCode, Integer assignedTo) {
-		this.clientId=null;
-		this.priority=null;
-		this.ticketDate=null;
-		this.problemCode=null;
-		this.description=null;
-		this.status=null;
+	public TicketMaster(final Integer statusCode, final Integer assignedTo) {
+		
+		this.clientId = null;
+		this.priority = null;
+		this.ticketDate = null;
+		this.problemCode = null;
+		this.description = null;
+		this.status = null;
 		this.statusCode = statusCode;
-		this.source=null;
-		this.resolutionDescription=null;
-		this.assignedTo=assignedTo;	
+		this.source = null;
+		this.resolutionDescription = null;
+		this.assignedTo = assignedTo;	
 		this.createdDate = null;
 		this.createdbyId = null;
 	}
 
-
-
-	public TicketMaster(Long clientId, String priority,
-			Date ticketDate, Integer problemCode, String description,
-			String status, String resolutionDescription, Integer assignedTo, Integer statusCode,
-			Date createdDate, Integer createdbyId,String sourceOfTicket,Date dueTime) {
+	public TicketMaster(final Long clientId, final String priority, final Date ticketDate, final Integer problemCode,
+			final String description, final String status, final String resolutionDescription, 
+			final Integer assignedTo, final Integer statusCode, final Date createdDate, final Integer createdbyId,
+			final String sourceOfTicket, final Date dueTime) {
 		
-		this.clientId=clientId;
-		this.priority=priority;
-		this.ticketDate=ticketDate;
-		this.problemCode=problemCode;
-		this.description=description;
-		this.status="OPEN";
+		this.clientId = clientId;
+		this.priority = priority;
+		this.ticketDate = ticketDate;
+		this.problemCode = problemCode;
+		this.description = description;
+		this.status = "OPEN";
 		this.statusCode = statusCode;
-		this.source="Manual";
-		this.resolutionDescription=resolutionDescription;
-		this.assignedTo=assignedTo;	
+		this.source = "Manual";
+		this.resolutionDescription = resolutionDescription;
+		this.assignedTo = assignedTo;	
 		this.createdDate = new Date();
 		this.createdbyId = null;
-		this.sourceOfTicket=sourceOfTicket;
-		this.dueDate=dueTime;
+		this.sourceOfTicket = sourceOfTicket;
+		this.dueDate = dueTime;
+		
 	}
-
-
 
 	public String getSource() {
 		return source;
 	}
 
-
-
 	public Long getId() {
 		return id;
 	}
-
-
 
 	public Long getClientId() {
 		return clientId;
 	}
 
-
-
 	public String getPriority() {
 		return priority;
 	}
-
-
 
 	public Integer getProblemCode() {
 		return problemCode;
 	}
 
-
-
 	public String getDescription() {
 		return description;
 	}
 
-
-
 	public Date getTicketDate() {
 		return ticketDate;
 	}
-
-
 
 	public String getStatus() {
 		return status;
@@ -202,13 +181,9 @@ public static TicketMaster fromJson(final JsonCommand command) throws ParseExcep
 		return statusCode;
 	}
 
-
-
 	public String getResolutionDescription() {
 		return resolutionDescription;
 	}
-
-
 
 	public Integer getAssignedTo() {
 		return assignedTo;
@@ -218,23 +193,21 @@ public static TicketMaster fromJson(final JsonCommand command) throws ParseExcep
 		return createdDate;
 	}
 
-	public void updateTicket(TicketMasterCommand command) {
+	public void updateTicket(final TicketMasterCommand command) {
 		this.statusCode = command.getStatusCode();
 		this.assignedTo = command.getAssignedTo();
 	}
 
-
-	public void closeTicket(JsonCommand command,Long userId) {
+	public void closeTicket(final JsonCommand command, final Long userId) {
+		
 		this.status = "CLOSED";
 	    this.statusCode = Integer.parseInt(command.stringValueOfParameterNamed("status"));
-		this.resolutionDescription=command.stringValueOfParameterNamed("resolutionDescription");
-		this.closedDate=new Date();
-		this.lastModifyId=userId;
-		this.lastModifydate=new Date();
+		this.resolutionDescription = command.stringValueOfParameterNamed("resolutionDescription");
+		this.closedDate = new Date();
+		this.lastModifyId = userId;
+		this.lastModifydate = new Date();
 		
 	}
-	
-	
 	
 	public Date getClosedDate() {
 		return closedDate;
@@ -250,12 +223,8 @@ public static TicketMaster fromJson(final JsonCommand command) throws ParseExcep
 	/**
 	 * @param createdbyId the createdbyId to set
 	 */
-	public void setCreatedbyId(Long createdbyId) {
+	public void setCreatedbyId(final Long createdbyId) {
 		this.createdbyId = createdbyId;
 	}
-
-
-
 	
-	 
 }

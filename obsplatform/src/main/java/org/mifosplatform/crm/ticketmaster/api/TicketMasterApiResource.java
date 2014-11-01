@@ -26,14 +26,12 @@ import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.mifosplatform.crm.clientprospect.service.SearchSqlQuery;
 import org.mifosplatform.crm.ticketmaster.data.ClientTicketData;
-import org.mifosplatform.crm.ticketmaster.data.ProblemsData;
 import org.mifosplatform.crm.ticketmaster.data.TicketMasterData;
 import org.mifosplatform.crm.ticketmaster.data.UsersData;
 import org.mifosplatform.crm.ticketmaster.domain.TicketDetail;
 import org.mifosplatform.crm.ticketmaster.domain.TicketDetailsRepository;
 import org.mifosplatform.crm.ticketmaster.service.TicketMasterReadPlatformService;
 import org.mifosplatform.crm.ticketmaster.service.TicketMasterWritePlatformService;
-import org.mifosplatform.infrastructure.core.api.ApiParameterHelper;
 import org.mifosplatform.infrastructure.core.api.ApiRequestParameterHelper;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
@@ -54,21 +52,21 @@ import org.springframework.stereotype.Component;
 
 import com.google.gson.JsonElement;
 
-
 @Path("/tickets")
 @Component
 @Scope("singleton")
 public class TicketMasterApiResource {
 		
 		private final String resourceNameForPermission = "TICKET";
-		private TicketMasterWritePlatformService ticketMasterWritePlatformService;
-		private TicketMasterReadPlatformService ticketMasterReadPlatformService ;
-		private  DefaultToApiJsonSerializer<TicketMasterData> toApiJsonSerializer;
-		private  DefaultToApiJsonSerializer<ClientTicketData> clientToApiJsonSerializer;
-		private ApiRequestParameterHelper apiRequestParameterHelper;
-		private TicketDetailsRepository detailsRepository;
-		private PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
-		private PlatformSecurityContext context;
+		private final TicketMasterWritePlatformService ticketMasterWritePlatformService;
+		private final TicketMasterReadPlatformService ticketMasterReadPlatformService ;
+		private final DefaultToApiJsonSerializer<TicketMasterData> toApiJsonSerializer;
+		private final DefaultToApiJsonSerializer<ClientTicketData> clientToApiJsonSerializer;
+		private final DefaultToApiJsonSerializer<MCodeData> statusToApiJsonSerializer;
+		private final ApiRequestParameterHelper apiRequestParameterHelper;
+		private final TicketDetailsRepository detailsRepository;
+		private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
+		private final PlatformSecurityContext context;
 		final private MCodeReadPlatformService codeReadPlatformService;
 		private final FromJsonHelper fromApiJsonHelper;
 		@Autowired
@@ -77,7 +75,8 @@ public class TicketMasterApiResource {
 										final ApiRequestParameterHelper apiRequestParameterHelper, final TicketDetailsRepository detailsRepository,
 										final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final PlatformSecurityContext context,
 										final MCodeReadPlatformService codeReadPlatformService,
-										final FromJsonHelper fromApiJsonHelper)	{
+										final FromJsonHelper fromApiJsonHelper,
+										final DefaultToApiJsonSerializer<MCodeData> statusToApiJsonSerializer)	{
 			this.ticketMasterWritePlatformService = ticketMasterWritePlatformService;
 			this.ticketMasterReadPlatformService = ticketMasterReadPlatformService;
 		    this.toApiJsonSerializer = toApiJsonSerializer;
@@ -86,10 +85,12 @@ public class TicketMasterApiResource {
 			this.detailsRepository = detailsRepository;
 			this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
 			this.context = context;
-			this.codeReadPlatformService=codeReadPlatformService;
-			this.fromApiJsonHelper=fromApiJsonHelper;
+			this.codeReadPlatformService = codeReadPlatformService;
+			this.fromApiJsonHelper = fromApiJsonHelper;
+			this.statusToApiJsonSerializer = statusToApiJsonSerializer;
 		}
-		private final Set<String> RESPONSE_PARAMETERS = new HashSet<String>(Arrays.asList("id","priorityType","problemsDatas","usersData","status","assignedTo","userName","ticketDate","lastComment","masterData"));   
+		private final Set<String> RESPONSE_PARAMETERS = new HashSet<String>(Arrays.asList("id", "priorityType", "problemsDatas", "usersData", "status", "assignedTo", 
+														"userName", "ticketDate", "lastComment", "masterData"));   
 
 		
 
@@ -103,44 +104,60 @@ public class TicketMasterApiResource {
 	    @Path("{clientId}")
 		@Consumes({ MediaType.APPLICATION_JSON })
 		@Produces({ MediaType.APPLICATION_JSON })
-		public String createTicketMaster(@PathParam("clientId") final Long clientId,final String jsonRequestBody) {
-			CommandProcessingResult result=null;
-			Long userId=null;
-			SecurityContext context = SecurityContextHolder.getContext();
+		public String createTicketMaster(@PathParam("clientId") final Long clientId, final String jsonRequestBody) {
+			CommandProcessingResult result = null;
+			Long userId = null;
+			final SecurityContext context = SecurityContextHolder.getContext();
         	if (context.getAuthentication() != null) {
-        		AppUser appUser=this.context.authenticatedUser();
-        		userId=appUser.getId();
+        		final AppUser appUser = this.context.authenticatedUser();
+        		userId = appUser.getId();
         	}
-        	if(userId !=null){	 
-			final CommandWrapper commandRequest = new CommandWrapperBuilder().createTicketMaster(clientId).withJson(jsonRequestBody).build();
-		     result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-		     return this.toApiJsonSerializer.serialize(result);
+        	if(userId != null){	 
+        		final CommandWrapper commandRequest = new CommandWrapperBuilder().createTicketMaster(clientId).withJson(jsonRequestBody).build();
+        		result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+        		return this.toApiJsonSerializer.serialize(result);
         	}else{
-			 final JsonElement parsedCommand = this.fromApiJsonHelper.parse(jsonRequestBody.toString());
-			 final JsonCommand command = JsonCommand.from(jsonRequestBody.toString(),parsedCommand,this.fromApiJsonHelper,"TICKET",clientId,
-					 null,null,clientId,null,null,null,null,null,null,null);
-		     result =this.ticketMasterWritePlatformService.createTicketMaster(command);
-		     return this.toApiJsonSerializer.serialize(result);
+        		final JsonElement parsedCommand = this.fromApiJsonHelper.parse(jsonRequestBody.toString());
+        		final JsonCommand command = JsonCommand.from(jsonRequestBody.toString(), parsedCommand, this.fromApiJsonHelper, "TICKET", clientId,
+        													null, null, clientId, null, null, null, null, null, null, null);
+        		result =this.ticketMasterWritePlatformService.createTicketMaster(command);
+        		return this.toApiJsonSerializer.serialize(result);
         	}
 		}	
-			
-			
-			
+		
+		/**
+		 * Method to Close Ticket
+		 * @param ticketId
+		 * @param jsonRequestBody
+		 * @return
+		 */
+		@PUT
+		@Path("{ticketId}")
+		@Consumes({ MediaType.APPLICATION_JSON })
+		@Produces({ MediaType.APPLICATION_JSON })
+		public String closeTicket(@PathParam("ticketId") final Long ticketId, final String jsonRequestBody) {
+			final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteTicketMaster(ticketId).withJson(jsonRequestBody).build();
+			final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+			return this.toApiJsonSerializer.serialize(result);
+		}
+		
+		
+		/**
+		 * Listing tickets
+		 * */		
 		@GET
 		@Path("alltickets")
 		@Consumes({ MediaType.APPLICATION_JSON })
 		@Produces({ MediaType.APPLICATION_JSON })
-		public String assignedTicketsForUserNewClient(@Context final UriInfo uriInfo, @QueryParam("sqlSearch") final String sqlSearch, @QueryParam("limit") final Integer limit,
-				@QueryParam("offset") final Integer offset,@QueryParam("statusType") final String statusType){
+		public String assignedAllTickets(@Context final UriInfo uriInfo, @QueryParam("sqlSearch") final String sqlSearch,
+				@QueryParam("limit") final Integer limit, @QueryParam("offset") final Integer offset, @QueryParam("statusType") final String statusType){
 			
 			context.authenticatedUser().validateHasReadPermission(resourceNameForPermission);
-			final SearchSqlQuery searchTicketMaster =SearchSqlQuery.forSearch(sqlSearch, offset,limit );
+			final SearchSqlQuery searchTicketMaster = SearchSqlQuery.forSearch(sqlSearch, offset,limit );
 		    final Page<ClientTicketData> data = this.ticketMasterReadPlatformService.retrieveAssignedTicketsForNewClient(searchTicketMaster,statusType);
-		
-		//final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		    
 	        return this.clientToApiJsonSerializer.serialize(data);
 		}
-		
 		
 		/**
 		 * Method for Retrieving Ticket Details for template
@@ -151,20 +168,20 @@ public class TicketMasterApiResource {
 		@Path("template")
 		@Consumes({ MediaType.APPLICATION_JSON })
 		@Produces({ MediaType.APPLICATION_JSON })
-		public String retrieveTicketMasterTemplateData(@Context final UriInfo uriInfo) {
-
+		public String retrieveTicketMasterTemplateData(@Context final UriInfo uriInfo, @QueryParam("templateFor") final String templateFor) {
+			
 			context.authenticatedUser().validateHasReadPermission(resourceNameForPermission);
-
-			Set<String> typicalResponseParameters = new HashSet<String>(Arrays.asList("statusType"));
-			Collection<MCodeData> sourceData = codeReadPlatformService.getCodeValue("Ticket Source");
-			Set<String> responseParameters = ApiParameterHelper.extractFieldsForResponseIfProvided(uriInfo.getQueryParameters());
-			if (responseParameters.isEmpty()) {
-				responseParameters.addAll(typicalResponseParameters);
-			}
-			responseParameters.addAll(RESPONSE_PARAMETERS);
-			TicketMasterData templateData = handleTemplateRelatedData(responseParameters,null,sourceData);
 			final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-			return this.toApiJsonSerializer.serialize(settings, templateData, responseParameters);
+			
+			if(templateFor != null && "closeticket".equalsIgnoreCase(templateFor)){
+				final Collection<MCodeData> closedStatusdata = this.codeReadPlatformService.getCodeValue("Ticket Status", "2");
+				return this.statusToApiJsonSerializer.serialize(settings, closedStatusdata, RESPONSE_PARAMETERS);
+				
+			}else{
+				final Collection<MCodeData> sourceData = codeReadPlatformService.getCodeValue("Ticket Source");
+				final TicketMasterData templateData = handleTicketTemplateData(sourceData);
+				return this.toApiJsonSerializer.serialize(settings, templateData, RESPONSE_PARAMETERS);
+			}
 		}
 		
 		/**
@@ -178,7 +195,6 @@ public class TicketMasterApiResource {
 	    @Consumes({MediaType.APPLICATION_JSON})
 	    @Produces({MediaType.APPLICATION_JSON})
 	    public String retrieveSingleClientTicketDetails(@PathParam("clientId") final Long clientId, @Context final UriInfo uriInfo) {
-
 
 			context.authenticatedUser().validateHasReadPermission(resourceNameForPermission);
 	        final List<TicketMasterData> data = this.ticketMasterReadPlatformService.retrieveClientTicketDetails(clientId);
@@ -197,33 +213,19 @@ public class TicketMasterApiResource {
 	    @Path("{clientId}/update/{ticketId}")
 	    @Consumes({MediaType.APPLICATION_JSON})
 	    @Produces({MediaType.APPLICATION_JSON})
-	    public String retrieveClientSingleTicketDetails(@PathParam("clientId")final Long clientId ,@PathParam("ticketId") final Long ticketId, @Context final UriInfo uriInfo) {
+	    public String retrieveClientSingleTicketDetails(@PathParam("clientId")final Long clientId , @PathParam("ticketId") final Long ticketId,
+	    												@Context final UriInfo uriInfo) {
 	    	
 	    	context.authenticatedUser().validateHasReadPermission(resourceNameForPermission);
-	    	TicketMasterData data = this.ticketMasterReadPlatformService.retrieveSingleTicketDetails(clientId,ticketId);
-	         data = handleTemplateRelatedData(RESPONSE_PARAMETERS,data,null);
-	         List<TicketMasterData> Statusdata = this.ticketMasterReadPlatformService.retrieveTicketStatusData();
-	         data.setStatusData(Statusdata);
-	         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-	         return this.toApiJsonSerializer.serialize(settings, data, RESPONSE_PARAMETERS);
+	    	final TicketMasterData data = this.ticketMasterReadPlatformService.retrieveSingleTicketDetails(clientId, ticketId);
+	        final Collection<MCodeData> statusdata = this.codeReadPlatformService.getCodeValue("Ticket Status", "1");
+	        data.setStatusData(statusdata);
+	        final List<UsersData>  userData = this.ticketMasterReadPlatformService.retrieveUsers();
+	        data.setUsersData(userData);
+	        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+	        return this.toApiJsonSerializer.serialize(settings, data, RESPONSE_PARAMETERS);
 	    }
 	   
-		/**
-		 * Method to Close Ticket
-		 * @param ticketId
-		 * @param jsonRequestBody
-		 * @return
-		 */
-		@PUT
-		@Path("{ticketId}")
-		@Consumes({ MediaType.APPLICATION_JSON })
-		@Produces({ MediaType.APPLICATION_JSON })
-		public String closeTicket(@PathParam("ticketId") final Long ticketId,final String jsonRequestBody) {
-			final CommandWrapper commandRequest = new CommandWrapperBuilder().closeTicketMaster(ticketId).withJson(jsonRequestBody).build();
-			final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-			return this.toApiJsonSerializer.serialize(result);
-		}
-		
 		/**
 		 * Method to retrieve Ticket History
 		 * @param ticketId
@@ -237,13 +239,13 @@ public class TicketMasterApiResource {
 	    public String ticketHistory(@PathParam("ticketId") final Long ticketId, @Context final UriInfo uriInfo) {
 			
 			context.authenticatedUser().validateHasReadPermission(resourceNameForPermission);
-			 String description=this.ticketMasterWritePlatformService.retrieveTicketProblems(ticketId);
-	         final List<TicketMasterData> data = this.ticketMasterReadPlatformService.retrieveClientTicketHistory(ticketId);
+			final String description = this.ticketMasterWritePlatformService.retrieveTicketProblems(ticketId);
+	        final List<TicketMasterData> data = this.ticketMasterReadPlatformService.retrieveClientTicketHistory(ticketId);
 	        
-	        TicketMasterData masterData=new TicketMasterData(description,data);
+	        final TicketMasterData masterData = new TicketMasterData(description,data);
              
-	         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-	         return this.toApiJsonSerializer.serialize(settings, masterData, RESPONSE_PARAMETERS);
+	        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+	        return this.toApiJsonSerializer.serialize(settings, masterData, RESPONSE_PARAMETERS);
 	        
 	    }
 		
@@ -259,34 +261,14 @@ public class TicketMasterApiResource {
 		public Response downloadFile(@PathParam("ticketId") final Long ticketId) {
 
 			context.authenticatedUser().validateHasReadPermission(resourceNameForPermission);
-			TicketDetail ticketDetail = this.detailsRepository.findOne(ticketId);
-
-			String printFileName = ticketDetail.getAttachments();
-
-			File file = new File(printFileName);
-			ResponseBuilder response = Response.ok(file);
-			response.header("Content-Disposition", "attachment; filename=\""+ printFileName + "\"");
+			final TicketDetail ticketDetail = this.detailsRepository.findOne(ticketId);
+			final String printFileName = ticketDetail.getAttachments();
+			final File file = new File(printFileName);
+			final ResponseBuilder response = Response.ok(file);
+			response.header("Content-Disposition", "attachment; filename=\"" + printFileName + "\"");
 			response.header("Content-Type", "application/pdf");
 			return response.build();
 		}
-		
-		/**
-		 * Method to get all the tickets and associated for user
-		 * @param uriInfo
-		 * @return
-		 */
-		@GET
-		@Path("assignedTickets")
-		@Consumes({ MediaType.APPLICATION_JSON })
-		@Produces({ MediaType.APPLICATION_JSON })
-		public String assignedTicketsForUser(@Context final UriInfo uriInfo){
-		
-			context.authenticatedUser().validateHasReadPermission(resourceNameForPermission);
-		    final List<ClientTicketData> data = this.ticketMasterReadPlatformService.retrieveAssignedTickets();
-		    final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-	         return this.clientToApiJsonSerializer.serialize(settings, data, RESPONSE_PARAMETERS);
-		}
-	
 		
 		/**
 		 * Method to handle Template Data
@@ -294,26 +276,25 @@ public class TicketMasterApiResource {
 		 * @param singleTicketData
 		 * @return
 		 */
-		private TicketMasterData handleTemplateRelatedData(final Set<String> responseParameters,TicketMasterData singleTicketData,Collection<MCodeData> sourceData) {
-			List<EnumOptionData> priorityData = this.ticketMasterReadPlatformService.retrievePriorityData();
-			List<TicketMasterData> closedStatusdata = this.ticketMasterReadPlatformService.retrieveTicketCloseStatusData();
-			List<ProblemsData> datas=this.ticketMasterReadPlatformService.retrieveProblemData();
-			List<UsersData>  userData=this.ticketMasterReadPlatformService.retrieveUsers();
-			singleTicketData= new TicketMasterData(closedStatusdata,datas,userData,singleTicketData,priorityData,sourceData);
+		private TicketMasterData handleTicketTemplateData(final Collection<MCodeData> sourceData) {
+			final List<EnumOptionData> priorityData = this.ticketMasterReadPlatformService.retrievePriorityData();
+			final Collection<MCodeData> datas = this.codeReadPlatformService.getCodeValue("Problem Code");
+			final List<UsersData>  userData = this.ticketMasterReadPlatformService.retrieveUsers();
 			
-			return  singleTicketData;
+			return  new TicketMasterData(datas, userData, priorityData, sourceData);
 		}
 		
-		 @GET
-		    @Path("{clientId}/{ticketId}")
-		    @Consumes({MediaType.APPLICATION_JSON})
-		    @Produces({MediaType.APPLICATION_JSON})
-		    public String retrieveClientSingleTicket(@PathParam("clientId")final Long clientId ,@PathParam("ticketId") final Long ticketId, @Context final UriInfo uriInfo) {
+		@GET
+		@Path("{clientId}/{ticketId}")
+		@Consumes({MediaType.APPLICATION_JSON})
+		@Produces({MediaType.APPLICATION_JSON})
+		public String retrieveClientSingleTicket(@PathParam("clientId")final Long clientId, @PathParam("ticketId") final Long ticketId, @Context final UriInfo uriInfo) {
 		  
-			 	context.authenticatedUser().validateHasReadPermission(resourceNameForPermission);
-		    	TicketMasterData data = this.ticketMasterReadPlatformService.retrieveTicket(clientId,ticketId);
-		         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-		         return this.toApiJsonSerializer.serialize(settings, data, RESPONSE_PARAMETERS);
-		    }
+			context.authenticatedUser().validateHasReadPermission(resourceNameForPermission);
+		    final TicketMasterData data = this.ticketMasterReadPlatformService.retrieveTicket(clientId, ticketId);
+		    final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		    return this.toApiJsonSerializer.serialize(settings, data, RESPONSE_PARAMETERS);
+		     
+		}
+		 
 }
-

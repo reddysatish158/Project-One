@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,8 @@ import org.mifosplatform.infrastructure.dataqueries.service.ReadReportingService
 import org.mifosplatform.infrastructure.jobs.annotation.CronTarget;
 import org.mifosplatform.infrastructure.jobs.service.JobName;
 import org.mifosplatform.infrastructure.jobs.service.MiddlewareJobConstants;
+import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
+import org.mifosplatform.organisation.mcodevalues.service.MCodeReadPlatformService;
 import org.mifosplatform.organisation.message.data.BillingMessageDataForProcessing;
 import org.mifosplatform.organisation.message.service.BillingMessageDataWritePlatformService;
 import org.mifosplatform.organisation.message.service.BillingMesssageReadPlatformService;
@@ -106,6 +109,7 @@ private final ConfigurationRepository globalConfigurationRepository;
 private final TicketMasterApiResource ticketMasterApiResource;
 private final TicketMasterReadPlatformService ticketMasterReadPlatformService;
 private final OrderRepository orderRepository;
+private final MCodeReadPlatformService codeReadPlatformService;
 private  String ReceiveMessage;
 
 
@@ -124,7 +128,8 @@ final EntitlementWritePlatformService entitlementWritePlatformService,final Read
 final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,final OrderRepository orderRepository,
 final ConfigurationRepository globalConfigurationRepository,
 final TicketMasterApiResource ticketMasterApiResource, 
-final TicketMasterReadPlatformService ticketMasterReadPlatformService) {
+final TicketMasterReadPlatformService ticketMasterReadPlatformService,
+final MCodeReadPlatformService codeReadPlatformService) {
 
 this.sheduleJobReadPlatformService = sheduleJobReadPlatformService;
 this.invoiceClient = invoiceClient;
@@ -140,15 +145,15 @@ this.billingMesssageReadPlatformService = billingMesssageReadPlatformService;
 this.messagePlatformEmailService = messagePlatformEmailService;
 this.entitlementReadPlatformService = entitlementReadPlatformService;
 this.entitlementWritePlatformService = entitlementWritePlatformService;
-this.actionDetailsReadPlatformService=actionDetailsReadPlatformService;
-this.actiondetailsWritePlatformService=actiondetailsWritePlatformService;
-this.scheduleJob=scheduleJob;
-this.orderRepository=orderRepository;
-this.readExtraDataAndReportingService=readExtraDataAndReportingService;
-this.globalConfigurationRepository=globalConfigurationRepository;
-this.ticketMasterApiResource=ticketMasterApiResource;
+this.actionDetailsReadPlatformService = actionDetailsReadPlatformService;
+this.actiondetailsWritePlatformService = actiondetailsWritePlatformService;
+this.scheduleJob = scheduleJob;
+this.orderRepository = orderRepository;
+this.readExtraDataAndReportingService = readExtraDataAndReportingService;
+this.globalConfigurationRepository = globalConfigurationRepository;
+this.ticketMasterApiResource = ticketMasterApiResource;
 this.ticketMasterReadPlatformService = ticketMasterReadPlatformService;
-
+this.codeReadPlatformService = codeReadPlatformService;
 
 }
 
@@ -408,7 +413,7 @@ try {
 					for (ProcessingDetailsData detailsData : processingDetails) {
 						ProcessRequest processRequest = this.processRequestRepository.findOne(detailsData.getId());
 						Order order=this.orderRepository.findOne(processRequest.getOrderId());
-						List<ProblemsData> problemsData=this.ticketMasterReadPlatformService.retrieveProblemData();
+						Collection<MCodeData> problemsData = this.codeReadPlatformService.getCodeValue("Problem Code");
 						List<EnumOptionData> priorityData = this.ticketMasterReadPlatformService.retrievePriorityData();
 						Long userId=0L;
 						JSONObject jsonobject = new JSONObject();
@@ -423,7 +428,7 @@ try {
 						jsonobject.put("sourceOfTicket","Phone");
 						jsonobject.put("assignedTo", userId);
 						jsonobject.put("priority",priorityData.get(0).getValue());
-						jsonobject.put("problemCode", problemsData.get(0).getProblemCode());
+						jsonobject.put("problemCode", problemsData.iterator().next().getId());
 						String resourceId = this.ticketMasterApiResource.createTicketMaster(processRequest.getClientId(), jsonobject.toString());
  		  
 					}

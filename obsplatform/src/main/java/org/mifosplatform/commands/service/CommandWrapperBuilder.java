@@ -1266,7 +1266,7 @@ public class CommandWrapperBuilder {
 		return this;
 	}
 
-	public CommandWrapperBuilder closeTicketMaster(final Long ticketId) {
+	public CommandWrapperBuilder deleteTicketMaster(final Long ticketId) {
 		this.actionName = "CLOSE";
 		this.entityName = "TICKET";
 		this.entityId = ticketId;
