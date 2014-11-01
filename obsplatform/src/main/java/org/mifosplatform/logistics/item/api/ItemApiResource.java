@@ -42,11 +42,9 @@ import org.springframework.stereotype.Component;
 @Scope("singleton")
 public class ItemApiResource {
 	
-	//private final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(Arrays.asList("id", "name", "systemDefined"));
-	private static final Set<String> RESPONSE_ITEM_DATA_PARAMETERS = new HashSet<String>(Arrays.asList("itemId","chargedatas","unitData","itemclassData","chargeCode","unit","warranty","itemDescription","itemCode","unitPrice"));
+	private static final Set<String> RESPONSE_ITEM_DATA_PARAMETERS = new HashSet<String>(Arrays.asList("itemId","chargedatas","unitData",
+			           "itemclassData","chargeCode","unit","warranty","itemDescription","itemCode","unitPrice"));
 	private final String resourceNameForPermissions = "ITEM";
-	
-	
 	private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 	private final ApiRequestParameterHelper apiRequestParameterHelper;
 	private final DefaultToApiJsonSerializer<ItemData> toApiJsonSerializer;
@@ -54,8 +52,11 @@ public class ItemApiResource {
 	private final ItemReadPlatformService itemReadPlatformService;
 	
 	
-	@Autowired(required=true)
-	ItemApiResource(final PlatformSecurityContext context,final PortfolioCommandSourceWritePlatformService portfolioCommandSourceWritePlatformService,ApiRequestParameterHelper requestParameterHelper,DefaultToApiJsonSerializer<ItemData> defaultToApiJsonSerializer,final ItemReadPlatformService itemReadPlatformService){
+	@Autowired
+	public ItemApiResource(final PlatformSecurityContext context,final PortfolioCommandSourceWritePlatformService portfolioCommandSourceWritePlatformService,
+			ApiRequestParameterHelper requestParameterHelper,DefaultToApiJsonSerializer<ItemData> defaultToApiJsonSerializer,
+			final ItemReadPlatformService itemReadPlatformService){
+		
 		this.context = context;
 		this.commandsSourceWritePlatformService=portfolioCommandSourceWritePlatformService;
 		this.apiRequestParameterHelper = requestParameterHelper;
@@ -72,19 +73,15 @@ public class ItemApiResource {
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());	
 		ItemData itemData = handleTemplateData();
 		return this.toApiJsonSerializer.serialize(settings, itemData, RESPONSE_ITEM_DATA_PARAMETERS);
-		
-	
 	}
-
 
 	private ItemData handleTemplateData() {
-		List<EnumOptionData> itemClassdata = this.itemReadPlatformService.retrieveItemClassType();
-		List<EnumOptionData> unitTypeData = this.itemReadPlatformService.retrieveUnitTypes();
-		List<ChargesData> chargeDatas = this.itemReadPlatformService.retrieveChargeCode();
-	
-
-		 return new ItemData(itemClassdata, unitTypeData, chargeDatas);
+		final List<EnumOptionData> itemClassdata = this.itemReadPlatformService.retrieveItemClassType();
+		final List<EnumOptionData> unitTypeData = this.itemReadPlatformService.retrieveUnitTypes();
+		final List<ChargesData> chargeDatas = this.itemReadPlatformService.retrieveChargeCode();
+		return new ItemData(itemClassdata, unitTypeData, chargeDatas);
 	}
+	
 	@POST
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
@@ -96,25 +93,15 @@ public class ItemApiResource {
 		
 	}
 
-/*	@GET
-	@Consumes({ MediaType.APPLICATION_JSON })
-	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrieveAllItems(@Context final UriInfo uriInfo) {
-
-		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-		List<ItemData> itemData=this.itemReadPlatformService.retrieveAllItems();
-		return this.toApiJsonSerializer.serialize(settings, itemData, RESPONSE_ITEM_DATA_PARAMETERS);
-	}*/
 	
 	@GET
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrieveAllItems(@Context final UriInfo uriInfo,  @QueryParam("sqlSearch") final String sqlSearch, @QueryParam("limit") final Integer limit, @QueryParam("offset") final Integer offset) {
-		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+	public String retrieveAllItems(@Context final UriInfo uriInfo,  @QueryParam("sqlSearch") final String sqlSearch, 
+			@QueryParam("limit") final Integer limit, @QueryParam("offset") final Integer offset) {
 		
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
 		final SearchSqlQuery searchItems =SearchSqlQuery.forSearch(sqlSearch, offset,limit );
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 		Page<ItemData> itemData=this.itemReadPlatformService.retrieveAllItems(searchItems);
 		return this.toApiJsonSerializer.serialize(itemData);
 	}
@@ -127,11 +114,10 @@ public class ItemApiResource {
 		
 		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
 		ItemData itemData=this.itemReadPlatformService.retrieveSingleItemDetails(itemId);
-		
-		List<EnumOptionData> itemClassdata = this.itemReadPlatformService.retrieveItemClassType();
-   		List<EnumOptionData> unitTypeData = this.itemReadPlatformService.retrieveUnitTypes();
-   		List<ChargesData> chargeDatas = this.itemReadPlatformService.retrieveChargeCode();
-   		List<ItemData> auditDetails = this.itemReadPlatformService.retrieveAuditDetails(itemId);
+		final List<EnumOptionData> itemClassdata = this.itemReadPlatformService.retrieveItemClassType();
+		final List<EnumOptionData> unitTypeData = this.itemReadPlatformService.retrieveUnitTypes();
+		final List<ChargesData> chargeDatas = this.itemReadPlatformService.retrieveChargeCode();
+		final List<ItemData> auditDetails = this.itemReadPlatformService.retrieveAuditDetails(itemId);
    		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
    		itemData=new ItemData(itemData,itemClassdata,unitTypeData,chargeDatas,auditDetails);
    		return this.toApiJsonSerializer.serialize(settings, itemData, RESPONSE_ITEM_DATA_PARAMETERS);

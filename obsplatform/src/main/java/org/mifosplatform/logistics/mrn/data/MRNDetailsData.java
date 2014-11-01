@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.joda.time.LocalDate;
+import org.mifosplatform.logistics.item.data.ItemData;
 import org.mifosplatform.organisation.office.data.OfficeData;
 
 public class MRNDetailsData {
@@ -16,12 +17,11 @@ public class MRNDetailsData {
 	private Long orderdQuantity;
 	private Long receivedQuantity;
 	private String status;
-	
 	private Long officeId;
 	private Long parentId;
 	private String officeName;
 	private Collection<OfficeData> officeData;
-	private Collection<MRNDetailsData> itemMasterData;
+	private Collection<ItemData> itemMasterData;
 	private Long itemId;
 	private String itemCode;
 	private String itemDescription;
@@ -29,12 +29,12 @@ public class MRNDetailsData {
 	private List<MRNDetailsData> itemsaleIds;
 	private Long mrnId;
 	private List<String> serialNumber;
-	private List<String> serialNumberForItems;
 	private Long fromOfficeNum;
 	private Long toOfficeNum;
 	
 	
-	public MRNDetailsData(final String id, final LocalDate requestedDate, final String fromOffice, final String toOffice, final Long orderdQuantity, final Long receivedQuantity, final String status, final String itemDescription){
+	public MRNDetailsData(final String id, final LocalDate requestedDate, final String fromOffice, final String toOffice, final Long orderdQuantity, 
+			        final Long receivedQuantity, final String status, final String itemDescription){
 		this.id = id;
 		this.requestedDate = requestedDate;
 		this.fromOffice = fromOffice;
@@ -44,39 +44,21 @@ public class MRNDetailsData {
 		this.status = status;
 		this.itemDescription = itemDescription;
 	}
-	
-	public MRNDetailsData(final LocalDate requestedDate, final String fromOffice, final String toOffice, final Long orderdQuantity, final Long receivedQuantity, final String status){
-		this.requestedDate = requestedDate;
-		this.fromOffice = fromOffice;
-		this.toOffice = toOffice;
-		this.orderdQuantity = orderdQuantity;
-		this.receivedQuantity = receivedQuantity;
-		this.status = status;
-	}
 
-	public MRNDetailsData(Long officeId, Long parentId, String officeName) {
-		this.officeId = officeId;
-		this.parentId = parentId;
-		this.officeName = officeName;
-		
-		
-	}
 	
-	public MRNDetailsData(final Long itemId, final String itemCode, final String itemDescription){
-		this.itemId = itemId;
-		this.itemCode = itemCode;
-		this.itemDescription = itemDescription;
-	}
-
-	public MRNDetailsData(Collection<OfficeData> officeData, Collection<MRNDetailsData> itemMasterData) {
+	public MRNDetailsData(Collection<OfficeData> officeData, Collection<ItemData> itemMasterData) {
 		this.officeData = officeData;
 		this.itemMasterData = itemMasterData;
 	}
+	
 	public MRNDetailsData(Collection<MRNDetailsData> mrnIds,List<MRNDetailsData> itemsaleIds) {
 	this.mrnIds = mrnIds;
 	this.itemsaleIds=itemsaleIds;
 	}
-	public MRNDetailsData(Long mrnId,String itemDescription, Long itemId) {
+	
+	public MRNDetailsData(Long mrnId,String itemDescription, Long itemId,String itemsaleId) {
+		
+		this.id=itemsaleId;
 		this.mrnId = mrnId;
 		this.itemDescription = itemDescription;
 		this.itemId = itemId;
@@ -84,19 +66,6 @@ public class MRNDetailsData {
 
 	public MRNDetailsData(List<String> serialNumber) {
 		this.serialNumber = serialNumber;
-	}
-
-	public MRNDetailsData(Long fromOffice, Long toOffice) {
-		this.fromOfficeNum = fromOffice;
-		this.toOfficeNum = toOffice;
-	}
-
-	public MRNDetailsData(String itemDescription, String itemsaleId,
-			Long itemMasterId) {
-		
-			this.id=itemsaleId;
-			this.itemId=itemMasterId;
-			this.itemDescription=itemDescription;
 	}
 
 	public MRNDetailsData(Long agentId) {
@@ -216,14 +185,11 @@ public class MRNDetailsData {
 		this.itemDescription = itemDescription;
 	}
 
-	public Collection<MRNDetailsData> getItemMasterData() {
+	public Collection<ItemData> getItemMasterData() {
 		return itemMasterData;
 	}
 
-	public void setItemMasterData(Collection<MRNDetailsData> itemMasterData) {
-		this.itemMasterData = itemMasterData;
-	}
-
+	
 	public Collection<MRNDetailsData> getMrnIds() {
 		return mrnIds;
 	}

@@ -360,8 +360,9 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 								client.setStatus(ClientStatus.ACTIVE.getValue());
 								this.clientRepository.save(client);
 								List<ActionDetaislData> actionDetaislDatas=this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_CREATE_ORDER);
+								
 								if(actionDetaislDatas.size() != 0){
-									this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,command.entityId(), order.getId().toString(),null);
+									this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,clientId, order.getId().toString(),null);
 								}
 							}
 					return new CommandProcessingResult(order.getId(),order.getClientId());	

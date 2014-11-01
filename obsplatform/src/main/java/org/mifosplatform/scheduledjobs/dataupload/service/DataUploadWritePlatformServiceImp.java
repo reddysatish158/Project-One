@@ -22,12 +22,11 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.AbstractPlatformDomainRuleException;
 import org.mifosplatform.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
-import org.mifosplatform.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.mifosplatform.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.mifosplatform.infrastructure.core.service.FileUtils;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.logistics.item.exception.ItemNotFoundException;
-import org.mifosplatform.logistics.itemdetails.data.InventoryItemDetailsData;
+import org.mifosplatform.logistics.itemdetails.data.ItemDetailsData;
 import org.mifosplatform.logistics.itemdetails.exception.OrderQuantityExceedsException;
 import org.mifosplatform.logistics.itemdetails.exception.SerialNumberAlreadyExistException;
 import org.mifosplatform.logistics.itemdetails.exception.SerialNumberNotFoundException;
@@ -57,7 +56,7 @@ public class DataUploadWritePlatformServiceImp implements DataUploadWritePlatfor
 	
 	@Autowired
 	public DataUploadWritePlatformServiceImp(final PlatformSecurityContext context,final DataUploadRepository uploadStatusRepository,
-			final DefaultToApiJsonSerializer<InventoryItemDetailsData> toApiJsonSerializer,final DataUploadHelper dataUploadHelper,
+			final DefaultToApiJsonSerializer<ItemDetailsData> toApiJsonSerializer,final DataUploadHelper dataUploadHelper,
 			final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
 		
 		this.context=context;

@@ -26,7 +26,6 @@ public class ItemData {
 	private String itemDescription;
 	private int warranty;
 	private String itemClass;
-	private LocalDate saleDate;
 	private List<DiscountMasterData> discountMasterDatas;
 	private Long itemMasterId;
 	private LocalDate changedDate;
@@ -69,18 +68,11 @@ public class ItemData {
 	
 	}
 
-	public ItemData(List<EnumOptionData> itemClassdata,
-			List<EnumOptionData> unitTypeData, List<ChargesData> chargeDatas) {
+	public ItemData(List<EnumOptionData> itemClassdata,List<EnumOptionData> unitTypeData, List<ChargesData> chargeDatas) {
      this.itemClassData=itemClassdata;
      this.unitData=unitTypeData;
      this.chargesData=chargeDatas;
-		
-		
 	}
-
-	
-
-	
 
 	public ItemData(ItemData itemData, List<EnumOptionData> itemClassdata,
 			List<EnumOptionData> unitTypeData, List<ChargesData> chargeDatas,List<ItemData> auditDetails) {

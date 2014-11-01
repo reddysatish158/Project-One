@@ -1,11 +1,10 @@
-package org.mifosplatform.logistics.itemdetails.service;
+package org.mifosplatform.logistics.grn.service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.joda.time.LocalDate;
 import org.mifosplatform.billing.paymode.data.McodeData;
 import org.mifosplatform.crm.clientprospect.service.SearchSqlQuery;
@@ -13,22 +12,24 @@ import org.mifosplatform.infrastructure.core.domain.JdbcSupport;
 import org.mifosplatform.infrastructure.core.service.Page;
 import org.mifosplatform.infrastructure.core.service.PaginationHelper;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
+import org.mifosplatform.logistics.grn.service.GrnReadPlatformService;
 import org.mifosplatform.logistics.itemdetails.data.InventoryGrnData;
 import org.mifosplatform.logistics.itemdetails.domain.InventoryGrnRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 @Service
-public class InventoryGrnReadPlatformServiceImp implements InventoryGrnReadPlatformService{
+public class GrnReadPlatformServiceImp implements GrnReadPlatformService{
 
 	
 	private final JdbcTemplate jdbcTemplate;
 	private final InventoryGrnRepository inventoryGrnRepository;
 	private final PaginationHelper<InventoryGrnData> paginationHelper = new PaginationHelper<InventoryGrnData>();
 	@Autowired
-	public InventoryGrnReadPlatformServiceImp(final TenantAwareRoutingDataSource dataSource,InventoryGrnRepository inventoryGrnRepository){
+	public GrnReadPlatformServiceImp(final TenantAwareRoutingDataSource dataSource,InventoryGrnRepository inventoryGrnRepository){
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 		this.inventoryGrnRepository = inventoryGrnRepository;
 		
@@ -70,6 +71,7 @@ public class InventoryGrnReadPlatformServiceImp implements InventoryGrnReadPlatf
 public Page<InventoryGrnData> retriveGrnDetails(SearchSqlQuery searchGrn) {
 		
 		GrnMapperForDetails grn = new GrnMapperForDetails();
+		
 		String sql = "SQL_CALC_FOUND_ROWS g.id as id, f.name as officeName, g.purchase_date as purchaseDate, "
 				+ "g.supplier_id as supplierId, g.item_master_id as itemMasterId, g.orderd_quantity as orderdQuantity, "
 				+ "g.received_quantity as receivedQuantity, g.po_no as purchaseNo, im.item_description as itemDescription, "
@@ -116,9 +118,18 @@ public Page<InventoryGrnData> retriveGrnDetails(SearchSqlQuery searchGrn) {
 	@Override
 	public InventoryGrnData retriveGrnDetailTemplate(final Long grnId){
 		
-		GrnMapperForTemplate grn = new GrnMapperForTemplate();
-		String sql = "select g.id as id, g.purchase_date as purchaseDate, g.supplier_id as supplierId, g.item_master_id as itemMasterId, g.po_no as purchaseNo,g.office_id as officeId,g.orderd_quantity as orderdQuantity, g.received_quantity as receivedQuantity, im.item_description as itemDescription, s.supplier_description as supplierDescription from b_grn g left outer join b_item_master im on g.item_master_id = im.id left outer join b_supplier s on g.supplier_id = s.id where g.id = ?";
+		try{
+			GrnMapper grn = new GrnMapper();
+			
+		final String sql = "select g.id as id, g.purchase_date as purchaseDate, g.supplier_id as supplierId, g.item_master_id as itemMasterId, " +
+				"g.po_no as purchaseNo,g.office_id as officeId,g.orderd_quantity as orderdQuantity, g.received_quantity as receivedQuantity," +
+				" im.item_description as itemDescription, s.supplier_description as supplierDescription from b_grn g left outer join b_item_master im " +
+				" on g.item_master_id = im.id left outer join b_supplier s on g.supplier_id = s.id where g.id = ?";
 		return jdbcTemplate.queryForObject(sql,grn,new Object[]{grnId});
+		
+		}catch(EmptyResultDataAccessException accessException){
+			return null;
+		}
 	}
 
 
@@ -127,7 +138,8 @@ public Page<InventoryGrnData> retriveGrnDetails(SearchSqlQuery searchGrn) {
 	@Override
 	public Collection<InventoryGrnData> retriveGrnIds() {
 		GrnIds rowMapper = new GrnIds();
-		String sql = "select id,(select item_description from b_item_master where id=item_master_id) as itemDescription from b_grn where orderd_quantity>received_quantity order by id desc";
+		String sql = "select id,(select item_description from b_item_master where id=item_master_id) as itemDescription from b_grn " +
+				"  where orderd_quantity>received_quantity order by id desc";
 		return jdbcTemplate.query(sql, rowMapper);
 	}
 	
@@ -154,7 +166,7 @@ public Page<InventoryGrnData> retriveGrnDetails(SearchSqlQuery searchGrn) {
 		
 	}
 	
-	private class GrnMapperForTemplate implements RowMapper<InventoryGrnData>{
+	private class GrnMapper implements RowMapper<InventoryGrnData>{
 
 		@Override
 		public InventoryGrnData mapRow(ResultSet rs, int rowNum)
@@ -188,32 +200,5 @@ public Page<InventoryGrnData> retriveGrnDetails(SearchSqlQuery searchGrn) {
 		
 	}
 
-	@Override
-	public List<McodeData> retrieveItemQualityData(String str) {
-		ItemDataMaper mapper = new ItemDataMaper();
-
-		String sql = "select " + mapper.schema()+" m.code_name=? order by mc.id";
-
-		return this.jdbcTemplate.query(sql, mapper, new Object[] {str});
-	}
-	private static final class ItemDataMaper implements RowMapper<McodeData> {
-
-		public String schema() {
-			return "mc.id as id,mc.code_value as codeValue FROM m_code_value mc,m_code m where mc.code_id=m.id and";
-
-		}
-
-		@Override
-		public McodeData mapRow(final ResultSet rs,
-				@SuppressWarnings("unused") final int rowNum)
-				throws SQLException {
-           
-			String codeValue = rs.getString("codeValue");
-			Long id = rs.getLong("id");
-			return new McodeData(id,codeValue);
-
-		}
-	}
-	
 	
 }

@@ -42,9 +42,11 @@ import org.springframework.stereotype.Component;
 @Scope("singleton")
 public class ChargeCodeApiResource {
 
+
 	private final Set<String> RESPONSE_PARAMETERS = new HashSet<String>(Arrays.asList("id", "chargeCode", "chargeDescription","chargeType",
 			"chargeDurtion", "durationType","taxInclusive", "billFrequencyCode"));
 	
+
 	private final String resourceNameForPermissions = "CHARGECODE";
 	private final PlatformSecurityContext context;
 	private final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService;
@@ -91,6 +93,7 @@ public class ChargeCodeApiResource {
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String retrieveChargeCodeTemplateData(@Context final UriInfo uriInfo) {
+
 	   
 		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
 		final List<ChargeTypeData> chargeTypeData = this.chargeCodeReadPlatformService.getChargeType();
@@ -110,6 +113,7 @@ public class ChargeCodeApiResource {
 	@POST
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
+
 	public String createChargeCode(final String apiRequestBodyAsJson,@Context final UriInfo uriInfo) {
 		
 		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
@@ -128,6 +132,7 @@ public class ChargeCodeApiResource {
 	@Path("{chargeCodeId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
+
 	public String retrieveSingleChargeCodeDetails(@PathParam("chargeCodeId") final Long chargeCodeId,@Context final UriInfo uriInfo) {
 	   
 		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
@@ -150,6 +155,7 @@ public class ChargeCodeApiResource {
 	@Path("{chargeCodeId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
+
 	public String updateSingleChargeCode(@PathParam("chargeCodeId") final Long chargeCodeId,final String apiRequestBodyAsJson) {
 	   
 		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);

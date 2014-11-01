@@ -15,11 +15,11 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-public class SupplierReadPlatformServiceImpl implements
-		SupplierReadPlatformService {
+public class SupplierReadPlatformServiceImpl implements SupplierReadPlatformService {
 	
 	private final JdbcTemplate jdbcTemplate;
 	private final PaginationHelper<SupplierData> paginationHelper = new PaginationHelper<SupplierData>();
+	
 	@Autowired
 	public SupplierReadPlatformServiceImpl(final TenantAwareRoutingDataSource dataSource) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
@@ -28,18 +28,19 @@ public class SupplierReadPlatformServiceImpl implements
 	private class SupplierMapper implements RowMapper<SupplierData> {
 		@Override
 		public SupplierData mapRow(ResultSet rs, int rowNum) throws SQLException {
-			Long id = rs.getLong("id");
-			String supplierCode = rs.getString("supplierCode");
-			String supplierDescription = rs.getString("supplierDescription");
-			String supplierAddress = rs.getString("supplierAddress");
+			final Long id = rs.getLong("id");
+			final String supplierCode = rs.getString("supplierCode");
+			final String supplierDescription = rs.getString("supplierDescription");
+			final String supplierAddress = rs.getString("supplierAddress");
 			return new SupplierData(id, supplierCode, supplierDescription, supplierAddress);
 		}
 		
 		public String schema() {
-			String sql = " SQL_CALC_FOUND_ROWS id as id, supplier_code as supplierCode, "
+			
+			return " SQL_CALC_FOUND_ROWS id as id, supplier_code as supplierCode, "
 					+ "supplier_description as supplierDescription, supplier_address as supplierAddress "
 						 + " from b_supplier ";
-			return sql;
+			
 		}
 	}
 
@@ -55,7 +56,7 @@ public class SupplierReadPlatformServiceImpl implements
 	public Page<SupplierData> retrieveSupplier(SearchSqlQuery searchSupplier) {
 		SupplierMapper supplierMapper = new SupplierMapper();
 		
-		StringBuilder sqlBuilder = new StringBuilder(200);
+		final StringBuilder sqlBuilder = new StringBuilder(200);
         sqlBuilder.append("select ");
         sqlBuilder.append(supplierMapper.schema());
         sqlBuilder.append(" where id IS NOT NULL ");
@@ -90,6 +91,7 @@ public class SupplierReadPlatformServiceImpl implements
 	
 	@Override
 	public List<SupplierData> retrieveSupplier(Long supplierId) {
+		
 		SupplierMapper supplierMapper = new SupplierMapper();
 		String sql = "select id as id, supplier_code as supplierCode, supplier_description as supplierDescription, supplier_address as supplierAddress "
 						 + " from b_supplier where id=?";

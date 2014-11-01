@@ -1,4 +1,4 @@
-package org.mifosplatform.logistics.itemdetails.service;
+package org.mifosplatform.logistics.grn.service;
 
 import java.util.Map;
 
@@ -8,7 +8,6 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.logistics.itemdetails.domain.InventoryGrn;
 import org.mifosplatform.logistics.itemdetails.domain.InventoryGrnRepository;
-import org.mifosplatform.logistics.itemdetails.domain.InventoryItemDetails;
 import org.mifosplatform.logistics.itemdetails.serialization.InventoryGrnCommandFromApiJsonDeserializer;
 import org.mifosplatform.workflow.eventactionmapping.exception.EventActionMappingNotFoundException;
 import org.slf4j.Logger;
@@ -19,7 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class InventoryGrnDetailsWritePlatformServiceImp implements InventoryGrnDetailsWritePlatformService{
+public class GrnDetailsWritePlatformServiceImpl implements GrnDetailsWritePlatformService{
 
 	
 	private PlatformSecurityContext context;
@@ -27,13 +26,13 @@ public class InventoryGrnDetailsWritePlatformServiceImp implements InventoryGrnD
 	private InventoryGrnCommandFromApiJsonDeserializer inventoryGrnCommandFromApiJsonDeserializer;
 	
 	@Autowired
-	public InventoryGrnDetailsWritePlatformServiceImp(final PlatformSecurityContext context,InventoryGrnRepository inventoryGrnRepository, InventoryGrnCommandFromApiJsonDeserializer inventoryGrnCommandFromApiJsonDeserializer) {
+	public GrnDetailsWritePlatformServiceImpl(final PlatformSecurityContext context,InventoryGrnRepository inventoryGrnRepository, InventoryGrnCommandFromApiJsonDeserializer inventoryGrnCommandFromApiJsonDeserializer) {
 		this.context = context;
 		this.inventoryGrnRepository = inventoryGrnRepository;
 		this.inventoryGrnCommandFromApiJsonDeserializer = inventoryGrnCommandFromApiJsonDeserializer;
 	}
 	
-	private final static Logger logger = (Logger) LoggerFactory.getLogger(InventoryGrnDetailsWritePlatformServiceImp.class);	
+	private final static Logger logger = (Logger) LoggerFactory.getLogger(GrnDetailsWritePlatformServiceImpl.class);	
 		
 		
 	@Transactional

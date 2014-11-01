@@ -2,11 +2,11 @@ package org.mifosplatform.logistics.item.domain;
 
 import java.math.BigDecimal;
 import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import org.joda.time.LocalDate;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 

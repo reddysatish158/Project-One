@@ -4,7 +4,7 @@ import java.util.List;
 
 public class AllocationHardwareData {
 
-	private List<InventoryItemSerialNumberData> serialNumbers;
+	private List<ItemSerialNumberData> serialNumbers;
 	private Long quantity;
 	private Long itemMasterId;
 	private Long itemDetailsId;
@@ -12,10 +12,11 @@ public class AllocationHardwareData {
 	private Long saleId;
 	private Long allocationId;
 	private String quality;
+	private String serialNumber;
 	
 	public AllocationHardwareData() {}
 	
-	public AllocationHardwareData(List<InventoryItemSerialNumberData> serialNumbers,Long quantity,Long itemMasterId){
+	public AllocationHardwareData(List<ItemSerialNumberData> serialNumbers,Long quantity,Long itemMasterId){
 		this.serialNumbers = serialNumbers;
 		this.quantity = quantity;
 		this.itemMasterId = itemMasterId;
@@ -40,17 +41,18 @@ public class AllocationHardwareData {
 
 }
 
-	public AllocationHardwareData(Long id, Long clientId, String quality) {
+	public AllocationHardwareData(Long id, Long clientId, String quality,String serialNo) {
 		this.itemDetailsId = id;
 		this.clientId = clientId;
 		this.quality = quality;
+		this.serialNumber=serialNo;
 	}
 
-	public List<InventoryItemSerialNumberData> getSrialNumbers() {
+	public List<ItemSerialNumberData> getSrialNumbers() {
 		return serialNumbers;
 	}
 	public void setSrialNumbers(
-			List<InventoryItemSerialNumberData> srialNumbers) {
+			List<ItemSerialNumberData> srialNumbers) {
 		this.serialNumbers = srialNumbers;
 	}
 	public Long getQuantity() {
@@ -66,7 +68,7 @@ public class AllocationHardwareData {
 		this.itemMasterId = itemMasterId;
 	}
 
-	public List<InventoryItemSerialNumberData> getSerialNumbers() {
+	public List<ItemSerialNumberData> getSerialNumbers() {
 		return serialNumbers;
 	}
 
@@ -84,6 +86,12 @@ public class AllocationHardwareData {
 
 	public Long getAllocationId() {
 		return allocationId;
+	}
+	
+	
+
+	public String getSerialNumber() {
+		return serialNumber;
 	}
 
 	/**

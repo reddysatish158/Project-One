@@ -3,7 +3,7 @@ package org.mifosplatform.logistics.itemdetails.handler;
 import org.mifosplatform.commands.handler.NewCommandSourceHandler;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
-import org.mifosplatform.logistics.itemdetails.service.InventoryItemDetailsWritePlatformService;
+import org.mifosplatform.logistics.itemdetails.service.ItemDetailsWritePlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,11 +12,11 @@ import com.google.gson.JsonElement;
 @Service
 public class CreateInventoryItemsCommandHandler implements NewCommandSourceHandler {
 	
-	private final InventoryItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService;
+	private final ItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService;
 	
 	
 	@Autowired
-	public CreateInventoryItemsCommandHandler(final InventoryItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService) {
+	public CreateInventoryItemsCommandHandler(final ItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService) {
 		this.inventoryItemDetailsWritePlatformService = inventoryItemDetailsWritePlatformService;
 	}
 

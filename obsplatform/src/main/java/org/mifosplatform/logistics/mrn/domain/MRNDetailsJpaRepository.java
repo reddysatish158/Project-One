@@ -1,4 +1,4 @@
-package org.mifosplatform.logistics.mrn.api;
+package org.mifosplatform.logistics.mrn.domain;
 
 import org.mifosplatform.logistics.mrn.domain.MRNDetails;
 import org.springframework.data.jpa.repository.JpaRepository;

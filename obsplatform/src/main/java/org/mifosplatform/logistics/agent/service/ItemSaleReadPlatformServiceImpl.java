@@ -107,7 +107,7 @@ private final class ItemSaleDetailsMrnIDsMapper implements RowMapper<MRNDetailsD
 		final String itemsaleId = rs.getString("itemsaleId");
 		final Long itemMasterId = rs.getLong("itemMasterId");
 		final String itemDescription = rs.getString("itemDescription");
-		return new MRNDetailsData(itemDescription,itemsaleId,itemMasterId);
+		return new MRNDetailsData(null,itemDescription,itemMasterId,itemsaleId);
 	}
 }
 
