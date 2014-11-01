@@ -92,10 +92,11 @@ public class RedemptionWritePlatformServiceImpl implements
 			final VoucherDetails voucherDetails = retrieveRandomDetailsByPinNo(pinNum);
 			final Voucher voucher = voucherDetails.getVoucher();
 			final String pinType = voucher.getPinType();
+			final String pinTypeValue =  voucher.getPinValue();
 			 
-			if(pinType.equalsIgnoreCase(VALUE_PINTYPE)){
-				 
-				final BigDecimal pinValue = new BigDecimal(pinType);
+			if(pinType.equalsIgnoreCase(VALUE_PINTYPE) && pinTypeValue != null){
+				
+				final BigDecimal pinValue = new BigDecimal(pinTypeValue);
 				final JsonObject json = new JsonObject();
 				json.addProperty("adjustment_type", "CREDIT");json.addProperty("adjustment_code", 123);
 				json.addProperty("amount_paid",pinValue);json.addProperty("Remarks", "Adjustment Post By Redemption");
@@ -105,9 +106,9 @@ public class RedemptionWritePlatformServiceImpl implements
 				this.adjustmentWritePlatformService.createAdjustments(commd);
 			}
 			 
-			if(pinType.equalsIgnoreCase(PRODUCE_PINTYPE)){
+			if(pinType.equalsIgnoreCase(PRODUCE_PINTYPE) && pinTypeValue != null){
 				 
-				final Long planId = Long.parseLong(pinType);
+				final Long planId = Long.parseLong(pinTypeValue);
 				final List<Long> orderIds=this.redemptionReadPlatformService.retrieveOrdersData(clientId,planId);
 				final JsonObject json = new JsonObject();
 				final List<SubscriptionData> subscriptionDatas=this.contractPeriodReadPlatformService.retrieveSubscriptionDatabyContractType("Month(s)",1);

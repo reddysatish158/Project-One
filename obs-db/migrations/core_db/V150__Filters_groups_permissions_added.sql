@@ -14,4 +14,13 @@ insert IGNORE into m_permission values(null, 'organisation', 'READ_VOUCHER', 'VO
 
 delete from m_permission where entity_name Like '%RANDOMGENERATOR%';
 
+delete from m_permission where entity_name = 'PROSPECT';
+
 insert IGNORE into c_configuration VALUES (null,'OSD_ProvisioningSystem',1,'Comvenient');
+
+insert IGNORE into m_permission values(null, 'Crm', 'CREATE_PROSPECT', 'PROSPECT', 'CREATE', '0');
+insert IGNORE into m_permission values(null, 'Crm', 'UPDATE_PROSPECT', 'PROSPECT', 'UPDATE', '1');
+insert IGNORE into m_permission values(null, 'Crm', 'DELETE_PROSPECT', 'PROSPECT', 'DELETE', '2');
+insert IGNORE into m_permission values(null, 'Crm', 'FOLLOWUP_PROSPECT', 'PROSPECT', 'FOLLOWUP', '3');
+insert IGNORE into m_permission values(null, 'Crm', 'CONVERT_PROSPECT', 'PROSPECT', 'CONVERT', '4');
+insert IGNORE into m_permission values(null, 'Crm', 'READ_PROSPECT', 'PROSPECT', 'READ', '5');
