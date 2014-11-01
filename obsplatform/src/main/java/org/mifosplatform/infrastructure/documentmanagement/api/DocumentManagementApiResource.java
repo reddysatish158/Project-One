@@ -187,7 +187,7 @@ public class DocumentManagementApiResource {
     @GET
     @Path("{documentId}/attachment")
     @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_OCTET_STREAM })
+    @Produces({ MediaType.MULTIPART_FORM_DATA })
     public Response downloadFile(@PathParam("entityType") final String entityType, @PathParam("entityId") final Long entityId,
             @PathParam("documentId") final Long documentId) {
 
