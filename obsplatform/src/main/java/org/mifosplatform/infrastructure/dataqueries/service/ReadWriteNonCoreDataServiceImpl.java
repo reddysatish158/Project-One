@@ -228,16 +228,11 @@ public class ReadWriteNonCoreDataServiceImpl implements
 			this.context.authenticatedUser();
 			this.fromApiJsonDeserializer.validateForCreate(command.json());
 
-			final JsonElement element = this.fromJsonHelper.parse(command
-					.json());
-			final JsonArray columns = this.fromJsonHelper
-					.extractJsonArrayNamed("columns", element);
-			datatableName = this.fromJsonHelper.extractStringNamed(
-					"datatableName", element);
-			final String apptableName = this.fromJsonHelper.extractStringNamed(
-					"apptableName", element);
-			Boolean multiRow = this.fromJsonHelper.extractBooleanNamed(
-					"multiRow", element);
+			final JsonElement element = this.fromJsonHelper.parse(command.json());
+			final JsonArray columns = this.fromJsonHelper.extractJsonArrayNamed("columns", element);
+			datatableName = this.fromJsonHelper.extractStringNamed("datatableName", element);
+			final String apptableName = this.fromJsonHelper.extractStringNamed("apptableName", element);
+			Boolean multiRow = this.fromJsonHelper.extractBooleanNamed("multiRow", element);
 			// final String actualAppTableName =
 			// mapToActualAppTable(apptableName);
 
@@ -248,13 +243,11 @@ public class ReadWriteNonCoreDataServiceImpl implements
 			validateDatatableName(datatableName);
 			validateAppTable(apptableName);
 
-			final boolean isConstraintApproach = this.configurationDomainService
-					.isConstraintApproachEnabledForDatatables();
+			final boolean isConstraintApproach = this.configurationDomainService.isConstraintApproachEnabledForDatatables();
 
 			final String fkColumnName = apptableName.substring(2) + "_id";
 
-			final String dataTableNameAlias = datatableName.toLowerCase()
-					.replaceAll("\\s", "_");
+			final String dataTableNameAlias = datatableName.toLowerCase().replaceAll("\\s", "_");
 			final String fkName = dataTableNameAlias + "_" + fkColumnName;
 			StringBuilder sqlBuilder = new StringBuilder();
 

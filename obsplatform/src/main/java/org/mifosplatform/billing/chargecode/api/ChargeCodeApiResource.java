@@ -42,10 +42,9 @@ import org.springframework.stereotype.Component;
 @Scope("singleton")
 public class ChargeCodeApiResource {
 
-	private final Set<String> RESPONSE_PARAMETERS = new HashSet<String>(
-			Arrays.asList("id", "chargeCode", "chargeDescription",
-					"chargeType", "chargeDurtion", "durationType",
-					"taxInclusive", "billFrequencyCode"));
+	private final Set<String> RESPONSE_PARAMETERS = new HashSet<String>(Arrays.asList("id", "chargeCode", "chargeDescription","chargeType",
+			"chargeDurtion", "durationType","taxInclusive", "billFrequencyCode"));
+	
 	private final String resourceNameForPermissions = "CHARGECODE";
 	private final PlatformSecurityContext context;
 	private final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService;
@@ -75,13 +74,11 @@ public class ChargeCodeApiResource {
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String retrieveAllChargeCodes(@Context final UriInfo uriInfo) {
-		// context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		final List<ChargeCodeData> chargeCodes = this.chargeCodeReadPlatformService
-				.retrieveAllChargeCodes();
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper
-				.process(uriInfo.getQueryParameters());
-		return this.toApiJsonSerializer.serialize(settings, chargeCodes,
-				RESPONSE_PARAMETERS);
+		
+	    context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		final List<ChargeCodeData> chargeCodes = this.chargeCodeReadPlatformService.retrieveAllChargeCodes();
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		return this.toApiJsonSerializer.serialize(settings, chargeCodes,RESPONSE_PARAMETERS);
 
 	}
 
@@ -94,20 +91,14 @@ public class ChargeCodeApiResource {
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String retrieveChargeCodeTemplateData(@Context final UriInfo uriInfo) {
-		// context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		final List<ChargeTypeData> chargeTypeData = this.chargeCodeReadPlatformService
-				.getChargeType();
-		final List<DurationTypeData> durationTypeData = this.chargeCodeReadPlatformService
-				.getDurationType();
-		final List<BillFrequencyCodeData> billFrequencyData = this.chargeCodeReadPlatformService
-				.getBillFrequency();
-
-		final ChargeCodeData chargeCodeData = new ChargeCodeData(null,
-				chargeTypeData, durationTypeData, billFrequencyData);
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper
-				.process(uriInfo.getQueryParameters());
-		return this.toApiJsonSerializer.serialize(settings, chargeCodeData,
-				RESPONSE_PARAMETERS);
+	   
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		final List<ChargeTypeData> chargeTypeData = this.chargeCodeReadPlatformService.getChargeType();
+		final List<DurationTypeData> durationTypeData = this.chargeCodeReadPlatformService.getDurationType();
+		final List<BillFrequencyCodeData> billFrequencyData = this.chargeCodeReadPlatformService.getBillFrequency();
+		final ChargeCodeData chargeCodeData = new ChargeCodeData(null,chargeTypeData,durationTypeData,billFrequencyData);
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		return this.toApiJsonSerializer.serialize(settings, chargeCodeData,RESPONSE_PARAMETERS);
 
 	}
 
@@ -119,14 +110,13 @@ public class ChargeCodeApiResource {
 	@POST
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String createChargeCode(String apiRequestBodyAsJson,
-			@Context final UriInfo uriInfo) {
-		// context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		final CommandWrapper commandRequest = new CommandWrapperBuilder()
-				.createChargeCode().withJson(apiRequestBodyAsJson).build();
-		final CommandProcessingResult result = this.commandSourceWritePlatformService
-				.logCommandSource(commandRequest);
+	public String createChargeCode(final String apiRequestBodyAsJson,@Context final UriInfo uriInfo) {
+		
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().createChargeCode().withJson(apiRequestBodyAsJson).build();
+		final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
+	
 	}
 
 	/**
@@ -138,23 +128,17 @@ public class ChargeCodeApiResource {
 	@Path("{chargeCodeId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrieveSingleChargeCodeDetails(
-			@PathParam("chargeCodeId") final Long chargeCodeId,
-			@Context final UriInfo uriInfo) {
-		// context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		ChargeCodeData chargeCodeData = chargeCodeReadPlatformService
-				.retrieveSingleChargeCodeDetails(chargeCodeId);
-		chargeCodeData.setChargeTypeData(this.chargeCodeReadPlatformService
-				.getChargeType());
-		chargeCodeData.setDurationTypeData(this.chargeCodeReadPlatformService
-				.getDurationType());
-		chargeCodeData
-				.setBillFrequencyCodeData(this.chargeCodeReadPlatformService
-						.getBillFrequency());
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper
-				.process(uriInfo.getQueryParameters());
-		return this.toApiJsonSerializer.serialize(settings, chargeCodeData,
-				RESPONSE_PARAMETERS);
+	public String retrieveSingleChargeCodeDetails(@PathParam("chargeCodeId") final Long chargeCodeId,@Context final UriInfo uriInfo) {
+	   
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		ChargeCodeData chargeCodeData = chargeCodeReadPlatformService.retrieveSingleChargeCodeDetails(chargeCodeId);
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		if(settings.isTemplate()){
+		chargeCodeData.setChargeTypeData(this.chargeCodeReadPlatformService.getChargeType());
+		chargeCodeData.setDurationTypeData(this.chargeCodeReadPlatformService.getDurationType());
+		chargeCodeData.setBillFrequencyCodeData(this.chargeCodeReadPlatformService.getBillFrequency());
+		}
+		return this.toApiJsonSerializer.serialize(settings,chargeCodeData,RESPONSE_PARAMETERS);
 	}
 
 	/**
@@ -166,15 +150,11 @@ public class ChargeCodeApiResource {
 	@Path("{chargeCodeId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String updateSingleChargeCode(
-			@PathParam("chargeCodeId") final Long chargeCodeId,
-			final String apiRequestBodyAsJson) {
-		// context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		final CommandWrapper commandRequest = new CommandWrapperBuilder()
-				.updateChargeCode(chargeCodeId).withJson(apiRequestBodyAsJson)
-				.build();
-		final CommandProcessingResult result = this.commandSourceWritePlatformService
-				.logCommandSource(commandRequest);
+	public String updateSingleChargeCode(@PathParam("chargeCodeId") final Long chargeCodeId,final String apiRequestBodyAsJson) {
+	   
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().updateChargeCode(chargeCodeId).withJson(apiRequestBodyAsJson)	.build();
+		final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 	}
 

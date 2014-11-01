@@ -1,6 +1,7 @@
 package org.mifosplatform.billing.currency.serialization;
 
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -29,14 +30,12 @@ public final class CountryCurrencyCommandFromApiJsonDeserializer {
 	/**
 	 * The parameters supported for this command.
 	 */
-	private final Set<String> supportedParameters = new HashSet<String>(
-			Arrays.asList("country", "currency", "status", "baseCurrency",
+	private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("country", "currency", "status", "baseCurrency",
 					"conversionRate", "locale"));
 	private final FromJsonHelper fromApiJsonHelper;
 
 	@Autowired
-	public CountryCurrencyCommandFromApiJsonDeserializer(
-			final FromJsonHelper fromApiJsonHelper) {
+	public CountryCurrencyCommandFromApiJsonDeserializer(final FromJsonHelper fromApiJsonHelper) {
 		this.fromApiJsonHelper = fromApiJsonHelper;
 	}
 
@@ -51,34 +50,32 @@ public final class CountryCurrencyCommandFromApiJsonDeserializer {
 
 		final Type typeOfMap = new TypeToken<Map<String, Object>>() {
 		}.getType();
-		fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json,
-				supportedParameters);
+		fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json,supportedParameters);
 
 		final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
-		final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(
-				dataValidationErrors).resource("countrycurrency");
+		final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("countrycurrency");
 
 		final JsonElement element = fromApiJsonHelper.parse(json);
 
-		final String country = fromApiJsonHelper.extractStringNamed("country",
-				element);
-		baseDataValidator.reset().parameter("country").value(country)
-				.notBlank();
+		final String country = fromApiJsonHelper.extractStringNamed("country",element);
+		baseDataValidator.reset().parameter("country").value(country).notBlank();
 		
-		final String currency = fromApiJsonHelper.extractStringNamed(
-				"currency", element);
-		baseDataValidator.reset().parameter("currency").value(currency)
-				.notBlank();
+		final String currency = fromApiJsonHelper.extractStringNamed("currency", element);
+		baseDataValidator.reset().parameter("currency").value(currency).notBlank();
 		
-		final String status = fromApiJsonHelper.extractStringNamed("status",
-				element);
+		final String status = fromApiJsonHelper.extractStringNamed("status",element);
 		baseDataValidator.reset().parameter("status").value(status).notBlank();
+		
+		final String baseCurrency = fromApiJsonHelper.extractStringNamed("baseCurrency",element);
+		baseDataValidator.reset().parameter("baseCurrency").value(baseCurrency).notBlank();
+		
+		final BigDecimal conversionRate = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("conversionRate", element);
+		baseDataValidator.reset().parameter("conversionRate").value(conversionRate).notNull();
 
 		throwExceptionIfValidationWarningsExist(dataValidationErrors);
 	}
 
-	private void throwExceptionIfValidationWarningsExist(
-			final List<ApiParameterError> dataValidationErrors) {
+	private void throwExceptionIfValidationWarningsExist(final List<ApiParameterError> dataValidationErrors) {
 		if (!dataValidationErrors.isEmpty()) {
 			throw new PlatformApiDataValidationException(
 					"validation.msg.validation.errors.exist",

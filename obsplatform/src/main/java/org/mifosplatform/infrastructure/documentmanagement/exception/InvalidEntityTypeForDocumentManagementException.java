@@ -12,8 +12,10 @@ import org.mifosplatform.infrastructure.core.exception.AbstractPlatformResourceN
  * invoked for invalid Entity Types
  */
 public class InvalidEntityTypeForDocumentManagementException extends AbstractPlatformResourceNotFoundException {
+	
+	private static final long serialVersionUID = 1L;
 
-    public InvalidEntityTypeForDocumentManagementException(final String entityType) {
+	public InvalidEntityTypeForDocumentManagementException(final String entityType) {
         super("error.documentmanagement.entitytype.invalid", "Document Management is not support for the Entity Type: " + entityType,
                 entityType);
     }

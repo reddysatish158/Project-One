@@ -6,7 +6,7 @@ import org.mifosplatform.organisation.priceregion.data.PriceRegionData;
 
 public interface RegionalPriceReadplatformService {
 
-	List<PriceRegionData> getThePriceregionsDetails();
+	List<PriceRegionData> getPriceRegionsDetails();
 
 	PriceRegionData getTheClientRegionDetails(Long clientId);
 

@@ -29,9 +29,7 @@ public class DiscountReadPlatformServiceImpl implements
 	private final PlatformSecurityContext context;
 
 	@Autowired
-	public DiscountReadPlatformServiceImpl(
-			final PlatformSecurityContext context,
-			final TenantAwareRoutingDataSource dataSource) {
+	public DiscountReadPlatformServiceImpl(final PlatformSecurityContext context,final TenantAwareRoutingDataSource dataSource) {
 		this.context = context;
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
@@ -45,7 +43,6 @@ public class DiscountReadPlatformServiceImpl implements
 		try {
 			context.authenticatedUser();
 			final DiscountMapper mapper = new DiscountMapper();
-
 			final String sql = "select " + mapper.schema();
 
 			return this.jdbcTemplate.query(sql, mapper, new Object[] {});
@@ -60,9 +57,9 @@ public class DiscountReadPlatformServiceImpl implements
 			RowMapper<DiscountMasterData> {
 
 		public String schema() {
-			return "ds.id as id, ds.discount_code as discountCode, ds.discount_description as discountdescription,"
+			return "ds.id as id, ds.discount_code as discountCode, ds.discount_description as discountDescription,"
 					+ "ds.discount_type as discountType, ds.discount_rate as discountRate, ds.start_date as startDate, "
-					+ "ds.discount_status as status from b_discount_master ds  where ds.is_delete='N' ";
+					+ "ds.discount_status as discountStatus from b_discount_master ds  where ds.is_delete='N' ";
 
 		}
 
@@ -72,17 +69,12 @@ public class DiscountReadPlatformServiceImpl implements
 
 			final Long id = resultSet.getLong("id");
 			final String discountCode = resultSet.getString("discountCode");
-			final String discountdescription = resultSet
-					.getString("discountdescription");
+			final String discountDescription = resultSet.getString("discountDescription");
 			final String discountType = resultSet.getString("discountType");
-			final BigDecimal discountRate = resultSet
-					.getBigDecimal("discountRate");
-			final LocalDate startDate = JdbcSupport.getLocalDate(resultSet,
-					"startDate");
-			final String status = resultSet.getString("status");
-			return new DiscountMasterData(id, discountCode,
-					discountdescription, discountType, discountRate, startDate,
-					status);
+			final BigDecimal discountRate = resultSet.getBigDecimal("discountRate");
+			final LocalDate startDate = JdbcSupport.getLocalDate(resultSet,"startDate");
+			final String discountStatus = resultSet.getString("discountStatus");
+			return new DiscountMasterData(id, discountCode,discountDescription, discountType, discountRate, startDate,discountStatus);
 
 		}
 	}
@@ -94,11 +86,10 @@ public class DiscountReadPlatformServiceImpl implements
 	public DiscountMasterData retrieveSingleDiscountDetail(Long discountId) {
 		try {
 			context.authenticatedUser();
-			DiscountMapper mapper = new DiscountMapper();
-			String sql = "select " + mapper.schema() + " and ds.id=?";
+			final DiscountMapper mapper = new DiscountMapper();
+			final String sql = "select " + mapper.schema() + " and ds.id=?";
 
-			return this.jdbcTemplate.queryForObject(sql, mapper,
-					new Object[] { discountId });
+			return this.jdbcTemplate.queryForObject(sql, mapper,new Object[] { discountId });
 		} catch (EmptyResultDataAccessException accessException) {
 			return null;
 		}

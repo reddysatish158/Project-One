@@ -469,6 +469,9 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         logger.error(dve.getMessage(), dve);
     }
 
+    /* (non-Javadoc)
+     * @see #updateClientTaxExemption(java.lang.Long, org.mifosplatform.infrastructure.core.api.JsonCommand)
+     */
     @Transactional
 	@Override
 	public CommandProcessingResult updateClientTaxExemption(final Long clientId,final JsonCommand command) {
@@ -476,6 +479,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 		Client clientTaxStatus=null;
 		
 		try{
+			 this.context.authenticatedUser();
 			 clientTaxStatus = this.clientRepository.findOneWithNotFoundDetection(clientId);
 			 char taxValue=clientTaxStatus.getTaxExemption();
 			 final boolean taxStatus=command.booleanPrimitiveValueOfParameterNamed("taxExemption");
@@ -487,20 +491,26 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 				 clientTaxStatus.setTaxExemption(taxValue);
 			 }
 			 this.clientRepository.save(clientTaxStatus); 
-		}catch(DataIntegrityViolationException dve){
+			 return new CommandProcessingResultBuilder().withEntityId(clientTaxStatus.getId()).build();
+		 }catch(DataIntegrityViolationException dve){
 			 handleDataIntegrityIssues(command, dve);
-	            return CommandProcessingResult.empty();
+			 return new CommandProcessingResult(Long.valueOf(-1));
 		}
-		return new CommandProcessingResultBuilder().withEntityId(clientTaxStatus.getId()).withClientId(clientId).build();
+		
 	}
 
+    /* (non-Javadoc)
+     * @see #updateClientBillModes(java.lang.Long, org.mifosplatform.infrastructure.core.api.JsonCommand)
+     */
     @Transactional
 	@Override
-	public CommandProcessingResult updateClientBillMode(final Long clientId,final JsonCommand command) {
-		
+
+	public CommandProcessingResult updateClientBillModes(final Long clientId,final JsonCommand command) {
+
 		Client clientBillMode=null;
 	
 		try{
+			 this.context.authenticatedUser();
 			 this.fromApiJsonDeserializer.ValidateBillMode(command);
 			 clientBillMode=this.clientRepository.findOneWithNotFoundDetection(clientId);
 			 final String billMode=command.stringValueOfParameterNamed("billMode");
@@ -509,22 +519,30 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 			 }else{
 				 
 			 }
-		 this.clientRepository.save(clientBillMode); 	 
+		 this.clientRepository.save(clientBillMode); 
+		 return new CommandProcessingResultBuilder().withCommandId(command.commandId())
+				 .withEntityId(clientBillMode.getId()).build();
 		}catch(DataIntegrityViolationException dve){
 			 handleDataIntegrityIssues(command, dve);
-	            return CommandProcessingResult.empty();
+			return new CommandProcessingResult(Long.valueOf(-1));
 		}
 		
-		return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(clientBillMode.getId()).withClientId(clientId).build();
+		
 	}
 
+    /* (non-Javadoc)
+     * @see #createClientParent(java.lang.Long, org.mifosplatform.infrastructure.core.api.JsonCommand)
+     */
     @Transactional
 	@Override
-	public CommandProcessingResult createClientParent(final Long entityId,final JsonCommand command) {
+
+	public CommandProcessingResult createParentClient(final Long entityId,final JsonCommand command) {
+  
 			Client childClient=null;
 			Client parentClient=null;
 		
 				try {
+					this.context.authenticatedUser();
 					this.fromApiJsonDeserializer.ValidateParent(command);
 					final String parentAcntId=command.stringValueOfParameterNamed("accountNo");
 					childClient = this.clientRepository.findOneWithNotFoundDetection(entityId);
@@ -534,7 +552,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 					
 						if(parentClient.getParentId() == null && !parentClient.getId().equals(childClient.getId())&&count.equals(false)){	
 							childClient.setParentId(parentClient.getId());
-							this.clientRepository.save(childClient);
+							this.clientRepository.saveAndFlush(childClient);
 						}else if(parentClient.getId().equals(childClient.getId())){
 							final String errorMessage="himself can not be parent to his account.";
 							throw new InvalidClientStateTransitionException("Not parent", "himself.can.not.be.parent.to his.account", errorMessage);
@@ -545,35 +563,37 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 							final String errorMessage="can not be parent to this account.";
 							throw new InvalidClientStateTransitionException("Not parent", "can.not.be.parent.to this.account", errorMessage);
 						}
-			
-				}catch(DataIntegrityViolationException dve){
-					handleDataIntegrityIssues(command, dve);
-	            return CommandProcessingResult.empty();
-				}
+						
 				return new CommandProcessingResultBuilder().withEntityId(childClient.getId()).withClientId(childClient.getId()).build();
+						
+			  	}catch(DataIntegrityViolationException dve){
+					handleDataIntegrityIssues(command, dve);
+					return new CommandProcessingResult(Long.valueOf(-1));
+				}
 		}
 	
 	
+	/* (non-Javadoc)
+	 * @see #deleteChildFromParentClient(java.lang.Long, org.mifosplatform.infrastructure.core.api.JsonCommand)
+	 */
 	@Transactional
 	@Override
-	public CommandProcessingResult deleteChildFromParentClient(final Long clientId, final JsonCommand command) {
-		Long parentId=null;
+
+	public CommandProcessingResult deleteChildFromParentClient(final Long childId, final JsonCommand command) {
+		
 		try {
 			context.authenticatedUser();
-			final Client childClient = this.clientRepository.findOneWithNotFoundDetection(clientId);
-			parentId=childClient.getParentId();
+			Client childClient = this.clientRepository.findOneWithNotFoundDetection(childId);
+			final Long parentId=childClient.getParentId();
 			childClient.setParentId(null);
 			this.clientRepository.saveAndFlush(childClient);
+			return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(parentId).build();
 	
 		}catch(DataIntegrityViolationException dve){
 			handleDataIntegrityIssues(command, dve);
-        return CommandProcessingResult.empty();
+			return new CommandProcessingResult(Long.valueOf(-1));
 		}
-		return new CommandProcessingResultBuilder() //
-        .withCommandId(command.commandId()) //
-        .withClientId(parentId) //
-        .withEntityId(clientId) //
-        .build();
+		
 	}
 
 }

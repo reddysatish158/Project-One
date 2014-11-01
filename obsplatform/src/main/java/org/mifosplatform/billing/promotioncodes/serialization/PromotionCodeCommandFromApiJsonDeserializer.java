@@ -30,15 +30,12 @@ public final class PromotionCodeCommandFromApiJsonDeserializer {
 	/**
 	 * The parameters supported for this command.
 	 */
-	private final Set<String> supportedParameters = new HashSet<String>(
-			Arrays.asList("promotionCode", "promotionDescription",
-					"durationType", "duration", "discountType", "discountRate",
-					"startDate", "locale", "dateFormat"));
+	private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("promotionCode", "promotionDescription","durationType", 
+			                            "duration", "discountType", "discountRate","startDate", "locale", "dateFormat"));
 	private final FromJsonHelper fromApiJsonHelper;
 
 	@Autowired
-	public PromotionCodeCommandFromApiJsonDeserializer(
-			final FromJsonHelper fromApiJsonHelper) {
+	public PromotionCodeCommandFromApiJsonDeserializer(final FromJsonHelper fromApiJsonHelper) {
 		this.fromApiJsonHelper = fromApiJsonHelper;
 	}
 
@@ -58,46 +55,33 @@ public final class PromotionCodeCommandFromApiJsonDeserializer {
 
 		final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
 		final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(
-				dataValidationErrors).resource("promotioncodes");
+				dataValidationErrors).resource("promotioncode");
 
 		final JsonElement element = fromApiJsonHelper.parse(json);
 
-		final String promotioncode = fromApiJsonHelper.extractStringNamed(
-				"promotionCode", element);
-		baseDataValidator.reset().parameter("promotionCode")
-				.value(promotioncode).notBlank();
+		final String promotioncode = fromApiJsonHelper.extractStringNamed("promotionCode", element);
+		baseDataValidator.reset().parameter("promotionCode").value(promotioncode).notBlank();
 
-		final String promotionDescription = fromApiJsonHelper
-				.extractStringNamed("promotionDescription", element);
-		baseDataValidator.reset().parameter("promotionDescription")
-				.value(promotionDescription).notBlank();
+		final String promotionDescription = fromApiJsonHelper.extractStringNamed("promotionDescription", element);
+		baseDataValidator.reset().parameter("promotionDescription").value(promotionDescription).notBlank();
 
-		final String durationtype = fromApiJsonHelper.extractStringNamed(
-				"durationType", element);
-		baseDataValidator.reset().parameter("durationtype").value(durationtype)
-				.notBlank();
+		final String durationtype = fromApiJsonHelper.extractStringNamed("durationType", element);
+		baseDataValidator.reset().parameter("durationtype").value(durationtype).notBlank();
 
-		final Long duration = fromApiJsonHelper.extractLongNamed("duration",
-				element);
-		baseDataValidator.reset().parameter("duration").value(duration)
-				.notBlank();
+		final Long duration = fromApiJsonHelper.extractLongNamed("duration",element);
+		baseDataValidator.reset().parameter("duration").value(duration).notBlank();
 
-		final String discounttype = fromApiJsonHelper.extractStringNamed(
-				"discountType", element);
-		baseDataValidator.reset().parameter("discounttype").value(discounttype)
-				.notBlank();
+		final String discounttype = fromApiJsonHelper.extractStringNamed("discountType", element);
+		baseDataValidator.reset().parameter("discounttype").value(discounttype).notBlank();
 
-		final BigDecimal discountRate = fromApiJsonHelper
-				.extractBigDecimalWithLocaleNamed("discountRate", element);
-		baseDataValidator.reset().parameter("discountRate").value(discountRate)
-				.notBlank();
+		final BigDecimal discountRate = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("discountRate", element);
+		baseDataValidator.reset().parameter("discountRate").value(discountRate).notBlank();
 
 		throwExceptionIfValidationWarningsExist(dataValidationErrors);
 
 	}
 
-	private void throwExceptionIfValidationWarningsExist(
-			final List<ApiParameterError> dataValidationErrors) {
+	private void throwExceptionIfValidationWarningsExist(final List<ApiParameterError> dataValidationErrors) {
 		if (!dataValidationErrors.isEmpty()) {
 			throw new PlatformApiDataValidationException(
 					"validation.msg.validation.errors.exist",

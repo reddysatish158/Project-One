@@ -27,8 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class DiscountWritePlatformServiceImpl implements
 		DiscountWritePlatformService {
 
-	private final static Logger LOGGER = LoggerFactory
-			.getLogger(DiscountWritePlatformServiceImpl.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(DiscountWritePlatformServiceImpl.class);
 	private final PlatformSecurityContext context;
 	private final DiscountCommandFromApiJsonDeserializer apiJsonDeserializer;
 	private final DiscountMasterRepository discountMasterRepository;
@@ -39,9 +38,8 @@ public class DiscountWritePlatformServiceImpl implements
 	 * @param discountMasterRepository
 	 */
 	@Autowired
-	public DiscountWritePlatformServiceImpl(
-			final PlatformSecurityContext context,
-			DiscountCommandFromApiJsonDeserializer apiJsonDeserializer,
+	public DiscountWritePlatformServiceImpl(final PlatformSecurityContext context,
+			final DiscountCommandFromApiJsonDeserializer apiJsonDeserializer,
 			final DiscountMasterRepository discountMasterRepository) {
 		this.context = context;
 		this.apiJsonDeserializer = apiJsonDeserializer;
@@ -73,12 +71,10 @@ public class DiscountWritePlatformServiceImpl implements
 
 	}
 
-	private void handleCodeDataIntegrityIssues(final JsonCommand command,
-			final DataIntegrityViolationException dve) {
+	private void handleCodeDataIntegrityIssues(final JsonCommand command,final DataIntegrityViolationException dve) {
 		final Throwable realCause = dve.getMostSpecificCause();
 		if (realCause.getMessage().contains("discountcode")) {
-			final String name = command
-					.stringValueOfParameterNamed("discountCode");
+			final String name = command.stringValueOfParameterNamed("discountCode");
 			throw new PlatformDataIntegrityException(
 					"error.msg.discount.duplicate.name",
 					"A discount with Code'" + name + "'already exists",
@@ -101,8 +97,7 @@ public class DiscountWritePlatformServiceImpl implements
 	 */
 	@Transactional
 	@Override
-	public CommandProcessingResult updateDiscount(final Long entityId,
-			final JsonCommand command) {
+	public CommandProcessingResult updateDiscount(final Long entityId,final JsonCommand command) {
 
 		try {
 
@@ -110,14 +105,12 @@ public class DiscountWritePlatformServiceImpl implements
 			this.apiJsonDeserializer.validateForCreate(command.json());
 			DiscountMaster discountMaster = discountRetrieveById(entityId);
 			final Map<String, Object> changes = discountMaster.update(command);
-
 			if (!changes.isEmpty()) {
 				this.discountMasterRepository.saveAndFlush(discountMaster);
 			}
 			
-			return new CommandProcessingResultBuilder()
-					.withCommandId(command.commandId())
-					.withEntityId(discountMaster.getId()).with(changes).build();
+			return new CommandProcessingResultBuilder().withCommandId(command.commandId())
+					       .withEntityId(discountMaster.getId()).with(changes).build();
 
 		} catch (DataIntegrityViolationException dve) {
 
@@ -148,7 +141,7 @@ public class DiscountWritePlatformServiceImpl implements
 			this.discountMasterRepository.save(discountMaster);
 			return new CommandProcessingResult(entityId);
 
-		} catch (DataIntegrityViolationException dve) {
+		} catch (final DataIntegrityViolationException dve) {
 			throw new PlatformDataIntegrityException(
 					"error.msg.could.unknown.data.integrity.issue",
 					"Unknown data integrity issue with resource: "
@@ -159,8 +152,7 @@ public class DiscountWritePlatformServiceImpl implements
 
 	private DiscountMaster discountRetrieveById(final Long entityId) {
 
-		DiscountMaster discountMaster = this.discountMasterRepository
-				.findOne(entityId);
+		DiscountMaster discountMaster = this.discountMasterRepository.findOne(entityId);
 		if (discountMaster == null) {
 			throw new DiscountMasterNotFoundException(entityId);
 		}

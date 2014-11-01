@@ -19,14 +19,12 @@ import org.springframework.stereotype.Service;
  * 
  */
 @Service
-public class CountryCurrencyReadPlatformServiceImpl implements
-		CountryCurrencyReadPlatformService {
+public class CountryCurrencyReadPlatformServiceImpl implements CountryCurrencyReadPlatformService {
 
 	private final JdbcTemplate jdbcTemplate;
 
 	@Autowired
-	public CountryCurrencyReadPlatformServiceImpl(
-			final TenantAwareRoutingDataSource dataSource) {
+	public CountryCurrencyReadPlatformServiceImpl(final TenantAwareRoutingDataSource dataSource) {
 
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 
@@ -38,17 +36,12 @@ public class CountryCurrencyReadPlatformServiceImpl implements
 	 * @see #getCountryCurrencyDetailsByName(java.lang.String)
 	 */
 	@Override
-	public List<CountryCurrencyData> getCountryCurrencyDetailsByName(
-			final String country) {
+	public List<CountryCurrencyData> getCountryCurrencyDetailsByName(final String country) {
 
 		try {
 			final CurrencyMapper mapper = new CurrencyMapper();
-
-			final String sql = "select " + mapper.schema()
-					+ " WHERE country = ? and  c.is_deleted='N' ";
-
-			return this.jdbcTemplate.query(sql, mapper,
-					new Object[] { country });
+			final String sql = "select " + mapper.schema() + " WHERE country = ? and  c.is_deleted='N' ";
+			return this.jdbcTemplate.query(sql, mapper,new Object[] { country });
 		} catch (EmptyResultDataAccessException accessException) {
 			return null;
 		}
@@ -72,11 +65,9 @@ public class CountryCurrencyReadPlatformServiceImpl implements
 			final String currency = rs.getString("currency");
 			final String status = rs.getString("status");
 			final String baseCurrency = rs.getString("baseCurrency");
-			final BigDecimal conversionRate = rs
-					.getBigDecimal("conversionRate");
+			final BigDecimal conversionRate = rs.getBigDecimal("conversionRate");
 
-			return new CountryCurrencyData(id, country, currency, baseCurrency,
-					conversionRate, status);
+			return new CountryCurrencyData(id, country, currency, baseCurrency,conversionRate, status);
 		}
 	}
 
@@ -91,9 +82,7 @@ public class CountryCurrencyReadPlatformServiceImpl implements
 		try {
 
 			final CurrencyMapper mapper = new CurrencyMapper();
-
-			final String sql = "select " + mapper.schema()
-					+ " WHERE  c.is_deleted='N' ";
+			final String sql = "select " + mapper.schema() + " WHERE  c.is_deleted='N' ";
 			return this.jdbcTemplate.query(sql, mapper, new Object[] {});
 		} catch (EmptyResultDataAccessException exception) {
 			return null;
@@ -106,15 +95,11 @@ public class CountryCurrencyReadPlatformServiceImpl implements
 	 * @see #retrieveSingleCurrencyConfigurationDetails(java.lang.Long)
 	 */
 	@Override
-	public CountryCurrencyData retrieveSingleCurrencyConfigurationDetails(
-			final Long currencyId) {
+	public CountryCurrencyData retrieveSingleCurrencyConfigurationDetails(final Long currencyId) {
 		try {
 			final CurrencyMapper mapper = new CurrencyMapper();
-
-			final String sql = "select " + mapper.schema()
-					+ " WHERE  c.is_deleted='N' and c.id=?";
-			return this.jdbcTemplate.queryForObject(sql, mapper,
-					new Object[] { currencyId });
+			final String sql = "select " + mapper.schema() + " WHERE  c.is_deleted='N' and c.id=?";
+			return this.jdbcTemplate.queryForObject(sql, mapper,new Object[] { currencyId });
 		} catch (EmptyResultDataAccessException exception) {
 			return null;
 		}

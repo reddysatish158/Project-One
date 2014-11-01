@@ -21,16 +21,13 @@ import org.springframework.stereotype.Service;
  * 
  */
 @Service
-public class PromotionCodeReadPlatformServiceImpl implements
-		PromotionCodeReadPlatformService {
+public class PromotionCodeReadPlatformServiceImpl implements PromotionCodeReadPlatformService {
 
 	private final JdbcTemplate jdbcTemplate;
 	private final PlatformSecurityContext context;
 
 	@Autowired
-	public PromotionCodeReadPlatformServiceImpl(
-			final PlatformSecurityContext context,
-			final TenantAwareRoutingDataSource dataSource) {
+	public PromotionCodeReadPlatformServiceImpl(final PlatformSecurityContext context,final TenantAwareRoutingDataSource dataSource) {
 		this.context = context;
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
@@ -45,9 +42,8 @@ public class PromotionCodeReadPlatformServiceImpl implements
 
 		try {
 			context.authenticatedUser();
-			PromotionCodeMapper mapper = new PromotionCodeMapper();
-
-			String sql = "select " + mapper.schema();
+			final PromotionCodeMapper mapper = new PromotionCodeMapper();
+			final String sql = "select " + mapper.schema();
 
 			return this.jdbcTemplate.query(sql, mapper, new Object[] {});
 		} catch (EmptyResultDataAccessException accessException) {
@@ -55,8 +51,7 @@ public class PromotionCodeReadPlatformServiceImpl implements
 		}
 	}
 
-	private static final class PromotionCodeMapper implements
-			RowMapper<PromotionCodeData> {
+	private static final class PromotionCodeMapper implements RowMapper<PromotionCodeData> {
 
 		public String schema() {
 			return "pm.id as id, pm.promotion_code as promotionCode, pm.promotion_description as promotionDescription,"
@@ -66,23 +61,18 @@ public class PromotionCodeReadPlatformServiceImpl implements
 		}
 
 		@Override
-		public PromotionCodeData mapRow(final ResultSet rs, final int rowNum)
-				throws SQLException {
+		public PromotionCodeData mapRow(final ResultSet rs, final int rowNum)throws SQLException {
 
 			final Long id = rs.getLong("id");
 			final String promotionCode = rs.getString("promotionCode");
-			final String promotionDescription = rs
-					.getString("promotionDescription");
+			final String promotionDescription = rs.getString("promotionDescription");
 			final String durationType = rs.getString("durationType");
 			final Long duration = rs.getLong("duration");
 			final String discountType = rs.getString("discountType");
 			final BigDecimal discountRate = rs.getBigDecimal("discountRate");
-			final LocalDate startDate = JdbcSupport.getLocalDate(rs,
-					"startDate");
+			final LocalDate startDate = JdbcSupport.getLocalDate(rs,"startDate");
 			// String status = rs.getString("status");
-			return new PromotionCodeData(id, promotionCode,
-					promotionDescription, durationType, duration, discountType,
-					discountRate, startDate);
+			return new PromotionCodeData(id, promotionCode,promotionDescription, durationType, duration, discountType,discountRate, startDate);
 
 		}
 	}
@@ -96,12 +86,10 @@ public class PromotionCodeReadPlatformServiceImpl implements
 	public PromotionCodeData retriveSinglePromotionCodeDetails(Long id) {
 		try {
 			context.authenticatedUser();
-			PromotionCodeMapper mapper = new PromotionCodeMapper();
+			final PromotionCodeMapper mapper = new PromotionCodeMapper();
+			final String sql = "select " + mapper.schema() + " and pm.id=?";
 
-			String sql = "select " + mapper.schema() + " and pm.id=?";
-
-			return this.jdbcTemplate.queryForObject(sql, mapper,
-					new Object[] { id });
+			return this.jdbcTemplate.queryForObject(sql, mapper,new Object[] { id });
 		} catch (EmptyResultDataAccessException accessException) {
 			return null;
 		}

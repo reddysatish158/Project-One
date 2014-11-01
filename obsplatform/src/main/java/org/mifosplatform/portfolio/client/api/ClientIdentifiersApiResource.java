@@ -41,6 +41,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author hugo
+ *this api class used to upload ,download and delete different  identifiers of a client
+ */
 @Path("/clients/{clientId}/identifiers")
 @Component
 @Scope("singleton")
@@ -84,7 +88,6 @@ public class ClientIdentifiersApiResource {
 
         final Collection<ClientIdentifierData> clientIdentifiers = this.clientIdentifierReadPlatformService
                 .retrieveClientIdentifiers(clientId);
-
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, clientIdentifiers, CLIENT_IDENTIFIER_DATA_PARAMETERS);
     }
@@ -99,7 +102,6 @@ public class ClientIdentifiersApiResource {
 
         final Collection<CodeValueData> codeValues = this.codeValueReadPlatformService.retrieveCodeValuesByCode("Customer Identifier");
         final ClientIdentifierData clientIdentifierData = ClientIdentifierData.template(codeValues);
-
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, clientIdentifierData, CLIENT_IDENTIFIER_DATA_PARAMETERS);
     }
@@ -139,7 +141,6 @@ public class ClientIdentifiersApiResource {
         this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-
         ClientIdentifierData clientIdentifierData = this.clientIdentifierReadPlatformService.retrieveClientIdentifier(clientId,
                 clientIdentifierId);
         if (settings.isTemplate()) {
@@ -158,11 +159,11 @@ public class ClientIdentifiersApiResource {
             @PathParam("identifierId") final Long clientIdentifierId, final String apiRequestBodyAsJson) {
 
         try {
+        	this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions);
+        	
             final CommandWrapper commandRequest = new CommandWrapperBuilder().updateClientIdentifier(clientId, clientIdentifierId)
                     .withJson(apiRequestBodyAsJson).build();
-
             final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
             return this.toApiJsonSerializer.serialize(result);
         } catch (final DuplicateClientIdentifierException e) {
             DuplicateClientIdentifierException reThrowAs = e;
@@ -183,10 +184,10 @@ public class ClientIdentifiersApiResource {
     public String deleteClientIdentifier(@PathParam("clientId") final Long clientId,
             @PathParam("identifierId") final Long clientIdentifierId) {
 
+    	this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions);
+    	
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteClientIdentifier(clientId, clientIdentifierId).build();
-
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.toApiJsonSerializer.serialize(result);
     }
 }
