@@ -17,13 +17,13 @@ Drop procedure IF EXISTS addlocation;
 
 
 insert ignore into m_code (id,code_name,is_system_defined,code_description) VALUES (null,'Item Quality',0,'define haraware condition');
-select @a_lid:=last_insert_id();
+select @a_lid:=(select id from m_code where code_name='Item Quality');
 insert ignore into m_code_value VALUES (null,@a_lid,'Good',0);
 insert ignore into m_code_value VALUES (null,@a_lid,'Refurbished',0);
 insert ignore into m_code_value VALUES (null,@a_lid,'Faulty',0);
 
 insert ignore into m_code (id,code_name,is_system_defined,code_description) VALUES (null,'Item Status',0,'define haraware staus');
-select @a_lid:=last_insert_id();
+select @a_lid:=(select id from m_code where code_name='Item Status');
 insert ignore into m_code_value VALUES (null,@a_lid,'Available',0);
 insert ignore into m_code_value VALUES (null,@a_lid,'UnAvailable',0);
 insert ignore into m_code_value VALUES (null,@a_lid,'In Use',0);
