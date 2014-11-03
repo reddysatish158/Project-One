@@ -115,15 +115,11 @@ public class DatatablesApiResource {
 	@Path("{datatableName}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String updateDatatable(
-			@PathParam("datatableName") final String datatableName,
+	public String updateDatatable(@PathParam("datatableName") final String datatableName,
 			final String apiRequestBodyAsJson) {
 
-		final CommandWrapper commandRequest = new CommandWrapperBuilder()
-				.updateDatatable(datatableName, apiRequestBodyAsJson).build();
-
-		final CommandProcessingResult result = this.commandSourceWritePlatformService
-				.logCommandSource(commandRequest);
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().updateDatatable(datatableName, apiRequestBodyAsJson).build();
+		final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 	}
 
@@ -353,13 +349,8 @@ public class DatatablesApiResource {
 			@PathParam("apptableId") final Long apptableId,
 			@PathParam("datatableId") final Long datatableId) {
 
-		final CommandWrapper commandRequest = new CommandWrapperBuilder() //
-				.deleteDatatable(datatable, apptableId, datatableId) //
-				.build();
-
-		final CommandProcessingResult result = this.commandSourceWritePlatformService
-				.logCommandSource(commandRequest);
-
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteDatatable(datatable, apptableId, datatableId).build();
+		final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 	}
 

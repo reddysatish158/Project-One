@@ -5,6 +5,10 @@ import java.util.Set;
 
 import org.joda.time.LocalDate;
 
+/**
+ * @author hugo
+ *
+ */
 public class OneTimeSaleCommand {
 	private final Long itemId;
 	private final String units;
@@ -15,9 +19,9 @@ public class OneTimeSaleCommand {
 	private final Set<String> modifiedParameters;
 	private final LocalDate saleDate; 
 
-	public OneTimeSaleCommand(Set<String> modifiedParameters, Long itemId,
-			String units, String chargeCode, BigDecimal unitPrice,
-			String quantity, BigDecimal totalPrice, LocalDate saleDate) {
+	public OneTimeSaleCommand(final Set<String> modifiedParameters, final Long itemId,
+			final String units, final String chargeCode, final BigDecimal unitPrice,
+			final String quantity, final BigDecimal totalPrice, final LocalDate saleDate) {
 		this.itemId = itemId;
 		this.modifiedParameters = modifiedParameters;
 		this.units = units;

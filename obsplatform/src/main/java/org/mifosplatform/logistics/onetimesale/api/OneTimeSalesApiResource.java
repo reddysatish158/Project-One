@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -48,64 +48,72 @@ import org.springframework.stereotype.Component;
 
 import com.google.gson.JsonElement;
 
-
-
+/**
+ * @author hugo
+ * 
+ */
 @Path("/onetimesales")
 @Component
 @Scope("singleton")
 public class OneTimeSalesApiResource {
-	private  final Set<String> RESPONSE_DATA_PARAMETERS=new HashSet<String>(Arrays.asList("itemId","chargedatas","itemDatas",
-            "units","unitPrice","saleDate","totalprice","quantity","flag","allocationData","discountMasterDatas","id","eventName","bookedDate",
-            "eventPrice","chargeCode","status","contractPeriods"));
-    
+	private final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(Arrays.asList("itemId", "chargedatas", "itemDatas", "units",
+					"unitPrice", "saleDate", "totalprice", "quantity", "flag","allocationData", "discountMasterDatas", "id", "eventName",
+					"bookedDate", "eventPrice", "chargeCode", "status","contractPeriods"));
+
 	private final String resourceNameForPermissions = "ONETIMESALE";
-    private final PlatformSecurityContext context;
+	private final PlatformSecurityContext context;
 	private final DefaultToApiJsonSerializer<OneTimeSaleData> toApiJsonSerializer;
 	private final DefaultToApiJsonSerializer<ItemData> defaultToApiJsonSerializer;
 	private final ApiRequestParameterHelper apiRequestParameterHelper;
-	private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
+	private final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService;
 	private final OneTimeSaleWritePlatformService oneTimeSaleWritePlatformService;
 	private final OneTimeSaleReadPlatformService oneTimeSaleReadPlatformService;
-	private final  ItemReadPlatformService itemMasterReadPlatformService;
-	private final  DiscountReadPlatformService discountReadPlatformService;
+	private final ItemReadPlatformService itemMasterReadPlatformService;
+	private final DiscountReadPlatformService discountReadPlatformService;
 	private final EventOrderReadplatformServie eventOrderReadplatformServie;
 	private final FromJsonHelper fromJsonHelper;
 	private final OfficeReadPlatformService officeReadPlatformService;
 	private final ContractPeriodReadPlatformService contractPeriodReadPlatformService;
-		 @Autowired
-	    public OneTimeSalesApiResource(final PlatformSecurityContext context,final DefaultToApiJsonSerializer<OneTimeSaleData> toApiJsonSerializer,
-	    final ApiRequestParameterHelper apiRequestParameterHelper,final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
-	    final OneTimeSaleWritePlatformService oneTimeSaleWritePlatformService,final OneTimeSaleReadPlatformService oneTimeSaleReadPlatformService,
-	    final ItemReadPlatformService itemReadPlatformService,final DiscountReadPlatformService discountReadPlatformService,
-	    final EventOrderReadplatformServie eventOrderReadplatformServie,final OfficeReadPlatformService officeReadPlatformService,
-	    final DefaultToApiJsonSerializer<ItemData> defaultToApiJsonSerializer,final FromJsonHelper fromJsonHelper,
-	    final ContractPeriodReadPlatformService contractPeriodReadPlatformService) {
-		        
-			    this.context = context;
-		        this.fromJsonHelper=fromJsonHelper;
-		        this.toApiJsonSerializer = toApiJsonSerializer;
-		        this.officeReadPlatformService=officeReadPlatformService;
-		        this.defaultToApiJsonSerializer=defaultToApiJsonSerializer;
-		        this.itemMasterReadPlatformService=itemReadPlatformService;
-		        this.apiRequestParameterHelper = apiRequestParameterHelper;
-		        this.discountReadPlatformService=discountReadPlatformService;
-		        this.eventOrderReadplatformServie=eventOrderReadplatformServie;
-		        this.oneTimeSaleReadPlatformService=oneTimeSaleReadPlatformService;
-		        this.oneTimeSaleWritePlatformService=oneTimeSaleWritePlatformService;
-		        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
-                this.contractPeriodReadPlatformService=contractPeriodReadPlatformService;
-		 }		
-		
-	
+
+	@Autowired
+	public OneTimeSalesApiResource(final PlatformSecurityContext context,
+			final DefaultToApiJsonSerializer<OneTimeSaleData> toApiJsonSerializer,
+			final ApiRequestParameterHelper apiRequestParameterHelper,
+			final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService,
+			final OneTimeSaleWritePlatformService oneTimeSaleWritePlatformService,
+			final OneTimeSaleReadPlatformService oneTimeSaleReadPlatformService,
+			final ItemReadPlatformService itemReadPlatformService,
+			final DiscountReadPlatformService discountReadPlatformService,
+			final EventOrderReadplatformServie eventOrderReadplatformServie,
+			final OfficeReadPlatformService officeReadPlatformService,
+			final DefaultToApiJsonSerializer<ItemData> defaultToApiJsonSerializer,
+			final FromJsonHelper fromJsonHelper,
+			final ContractPeriodReadPlatformService contractPeriodReadPlatformService) {
+
+		this.context = context;
+		this.fromJsonHelper = fromJsonHelper;
+		this.toApiJsonSerializer = toApiJsonSerializer;
+		this.officeReadPlatformService = officeReadPlatformService;
+		this.defaultToApiJsonSerializer = defaultToApiJsonSerializer;
+		this.itemMasterReadPlatformService = itemReadPlatformService;
+		this.apiRequestParameterHelper = apiRequestParameterHelper;
+		this.discountReadPlatformService = discountReadPlatformService;
+		this.eventOrderReadplatformServie = eventOrderReadplatformServie;
+		this.oneTimeSaleReadPlatformService = oneTimeSaleReadPlatformService;
+		this.oneTimeSaleWritePlatformService = oneTimeSaleWritePlatformService;
+		this.commandSourceWritePlatformService = commandSourceWritePlatformService;
+		this.contractPeriodReadPlatformService = contractPeriodReadPlatformService;
+	}
 
 	@POST
 	@Path("{clientId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String createNewSale(@PathParam("clientId") final Long clientId,final String apiRequestBodyAsJson) {
-	 final CommandWrapper commandRequest = new CommandWrapperBuilder().createOneTimeSale(clientId).withJson(apiRequestBodyAsJson).build();
-     final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-     return this.toApiJsonSerializer.serialize(result);
+		
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().createOneTimeSale(clientId).withJson(apiRequestBodyAsJson).build();
+		final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
+		return this.toApiJsonSerializer.serialize(result);
 	}
 
 	@GET
@@ -113,106 +121,103 @@ public class OneTimeSalesApiResource {
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String retrieveItemTemplateData(@Context final UriInfo uriInfo) {
-		 context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		 
-		OneTimeSaleData data=null;
-		 data= handleTemplateRelatedData(data);
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-		return this.toApiJsonSerializer.serialize(settings, data, RESPONSE_DATA_PARAMETERS);
-	}
-
-	private OneTimeSaleData handleTemplateRelatedData(OneTimeSaleData salesData) {
 		
-			List<ChargesData> chargeDatas = this.itemMasterReadPlatformService.retrieveChargeCode();
-			List<ItemData> itemData = this.oneTimeSaleReadPlatformService.retrieveItemData();
-			final Collection<OfficeData> offices = officeReadPlatformService.retrieveAllOfficesForDropdown();
-			List<DiscountMasterData> discountdata = this.discountReadPlatformService.retrieveAllDiscounts();
-			Collection<SubscriptionData> subscriptionDatas=this.contractPeriodReadPlatformService.retrieveAllSubscription();
-			return new OneTimeSaleData(chargeDatas,itemData,salesData,discountdata,offices,subscriptionDatas);
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		OneTimeSaleData data = handleTemplateRelatedData();
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		return this.toApiJsonSerializer.serialize(settings, data,RESPONSE_DATA_PARAMETERS);
+	}
+
+	private OneTimeSaleData handleTemplateRelatedData() {
+
+		final List<ItemData> itemData = this.oneTimeSaleReadPlatformService.retrieveItemData();
+		final Collection<OfficeData> offices = officeReadPlatformService.retrieveAllOfficesForDropdown();
+		List<DiscountMasterData> discountData = this.discountReadPlatformService.retrieveAllDiscounts();
+		Collection<SubscriptionData> subscriptionDatas = this.contractPeriodReadPlatformService.retrieveAllSubscription();
+		return new OneTimeSaleData(itemData,discountData, offices, subscriptionDatas);
 
 	}
-	
+
 	@GET
 	@Path("{clientId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String retrieveClientOneTimeSaleDetails(@PathParam("clientId") final Long clientId,@Context final UriInfo uriInfo) {
+		
 		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		List<OneTimeSaleData> salesData = this.oneTimeSaleReadPlatformService.retrieveClientOneTimeSalesData(clientId);
-		List<EventOrderData> eventOrderDatas=this.eventOrderReadplatformServie.getTheClientEventOrders(clientId);
-		OneTimeSaleData data=new OneTimeSaleData(salesData,eventOrderDatas);
+		final List<OneTimeSaleData> salesData = this.oneTimeSaleReadPlatformService.retrieveClientOneTimeSalesData(clientId);
+		final List<EventOrderData> eventOrderDatas = this.eventOrderReadplatformServie.getTheClientEventOrders(clientId);
+		final OneTimeSaleData data = new OneTimeSaleData(salesData, eventOrderDatas);
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-		return this.toApiJsonSerializer.serialize(settings, data, RESPONSE_DATA_PARAMETERS);
+		return this.toApiJsonSerializer.serialize(settings, data,RESPONSE_DATA_PARAMETERS);
 	}
-	
-	
+
 	@GET
-	 @Path("{itemId}/item")
+	@Path("{itemId}/item")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String retrieveSingleItemDetails(@PathParam("itemId") final Long itemId,@Context final UriInfo uriInfo) {
+		
 		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		List<ItemData> itemCodeData = this.oneTimeSaleReadPlatformService.retrieveItemData();
-		List<DiscountMasterData> discountdata = this.discountReadPlatformService.retrieveAllDiscounts();
-	    ItemData  itemData = this.itemMasterReadPlatformService.retrieveSingleItemDetails(itemId);
-	    List<ChargesData> chargesDatas=this.itemMasterReadPlatformService.retrieveChargeCode();
-		itemData=new ItemData(itemCodeData,itemData,null,null,discountdata,chargesDatas);
+		final List<ItemData> itemCodeData = this.oneTimeSaleReadPlatformService.retrieveItemData();
+		final List<DiscountMasterData> discountdata = this.discountReadPlatformService.retrieveAllDiscounts();
+	    ItemData itemData = this.itemMasterReadPlatformService.retrieveSingleItemDetails(itemId);
+		final List<ChargesData> chargesDatas = this.itemMasterReadPlatformService.retrieveChargeCode();
+		itemData = new ItemData(itemCodeData, itemData, null, null,discountdata, chargesDatas);
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-		return this.defaultToApiJsonSerializer.serialize(settings, itemData, RESPONSE_DATA_PARAMETERS);		
+		return this.defaultToApiJsonSerializer.serialize(settings, itemData,RESPONSE_DATA_PARAMETERS);
 	}
-	
-	
+
 	@POST
 	@Path("{itemId}/totalprice")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrieveTotalPrice(@PathParam("itemId") final Long itemId,@Context final UriInfo uriInfo,final String apiRequestBodyAsJson) {
+	public String retrieveTotalPrice(@PathParam("itemId") final Long itemId,@Context final UriInfo uriInfo, final String apiRequestBodyAsJson) {
 
 		final JsonElement parsedQuery = this.fromJsonHelper.parse(apiRequestBodyAsJson);
-         final JsonQuery query = JsonQuery.from(apiRequestBodyAsJson, parsedQuery, this.fromJsonHelper);
-         ItemData itemData=oneTimeSaleWritePlatformService.calculatePrice(itemId,query);
-         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
- 		return this.defaultToApiJsonSerializer.serialize(settings, itemData, RESPONSE_DATA_PARAMETERS);	
+		final JsonQuery query = JsonQuery.from(apiRequestBodyAsJson,parsedQuery, this.fromJsonHelper);
+		ItemData itemData = oneTimeSaleWritePlatformService.calculatePrice(itemId, query);
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		return this.defaultToApiJsonSerializer.serialize(settings, itemData,RESPONSE_DATA_PARAMETERS);
 	}
 
-	@GET
+/*	@GET
 	@Path("{saleId}/oneTimeSale")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String retrieveSingleOneTimeSaleData(@PathParam("saleId") final Long saleId,@Context final UriInfo uriInfo) {
-		 context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
 		OneTimeSaleData salesData = this.oneTimeSaleReadPlatformService.retrieveSingleOneTimeSaleDetails(saleId);
 		salesData = handleTemplateRelatedData(salesData);
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-		return this.toApiJsonSerializer.serialize(settings, salesData, RESPONSE_DATA_PARAMETERS);	
-	}
-	
+		return this.toApiJsonSerializer.serialize(settings, salesData,RESPONSE_DATA_PARAMETERS);
+	}*/
 
 	@GET
-	@Path("{orderId}/allocation")
+	@Path("{saleId}/allocation")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrieveItemAllocationDetails(@PathParam("orderId") final Long orderId,@Context final UriInfo uriInfo) {
-		 context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		List<AllocationDetailsData> Data = this.oneTimeSaleReadPlatformService.retrieveAllocationDetails(orderId);
-		OneTimeSaleData salesData=new OneTimeSaleData();
-		salesData.setAllocationDetails(Data);
+	public String retrieveItemAllocationDetails(@PathParam("saleId") final Long saleId,@Context final UriInfo uriInfo) {
+		
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		final List<AllocationDetailsData> allocationData = this.oneTimeSaleReadPlatformService.retrieveAllocationDetails(saleId);
+		OneTimeSaleData salesData = new OneTimeSaleData();
+		salesData.setAllocationData(allocationData);
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-		return this.toApiJsonSerializer.serialize(settings, salesData, RESPONSE_DATA_PARAMETERS);	
+		return this.toApiJsonSerializer.serialize(settings, salesData,RESPONSE_DATA_PARAMETERS);
 	}
-	
-	@PUT
+
+	@DELETE
 	@Path("{saleId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String cancelSale(@PathParam("saleId") final Long saleId,final String apiRequestBodyAsJson) {
-	 final CommandWrapper commandRequest = new CommandWrapperBuilder().cancelOneTimeSale(saleId).withJson(apiRequestBodyAsJson).build();
-     final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-     return this.toApiJsonSerializer.serialize(result);
+		
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().cancelOneTimeSale(saleId).build();
+		final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
+		return this.toApiJsonSerializer.serialize(result);
 	}
 
-	
-	
 }
-
-

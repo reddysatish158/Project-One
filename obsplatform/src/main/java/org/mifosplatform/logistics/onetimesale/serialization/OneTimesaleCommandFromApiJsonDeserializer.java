@@ -42,6 +42,10 @@ public final class OneTimesaleCommandFromApiJsonDeserializer {
         this.fromApiJsonHelper = fromApiJsonHelper;
     }
 
+    /**
+     * @param json
+     * check validation for create one time sale
+     */
     public void validateForCreate(final String json) {
         if (StringUtils.isBlank(json)) { throw new InvalidJsonException(); }
 
@@ -52,22 +56,31 @@ public final class OneTimesaleCommandFromApiJsonDeserializer {
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("onetimesale");
 
         final JsonElement element = fromApiJsonHelper.parse(json);
+        
         final String saleType = fromApiJsonHelper.extractStringNamed("saleType", element);
         baseDataValidator.reset().parameter("saleType").value(saleType).notNull();
+        
         final LocalDate saleDate = fromApiJsonHelper.extractLocalDateNamed("saleDate", element);
         baseDataValidator.reset().parameter("saleDate").value(saleDate).notBlank();
+        
         final Long itemId = fromApiJsonHelper.extractLongNamed("itemId", element);
         baseDataValidator.reset().parameter("itemId").value(itemId).notNull();
+        
         final String quantity = fromApiJsonHelper.extractStringNamed("quantity", element);
-        baseDataValidator.reset().parameter("quantity").value(quantity).notBlank().integerGreaterThanZero().notExceedingLengthOf(50);        
+        baseDataValidator.reset().parameter("quantity").value(quantity).notBlank().integerGreaterThanZero().notExceedingLengthOf(50); 
+        
         final Long discountId = fromApiJsonHelper.extractLongNamed("discountId", element);
         baseDataValidator.reset().parameter("discountId").value(discountId).notNull();
+        
         final String chargeCode = fromApiJsonHelper.extractStringNamed("chargeCode", element);
         baseDataValidator.reset().parameter("chargeCode").value(chargeCode).notBlank();
+        
         final BigDecimal totalPrice=fromApiJsonHelper.extractBigDecimalWithLocaleNamed("totalPrice", element);
         baseDataValidator.reset().parameter("totalPrice").value(totalPrice).notNull();
+        
         final BigDecimal unitPrice=fromApiJsonHelper.extractBigDecimalWithLocaleNamed("unitPrice", element);
         baseDataValidator.reset().parameter("unitPrice").value(unitPrice).notNull();
+        
         final Long officeId = fromApiJsonHelper.extractLongNamed("officeId", element);
         baseDataValidator.reset().parameter("officeId").value(officeId).notNull();
         
@@ -77,19 +90,23 @@ public final class OneTimesaleCommandFromApiJsonDeserializer {
         		
         	}
         
-        
-        
-        
-
         throwExceptionIfValidationWarningsExist(dataValidationErrors);
-    }  public void validateForPrice(final JsonElement jsonElement) {
+        
+    }  
+    
+    /**
+     * @param jsonElement
+     * check validation for calculate total price of item sale
+     */
+    public void validateForPrice(final JsonElement jsonElement) {
         if (StringUtils.isBlank(jsonElement.toString())) { throw new InvalidJsonException(); }
 
         final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
         fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, jsonElement.toString(), supportedParameters);
-       // final JsonElement element = fromApiJsonHelper.parse(jsonElement);
+      
         final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("onetimesale");
+        
         final Integer totalPrice=fromApiJsonHelper.extractIntegerWithLocaleNamed("quantity", jsonElement);
         baseDataValidator.reset().parameter("quantity").value(totalPrice).notNull().integerGreaterThanZero();
         
@@ -98,7 +115,8 @@ public final class OneTimesaleCommandFromApiJsonDeserializer {
     }
    
     private void throwExceptionIfValidationWarningsExist(final List<ApiParameterError> dataValidationErrors) {
-        if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist",
+        if (!dataValidationErrors.isEmpty()) {
+        	throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist",
                 "Validation errors exist.", dataValidationErrors); }
     }
 }

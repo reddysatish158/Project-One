@@ -42,13 +42,11 @@ public class OneTimeSaleData {
 	private Integer taxInclusive;
 	private String chargeType;
 	
-	public OneTimeSaleData(List<ChargesData> chargeDatas,List<ItemData> itemData, OneTimeSaleData salesData,List<DiscountMasterData> discountdata,
-			Collection<OfficeData> officesData, Collection<SubscriptionData> contractPeriods) {
+	public OneTimeSaleData(final List<ItemData> itemData, final List<DiscountMasterData> discountData,
+			final Collection<OfficeData> officesData, final Collection<SubscriptionData> contractPeriods) {
 		
-		this.chargesDatas=chargeDatas;
 		this.itemDatas=itemData;
-		this.salesData=salesData;
-		this.discountMasterDatas=discountdata;
+		this.discountMasterDatas=discountData;
 		this.officesData=officesData;
 		this.contractPeriods=contractPeriods;
 	}
@@ -76,10 +74,10 @@ public class OneTimeSaleData {
 			String isInvoiced, Long itemId, Long discountId,Integer taxInclusive) {
 		this.id = oneTimeSaleId;
 		this.clientId = clientId;
-		this.units = units;
+		this.setUnits(units);
 		this.chargeCode = chargeCode;
 		this.chargeType = chargeType;
-		this.unitPrice = unitPrice;
+		this.setUnitPrice(unitPrice);
 		this.quantity = quantity;
 		this.totalPrice = totalPrice;
 		this.isInvoiced = isInvoiced;
@@ -91,99 +89,59 @@ public class OneTimeSaleData {
 
 
 	public OneTimeSaleData() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
-	public OneTimeSaleData(List<OneTimeSaleData> salesData,List<EventOrderData> eventOrderDatas) {
+	public OneTimeSaleData(final List<OneTimeSaleData> salesData,
+			          final List<EventOrderData> eventOrderDatas) {
              
 		this.oneTimeSaleData=salesData;
 		this.eventOrdersData=eventOrderDatas;
 	
-	
 	}
 
+	/**
+	 * @return the chargesDatas
+	 */
 	public List<ChargesData> getChargesDatas() {
 		return chargesDatas;
 	}
 
+	public void setChargesDatas(List<ChargesData> chargesDatas) {
+		this.chargesDatas = chargesDatas;
+	}
 
+	/**
+	 * @return the itemDatas
+	 */
 	public List<ItemData> getItemDatas() {
 		return itemDatas;
 	}
 
+	public void setItemDatas(List<ItemData> itemDatas) {
+		this.itemDatas = itemDatas;
+	}
 
+	/**
+	 * @return the itemId
+	 */
 	public Long getItemId() {
 		return itemId;
 	}
+
+	public void setItemId(Long itemId) {
+		this.itemId = itemId;
+	}
+
+	/**
+	 * @return the id
+	 */
 	public Long getId() {
 		return id;
 	}
-
-
+	
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public String getUnits() {
-		return units;
-	}
-
-
-	public String getChargeCode() {
-		return chargeCode;
-	}
-
-
-	public String getQuantity() {
-		return quantity;
-	}
-
-
-	public BigDecimal getUnitPrice() {
-		return unitPrice;
-	}
-
-
-	public BigDecimal getTotalPrice() {
-		return totalPrice;
-	}
-
-
-	public LocalDate getSaleDate() {
-		return saleDate;
-	}
-
-
-	public String getIsInvoiced() {
-		return isInvoiced;
-	}
-
-
-	public void setIsInvoiced(String isInvoiced) {
-		this.isInvoiced = isInvoiced;
-	}
-
-
-	public Long getClientId() {
-		return clientId;
-	}
-
-
-	public void setClientId(Long clientId) {
-		this.clientId = clientId;
-	}
-	
-	public String getHardwareAllocated() {
-		return hardwareAllocated;
-	}
-
-	public void setHardwareAllocated(String hardwareAllocated) {
-		this.hardwareAllocated = hardwareAllocated;
-	}
-
-	public void setAllocationDetails(List<AllocationDetailsData> data) {
-		this.allocationData=data;
-		
 	}
 
 	/**
@@ -194,17 +152,104 @@ public class OneTimeSaleData {
 	}
 
 	/**
+	 * @param itemCode the itemCode to set
+	 */
+	public void setItemCode(String itemCode) {
+		this.itemCode = itemCode;
+	}
+
+	/**
+	 * @return the chargeCode
+	 */
+	public String getChargeCode() {
+		return chargeCode;
+	}
+
+	/**
+	 * @param chargeCode the chargeCode to set
+	 */
+	public void setChargeCode(String chargeCode) {
+		this.chargeCode = chargeCode;
+	}
+
+	/**
+	 * @return the quantity
+	 */
+	public String getQuantity() {
+		return quantity;
+	}
+
+
+	public void setQuantity(String quantity) {
+		this.quantity = quantity;
+	}
+
+	/**
+	 * @return the totalPrice
+	 */
+	public BigDecimal getTotalPrice() {
+		return totalPrice;
+	}
+
+	
+	public void setTotalPrice(BigDecimal totalPrice) {
+		this.totalPrice = totalPrice;
+	}
+
+	/**
+	 * @return the saleDate
+	 */
+	public LocalDate getSaleDate() {
+		return saleDate;
+	}
+
+	public void setSaleDate(LocalDate saleDate) {
+		this.saleDate = saleDate;
+	}
+
+	/**
+	 * @return the clientId
+	 */
+	public Long getClientId() {
+		return clientId;
+	}
+
+	
+	public void setClientId(Long clientId) {
+		this.clientId = clientId;
+	}
+
+	/**
+	 * @return the isInvoiced
+	 */
+	public String getIsInvoiced() {
+		return isInvoiced;
+	}
+
+	public void setIsInvoiced(String isInvoiced) {
+		this.isInvoiced = isInvoiced;
+	}
+
+	/**
 	 * @return the salesData
 	 */
 	public OneTimeSaleData getSalesData() {
 		return salesData;
 	}
 
+	public void setSalesData(OneTimeSaleData salesData) {
+		this.salesData = salesData;
+	}
+
 	/**
-	 * @return the flag
+	 * @return the hardwareAllocated
 	 */
-	public boolean isFlag() {
-		return flag;
+	public String getHardwareAllocated() {
+		return hardwareAllocated;
+	}
+
+	public void setHardwareAllocated(String hardwareAllocated) {
+		this.hardwareAllocated = hardwareAllocated;
 	}
 
 	/**
@@ -214,6 +259,11 @@ public class OneTimeSaleData {
 		return itemClass;
 	}
 
+	
+	public void setItemClass(String itemClass) {
+		this.itemClass = itemClass;
+	}
+
 	/**
 	 * @return the allocationData
 	 */
@@ -221,15 +271,94 @@ public class OneTimeSaleData {
 		return allocationData;
 	}
 
+	public void setAllocationData(List<AllocationDetailsData> allocationData) {
+		this.allocationData = allocationData;
+	}
+
+	/**
+	 * @return the discountMasterDatas
+	 */
 	public List<DiscountMasterData> getDiscountMasterDatas() {
 		return discountMasterDatas;
 	}
 
+	public void setDiscountMasterDatas(List<DiscountMasterData> discountMasterDatas) {
+		this.discountMasterDatas = discountMasterDatas;
+	}
 
+	/**
+	 * @return the discountId
+	 */
 	public Long getDiscountId() {
 		return discountId;
 	}
 
+	/**
+	 * @param discountId the discountId to set
+	 */
+	public void setDiscountId(Long discountId) {
+		this.discountId = discountId;
+	}
+
+	/**
+	 * @return the oneTimeSaleData
+	 */
+	public List<OneTimeSaleData> getOneTimeSaleData() {
+		return oneTimeSaleData;
+	}
+
+	public void setOneTimeSaleData(List<OneTimeSaleData> oneTimeSaleData) {
+		this.oneTimeSaleData = oneTimeSaleData;
+	}
+
+	/**
+	 * @return the eventOrdersData
+	 */
+	public List<EventOrderData> getEventOrdersData() {
+		return eventOrdersData;
+	}
+
+
+	public void setEventOrdersData(List<EventOrderData> eventOrdersData) {
+		this.eventOrdersData = eventOrdersData;
+	}
+
+	/**
+	 * @return the serialNo
+	 */
+	public String getSerialNo() {
+		return serialNo;
+	}
+
+	public void setSerialNo(String serialNo) {
+		this.serialNo = serialNo;
+	}
+
+	/**
+	 * @return the officesData
+	 */
+	public Collection<OfficeData> getOfficesData() {
+		return officesData;
+	}
+	
+	public void setOfficesData(Collection<OfficeData> officesData) {
+		this.officesData = officesData;
+	}
+
+	/**
+	 * @return the contractPeriods
+	 */
+	public Collection<SubscriptionData> getContractPeriods() {
+		return contractPeriods;
+	}
+
+	public void setContractPeriods(Collection<SubscriptionData> contractPeriods) {
+		this.contractPeriods = contractPeriods;
+	}
+
+	/**
+	 * @return the taxInclusive
+	 */
 	public Integer getTaxInclusive() {
 		return taxInclusive;
 	}
@@ -238,6 +367,9 @@ public class OneTimeSaleData {
 		this.taxInclusive = taxInclusive;
 	}
 
+	/**
+	 * @return the chargeType
+	 */
 	public String getChargeType() {
 		return chargeType;
 	}
@@ -246,4 +378,26 @@ public class OneTimeSaleData {
 		this.chargeType = chargeType;
 	}
 
+	/**
+	 * @return the units
+	 */
+	public String getUnits() {
+		return units;
+	}
+
+	public void setUnits(String units) {
+		this.units = units;
+	}
+
+	/**
+	 * @return the unitPrice
+	 */
+	public BigDecimal getUnitPrice() {
+		return unitPrice;
+	}
+
+	public void setUnitPrice(BigDecimal unitPrice) {
+		this.unitPrice = unitPrice;
+	}
+	
 }

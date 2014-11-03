@@ -5,7 +5,6 @@
  */
 package org.mifosplatform.infrastructure.documentmanagement.api;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
@@ -37,6 +36,7 @@ import org.mifosplatform.infrastructure.core.serialization.ToApiJsonSerializer;
 import org.mifosplatform.infrastructure.core.service.FileUtils;
 import org.mifosplatform.infrastructure.documentmanagement.command.DocumentCommand;
 import org.mifosplatform.infrastructure.documentmanagement.data.DocumentData;
+import org.mifosplatform.infrastructure.documentmanagement.data.FileData;
 import org.mifosplatform.infrastructure.documentmanagement.service.DocumentReadPlatformService;
 import org.mifosplatform.infrastructure.documentmanagement.service.DocumentWritePlatformService;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
@@ -177,9 +177,6 @@ public class DocumentManagementApiResource {
 
         final DocumentData documentData = this.documentReadPlatformService.retrieveDocument(entityType, entityId, documentId);
 
-        // we do not want to send document location as a part of the response
-        documentData.setLocation(null);
-
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, documentData, this.RESPONSE_DATA_PARAMETERS);
     }
@@ -187,17 +184,17 @@ public class DocumentManagementApiResource {
     @GET
     @Path("{documentId}/attachment")
     @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.MULTIPART_FORM_DATA })
+    @Produces({ MediaType.APPLICATION_OCTET_STREAM })
     public Response downloadFile(@PathParam("entityType") final String entityType, @PathParam("entityId") final Long entityId,
             @PathParam("documentId") final Long documentId) {
 
         this.context.authenticatedUser().validateHasReadPermission(this.SystemEntityType);
 
-        final DocumentData documentData = this.documentReadPlatformService.retrieveDocument(entityType, entityId, documentId);
-        final File file = new File(documentData.fileLocation());
-        final ResponseBuilder response = Response.ok(file);
-        response.header("Content-Disposition", "attachment; filename=\"" + documentData.fileLocation() + "\"");
-        response.header("Content-Type", documentData.contentType());
+        //final DocumentData documentData = this.documentReadPlatformService.retrieveDocument(entityType, entityId, documentId);
+        final FileData fileData = this.documentReadPlatformService.retrieveFileData(entityType, entityId, documentId);
+        final ResponseBuilder response = Response.ok(fileData.file());
+        response.header("Content-Disposition", "attachment; filename=\"" + fileData.name() + "\"");
+        response.header("Content-Type", fileData.contentType());
         return response.build();
     }
 
