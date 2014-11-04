@@ -30,6 +30,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author hugo
+ *This api class used to change the device 
+ */
 @Path("/hardwareswapping")
 @Component
 @Scope("singleton")
@@ -37,21 +41,21 @@ public class HardwareSwappingApiResource {
 
 	private  final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(Arrays.asList("id", "hardware", "serialNumber","itemCode"));
 	
-	 private final String resourceNameForPermissions = "HARDWARESWAPPING";
-	  private final PlatformSecurityContext context;
+	    private final String resourceNameForPermissions = "HARDWARESWAPPING";
+	    private final PlatformSecurityContext context;
 	    private final DefaultToApiJsonSerializer<AssociationData> toApiJsonSerializer;
 	    private final ApiRequestParameterHelper apiRequestParameterHelper;
-	    private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
+	    private final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService;
 	    private final HardwareAssociationReadplatformService associationReadplatformService;
 	    
 	    @Autowired
 	    public HardwareSwappingApiResource(final PlatformSecurityContext context, 
 	   final DefaultToApiJsonSerializer<AssociationData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper,
-	   final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,final HardwareAssociationReadplatformService associationReadplatformService) {
+	   final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService,final HardwareAssociationReadplatformService associationReadplatformService) {
 		        this.context = context;
 		        this.toApiJsonSerializer = toApiJsonSerializer;
 		        this.apiRequestParameterHelper = apiRequestParameterHelper; 
-		        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+		        this.commandSourceWritePlatformService = commandSourceWritePlatformService;
 		        this.associationReadplatformService=associationReadplatformService;
 		    }		
 	
@@ -59,10 +63,10 @@ public class HardwareSwappingApiResource {
 		@Path("template")
 		@Consumes({ MediaType.APPLICATION_JSON })
 		@Produces({ MediaType.APPLICATION_JSON })
-		public String retrievehardwareAllocationData(@QueryParam("clientId") final Long clientId,@Context final UriInfo uriInfo) {
+		public String retrieveHardwareAllocationData(@QueryParam("clientId") final Long clientId,@Context final UriInfo uriInfo) {
 	 		 
 	    	context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-			List<AssociationData> associationDatas = this.associationReadplatformService.retrieveClientAssociationDetails(clientId);
+			final List<AssociationData> associationDatas = this.associationReadplatformService.retrieveClientAssociationDetails(clientId);
 			final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 			return this.toApiJsonSerializer.serialize(settings, associationDatas, RESPONSE_DATA_PARAMETERS);
 		}
@@ -74,7 +78,7 @@ public class HardwareSwappingApiResource {
 	public String hardwareSwapping(@PathParam("clientId") final Long clientId,final String apiRequestBodyAsJson) {
 
 		final CommandWrapper commandRequest = new CommandWrapperBuilder().hardwareSwapping(clientId).withJson(apiRequestBodyAsJson).build();
-		final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+		final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 	}
 	

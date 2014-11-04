@@ -5,6 +5,6 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 
 public interface HardwareSwappingWriteplatformService {
 
-	CommandProcessingResult dohardWareSwapping(Long entityId,JsonCommand command);
+	CommandProcessingResult doHardWareSwapping(Long entityId,JsonCommand command);
 
 }

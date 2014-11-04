@@ -657,6 +657,7 @@ public class ProvisioningWritePlatformServiceImpl implements
 		} catch (DataIntegrityViolationException dve) {
 			handleCodeDataIntegrityIssues(null, dve);
 		}
+	
 		return new CommandProcessingResult(orderId,
 				ipPoolManagement.getClientId());
 
