@@ -52,7 +52,7 @@ public class PaymodeReadPlatformServiceImpl implements
 
 	@Transactional
 	@Override
-	public Collection<McodeData> retrievemCodeDetails(String codeName) {
+	public Collection<McodeData> retrievemCodeDetails(final String codeName) {
 		PaymodeMapper mapper = new PaymodeMapper();
 		String sql = "select " + mapper.codeScheme()+" and code_name=?";
 

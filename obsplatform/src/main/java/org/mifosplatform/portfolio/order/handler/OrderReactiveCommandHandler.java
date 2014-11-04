@@ -27,6 +27,6 @@ public class OrderReactiveCommandHandler implements NewCommandSourceHandler {
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
 
-        return this.writePlatformService.reactiveOrder(command,command.entityId());
+        return this.writePlatformService.reactiveOrder(command, command.entityId());
     }
 }
