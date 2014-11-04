@@ -21,7 +21,7 @@ public class PaypalEnquireyPaymentCommandHandler implements NewCommandSourceHand
 	
 	@Transactional
 	@Override
-	public CommandProcessingResult processCommand(JsonCommand command) {
+	public CommandProcessingResult processCommand(final JsonCommand command) {
 		return this.writePlatformService.paypalEnquirey(command);
 	}
 

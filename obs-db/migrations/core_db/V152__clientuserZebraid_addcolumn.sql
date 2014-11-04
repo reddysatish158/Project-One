@@ -49,8 +49,3 @@ END //
 DELIMITER ;
 call clientImage();
 Drop procedure IF EXISTS clientImage; 
-
-
-
-
-

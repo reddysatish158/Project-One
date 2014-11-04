@@ -2,11 +2,11 @@ package org.mifosplatform.cms.media.service;
 
 import java.util.List;
 
-import org.mifosplatform.billing.paymode.data.McodeData;
 import org.mifosplatform.cms.media.data.MediaAssetData;
 import org.mifosplatform.cms.media.data.MediaassetAttribute;
 import org.mifosplatform.cms.media.data.MediaassetAttributeData;
 import org.mifosplatform.cms.mediadetails.data.MediaLocationData;
+import org.mifosplatform.finance.payments.data.McodeData;
 import org.mifosplatform.infrastructure.core.data.MediaEnumoptionData;
 
 public interface MediaAssetReadPlatformService {

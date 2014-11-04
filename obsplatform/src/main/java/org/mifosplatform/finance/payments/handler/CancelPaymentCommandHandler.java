@@ -21,7 +21,7 @@ public class CancelPaymentCommandHandler implements NewCommandSourceHandler {
 
 	@Transactional
 	@Override
-	public CommandProcessingResult processCommand(JsonCommand command) {
+	public CommandProcessingResult processCommand(final JsonCommand command) {
 
 		return this.writePlatformService.cancelPayment(command,command.entityId());
 	}

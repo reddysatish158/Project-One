@@ -2,7 +2,7 @@ package org.mifosplatform.workflow.eventvalidation.data;
 
 import java.util.List;
 
-import org.mifosplatform.billing.paymode.data.McodeData;
+import org.mifosplatform.finance.payments.data.McodeData;
 
 public class EventValidationData {
 

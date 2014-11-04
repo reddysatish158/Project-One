@@ -379,15 +379,15 @@ public class OrderReadPlatformServiceImpl implements OrderReadPlatformService
 
 					        @Override
 					        public String mapRow(final ResultSet rs, final int rowNum) throws SQLException {
-							  String type = rs.getString("type");	
+							  final String type = rs.getString("type");	
 							  return type;
 					}
 					}
 					 
 					 @Override
-					public String checkRetrackInterval(Long entityId) {
-						 //final String sql = "select id FROM b_orders_history WHERE DATE_ADD((select created_date from b_orders_history where order_id = ? order by id desc limit 1), INTERVAL 1 HOUR) <= NOW() AND order_id = ? limit 1";
-						 OSDMapper1 rm = new OSDMapper1();
+					public String checkRetrackInterval(final Long entityId) {
+						
+						 final OSDMapper1 rm = new OSDMapper1();
 						 final String sql= "select if (max(created_date) < date_sub(now(),INTERVAL 1 HOUR) , 'yes','no') as type" +
 						 		" from b_orders_history where transaction_type in ('ACTIVATION','DISCONNECTION','RECONNECTION')" +
 						 		" and order_id=?";

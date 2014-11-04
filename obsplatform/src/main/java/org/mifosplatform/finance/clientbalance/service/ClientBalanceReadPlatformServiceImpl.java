@@ -58,9 +58,7 @@ public class ClientBalanceReadPlatformServiceImpl implements ClientBalanceReadPl
 	RowMapper<ClientBalanceData> {
 
   @Override
-public ClientBalanceData mapRow(final ResultSet rs,
-		@SuppressWarnings("unused") final int rowNum)
-		throws SQLException {
+public ClientBalanceData mapRow(final ResultSet rs,final int rowNum)	throws SQLException {
 	Long id = JdbcSupport.getLong(rs, "id");
 	Long clientId = JdbcSupport.getLong(rs, "client_id");
 	BigDecimal balanceAmount =rs.getBigDecimal("balance_amount");
