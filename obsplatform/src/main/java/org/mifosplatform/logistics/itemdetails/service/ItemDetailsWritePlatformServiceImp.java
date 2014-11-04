@@ -43,6 +43,7 @@ import org.mifosplatform.portfolio.order.service.OrderDetailsReadPlatformService
 import org.mifosplatform.portfolio.order.service.OrderReadPlatformService;
 import org.mifosplatform.provisioning.provisioning.service.ProvisioningWritePlatformService;
 import org.mifosplatform.workflow.eventactionmapping.exception.EventActionMappingNotFoundException;
+import org.mifosplatform.workflow.eventvalidation.service.EventValidationReadPlatformService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +71,7 @@ public class ItemDetailsWritePlatformServiceImp implements ItemDetailsWritePlatf
 	private final OneTimeSaleReadPlatformService oneTimeSaleReadPlatformService;
 	private final HardwareAssociationReadplatformService associationReadplatformService;
 	private final ItemDetailsReadPlatformService inventoryItemDetailsReadPlatformService;
-	private final OrderDetailsReadPlatformServices orderDetailsReadPlatformServices;
+	private final EventValidationReadPlatformService eventValidationReadPlatformService;
 	private final HardwareAssociationWriteplatformService associationWriteplatformService;
 	private final ProvisioningWritePlatformService provisioningWritePlatformService;
 	private final ItemDetailsAllocationRepository inventoryItemDetailsAllocationRepository; 
@@ -81,13 +82,15 @@ public class ItemDetailsWritePlatformServiceImp implements ItemDetailsWritePlatf
 	
 	@Autowired
 	public ItemDetailsWritePlatformServiceImp(final ItemDetailsReadPlatformService inventoryItemDetailsReadPlatformService, 
-			final PlatformSecurityContext context, final InventoryGrnRepository inventoryitemRopository,final OrderDetailsReadPlatformServices detailsReadPlatformServices,
-			final InventoryItemCommandFromApiJsonDeserializer inventoryItemCommandFromApiJsonDeserializer,final InventoryItemAllocationCommandFromApiJsonDeserializer inventoryItemAllocationCommandFromApiJsonDeserializer, 
+			final PlatformSecurityContext context, final InventoryGrnRepository inventoryitemRopository,
+			final InventoryItemCommandFromApiJsonDeserializer inventoryItemCommandFromApiJsonDeserializer,
+			final InventoryItemAllocationCommandFromApiJsonDeserializer inventoryItemAllocationCommandFromApiJsonDeserializer, 
 			final ItemDetailsAllocationRepository inventoryItemDetailsAllocationRepository,final OneTimeSaleReadPlatformService oneTimeSaleReadPlatformService, 
 			final OneTimeSaleRepository oneTimeSaleRepository,final ItemDetailsRepository inventoryItemDetailsRepository,final FromJsonHelper fromJsonHelper, 
 			final InventoryTransactionHistoryJpaRepository inventoryTransactionHistoryJpaRepository,final ConfigurationRepository  configurationRepository,
 			final HardwareAssociationReadplatformService associationReadplatformService,final HardwareAssociationWriteplatformService associationWriteplatformService,
-			final ItemRepository itemRepository,final OrderReadPlatformService orderReadPlatformService,final ProvisioningWritePlatformService provisioningWritePlatformService) 
+			final ItemRepository itemRepository,final OrderReadPlatformService orderReadPlatformService,
+			final ProvisioningWritePlatformService provisioningWritePlatformService,final EventValidationReadPlatformService eventValidationReadPlatformService) 
 	{
 		this.inventoryItemDetailsReadPlatformService = inventoryItemDetailsReadPlatformService;
 		this.context=context;
@@ -106,7 +109,7 @@ public class ItemDetailsWritePlatformServiceImp implements ItemDetailsWritePlatf
 		this.itemRepository=itemRepository;
 		this.orderReadPlatformService=orderReadPlatformService;
 		this.provisioningWritePlatformService=provisioningWritePlatformService;
-		this.orderDetailsReadPlatformServices=detailsReadPlatformServices;
+		this.eventValidationReadPlatformService=eventValidationReadPlatformService;
 		
 	}
 	
@@ -331,10 +334,7 @@ public class ItemDetailsWritePlatformServiceImp implements ItemDetailsWritePlatf
         	  final Long clientId=command.longValueOfParameterNamed("clientId");
         	   
 		        //Check for Custome_Validation
-				CustomValidationData customValidationData   = this.orderDetailsReadPlatformServices.checkForCustomValidations(clientId,"UnPairing", command.json());
-				if(customValidationData.getErrorCode() != 0 && customValidationData.getErrorMessage() != null){
-					throw new ActivePlansFoundException(customValidationData.getErrorMessage()); 
-				}
+				this.eventValidationReadPlatformService.checkForCustomValidations(clientId,"UnPairing", command.json());
         	   final Long activeorders=this.orderReadPlatformService.retrieveClientActiveOrderDetails(clientId,serialNo);
         	   	if(activeorders!= 0){
         	   		throw new ActivePlansFoundException();

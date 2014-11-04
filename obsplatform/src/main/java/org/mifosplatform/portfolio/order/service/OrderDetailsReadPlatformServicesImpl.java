@@ -3,38 +3,25 @@ package org.mifosplatform.portfolio.order.service;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.List;
-import java.util.Map;
 
 import org.mifosplatform.billing.planprice.data.PriceData;
-import org.mifosplatform.billing.planprice.service.PriceReadPlatformService;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
-import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
-import org.mifosplatform.portfolio.order.data.CustomValidationData;
 import org.mifosplatform.portfolio.plan.data.ServiceData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Service;
 
 @Service
 public class OrderDetailsReadPlatformServicesImpl implements OrderDetailsReadPlatformServices{
 
 	  private final JdbcTemplate jdbcTemplate;
-      private final PlatformSecurityContext context;
-	  private final SimpleJdbcCall jdbcCall;
 	
  @Autowired
- public OrderDetailsReadPlatformServicesImpl(final PlatformSecurityContext context, final TenantAwareRoutingDataSource dataSource,
-			final PriceReadPlatformService priceReadPlatformService) {
-	        this.context = context;
-	        this.jdbcTemplate = new JdbcTemplate(dataSource);
-	        this.jdbcCall= new SimpleJdbcCall(dataSource);
-	       	     
 
+ public OrderDetailsReadPlatformServicesImpl(final TenantAwareRoutingDataSource dataSource) {
+	        this.jdbcTemplate = new JdbcTemplate(dataSource);
 	    }
 
 	@Override
@@ -72,12 +59,12 @@ public class OrderDetailsReadPlatformServicesImpl implements OrderDetailsReadPla
 		public List<PriceData> retrieveAllPrices(Long plan_code,String billingFreq, Long clientId ) {
 
 
-			PriceMapper mapper1 = new PriceMapper();
+			PriceMapper mapper = new PriceMapper();
 
-			String sql = "select " + mapper1.schema()+" and da.plan_id = '"+plan_code+"' and (c.billfrequency_code='"+billingFreq+"'  or c.billfrequency_code='Once')" +
+			String sql = "select " + mapper.schema()+" and da.plan_id = '"+plan_code+"' and (c.billfrequency_code='"+billingFreq+"'  or c.billfrequency_code='Once')" +
 					" AND ca.client_id = ?  AND da.price_region_id =pd.priceregion_id AND s.state_name = ca.state And s.parent_code=pd.country_id" +
 					" AND pd.state_id = s.id group by da.id";
-			return this.jdbcTemplate.query(sql, mapper1, new Object[] { clientId });
+			return this.jdbcTemplate.query(sql, mapper, new Object[] { clientId });
 
 		} 
 
@@ -132,28 +119,7 @@ public class OrderDetailsReadPlatformServicesImpl implements OrderDetailsReadPla
 
 
 
-		@Override
-		public CustomValidationData checkForCustomValidations(Long clientId,String eventName,String strjson) {
-		       
-			
-					  jdbcCall.setProcedureName("custom_validation");
-					  MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-					  parameterSource.addValue("p_clientid", clientId, Types.INTEGER);
-					  parameterSource.addValue("jsonstr", strjson, Types.VARCHAR);
-					  parameterSource.addValue("event_name", eventName, Types.VARCHAR);
-					  Map<String, Object> out = jdbcCall.execute(parameterSource);
-					  
-					  Integer errCode=0;
-					  String errMsg=null;
-					  if(out != null){
-					   errCode=(Integer)out.get("err_code");
-					   errMsg=(String)out.get("err_msg");
-					  }
-					  
-					  return new CustomValidationData(errCode.longValue() ,errMsg);
-					  
-			 		
-			}
+		
 
 	}
 

@@ -52,6 +52,7 @@ public class VolumeDetails {
 
 
 	public static VolumeDetails fromJson(JsonCommand command, Plan plan) {
+		
 		    String volumeType=command.stringValueOfParameterNamed("volume");
 		    Long units=command.longValueOfParameterNamed("units");
 		    String unitType=command.stringValueOfParameterNamed("unitType");

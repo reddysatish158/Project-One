@@ -129,14 +129,15 @@ public class PlanWritePlatformServiceImpl implements PlanWritePlatformService {
              this.planRepository.save(plan);
 
              if(plan.isPrepaid()!= ConfigurationConstants.CONST_IS_N){
-            	final  VolumeDetailsData detailsData=this.eventActionReadPlatformService.retrieveVolumeDetails(plan.getId());
-            	 VolumeDetails volumeDetails=new VolumeDetails();
-            	 if(detailsData!=null)
-            	 {
-            	  volumeDetails=new VolumeDetails(detailsData.getId(),detailsData.getPlanId(),detailsData.getVolumeType(),
-            			 detailsData.getUnits(),detailsData.getUnitType());
+            	//final  VolumeDetailsData detailsData=this.eventActionReadPlatformService.retrieveVolumeDetails(plan.getId());
+            	VolumeDetails volumeDetails = this.volumeDetailsRepository.findoneByPlanId(plan.getId());
+            	
+            	 if(volumeDetails == null){
+            		 volumeDetails=VolumeDetails.fromJson(command, plan);
+            	 
+            	 }else{
+            		 volumeDetails.update(command,planId);	 
             	 }
-            	 volumeDetails.update(command,planId);
             	 this.volumeDetailsRepository.save(volumeDetails);
              }
 

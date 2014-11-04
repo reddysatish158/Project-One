@@ -23,8 +23,6 @@ import org.mifosplatform.useradministration.domain.AppUser;
 @Table(name = "b_orders")
 public class Order extends AbstractAuditableCustom<AppUser, Long> {
 
-	
-	
 	@Column(name = "client_id")
 	private Long clientId;
 

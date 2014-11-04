@@ -14,7 +14,6 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.joda.time.LocalDate;
-import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
 import org.mifosplatform.useradministration.domain.AppUser;
 
@@ -96,41 +95,6 @@ public class OrderPrice extends AbstractAuditableCustom<AppUser, Long> {
 		// TODO Auto-generated constructor stub
 	}
 
-	public OrderPrice(Long id2, Order order, Long serviceId, String chargeCode,
-			String chargeType, String chargeDuration, String durationType,
-			Date invoiceTillDate, BigDecimal price, Long createdBy,
-			Date createdDate, Date lastModifiedDate, Long lastModifiedBy) {
-
-		this.orders = order;
-		this.serviceId = serviceId;
-		this.chargeCode = chargeCode;
-		this.chargeType = chargeType;
-		this.chargeDuration = chargeDuration;
-		this.durationType = durationType;
-		this.price = price;
-		this.invoiceTillDate = invoiceTillDate;
-
-	}
-
-	public OrderPrice(Long id, Long orderId, Long serviceId,
-			String chargeCode, String chargeType, String chargeDuration,
-			String durationType, Date invoiceTillDate, BigDecimal price,
-			Long createdBy, Date createdDate, Date lastModifiedDate,
-			Long lastModifiedBy) {
-
-		this.orders = null;
-		this.serviceId = serviceId;
-		this.chargeCode = chargeCode;
-		this.chargeType = chargeType;
-		this.chargeDuration = chargeDuration;
-		this.durationType = durationType;
-		this.price = price;
-		this.invoiceTillDate = invoiceTillDate;
-
-
-
-
-	}
 
 	public Long getOrderId() {
 		return orderId;
@@ -278,6 +242,22 @@ public class OrderPrice extends AbstractAuditableCustom<AppUser, Long> {
 	
 	public void setChargeDurationType(String durationType) {
 		this.durationType=durationType;
+	}
+
+	public void setDatesOnOrderStatus(LocalDate newStartdate,LocalDate renewalEndDate, Long orderstatus) {
+		
+		if(renewalEndDate!=null){
+			this.billEndDate=renewalEndDate.toDate();
+		}else{
+		   this.billEndDate=null;
+		}
+		if(orderstatus.equals(StatusTypeEnum.DISCONNECTED.getValue().longValue())){
+			this.billStartDate=newStartdate.toDate();
+			this.nextBillableDay=null;
+			this.invoiceTillDate=null;
+			
+		}
+		
 	}
 
 

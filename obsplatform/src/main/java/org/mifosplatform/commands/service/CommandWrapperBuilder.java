@@ -1105,13 +1105,7 @@ public class CommandWrapperBuilder {
 		return this;
 	}
 
-	public CommandWrapperBuilder deleteOneTimeSale(final Long saleId) {
-		this.actionName = "DELETE";
-		this.entityName = "ORDER";
-		this.entityId = saleId;
-		this.href = "/prices/" + saleId;
-		return this;
-	}
+	
 
 	public CommandWrapperBuilder createAddress(Long clientId) {
 		this.actionName = "CREATE";

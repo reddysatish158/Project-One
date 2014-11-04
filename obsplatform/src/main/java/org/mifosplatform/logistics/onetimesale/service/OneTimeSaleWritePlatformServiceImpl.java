@@ -24,6 +24,7 @@ import org.mifosplatform.logistics.onetimesale.serialization.OneTimesaleCommandF
 import org.mifosplatform.portfolio.order.data.CustomValidationData;
 import org.mifosplatform.portfolio.order.service.OrderDetailsReadPlatformServices;
 import org.mifosplatform.portfolio.transactionhistory.service.TransactionHistoryWritePlatformService;
+import org.mifosplatform.workflow.eventvalidation.service.EventValidationReadPlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -49,22 +50,16 @@ public class OneTimeSaleWritePlatformServiceImpl implements
 	private final OneTimeSaleReadPlatformService oneTimeSaleReadPlatformService;
 	private final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService;
 	private final ItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService;
-	private final OrderDetailsReadPlatformServices orderDetailsReadPlatformServices;
+	private final EventValidationReadPlatformService eventValidationReadPlatformService;
 
 	@Autowired
-	public OneTimeSaleWritePlatformServiceImpl(
-			final PlatformSecurityContext context,
-			final OneTimeSaleRepository oneTimeSaleRepository,
-			final ItemRepository itemMasterRepository,
-			final OneTimesaleCommandFromApiJsonDeserializer apiJsonDeserializer,
-			final InvoiceOneTimeSale invoiceOneTimeSale,
-			final ItemReadPlatformService itemReadPlatformService,
-			final FromJsonHelper fromJsonHelper,
-			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,
-			final OneTimeSaleReadPlatformService oneTimeSaleReadPlatformService,
-			final ItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService,
-			final OrderDetailsReadPlatformServices orderDetailsReadPlatformServices,
-			final DiscountReadPlatformService discountReadPlatformService) {
+	public OneTimeSaleWritePlatformServiceImpl(final PlatformSecurityContext context,final OneTimeSaleRepository oneTimeSaleRepository,
+			final ItemRepository itemMasterRepository,final OneTimesaleCommandFromApiJsonDeserializer apiJsonDeserializer,
+			final InvoiceOneTimeSale invoiceOneTimeSale,final ItemReadPlatformService itemReadPlatformService,
+			final FromJsonHelper fromJsonHelper,final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,
+			final OneTimeSaleReadPlatformService oneTimeSaleReadPlatformService,final ItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService,
+			final EventValidationReadPlatformService eventValidationReadPlatformService,final DiscountReadPlatformService discountReadPlatformService) {
+		
 		this.context = context;
 		this.fromJsonHelper = fromJsonHelper;
 		this.invoiceOneTimeSale = invoiceOneTimeSale;
@@ -76,7 +71,7 @@ public class OneTimeSaleWritePlatformServiceImpl implements
 		this.oneTimeSaleReadPlatformService = oneTimeSaleReadPlatformService;
 		this.transactionHistoryWritePlatformService = transactionHistoryWritePlatformService;
 		this.inventoryItemDetailsWritePlatformService = inventoryItemDetailsWritePlatformService;
-		this.orderDetailsReadPlatformServices = orderDetailsReadPlatformServices;
+		this.eventValidationReadPlatformService = eventValidationReadPlatformService;
 
 	}
 
@@ -93,14 +88,8 @@ public class OneTimeSaleWritePlatformServiceImpl implements
 			ItemMaster item = this.itemMasterRepository.findOne(itemId);
 
 			// Check for Custome_Validation
-			CustomValidationData customValidationData = this.orderDetailsReadPlatformServices
-					.checkForCustomValidations(clientId, "Rental",
-							command.json());
-			if (customValidationData.getErrorCode() != 0
-					&& customValidationData.getErrorMessage() != null) {
-				throw new ActivePlansFoundException(
-						customValidationData.getErrorMessage());
-			}
+			this.eventValidationReadPlatformService.checkForCustomValidations(clientId, "Rental",command.json());
+			
 			OneTimeSale oneTimeSale = OneTimeSale.fromJson(clientId, command,
 					item);
 			this.oneTimeSaleRepository.saveAndFlush(oneTimeSale);
