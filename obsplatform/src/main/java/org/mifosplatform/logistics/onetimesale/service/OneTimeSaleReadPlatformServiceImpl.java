@@ -10,16 +10,18 @@ import org.mifosplatform.infrastructure.core.domain.JdbcSupport;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.logistics.item.data.ItemData;
-import org.mifosplatform.logistics.itemdetails.domain.ItemDetailsAllocation;
 import org.mifosplatform.logistics.onetimesale.data.AllocationDetailsData;
 import org.mifosplatform.logistics.onetimesale.data.OneTimeSaleData;
-import org.pentaho.reporting.engine.classic.core.EmptyReportException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
+/**
+ * @author hugo
+ *
+ */
 @Service
 public class OneTimeSaleReadPlatformServiceImpl implements	OneTimeSaleReadPlatformService {
 
@@ -27,19 +29,22 @@ public class OneTimeSaleReadPlatformServiceImpl implements	OneTimeSaleReadPlatfo
 	private final PlatformSecurityContext context;
 
 	@Autowired
-	public OneTimeSaleReadPlatformServiceImpl(final PlatformSecurityContext context,final TenantAwareRoutingDataSource dataSource) {
+	public OneTimeSaleReadPlatformServiceImpl(final PlatformSecurityContext context,
+			final TenantAwareRoutingDataSource dataSource) {
 		this.context = context;
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 
 	}
 
+	/* (non-Javadoc)
+	 * @see #retrieveItemData()
+	 */
 	@Override
 	public List<ItemData> retrieveItemData() {
-		context.authenticatedUser();
-
-		ItemMapper mapper = new ItemMapper();
-
-		String sql = "select " + mapper.schema();
+		
+		 this.context.authenticatedUser();
+		 final ItemMapper mapper = new ItemMapper();
+		 final String sql = "select " + mapper.schema();
 
 		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
 	}
@@ -47,41 +52,41 @@ public class OneTimeSaleReadPlatformServiceImpl implements	OneTimeSaleReadPlatfo
 	private static final class ItemMapper implements RowMapper<ItemData> {
 
 		public String schema() {
-			return "i.id AS id,i.item_description AS itemCode,i.units AS units,i.unit_price AS unitPrice FROM b_item_master i  where i.is_deleted='N'";
-
+			
+			return "i.id AS id,i.item_description AS itemCode,i.units AS units,i.unit_price AS unitPrice" +
+					" FROM b_item_master i  where i.is_deleted='N'";
 		}
 
 		@Override
 		public ItemData mapRow(ResultSet rs, int rowNum) throws SQLException {
 
-			Long id = rs.getLong("id");
-			String itemCode = rs.getString("itemCode");
-			String units = rs.getString("units");
-			BigDecimal unitPrice = rs.getBigDecimal("unitPrice");
+			final Long id = rs.getLong("id");
+			final String itemCode = rs.getString("itemCode");
+			final String units = rs.getString("units");
+			final BigDecimal unitPrice = rs.getBigDecimal("unitPrice");
 
-			return new ItemData(id, itemCode, units, units, units, null, 0,
-					unitPrice,null,null,null);
-
+			return new ItemData(id, itemCode, units, units, units, null, 0,unitPrice,null,null,null);
 		}
-
 	}
 
+	/* (non-Javadoc)
+	 * @see #retrieveClientOneTimeSalesData(java.lang.Long)
+	 */
 	@Override
-	public List<OneTimeSaleData> retrieveClientOneTimeSalesData(Long clientId) {
-		context.authenticatedUser();
-
-		SalesDataMapper mapper = new SalesDataMapper();
-
-		String sql = "select " + mapper.schema()
+	public List<OneTimeSaleData> retrieveClientOneTimeSalesData(final Long clientId) {
+		
+		this.context.authenticatedUser();
+		final SalesDataMapper mapper = new SalesDataMapper();
+		final String sql = "select " + mapper.schema()
 				+ " where o.item_id=i.id  and o.client_id=? and o.is_deleted = 'N' group by o.id order by o.id";
 
 		return this.jdbcTemplate.query(sql, mapper, new Object[] { clientId });
 	}
 
-	private static final class SalesDataMapper implements
-			RowMapper<OneTimeSaleData> {
+	private static final class SalesDataMapper implements RowMapper<OneTimeSaleData> {
 
 		public String schema() {
+			
 			return "o.id AS id,i.item_code AS itemCode, i.item_class as itemClass, a.serial_no as serialNo,o.sale_date as saleDate,o.charge_code AS chargeCode,"
 					+ "o.quantity as quantity,o.total_price as totalPrice,o.hardware_allocated as hardwareAllocated  FROM b_item_master i,b_onetime_sale o" +
 					" left join b_allocation a on a.order_id=o.id and a.is_deleted = 'N' ";
@@ -89,18 +94,17 @@ public class OneTimeSaleReadPlatformServiceImpl implements	OneTimeSaleReadPlatfo
 		}
 
 		@Override
-		public OneTimeSaleData mapRow(ResultSet rs, int rowNum)
-				throws SQLException {
+		public OneTimeSaleData mapRow(ResultSet rs, int rowNum)throws SQLException {
 
-			Long id = rs.getLong("id");
-			LocalDate saleDate = JdbcSupport.getLocalDate(rs, "saleDate");
-			String itemCode = rs.getString("itemCode");
-			String chargeCode = rs.getString("chargeCode");
-			String quantity = rs.getString("quantity");
-			BigDecimal totalPrice = rs.getBigDecimal("totalPrice");
-			String haardwareAllocated = rs.getString("hardwareAllocated");
-			String itemClass = rs.getString("itemClass");
-			String serialNo = rs.getString("serialNo");
+			final Long id = rs.getLong("id");
+			final LocalDate saleDate = JdbcSupport.getLocalDate(rs, "saleDate");
+			final String itemCode = rs.getString("itemCode");
+			final String chargeCode = rs.getString("chargeCode");
+			final String quantity = rs.getString("quantity");
+			final BigDecimal totalPrice = rs.getBigDecimal("totalPrice");
+			final String haardwareAllocated = rs.getString("hardwareAllocated");
+			final String itemClass = rs.getString("itemClass");
+			final String serialNo = rs.getString("serialNo");
 			return new OneTimeSaleData(id, saleDate, itemCode, chargeCode,quantity, totalPrice,haardwareAllocated,itemClass,serialNo);
 
 		}
@@ -108,20 +112,20 @@ public class OneTimeSaleReadPlatformServiceImpl implements	OneTimeSaleReadPlatfo
 	}
 	
 	
+	/* (non-Javadoc)
+	 * @see #retrieveOnetimeSalesForInvoice(java.lang.Long)
+	 */
 	@Override
-	public List<OneTimeSaleData> retrieveOnetimeSaleDate(Long clientId) {
-		context.authenticatedUser();
-
-		OneTimeSalesDataMapper mapper = new OneTimeSalesDataMapper();
-
-		String sql = "select " + mapper.schema()
-				+ " and ots.client_id = ? ";
+	public List<OneTimeSaleData> retrieveOnetimeSalesForInvoice(final Long clientId) {
+		
+		this.context.authenticatedUser();
+		final OneTimeSalesDataMapper mapper = new OneTimeSalesDataMapper();
+	    final String sql = "select " + mapper.schema() + " and ots.is_invoiced='N' and ots.client_id = ? ";
 
 		return this.jdbcTemplate.query(sql, mapper, new Object[] { clientId });
 	}
 
-	private static final class OneTimeSalesDataMapper implements
-			RowMapper<OneTimeSaleData> {
+	private static final class OneTimeSalesDataMapper implements RowMapper<OneTimeSaleData> {
 
 		public String schema() {
 			return " ots.id as oneTimeSaleId, ots.client_id AS clientId,ots.units AS units,ots.charge_code AS chargeCode,ots.unit_price AS unitPrice,"+
@@ -131,21 +135,20 @@ public class OneTimeSaleReadPlatformServiceImpl implements	OneTimeSaleReadPlatfo
 		}
 
 		@Override
-		public OneTimeSaleData mapRow(ResultSet rs, int rowNum)
-				throws SQLException {
+		public OneTimeSaleData mapRow(ResultSet rs, int rowNum)throws SQLException {
 
-			Long oneTimeSaleId = rs.getLong("oneTimeSaleId");
-			Long clientId = rs.getLong("clientId");
-			String units = rs.getString("units");
-			String chargeCode = rs.getString("chargeCode");
-			BigDecimal unitPrice = rs.getBigDecimal("unitPrice");
-			String quantity = rs.getString("quantity");
-			BigDecimal totalPrice = rs.getBigDecimal("totalPrice");
-			String isInvoiced = rs.getString("isInvoiced");
-			Long itemId = rs.getLong("itemId");
-			Long discountId=rs.getLong("discountId");
-			Integer taxInclusive = rs.getInt("taxInclusive");
-			String chargeType = rs.getString("chargeType");
+			final Long oneTimeSaleId = rs.getLong("oneTimeSaleId");
+			final Long clientId = rs.getLong("clientId");
+			final String units = rs.getString("units");
+			final String chargeCode = rs.getString("chargeCode");
+			final BigDecimal unitPrice = rs.getBigDecimal("unitPrice");
+			final String quantity = rs.getString("quantity");
+			final BigDecimal totalPrice = rs.getBigDecimal("totalPrice");
+			final String isInvoiced = rs.getString("isInvoiced");
+			final Long itemId = rs.getLong("itemId");
+			final Long discountId=rs.getLong("discountId");
+			final Integer taxInclusive = rs.getInt("taxInclusive");
+			final String chargeType = rs.getString("chargeType");
 			return new OneTimeSaleData(oneTimeSaleId,clientId, units, chargeCode,chargeType, unitPrice,quantity, totalPrice,isInvoiced,
 					                    itemId,discountId,taxInclusive);
 
@@ -153,23 +156,28 @@ public class OneTimeSaleReadPlatformServiceImpl implements	OneTimeSaleReadPlatfo
 
 	}
 
+	/* (non-Javadoc)
+	 * @see #retrieveSingleOneTimeSaleDetails(java.lang.Long)
+	 */
 	@Override
-	public OneTimeSaleData retrieveSingleOneTimeSaleDetails(Long saleId) {
-		context.authenticatedUser();
-
-		OneTimeSalesDataMapper mapper = new OneTimeSalesDataMapper();
-
-		String sql = "select " + mapper.schema()
-				+ " where ots.id = ? ";
+	public OneTimeSaleData retrieveSingleOneTimeSaleDetails(final Long saleId) {
+		
+		this.context.authenticatedUser();
+		final OneTimeSalesDataMapper mapper = new OneTimeSalesDataMapper();
+		final String sql = "select " + mapper.schema() + " where ots.id = ? ";
 
 		return this.jdbcTemplate.queryForObject(sql, mapper, new Object[] { saleId });
 	}
 
+	/* (non-Javadoc)
+	 * @see #retrieveAllocationDetails(java.lang.Long)
+	 */
 	@Override
-	public List<AllocationDetailsData> retrieveAllocationDetails(Long orderId) {
-		AllocationDataMapper mapper = new AllocationDataMapper();
-
-		String sql = "select " + mapper.schema()+ " and a.order_id=? ";
+	public List<AllocationDetailsData> retrieveAllocationDetails(final Long orderId) {
+		
+		this.context.authenticatedUser();
+		final AllocationDataMapper mapper = new AllocationDataMapper();
+		final String sql = "select " + mapper.schema()+ " and a.order_id=? ";
 
 		return this.jdbcTemplate.query(sql, mapper, new Object[] { orderId });
 	}
@@ -184,26 +192,29 @@ public class OneTimeSaleReadPlatformServiceImpl implements	OneTimeSaleReadPlatfo
 		}
 
 		@Override
-		public AllocationDetailsData mapRow(ResultSet rs, int rowNum)
-				throws SQLException {
+		public AllocationDetailsData mapRow(ResultSet rs, int rowNum) throws SQLException {
 
-			Long id = rs.getLong("id");
-			Long itemDetailId = rs.getLong("itemDetailId");
-			String itemDescription = rs.getString("itemDescription");
-			String serialNo = rs.getString("serialNo");
-			LocalDate allocationDate=JdbcSupport.getLocalDate(rs,"allocationDate");
+			final Long id = rs.getLong("id");
+			final Long itemDetailId = rs.getLong("itemDetailId");
+			final String itemDescription = rs.getString("itemDescription");
+            final String serialNo = rs.getString("serialNo");
+		    final LocalDate allocationDate=JdbcSupport.getLocalDate(rs,"allocationDate");
+		    
 			return new AllocationDetailsData(id,itemDescription,serialNo,allocationDate,itemDetailId);
 
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see #retrieveAllocationDetailsBySerialNo(java.lang.String)
+	 */
 	@Override
-	public AllocationDetailsData retrieveAllocationDetailsBySerialNo(String serialNo) {
+	public AllocationDetailsData retrieveAllocationDetailsBySerialNo(final String serialNo) {
  
 		try{
-		AllocationDataMapper mapper = new AllocationDataMapper();
-
-		String sql = "select " + mapper.schema()+ " and a.serial_no=?";
+			
+		final AllocationDataMapper mapper = new AllocationDataMapper();
+		final String sql = "select " + mapper.schema()+ " and a.serial_no=?";
 
 		return this.jdbcTemplate.queryForObject(sql, mapper, new Object[] { serialNo });
 		

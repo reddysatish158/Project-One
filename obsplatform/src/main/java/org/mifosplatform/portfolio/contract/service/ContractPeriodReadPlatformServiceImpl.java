@@ -116,9 +116,9 @@ public List<SubscriptionData> retrieveSubscriptionDatabyContractType(final Strin
 @Override
 public List<SubscriptionData> retrieveSubscriptionDatabyOrder(final Long orderId) {
 	//this.context.authenticatedUser();
-    final SuscriptionMapper depositProductMapper= new SuscriptionMapper();
-	final String sql="select "+depositProductMapper.contractPeriodSchema ()+" , b_orders o where o.contract_period = dp.id and o.id=? and dp.is_deleted='N'";
-	return this.jdbcTemplate.query(sql,depositProductMapper, new Object[]{ orderId });
+    final SuscriptionMapper mapper= new SuscriptionMapper();
+	final String sql="select "+mapper.contractPeriodSchema ()+" , b_orders o where o.contract_period = dp.id and o.id=? and dp.is_deleted='N'";
+	return this.jdbcTemplate.query(sql,mapper, new Object[]{ orderId });
 }
 
 }

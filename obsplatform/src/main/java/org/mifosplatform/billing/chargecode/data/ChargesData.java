@@ -9,12 +9,13 @@ public class ChargesData {
 	public ChargesData(final Long id, final String chargeCode,
 			final String chargeDescription) {
 
-		this.chargeDescription = chargeDescription;
 		this.id = id;
 		this.chargeCode = chargeCode;
+		this.chargeDescription = chargeDescription;
+		
 	}
 
-	public ChargesData(Long id, String chargeCode) {
+	public ChargesData(final Long id, final String chargeCode) {
 		this.chargeDescription = null;
 		this.id = id;
 		this.chargeCode = chargeCode;

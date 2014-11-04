@@ -1093,7 +1093,7 @@ public class CommandWrapperBuilder {
 		this.actionName = "CREATE";
 		this.entityName = "ONETIMESALE";
 		this.entityId = clientId;
-		this.href = "/orders/template";
+		this.href = "/onetimesale/template";
 		return this;
 	}
 
@@ -1101,15 +1101,15 @@ public class CommandWrapperBuilder {
 		this.actionName = "UPDATE";
 		this.entityName = "ONETIMESALE";
 		this.entityId = saleId;
-		this.href = "/orders/" + saleId;
+		this.href = "/onetimesale/" + saleId;
 		return this;
 	}
-
-	public CommandWrapperBuilder deleteOneTimeSale(final Long saleId) {
+	
+	public CommandWrapperBuilder cancelOneTimeSale(final Long saleId) {
 		this.actionName = "DELETE";
-		this.entityName = "ORDER";
+		this.entityName = "ONETIMESALE";
 		this.entityId = saleId;
-		this.href = "/prices/" + saleId;
+		this.href = "/onetimesale/"+saleId;
 		return this;
 	}
 
@@ -1362,11 +1362,11 @@ public CommandWrapperBuilder createMediaAsset() {
 	return this;
 }
 
-public CommandWrapperBuilder cancelOrder(Long orderId) {
-	this.actionName="UPDATE";
-	this.entityName="ORDER";
-	this.entityId=orderId;
-	this.href="order/template";
+public CommandWrapperBuilder updateOrder(Long orderId) {
+	this.actionName = "UPDATE";
+	this.entityName = "ORDER";
+	this.entityId = orderId;
+	this.href = "order/template";
 	return this;
 }
 
@@ -1378,7 +1378,7 @@ public CommandWrapperBuilder renewalOrder(Long orderId) {
 	return this;
 }
 
-public CommandWrapperBuilder reconnectOrder(Long orderId) {
+public CommandWrapperBuilder reconnectOrder(final Long orderId) {
 	this.actionName="RECONNECT";
 	this.entityName="ORDER";
 	this.entityId=orderId;
@@ -1800,14 +1800,6 @@ public CommandWrapperBuilder createPaymentGateway() {
 	this.entityName = "PAYMENTGATEWAY";
 	this.entityId = null;
 	this.href = "/paymentgateways";
-	return this;
-}
-
-public CommandWrapperBuilder cancelOneTimeSale(Long saleId) {
-	this.actionName = "DELETE";
-	this.entityName = "ONETIMESALE";
-	this.entityId = saleId;
-	this.href = "/onetimesale/"+saleId;
 	return this;
 }
 
@@ -2456,11 +2448,11 @@ public CommandWrapperBuilder updateIpDetails(Long orderId) {
 	return this;
 }
 
-public CommandWrapperBuilder reactiveOrder(Long orderId) {
+public CommandWrapperBuilder orderReactive(Long orderId) {
 	this.actionName = "REACTIVE";
 	this.entityName = "ORDER";
-	this.entityId=orderId;
-	this.href = "reactive/"+orderId;
+	this.entityId = orderId;
+	this.href = "reactive/"+ orderId;
 	return this;
 }
 

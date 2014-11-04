@@ -12,7 +12,10 @@ import org.mifosplatform.infrastructure.core.exception.AbstractPlatformResourceN
  */
 public class NoteNotFoundException extends AbstractPlatformResourceNotFoundException {
 
-    public NoteNotFoundException(final Long id) {
+  
+	private static final long serialVersionUID = 1L;
+
+	public NoteNotFoundException(final Long id) {
         super("error.msg.note.id.invalid", "Note with identifier " + id + " does not exist", id);
     }
 
