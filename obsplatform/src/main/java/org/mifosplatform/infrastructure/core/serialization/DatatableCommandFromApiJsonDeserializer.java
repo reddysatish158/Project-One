@@ -33,39 +33,26 @@ public class DatatableCommandFromApiJsonDeserializer {
 	/**
 	 * The parameters supported for this command.
 	 */
-	private final Set<String> supportedParametersForCreate = new HashSet<String>(
-			Arrays.asList("datatableName", "apptableName", "multiRow",
-					"columns"));
+	private final Set<String> supportedParametersForCreate = new HashSet<String>(Arrays.asList("datatableName", "apptableName", "multiRow","columns"));
 
-	private final Set<String> supportedParametersForUpdate = new HashSet<String>(
-			Arrays.asList("apptableName", "changeColumns", "addColumns",
-					"dropColumns"));
+	private final Set<String> supportedParametersForUpdate = new HashSet<String>(Arrays.asList("apptableName", "changeColumns", "addColumns","dropColumns"));
 
-	private final Set<String> supportedParametersForCreateColumns = new HashSet<String>(
-			Arrays.asList("name", "type", "length", "mandatory", "code"));
+	private final Set<String> supportedParametersForCreateColumns = new HashSet<String>(Arrays.asList("name", "type", "length", "mandatory", "code"));
 
-	private final Set<String> supportedParametersForAddColumns = new HashSet<String>(
-			Arrays.asList("name", "type", "length", "mandatory", "after",
-					"code"));
+	private final Set<String> supportedParametersForAddColumns = new HashSet<String>(Arrays.asList("name", "type", "length", "mandatory", "after","code"));
 
-	private final Set<String> supportedParametersForChangeColumns = new HashSet<String>(
-			Arrays.asList("name", "newName", "length", "mandatory", "after",
-					"code", "newCode"));
+	private final Set<String> supportedParametersForChangeColumns = new HashSet<String>(Arrays.asList("name", "newName", "length", "mandatory", "after","code", "newCode"));
 
-	private final Set<String> supportedParametersForDropColumns = new HashSet<String>(
-			Arrays.asList("name"));
+	private final Set<String> supportedParametersForDropColumns = new HashSet<String>(Arrays.asList("name"));
 
-	private final Object[] supportedColumnTypes = { "string", "number",
-			"decimal", "date", "text", "dropdown" };
+	private final Object[] supportedColumnTypes = { "string", "number","decimal", "date", "text", "dropdown" };
 
-	private final Object[] supportedApptableNames = { "m_client", "m_group",
-			"m_office" };
+	private final Object[] supportedApptableNames = { "m_client", "m_group","m_office" };
 
 	private final FromJsonHelper fromApiJsonHelper;
 
 	@Autowired
-	public DatatableCommandFromApiJsonDeserializer(
-			final FromJsonHelper fromApiJsonHelper) {
+	public DatatableCommandFromApiJsonDeserializer(final FromJsonHelper fromApiJsonHelper) {
 		this.fromApiJsonHelper = fromApiJsonHelper;
 	}
 
@@ -153,166 +140,95 @@ public class DatatableCommandFromApiJsonDeserializer {
 				dataValidationErrors).resource("datatable");
 
 		final JsonElement element = this.fromApiJsonHelper.parse(json);
-		final String apptableName = this.fromApiJsonHelper.extractStringNamed(
-				"apptableName", element);
-		baseDataValidator.reset().parameter("apptableName").value(apptableName)
-				.ignoreIfNull().notBlank()
+		
+		final String apptableName = this.fromApiJsonHelper.extractStringNamed("apptableName", element);
+		baseDataValidator.reset().parameter("apptableName").value(apptableName).ignoreIfNull().notBlank()
 				.isOneOfTheseValues(this.supportedApptableNames);
-		final String fkColumnName = (apptableName != null) ? apptableName
-				.substring(2) + "_id" : "";
+		
+		final String fkColumnName = (apptableName != null) ? apptableName.substring(2) + "_id" : "";
 
-		final JsonArray changeColumns = this.fromApiJsonHelper
-				.extractJsonArrayNamed("changeColumns", element);
-		baseDataValidator.reset().parameter("changeColumns")
-				.value(changeColumns).ignoreIfNull().jsonArrayNotEmpty();
+		final JsonArray changeColumns = this.fromApiJsonHelper.extractJsonArrayNamed("changeColumns", element);
+		baseDataValidator.reset().parameter("changeColumns").value(changeColumns).ignoreIfNull().jsonArrayNotEmpty();
 
 		if (changeColumns != null) {
 			for (final JsonElement column : changeColumns) {
-				this.fromApiJsonHelper.checkForUnsupportedParameters(
-						column.getAsJsonObject(),
-						this.supportedParametersForChangeColumns);
+				this.fromApiJsonHelper.checkForUnsupportedParameters(column.getAsJsonObject(),this.supportedParametersForChangeColumns);
 
-				final String name = this.fromApiJsonHelper.extractStringNamed(
-						"name", column);
-				baseDataValidator
-						.reset()
-						.parameter("name")
-						.value(name)
-						.notBlank()
+				final String name = this.fromApiJsonHelper.extractStringNamed("name", column);
+				baseDataValidator.reset().parameter("name").value(name).notBlank()
 						.isNotOneOfTheseValues("id", fkColumnName)
-						.matchesRegularExpression(
-								DATATABLE_COLUMN_NAME_REGEX_PATTERN);
+						.matchesRegularExpression(DATATABLE_COLUMN_NAME_REGEX_PATTERN);
 
-				final String newName = this.fromApiJsonHelper
-						.extractStringNamed("newName", column);
-				baseDataValidator.reset().parameter("newName").value(newName)
-						.ignoreIfNull().notBlank().notExceedingLengthOf(50)
+				final String newName = this.fromApiJsonHelper.extractStringNamed("newName", column);
+				baseDataValidator.reset().parameter("newName").value(newName).ignoreIfNull().notBlank().notExceedingLengthOf(50)
 						.isNotOneOfTheseValues("id", fkColumnName)
 						.matchesRegularExpression(DATATABLE_NAME_REGEX_PATTERN);
 
 				if (this.fromApiJsonHelper.parameterExists("length", column)) {
-					final String lengthStr = this.fromApiJsonHelper
-							.extractStringNamed("length", column);
-					if (StringUtils.isWhitespace(lengthStr)
-							|| !StringUtils.isNumeric(lengthStr)
-							|| StringUtils.isBlank(lengthStr)) {
-						baseDataValidator.reset().parameter("length")
-								.failWithCode("not.greater.than.zero");
+					final String lengthStr = this.fromApiJsonHelper.extractStringNamed("length", column);
+					if (StringUtils.isWhitespace(lengthStr) || !StringUtils.isNumeric(lengthStr)|| StringUtils.isBlank(lengthStr)) {
+						baseDataValidator.reset().parameter("length").failWithCode(".not.greater.than.zero");
 					} else {
-						final Integer length = Integer.parseInt(lengthStr);
-						baseDataValidator.reset().parameter("length")
-								.value(length).ignoreIfNull().notBlank()
-								.positiveAmount();
+						final Integer length = Integer.parseInt(lengthStr);baseDataValidator.reset().parameter("length")
+							  .value(length).ignoreIfNull().notBlank().positiveAmount();
 					}
 				}
 
-				final String code = this.fromApiJsonHelper.extractStringNamed(
-						"code", column);
-				baseDataValidator
-						.reset()
-						.parameter("code")
-						.value(code)
-						.ignoreIfNull()
-						.notBlank()
-						.notExceedingLengthOf(100)
-						.matchesRegularExpression(
-								DATATABLE_COLUMN_NAME_REGEX_PATTERN);
+				final String code = this.fromApiJsonHelper.extractStringNamed("code", column);
+				baseDataValidator.reset().parameter("code").value(code).ignoreIfNull().notBlank().notExceedingLengthOf(100)
+						.matchesRegularExpression(DATATABLE_COLUMN_NAME_REGEX_PATTERN);
 
-				final String newCode = this.fromApiJsonHelper
-						.extractStringNamed("newCode", column);
-				baseDataValidator
-						.reset()
-						.parameter("newCode")
-						.value(newCode)
-						.ignoreIfNull()
-						.notBlank()
-						.notExceedingLengthOf(100)
-						.matchesRegularExpression(
-								DATATABLE_COLUMN_NAME_REGEX_PATTERN);
+				final String newCode = this.fromApiJsonHelper.extractStringNamed("newCode", column);
+				baseDataValidator.reset().parameter("newCode").value(newCode).ignoreIfNull().notBlank().notExceedingLengthOf(100)
+						.matchesRegularExpression(DATATABLE_COLUMN_NAME_REGEX_PATTERN);
 
-				if (StringUtils.isBlank(code)
-						&& StringUtils.isNotBlank(newCode)) {
-					baseDataValidator
-							.reset()
-							.parameter("code")
-							.value(code)
-							.cantBeBlankWhenParameterProvidedIs("newCode",
-									newCode);
+				if (StringUtils.isBlank(code) && StringUtils.isNotBlank(newCode)) {
+					baseDataValidator.reset().parameter("code").value(code).cantBeBlankWhenParameterProvidedIs("newCode",newCode);
 				}
 
-				final Boolean mandatory = this.fromApiJsonHelper
-						.extractBooleanNamed("mandatory", column);
-				baseDataValidator.reset().parameter("mandatory")
-						.value(mandatory).ignoreIfNull().notBlank()
-						.isOneOfTheseValues(true, false);
+				final Boolean mandatory = this.fromApiJsonHelper.extractBooleanNamed("mandatory", column);
+				baseDataValidator.reset().parameter("mandatory").value(mandatory).ignoreIfNull().notBlank()
+				     .isOneOfTheseValues(true, false);
 
-				final Boolean after = this.fromApiJsonHelper
-						.extractBooleanNamed("after", column);
-				baseDataValidator.reset().parameter("after").value(after)
-						.ignoreIfNull().notBlank()
+				final Boolean after = this.fromApiJsonHelper.extractBooleanNamed("after", column);
+				baseDataValidator.reset().parameter("after").value(after).ignoreIfNull().notBlank()
 						.isOneOfTheseValues(true, false);
 			}
 		}
 
-		final JsonArray addColumns = this.fromApiJsonHelper
-				.extractJsonArrayNamed("addColumns", element);
-		baseDataValidator.reset().parameter("addColumns").value(addColumns)
-				.ignoreIfNull().jsonArrayNotEmpty();
+		final JsonArray addColumns = this.fromApiJsonHelper.extractJsonArrayNamed("addColumns", element);
+		baseDataValidator.reset().parameter("addColumns").value(addColumns).ignoreIfNull().jsonArrayNotEmpty();
 
 		if (addColumns != null) {
 			for (final JsonElement column : addColumns) {
-				this.fromApiJsonHelper.checkForUnsupportedParameters(
-						column.getAsJsonObject(),
-						this.supportedParametersForAddColumns);
+				this.fromApiJsonHelper.checkForUnsupportedParameters(column.getAsJsonObject(),this.supportedParametersForAddColumns);
 
-				final String name = this.fromApiJsonHelper.extractStringNamed(
-						"name", column);
-				baseDataValidator
-						.reset()
-						.parameter("name")
-						.value(name)
-						.notBlank()
-						.isNotOneOfTheseValues("id", fkColumnName)
-						.matchesRegularExpression(
-								DATATABLE_COLUMN_NAME_REGEX_PATTERN);
+				final String name = this.fromApiJsonHelper.extractStringNamed("name", column);
+				baseDataValidator.reset().parameter("name").value(name).notBlank().isNotOneOfTheseValues("id", fkColumnName)
+						.matchesRegularExpression(DATATABLE_COLUMN_NAME_REGEX_PATTERN);
 
 				validateType(baseDataValidator, column);
 
-				final Boolean mandatory = this.fromApiJsonHelper
-						.extractBooleanNamed("mandatory", column);
-				baseDataValidator.reset().parameter("mandatory")
-						.value(mandatory).ignoreIfNull().notBlank()
+				final Boolean mandatory = this.fromApiJsonHelper.extractBooleanNamed("mandatory", column);
+				baseDataValidator.reset().parameter("mandatory").value(mandatory).ignoreIfNull().notBlank()
 						.isOneOfTheseValues(true, false);
 
-				final Boolean after = this.fromApiJsonHelper
-						.extractBooleanNamed("after", column);
-				baseDataValidator.reset().parameter("after").value(after)
-						.ignoreIfNull().notBlank()
+				final Boolean after = this.fromApiJsonHelper.extractBooleanNamed("after", column);
+				baseDataValidator.reset().parameter("after").value(after).ignoreIfNull().notBlank()
 						.isOneOfTheseValues(true, false);
 			}
 		}
 
-		final JsonArray dropColumns = this.fromApiJsonHelper
-				.extractJsonArrayNamed("dropColumns", element);
-		baseDataValidator.reset().parameter("dropColumns").value(dropColumns)
-				.ignoreIfNull().jsonArrayNotEmpty();
+		final JsonArray dropColumns = this.fromApiJsonHelper.extractJsonArrayNamed("dropColumns", element);
+		baseDataValidator.reset().parameter("dropColumns").value(dropColumns).ignoreIfNull().jsonArrayNotEmpty();
 
 		if (dropColumns != null) {
 			for (final JsonElement column : dropColumns) {
-				this.fromApiJsonHelper.checkForUnsupportedParameters(
-						column.getAsJsonObject(),
-						this.supportedParametersForDropColumns);
+				this.fromApiJsonHelper.checkForUnsupportedParameters(column.getAsJsonObject(),this.supportedParametersForDropColumns);
 
-				final String name = this.fromApiJsonHelper.extractStringNamed(
-						"name", column);
-				baseDataValidator
-						.reset()
-						.parameter("name")
-						.value(name)
-						.notBlank()
-						.isNotOneOfTheseValues("id", fkColumnName)
-						.matchesRegularExpression(
-								DATATABLE_COLUMN_NAME_REGEX_PATTERN);
+				final String name = this.fromApiJsonHelper.extractStringNamed("name", column);
+				baseDataValidator.reset().parameter("name").value(name).notBlank().isNotOneOfTheseValues("id", fkColumnName)
+						.matchesRegularExpression(DATATABLE_COLUMN_NAME_REGEX_PATTERN);
 			}
 		}
 

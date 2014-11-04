@@ -153,8 +153,7 @@ public class BillingOrderWritePlatformServiceImplementation implements BillingOr
 	}*/
 
 	@Override
-	public void updateClientBalance(Invoice invoice,
-			List<ClientBalanceData> clientBalancesDatas) {
+	public void updateClientBalance(final Invoice invoice,final List<ClientBalanceData> clientBalancesDatas) {
 		Long clientBalanceId = null;
 		if (clientBalancesDatas.size() >= 1) {
 			clientBalanceId = clientBalancesDatas.get(0).getId();
