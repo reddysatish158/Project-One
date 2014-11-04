@@ -688,8 +688,12 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 			}
 	}
    
+	/* (non-Javadoc)
+	 * @see #reconnectOrder(java.lang.Long)
+	 */
+	@Transactional
     @Override
-	public CommandProcessingResult reconnectOrder(Long orderId) {
+	public CommandProcessingResult reconnectOrder(final Long orderId) {
 	  try{
 		 
 		  	Order order=this.orderRepository.findOne(orderId);
@@ -703,7 +707,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 		  		order.setStartDate(startDate);
 		  		order.setEndDate(EndDate);
 		  		order.setNextBillableDay(null);
-		  		List<OrderPrice> orderPrices=order.getPrice();
+		  		final List<OrderPrice> orderPrices=order.getPrice();
 		   			for(OrderPrice price:orderPrices){
 		   				price.setBillStartDate(startDate);
 		   				price.setBillEndDate(EndDate);
@@ -742,16 +746,16 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 		   								AppUser appUser=this.context.authenticatedUser();
 		   								userId=appUser.getId();
 		   						}else{
-		   							userId=new Long(0);
+		   							userId=Long.valueOf(0L);
 		   						}
 		   						OrderHistory orderHistory=new OrderHistory(order.getId(),new LocalDate(),new LocalDate(),processingResult.commandId(),requstStatus,userId,null);
 		   						this.orderHistoryRepository.save(orderHistory);
 		
 		   						//for TransactionHistory
-		   						transactionHistoryWritePlatformService.saveTransactionHistory(order.getClientId(),"Order Reconnection", order.getStartDate(),
-		   								"PlanId:"+order.getPlanId(),"contarctPeriod:"+order.getContarctPeriod(),"Services:"+order.getAllServicesAsString(),"OrderID:"+order.getId(),"Billing Align:"+order.getbillAlign());
+		   						/*transactionHistoryWritePlatformService.saveTransactionHistory(order.getClientId(),"Order Reconnection", order.getStartDate(),
+		   								"PlanId:"+order.getPlanId(),"contarctPeriod:"+order.getContarctPeriod(),"Services:"+order.getAllServicesAsString(),"OrderID:"+order.getId(),"Billing Align:"+order.getbillAlign());*/
 		   						return new CommandProcessingResult(order.getId(),order.getClientId());
-	  	}catch(DataIntegrityViolationException dve){
+	  	}catch(final DataIntegrityViolationException dve){
 	  		handleCodeDataIntegrityIssues(null, dve);
 	  		return new CommandProcessingResult(Long.valueOf(-1));
 	  	}
@@ -794,9 +798,9 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 				  processRequest.setNotify();
 				  List<OrderLine> orderLineData = order.getServices();
 				  	for (OrderLine orderLine : orderLineData) {
-				  		String HardWareId = null;
+				  		String hardWareId = null;
 				  			if (detailsData != null) {
-				  				HardWareId = detailsData.getSerialNo();
+				  				hardWareId = detailsData.getSerialNo();
 				  			}
 				  			List<ProvisionServiceDetails> provisionServiceDetails = this.provisionServiceDetailsRepository.findOneByServiceId(orderLine.getServiceId());
 				  			ServiceMaster service = this.serviceMasterRepository.findOne(orderLine.getServiceId());
@@ -805,7 +809,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 				  					message = provisionServiceDetails.get(0).getServiceIdentification();
 				  				}
 				  				ProcessRequestDetails processRequestDetails = new ProcessRequestDetails(orderLine.getId(), orderLine.getServiceId(),message, "Recieved",
-								HardWareId,order.getStartDate(), order.getEndDate(), null,null, 'N',requstStatus,service.getServiceType());
+				  				hardWareId,order.getStartDate(), order.getEndDate(), null,null, 'N',requstStatus,service.getServiceType());
 				  				processRequest.add(processRequestDetails);
 				  			}
 				  	}

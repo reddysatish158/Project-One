@@ -51,17 +51,18 @@ public class NotesApiResource {
     private final NoteReadPlatformService readPlatformService;
     private final DefaultToApiJsonSerializer<NoteData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
-    private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
+    private final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService;
 
     @Autowired
     public NotesApiResource(final PlatformSecurityContext context, final NoteReadPlatformService readPlatformService,
-            final DefaultToApiJsonSerializer<NoteData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper,
-            final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
+            final DefaultToApiJsonSerializer<NoteData> toApiJsonSerializer, 
+            final ApiRequestParameterHelper apiRequestParameterHelper,
+            final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService) {
         this.context = context;
         this.readPlatformService = readPlatformService;
         this.toApiJsonSerializer = toApiJsonSerializer;
         this.apiRequestParameterHelper = apiRequestParameterHelper;
-        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.commandSourceWritePlatformService = commandSourceWritePlatformService;
     }
 
     @GET
@@ -73,14 +74,13 @@ public class NotesApiResource {
         NoteType noteType = NoteType.fromApiUrl(resourceType);
 
         if (noteType == null) { throw new NoteResourceNotSupportedException(resourceType); }
-        ;
-
+        
         this.context.authenticatedUser().validateHasReadPermission(getResourceNameForPermissions(noteType));
-
+        
         final Integer noteTypeId = noteType.getValue();
-
+        
         final Collection<NoteData> notes = this.readPlatformService.retrieveNotesByResource(resourceId, noteTypeId);
-
+        
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, notes, this.NOTE_DATA_PARAMETERS);
     }
@@ -122,7 +122,7 @@ public class NotesApiResource {
         final CommandWrapper commandRequest = new CommandWrapperBuilder().createNote(resourceNameForPermissions, resourceType, resourceId)
                 .withJson(apiRequestBodyAsJson).build();
 
-        final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+        final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
 
         return this.toApiJsonSerializer.serialize(result);
     }
@@ -144,7 +144,7 @@ public class NotesApiResource {
         final CommandWrapper commandRequest = new CommandWrapperBuilder()
                 .updateNote(resourceNameForPermissions, resourceType, resourceId, noteId).withJson(apiRequestBodyAsJson).build();
 
-        final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+        final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
 
         return this.toApiJsonSerializer.serialize(result);
     }
@@ -166,7 +166,7 @@ public class NotesApiResource {
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteNote(resourceNameForPermissions, resourceType, resourceId,
                 noteId).build();
 
-        final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+        final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
 
         return this.toApiJsonSerializer.serialize(result);
     }

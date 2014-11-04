@@ -24,11 +24,12 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @Table(name = "m_note")
 public class Note extends AbstractPersistable<Long> {
 
-    @ManyToOne
+	private static final long serialVersionUID = 1L;
+
+	@ManyToOne
     @JoinColumn(name = "client_id", nullable = true)
     private final Client client;
 
-    @SuppressWarnings("unused")
     @ManyToOne
     @JoinColumn(name = "group_id", nullable = true)
     private Group group;
@@ -42,14 +43,9 @@ public class Note extends AbstractPersistable<Long> {
     @Column(name = "note", length = 1000)
     private String note;
 
-    @SuppressWarnings("unused")
     @Column(name = "note_type_enum")
     private final Integer noteTypeId;
 
-    // @SuppressWarnings("unused")
-    // @ManyToOne
-    // @JoinColumn(name = "saving_account_id", nullable = true)
-    // private SavingAccount savingAccount;
 
     public static Note clientNoteFromJson(final Client client, final JsonCommand command) {
         final String note = command.stringValueOfParameterNamed("note");
@@ -68,11 +64,6 @@ public class Note extends AbstractPersistable<Long> {
     public static Note loanTransactionNote(final String note) {
         return new Note(note);
     }
-
-    // public static Note savingNote(final SavingAccount account, final String
-    // note) {
-    // return new Note(account, note);
-    // }
     
     private Note(final Client client, final String note) {
         this.client = client;
@@ -87,13 +78,6 @@ public class Note extends AbstractPersistable<Long> {
         this.noteTypeId = NoteType.GROUP.getValue();
     }
 
-  /*  private Note(final String note) {
-        
-       // this.client = loan.client();
-        this.note = note;
-        this.noteTypeId = NoteType.LOAN.getValue();
-    }
-*/
     private Note(String note) {
         
         this.client = null;
@@ -110,12 +94,6 @@ public class Note extends AbstractPersistable<Long> {
         this.noteTypeId = null;
     }
 
-    // public Note(final SavingAccount account, final String note) {
-    // this.savingAccount = account;
-    // this.client = account.getClient();
-    // this.note = note;
-    // this.noteTypeId = NoteType.SAVING_ACCOUNT.getValue();
-    // }
 
     public Map<String, Object> update(final JsonCommand command) {
         final Map<String, Object> actualChanges = new LinkedHashMap<String, Object>(7);

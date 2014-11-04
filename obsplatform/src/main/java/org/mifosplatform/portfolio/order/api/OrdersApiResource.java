@@ -254,6 +254,8 @@ public class OrdersApiResource {
 		@Consumes({ MediaType.APPLICATION_JSON })
 		@Produces({ MediaType.APPLICATION_JSON })
 		public String reconnectOrder(@PathParam("orderId") final Long orderId) {
+		 
+		    context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
 			final CommandWrapper commandRequest = new CommandWrapperBuilder().reconnectOrder(orderId).build();
 	        final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 	        return this.toApiJsonSerializer.serialize(result);

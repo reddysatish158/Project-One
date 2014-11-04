@@ -17,7 +17,7 @@ import org.mifosplatform.useradministration.domain.AppUser;
 @Table(name = "b_onetime_sale")
 public class OneTimeSale extends AbstractAuditableCustom<AppUser, Long> {
 
-
+	private static final long serialVersionUID = 1L;
 
 	@Column(name = "client_id")
 	private Long clientId;
@@ -47,7 +47,7 @@ public class OneTimeSale extends AbstractAuditableCustom<AppUser, Long> {
 	private Long billId;
 
 	@Column(name = "is_invoiced", nullable = false)
-	private char deleted = 'n';
+	private char isInvoiced = 'N';
 	
 	@Column(name="hardware_allocated",nullable=false)
 	private String hardwareAllocated = "UNALLOCATED";
@@ -70,9 +70,10 @@ public class OneTimeSale extends AbstractAuditableCustom<AppUser, Long> {
 	
 	public OneTimeSale(){}
 	
-	public OneTimeSale(Long clientId, Long itemId,String units,String quantity,
-			 String chargeCode, BigDecimal unitPrice,
-			BigDecimal totalPrice, LocalDate saleDate, Long discountId, Long officeId,String saleType, Long contractPeriod) {
+	public OneTimeSale(final Long clientId, final Long itemId,final String units,final String quantity,
+			final  String chargeCode, final BigDecimal unitPrice,final BigDecimal totalPrice,
+            final LocalDate saleDate, final Long discountId, final Long officeId,final String saleType, 
+            final Long contractPeriod) {
 
 	this.clientId=clientId;
 	this.itemId=itemId;
@@ -85,7 +86,7 @@ public class OneTimeSale extends AbstractAuditableCustom<AppUser, Long> {
 	this.discountId=discountId;
 	this.officeId=officeId;
 	if(saleType.equalsIgnoreCase("SECOND_SALE")){
-			this.deleted='y';
+			this.isInvoiced='y';
 		}
 	this.deviceMode=saleType;
 	this.contractPeriod=contractPeriod;
@@ -123,12 +124,12 @@ public class OneTimeSale extends AbstractAuditableCustom<AppUser, Long> {
 		return itemId;
 	}
 
-	public char getDeleted() {
-		return deleted;
+	public char getIsInvoiced() {
+		return isInvoiced;
 	}
 
-	public void setDeleted(char deleted) {
-		this.deleted = deleted;
+	public void setIsInvoiced(char isInvoiced) {
+		this.isInvoiced = isInvoiced;
 	}
 	
 	public void updateBillId(Long billId) {
@@ -144,21 +145,6 @@ public class OneTimeSale extends AbstractAuditableCustom<AppUser, Long> {
 		this.isDeleted = isDeleted;
 	}
 	
-	public static OneTimeSale fromJson(Long clientId, JsonCommand command, ItemMaster item) {
-			final String saleType = command.stringValueOfParameterNamed("saleType");
-		    final Long itemId=command.longValueOfParameterNamed("itemId");
-		    final String units = item.getUnits();
-		    final String chargeCode = command.stringValueOfParameterNamed("chargeCode");
-		    final String quantity = command.stringValueOfParameterNamed("quantity");
-		    final BigDecimal unitPrice=command.bigDecimalValueOfParameterNamed("unitPrice");
-		    final BigDecimal totalPrice=command.bigDecimalValueOfParameterNamed("totalPrice");
-		    final LocalDate saleDate=command.localDateValueOfParameterNamed("saleDate");
-		    final Long discountId=command.longValueOfParameterNamed("discountId");
-		    final Long officeId=command.longValueOfParameterNamed("officeId");
-		    final Long contractPeriod=command.longValueOfParameterNamed("contractPeriod");
-          return new OneTimeSale(clientId, itemId, units, quantity, chargeCode, unitPrice, totalPrice, saleDate,discountId,officeId,saleType,contractPeriod);
-		 
-	}
 	public String getHardwareAllocated() {
 		return hardwareAllocated;
 	}
@@ -171,6 +157,23 @@ public class OneTimeSale extends AbstractAuditableCustom<AppUser, Long> {
 		this.hardwareAllocated = "UNALLOCATED";
 		
 	}
-
+	
+	public static OneTimeSale fromJson(final Long clientId, final JsonCommand command, final ItemMaster item) {
+		
+			final String saleType = command.stringValueOfParameterNamed("saleType");
+		    final Long itemId=command.longValueOfParameterNamed("itemId");
+		    final String units = item.getUnits();
+		    final String chargeCode = command.stringValueOfParameterNamed("chargeCode");
+		    final String quantity = command.stringValueOfParameterNamed("quantity");
+		    final BigDecimal unitPrice=command.bigDecimalValueOfParameterNamed("unitPrice");
+		    final BigDecimal totalPrice=command.bigDecimalValueOfParameterNamed("totalPrice");
+		    final LocalDate saleDate=command.localDateValueOfParameterNamed("saleDate");
+		    final Long discountId=command.longValueOfParameterNamed("discountId");
+		    final Long officeId=command.longValueOfParameterNamed("officeId");
+		    final Long contractPeriod=command.longValueOfParameterNamed("contractPeriod");
+		    
+          return new OneTimeSale(clientId, itemId, units, quantity, chargeCode, unitPrice, totalPrice, 
+        		  saleDate,discountId,officeId,saleType,contractPeriod);
+	}
 
 }
