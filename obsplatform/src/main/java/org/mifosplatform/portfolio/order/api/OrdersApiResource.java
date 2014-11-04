@@ -67,7 +67,6 @@ public class OrdersApiResource {
 	  private final OrderReadPlatformService orderReadPlatformService;
 	  private final MCodeReadPlatformService mCodeReadPlatformService;
 	  private final ApiRequestParameterHelper apiRequestParameterHelper;
-	  private final PaymodeReadPlatformService paymodeReadPlatformService;
 	  private final ConfigurationRepository configurationRepository;
 	  private final DefaultToApiJsonSerializer<OrderData> toApiJsonSerializer;
 	  private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
@@ -77,7 +76,7 @@ public class OrdersApiResource {
 	   public OrdersApiResource(final PlatformSecurityContext context,final ConfigurationRepository configurationRepository,  
 	   final DefaultToApiJsonSerializer<OrderData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper,
 	   final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,final OrderReadPlatformService orderReadPlatformService,
-	   final PlanReadPlatformService planReadPlatformService,final PaymodeReadPlatformService paymodeReadPlatformService,
+	   final PlanReadPlatformService planReadPlatformService,
 	   final MCodeReadPlatformService mCodeReadPlatformService) {
 
 		        this.context = context;
@@ -86,7 +85,6 @@ public class OrdersApiResource {
 		        this.configurationRepository=configurationRepository;
 		        this.mCodeReadPlatformService=mCodeReadPlatformService;
 		        this.orderReadPlatformService=orderReadPlatformService;
-		        this.paymodeReadPlatformService=paymodeReadPlatformService;
 		        this.apiRequestParameterHelper = apiRequestParameterHelper;
 		        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
 		        
@@ -192,14 +190,14 @@ public class OrdersApiResource {
 
 		}
 	@PUT
-		@Path("{orderId}")
-		@Consumes({ MediaType.APPLICATION_JSON })
-		@Produces({ MediaType.APPLICATION_JSON })
-		public String updateOrder(@PathParam("orderId") final Long orderId,final String apiRequestBodyAsJson) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().cancelOrder(orderId).withJson(apiRequestBodyAsJson).build();
+	@Path("{orderId}")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String updateOrder(@PathParam("orderId") final Long orderId, final String apiRequestBodyAsJson) {
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().updateOrder(orderId).withJson(apiRequestBodyAsJson).build();
 		final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
-		}
+	}
 		
 	@GET
     @Path("renewalorder")
@@ -219,7 +217,7 @@ public class OrdersApiResource {
     	}
     	OrderData orderData=new OrderData(null,contractPeriods,configurationProperty.isEnabled());
     	if(configurationProperty.isEnabled()){
-    		Collection<McodeData> data = this.paymodeReadPlatformService.retrievemCodeDetails("Payment Mode");
+    		Collection<MCodeData> data = this.mCodeReadPlatformService.getCodeValue("Payment Mode");
     		orderData.setPaymodeData(data);
     	}
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -239,16 +237,16 @@ public class OrdersApiResource {
 	
 	 
 	 @GET
-	    @Path("disconnect")
-	    @Consumes({MediaType.APPLICATION_JSON})
-	    @Produces({MediaType.APPLICATION_JSON})
-	    public String retrieveOrderDisconnectDetails(@Context final UriInfo uriInfo) {
-	        context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-	        final Collection<McodeData> disconnectDetails = this.paymodeReadPlatformService.retrievemCodeDetails("Disconnect Reason");
-	        OrderData orderData=new OrderData(disconnectDetails,null, false);
-	        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-	        return this.toApiJsonSerializer.serialize(settings, orderData, RESPONSE_DATA_PARAMETERS);
-	    }
+	 @Path("disconnect")
+	 @Consumes({MediaType.APPLICATION_JSON})
+	 @Produces({MediaType.APPLICATION_JSON})
+	 public String retrieveOrderDisconnectDetails(@Context final UriInfo uriInfo) {
+		 context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+	     final Collection<MCodeData> disconnectDetails = this.mCodeReadPlatformService.getCodeValue("Disconnect Reason");
+	     OrderData orderData = new OrderData(disconnectDetails, null, false);
+	     final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+	     return this.toApiJsonSerializer.serialize(settings, orderData, RESPONSE_DATA_PARAMETERS);
+	 }
 	 
 	 
 	 @PUT
@@ -381,15 +379,15 @@ public class OrdersApiResource {
 	return this.toApiJsonSerializer.serialize(result);
 	}
 	
-	 @PUT
-		@Path("reactive/{orderId}")
-		@Consumes({ MediaType.APPLICATION_JSON })
-		@Produces({ MediaType.APPLICATION_JSON })
-		public String reactiveOrder(@PathParam("orderId") final Long orderId,final String apiRequestBodyAsJson) {
-		 final CommandWrapper commandRequest = new CommandWrapperBuilder().reactiveOrder(orderId).withJson(apiRequestBodyAsJson).build();
-		 final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-		  return this.toApiJsonSerializer.serialize(result);
-
-		}
+	@PUT
+	@Path("reactive/{orderId}")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String reactiveOrder(@PathParam("orderId") final Long orderId, final String apiRequestBodyAsJson) {
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().orderReactive(orderId).withJson(apiRequestBodyAsJson).build();
+		final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+		return this.toApiJsonSerializer.serialize(result);
+		
+	}
 
 }

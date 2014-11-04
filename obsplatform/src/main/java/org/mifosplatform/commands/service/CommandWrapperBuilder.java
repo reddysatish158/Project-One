@@ -1362,11 +1362,11 @@ public CommandWrapperBuilder createMediaAsset() {
 	return this;
 }
 
-public CommandWrapperBuilder cancelOrder(Long orderId) {
-	this.actionName="UPDATE";
-	this.entityName="ORDER";
-	this.entityId=orderId;
-	this.href="order/template";
+public CommandWrapperBuilder updateOrder(Long orderId) {
+	this.actionName = "UPDATE";
+	this.entityName = "ORDER";
+	this.entityId = orderId;
+	this.href = "order/template";
 	return this;
 }
 
@@ -2456,11 +2456,11 @@ public CommandWrapperBuilder updateIpDetails(Long orderId) {
 	return this;
 }
 
-public CommandWrapperBuilder reactiveOrder(Long orderId) {
+public CommandWrapperBuilder orderReactive(Long orderId) {
 	this.actionName = "REACTIVE";
 	this.entityName = "ORDER";
-	this.entityId=orderId;
-	this.href = "reactive/"+orderId;
+	this.entityId = orderId;
+	this.href = "reactive/"+ orderId;
 	return this;
 }
 

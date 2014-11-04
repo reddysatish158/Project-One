@@ -17,7 +17,6 @@ import net.sf.jasperreports.engine.JasperPrint;
 import org.mifosplatform.finance.adjustment.domain.Adjustment;
 import org.mifosplatform.finance.adjustment.domain.AdjustmentRepository;
 import org.mifosplatform.finance.billingmaster.domain.BillDetail;
-import org.mifosplatform.finance.billingmaster.domain.BillDetailRepository;
 import org.mifosplatform.finance.billingmaster.domain.BillMaster;
 import org.mifosplatform.finance.billingmaster.domain.BillMasterRepository;
 import org.mifosplatform.finance.billingorder.data.BillDetailsData;
@@ -55,13 +54,11 @@ import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 
-
 @Service
 public class BillWritePlatformServiceImpl implements BillWritePlatformService {
-	private final static Logger logger = LoggerFactory.getLogger(BillWritePlatformServiceImpl.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(BillWritePlatformServiceImpl.class);
 	private final PlatformSecurityContext context;
 	private final BillMasterRepository billMasterRepository;
-	private final BillDetailRepository billDetailRepository;
 	private final PaymentRepository paymentRepository;
 	private final AdjustmentRepository adjustmentRepository;
 	private final BillingOrderRepository billingOrderRepository;
@@ -71,47 +68,25 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 	private final ClientRepository clientRepository;
 	
 	@Autowired
-	public BillWritePlatformServiceImpl(final PlatformSecurityContext context,final BillMasterRepository billMasterRepository,
-			final BillDetailRepository billDetailRepository,final PaymentRepository paymentRepository,final AdjustmentRepository adjustmentRepository,
-			final BillingOrderRepository billingOrderRepository,final InvoiceTaxRepository invoiceTaxRepository,final InvoiceRepository invoiceRepository,
-			final TenantAwareRoutingDataSource dataSource,final ClientRepository  clientRepository) {
+	public BillWritePlatformServiceImpl(final PlatformSecurityContext context, final BillMasterRepository billMasterRepository,
+			final PaymentRepository paymentRepository, final AdjustmentRepository adjustmentRepository,
+			final BillingOrderRepository billingOrderRepository, final InvoiceTaxRepository invoiceTaxRepository, final InvoiceRepository invoiceRepository,
+			final TenantAwareRoutingDataSource dataSource, final ClientRepository clientRepository) {
 
 		this.context = context;
 		this.dataSource = dataSource;
-		this.invoiceRepository=invoiceRepository;
+		this.invoiceRepository = invoiceRepository;
 		this.paymentRepository = paymentRepository;
-		this.clientRepository=clientRepository;
+		this.clientRepository = clientRepository;
 		this.billMasterRepository = billMasterRepository;
-		this.billDetailRepository = billDetailRepository;
 		this.adjustmentRepository = adjustmentRepository;
 		this.invoiceTaxRepository = invoiceTaxRepository;
 		this.billingOrderRepository = billingOrderRepository;
 		
-		
 	}
 
-	/*@Override
-	public List<BillDetail> createBillDetail(List<FinancialTransactionsData> financialTransactionsDatas,BillMaster master) {
-		
-		try{
-			
-		
-		List<BillDetail> listOfBillingDetail = new ArrayList<BillDetail>();
-		for (FinancialTransactionsData financialTransactionsData : financialTransactionsDatas) {
-			BillDetail billDetail = new BillDetail(master,financialTransactionsData.getTransactionId(),
-					financialTransactionsData.getTransDate().toDate(),	financialTransactionsData.getTransactionType(),
-					financialTransactionsData.getAmount(),financialTransactionsData.getPlanCode(),financialTransactionsData.getDescription());
-			this.billDetailRepository.save(billDetail);
-			listOfBillingDetail.add(billDetail);
-		}
-		return listOfBillingDetail;
-	}catch(DataIntegrityViolationException dve){
-		return null;
-	}
-	}
-*/
 	@Override
-	public CommandProcessingResult updateBillMaster(List<BillDetail> billDetails, BillMaster billMaster,BigDecimal clientBalance) {
+	public CommandProcessingResult updateBillMaster(final List<BillDetail> billDetails, final BillMaster billMaster, final BigDecimal clientBalance) {
 		
 		try{
 		BigDecimal chargeAmount = BigDecimal.ZERO;
@@ -120,17 +95,17 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 		BigDecimal dueAmount = BigDecimal.ZERO;
 		BigDecimal taxAmount = BigDecimal.ZERO;
 		//BigDecimal adjustMentsAndPayments = BigDecimal.ZERO;
-		BigDecimal OneTimeSaleAmount =BigDecimal.ZERO;
-		for (BillDetail billDetail : billDetails) {
-			if (billDetail.getTransactionType().equalsIgnoreCase("SERVICE_CHARGES")) {
+		BigDecimal oneTimeSaleAmount = BigDecimal.ZERO;
+		for (final BillDetail billDetail : billDetails) {
+			if ("SERVICE_CHARGES".equalsIgnoreCase(billDetail.getTransactionType())) {
 				if (billDetail.getAmount() != null)
 					chargeAmount = chargeAmount.add(billDetail.getAmount());
 				
-			} else if (billDetail.getTransactionType().equalsIgnoreCase("TAXES")) {
+			} else if ("TAXES".equalsIgnoreCase(billDetail.getTransactionType())) {
 				if (billDetail.getAmount() != null)
 					taxAmount = taxAmount.add(billDetail.getAmount());
 
-			} else if (billDetail.getTransactionType().equalsIgnoreCase("ADJUSTMENT")) {
+			} else if ("ADJUSTMENT".equalsIgnoreCase(billDetail.getTransactionType())) {
 				if (billDetail.getAmount() != null)
 					adjustmentAmount = adjustmentAmount.add(billDetail.getAmount());
 				
@@ -140,44 +115,38 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 
 			} else if (billDetail.getTransactionType().contains("ONETIME_CHARGES")) {
 				if (billDetail.getAmount() != null)
-					OneTimeSaleAmount =OneTimeSaleAmount.add(billDetail.getAmount());
+					oneTimeSaleAmount = oneTimeSaleAmount.add(billDetail.getAmount());
 
 			}
 			
 		}
-	  dueAmount = chargeAmount.add(taxAmount).add(OneTimeSaleAmount).add(clientBalance)
+	  dueAmount = chargeAmount.add(taxAmount).add(oneTimeSaleAmount).add(clientBalance)
 			      .add(adjustmentAmount).subtract(paymentAmount);
 	  billMaster.setChargeAmount(chargeAmount);
 	  billMaster.setAdjustmentAmount(adjustmentAmount);
 	  billMaster.setTaxAmount(taxAmount);
 	  billMaster.setPaidAmount(paymentAmount);
 	  billMaster.setDueAmount(dueAmount);
-	  //billMaster.setAdjustmentsAndPayments(paymentAmount.subtract(adjustmentAmount));
 	  billMaster.setPreviousBalance(clientBalance);
 	  this.billMasterRepository.save(billMaster);
 	  return new CommandProcessingResult(billMaster.getId(),billMaster.getClientId());
-		}catch(DataIntegrityViolationException dve){
+	}catch(DataIntegrityViolationException dve){
 			return null;
-		}
 	}
+}
 
-	@SuppressWarnings("null")
 	@Override
-	public String generatePdf(BillDetailsData billDetails,
-			List<FinancialTransactionsData> datas) {
+	public String generatePdf(final BillDetailsData billDetails,
+			final List<FinancialTransactionsData> datas) {
 
-		String fileLocation = FileUtils.MIFOSX_BASE_DIR + File.separator
+		final String fileLocation = FileUtils.MIFOSX_BASE_DIR + File.separator
 				+ "Print_invoice_Details";
-		// String fileLocation = FileUtils.MIFOSX_BASE_DIR;
-
-		// String fileLocation = "/home/ubuntu" + File.separator+
-		// "Print_invoice_Details";
-
+		
 		/** Recursively create the directory if it does not exist **/
 		if (!new File(fileLocation).isDirectory()) {
 			new File(fileLocation).mkdirs();
 		}
-		String printInvoicedetailsLocation = fileLocation + File.separator
+		final String printInvoicedetailsLocation = fileLocation + File.separator
 				+ "invoice" + billDetails.getId() + ".pdf";
 
 		BillMaster billMaster = this.billMasterRepository.findOne(billDetails
@@ -189,17 +158,17 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 
 			Document document = new Document();
 
-			PdfWriter writer = PdfWriter.getInstance(document,
+			final PdfWriter writer = PdfWriter.getInstance(document,
 					new FileOutputStream(printInvoicedetailsLocation));
 			document.open();
-			PdfContentByte pdfContentByte = writer.getDirectContent();
-			Font b = new Font(Font.BOLD + Font.BOLD, 8);
-			Font b1 = new Font(Font.BOLD + Font.UNDERLINE + Font.BOLDITALIC
+			final PdfContentByte pdfContentByte = writer.getDirectContent();
+			final Font b = new Font(Font.BOLD + Font.BOLD, 8);
+			final Font b1 = new Font(Font.BOLD + Font.UNDERLINE + Font.BOLDITALIC
 					+ Font.TIMES_ROMAN, 6);
 
 			pdfContentByte.beginText();
 
-			PdfPTable table = new PdfPTable(11);
+			final PdfPTable table = new PdfPTable(11);
 			table.setWidthPercentage(100);
 
 			PdfPCell cell1 = new PdfPCell((new Paragraph("Bill Invoice",
@@ -210,9 +179,9 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 			table.addCell(cell1);
 			PdfPCell cell = new PdfPCell();
 			cell.setColspan(2);
-			Paragraph para = new Paragraph("Name           :", b1);
-			Paragraph addr = new Paragraph("Address        :", b);
-			Paragraph branch = new Paragraph("Branch       :", b);
+			final Paragraph para = new Paragraph("Name           :", b1);
+			final Paragraph addr = new Paragraph("Address        :", b);
+			final Paragraph branch = new Paragraph("Branch       :", b);
 			branch.setSpacingBefore(25);
 
 			cell.addElement(para);
@@ -222,11 +191,11 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 			table.addCell(cell);
 			PdfPCell cell0 = new PdfPCell();
 
-			Paragraph add0 = new Paragraph("" + billDetails.getClientName(), b);
-			Paragraph add1 = new Paragraph("" + billDetails.getAddrNo() + ""
+			final Paragraph add0 = new Paragraph("" + billDetails.getClientName(), b);
+			final Paragraph add1 = new Paragraph("" + billDetails.getAddrNo() + ""
 					+ billDetails.getStreet(), b);
 			add1.setSpacingBefore(10);
-			Paragraph add2 = new Paragraph("" + billDetails.getCity() + ""
+			final Paragraph add2 = new Paragraph("" + billDetails.getCity() + ""
 					+ billDetails.getState() + "" + billDetails.getCountry()
 					+ "" + billDetails.getZip(), b);
 			cell0.setColspan(4);
@@ -236,10 +205,10 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 			cell0.addElement(add2);
 			table.addCell(cell0);
 
-			 Image image = Image.getInstance(FileUtils.MIFOSX_BASE_DIR +File.separator+billDetails.getCompanyLogo());
-			 image.scaleAbsolute(90,90);
+			Image image = Image.getInstance(FileUtils.MIFOSX_BASE_DIR  + File.separator + billDetails.getCompanyLogo());
+			image.scaleAbsolute(90, 90);
 			PdfPCell cell2 = new PdfPCell();
-			 cell2.addElement(image);
+			cell2.addElement(image);
 			cell2.disableBorderSide(PdfPCell.TOP);
 			cell2.disableBorderSide(PdfPCell.BOTTOM);
 			cell2.disableBorderSide(PdfPCell.LEFT);
@@ -247,14 +216,14 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 			cell2.setColspan(2);
 			table.addCell(cell2);
 			PdfPCell cell02 = new PdfPCell();
-			Paragraph addr1 = new Paragraph(billDetails.getAddr1(),
+			final Paragraph addr1 = new Paragraph(billDetails.getAddr1(),
 					FontFactory.getFont(FontFactory.HELVETICA, 8, Font.BOLD,
 							new CMYKColor(0, 255, 255, 17)));
-			Paragraph addr2 = new Paragraph(billDetails.getAddr2(), b);
-			Paragraph addr3 = new Paragraph(billDetails.getOffCity()+","+billDetails.getOffState(), b);
-			Paragraph addr4 = new Paragraph(billDetails.getOffCountry()+"-"+billDetails.getOffZip(),b);
-			Paragraph addr5 = new Paragraph(" Tel: "+billDetails.getPhnNum(), b);
-			Paragraph addr6 = new Paragraph(billDetails.getEmailId(), b);
+			final Paragraph addr2 = new Paragraph(billDetails.getAddr2(), b);
+			final Paragraph addr3 = new Paragraph(billDetails.getOffCity() + "," + billDetails.getOffState(), b);
+			final Paragraph addr4 = new Paragraph(billDetails.getOffCountry()+ "-" + billDetails.getOffZip(), b);
+			final Paragraph addr5 = new Paragraph(" Tel: " + billDetails.getPhnNum(), b);
+			final Paragraph addr6 = new Paragraph(billDetails.getEmailId(), b);
 			cell02.addElement(addr1);
 			cell02.addElement(addr2);
 			cell02.addElement(addr3);
@@ -270,29 +239,24 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 			table.addCell(cell02);
 			PdfPCell cell3 = new PdfPCell();
 			// cell3.setPadding (1.0f);
-			Paragraph BillId = new Paragraph("Client Id:   "
+			final Paragraph BillId = new Paragraph("Client Id:   "
 					+ billDetails.getClientId(), b);
 			cell3.setColspan(6);
 			cell3.addElement(BillId);
 			cell3.disableBorderSide(PdfPCell.RIGHT);
 			table.addCell(cell3);
 			PdfPCell cell12 = new PdfPCell();
-			Paragraph billNo = new Paragraph("BillNo:" + billDetails.getId(), b);
-			// billNo.setIndentationLeft(280);
-			Paragraph billDate = new Paragraph("Bill Date:"
+			final Paragraph billNo = new Paragraph("BillNo:" + billDetails.getId(), b);
+			final Paragraph billDate = new Paragraph("Bill Date:"
 					+ billDetails.getBillDate(), b);
-			// billDate.setIndentationLeft(280);
-			Paragraph BillPeriod = new Paragraph("Bill Period:"
+			
+			final Paragraph BillPeriod = new Paragraph("Bill Period:"
 					+ billDetails.getBillPeriod(), b);
-			// BillPeriod.setIndentationLeft(280);
-			Paragraph dueDate = new Paragraph("Due Date:"
+			
+			final Paragraph dueDate = new Paragraph("Due Date:"
 					+ billDetails.getDueDate(), b);
-			// dueDate.setIndentationLeft(280);
-
-			// cell12.disableBorderSide(PdfPCell.TOP);
-			// cell12.disableBorderSide(PdfPCell.BOTTOM);
+			
 			cell12.disableBorderSide(PdfPCell.LEFT);
-			// cell12.disableBorderSide(PdfPCell.RIGHT);
 			cell12.addElement(billNo);
 			cell12.addElement(billDate);
 			cell12.addElement(BillPeriod);
@@ -301,77 +265,68 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 			table.addCell(cell12);
 			PdfPCell cell4 = new PdfPCell();
 
-			Paragraph previousbal = new Paragraph("Previous Balance", b);
-			Paragraph previousamount = new Paragraph(""
+			final Paragraph previousbal = new Paragraph("Previous Balance", b);
+			final Paragraph previousamount = new Paragraph(""
 					+ billDetails.getPreviousBalance(), b);
 			cell4.setColspan(2);
 			cell4.addElement(previousbal);
 			cell4.addElement(previousamount);
 			cell4.disableBorderSide(PdfPCell.TOP);
-			// cell5.disableBorderSide(PdfPCell.BOTTOM);
-			// cell4.disableBorderSide(PdfPCell.LEFT);
-			// cell4.disableBorderSide(PdfPCell.RIGHT);
-
+			
 			table.addCell(cell4);
 			pdfContentByte.setTextMatrix(390, 405);
 
 			PdfPCell cell5 = new PdfPCell();
-			Paragraph adjstment = new Paragraph("Adjustment Amount", b);
-			Paragraph adjstmentamount = new Paragraph(""
+			final Paragraph adjstment = new Paragraph("Adjustment Amount", b);
+			final Paragraph adjstmentamount = new Paragraph(""
 					+ billDetails.getAdjustmentAmount(), b);
 			cell5.setColspan(2);
 			cell5.addElement(adjstment);
 			cell5.addElement(adjstmentamount);
 			cell5.disableBorderSide(PdfPCell.TOP);
-			// cell5.disableBorderSide(PdfPCell.BOTTOM);
 			cell5.disableBorderSide(PdfPCell.LEFT);
-			// cell5.disableBorderSide(PdfPCell.RIGHT);
 			table.addCell(cell5);
 
 			PdfPCell cell6 = new PdfPCell();
-			Paragraph paid_amount = new Paragraph("Payments", b);
-			Paragraph amount = new Paragraph("" + billDetails.getPaidAmount(),
+			final Paragraph paid_amount = new Paragraph("Payments", b);
+			final Paragraph amount = new Paragraph("" + billDetails.getPaidAmount(),
 					b);
 			cell6.setColspan(2);
 			cell6.addElement(paid_amount);
 			cell6.addElement(amount);
 			cell6.disableBorderSide(PdfPCell.TOP);
-			// cell5.disableBorderSide(PdfPCell.BOTTOM);
 			cell6.disableBorderSide(PdfPCell.LEFT);
-			// cell6.disableBorderSide(PdfPCell.RIGHT);
 			table.addCell(cell6);
 
 			PdfPCell cell7 = new PdfPCell();
-			Paragraph charge_amount = new Paragraph("Charge Amount", b);
-			Paragraph chargeamount = new Paragraph(""
+			final Paragraph charge_amount = new Paragraph("Charge Amount", b);
+			final Paragraph chargeamount = new Paragraph(""
 					+ billDetails.getChargeAmount(), b);
 			cell7.setColspan(2);
 			cell7.addElement(charge_amount);
 			cell7.addElement(chargeamount);
 
 			cell7.disableBorderSide(PdfPCell.TOP);
-			// cell5.disableBorderSide(PdfPCell.BOTTOM);
 			cell7.disableBorderSide(PdfPCell.LEFT);
-			// cell7.disableBorderSide(PdfPCell.RIGHT);
+			
 			table.addCell(cell7);
 
 			PdfPCell cell8 = new PdfPCell();
-			Paragraph due_amount = new Paragraph("Due Amount", b);
-			Paragraph dueamount = new Paragraph(
+			final Paragraph due_amount = new Paragraph("Due Amount", b);
+			final Paragraph dueamount = new Paragraph(
 					"" + billDetails.getDueAmount(), b);
 			cell8.setColspan(3);
 			cell8.addElement(due_amount);
 			cell8.addElement(dueamount);
 
 			cell8.disableBorderSide(PdfPCell.TOP);
-			// cell5.disableBorderSide(PdfPCell.BOTTOM);
 			cell8.disableBorderSide(PdfPCell.LEFT);
-			// cell8.disableBorderSide(PdfPCell.RIGHT);
+			
 			table.addCell(cell8);
 
 			PdfPCell cell9 = new PdfPCell();
 			cell9.setColspan(6);
-			Paragraph billDetail = new Paragraph("Current Bill Details", b);
+			final Paragraph billDetail = new Paragraph("Current Bill Details", b);
 			cell9.setPadding(10.0f);
 			cell9.setPaddingLeft(100.0f);
 			cell9.addElement(billDetail);
@@ -383,7 +338,7 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 
 			PdfPCell cell10 = new PdfPCell();
 			cell10.setColspan(5);
-			Paragraph message = new Paragraph("Promotional Message", b);
+			final Paragraph message = new Paragraph("Promotional Message", b);
 			cell10.setPadding(10.0f);
 			cell10.setPaddingLeft(100.0f);
 			cell10.addElement(message);
@@ -395,58 +350,52 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 
 			PdfPCell cell26 = new PdfPCell();
 			cell26.setColspan(1);
-			Paragraph charge = new Paragraph("Id", b);
+			final Paragraph charge = new Paragraph("Id", b);
 
 			cell26.addElement(charge);
 
-			// cell10.disableBorderSide(PdfPCell.TOP);
-			// cell10.disableBorderSide(PdfPCell.BOTTOM);
-			// cell26.disableBorderSide(PdfPCell.LEFT);
 			cell26.disableBorderSide(PdfPCell.RIGHT);
 
 			PdfPCell cell28 = new PdfPCell();
 			cell28.setColspan(1);
-			Paragraph Amount = new Paragraph("Amount", b);
+			Paragraph amountValue = new Paragraph("Amount", b);
 
-			cell28.addElement(Amount);
-			// cell10.disableBorderSide(PdfPCell.TOP);
-			// cell10.disableBorderSide(PdfPCell.BOTTOM);
+			cell28.addElement(amountValue);
+			
 			cell28.disableBorderSide(PdfPCell.LEFT);
 			cell28.disableBorderSide(PdfPCell.RIGHT);
 
 			PdfPCell cell27 = new PdfPCell();
 			cell27.setColspan(1);
-			Paragraph Date = new Paragraph("Date", b);
+			final Paragraph dateValue = new Paragraph("Date", b);
 
-			cell27.addElement(Date);
-			// cell10.disableBorderSide(PdfPCell.TOP);
-			// cell10.disableBorderSide(PdfPCell.BOTTOM);
+			cell27.addElement(dateValue);
+			
 			cell27.disableBorderSide(PdfPCell.LEFT);
 			cell27.disableBorderSide(PdfPCell.RIGHT);
 
 			PdfPCell cell23 = new PdfPCell();
 			cell23.setColspan(3);
-			Paragraph ID = new Paragraph("Transaction", b);
+			Paragraph transId = new Paragraph("Transaction", b);
 
-			cell23.addElement(ID);
-			// cell10.disableBorderSide(PdfPCell.TOP);
-			// cell10.disableBorderSide(PdfPCell.BOTTOM);
+			cell23.addElement(transId);
+		
 			cell23.disableBorderSide(PdfPCell.LEFT);
 			cell23.disableBorderSide(PdfPCell.RIGHT);
 
 			BigDecimal totalAmount = BigDecimal.ZERO;
 
-			for (FinancialTransactionsData data : datas) {
-				Paragraph id = new Paragraph("" + data.getTransactionId(), b);
+			for (final FinancialTransactionsData data : datas) {
+				final Paragraph id = new Paragraph("" + data.getTransactionId(), b);
 
 				cell26.addElement(id);
 
-				Paragraph transactionType = new Paragraph(""
+				final Paragraph transactionType = new Paragraph(""
 						+ data.getTransactionType(), b);
 				cell23.addElement(transactionType);
-				Paragraph date = new Paragraph("" + data.getTransDate(), b);
+				final Paragraph date = new Paragraph("" + data.getTransDate(), b);
 				cell27.addElement(date);
-				Paragraph tranAmount = new Paragraph("" + data.getAmount(), b);
+				final Paragraph tranAmount = new Paragraph("" + data.getAmount(), b);
 
 				cell28.addElement(tranAmount);
 				totalAmount = totalAmount.add(data.getAmount());
@@ -489,61 +438,59 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 	}
 
 	@Override
-	public void updateBillId(List<FinancialTransactionsData> financialTransactionsDatas,Long billId) {
+	public void updateBillId(final List<FinancialTransactionsData> financialTransactionsDatas, final Long billId) {
 		
 		try{
 
-		for (FinancialTransactionsData transIds : financialTransactionsDatas) {
-			if (transIds.getTransactionType().equalsIgnoreCase("ADJUSTMENT")) {
-				Adjustment adjustment = this.adjustmentRepository.findOne(transIds.getTransactionId());
-				adjustment.updateBillId(billId);
-				this.adjustmentRepository.save(adjustment);
-			}
-			else if (transIds.getTransactionType().equalsIgnoreCase("TAXES")) {
-				InvoiceTax tax = this.invoiceTaxRepository.findOne(transIds.getTransactionId());
-				tax.updateBillId(billId);
-				this.invoiceTaxRepository.save(tax);
-			}
-			else if (transIds.getTransactionType().contains("PAYMENT")) {
-				Payment payment = this.paymentRepository.findOne(transIds.getTransactionId());
-				payment.updateBillId(billId);
-				this.paymentRepository.save(payment);
-			}
-			else if (transIds.getTransactionType().equalsIgnoreCase("SERVICE_CHARGES")) {
-				BillingOrder billingOrder = this.billingOrderRepository.findOne(transIds.getTransactionId());
-				billingOrder.updateBillId(billId);
-				this.billingOrderRepository.save(billingOrder);
-				Invoice invoice = this.invoiceRepository.findOne(billingOrder.getInvoice().getId());
-				invoice.updateBillId(billId);
-				this.invoiceRepository.save(invoice);
-			}
-			else if (transIds.getTransactionType().equalsIgnoreCase("INVOICE")) {
-				Invoice invoice = this.invoiceRepository.findOne(transIds.getTransactionId());
-				invoice.updateBillId(billId);
-				this.invoiceRepository.save(invoice);
-			}
-			else if (transIds.getTransactionType().equalsIgnoreCase("ONETIME_CHARGES")) {
-            	BillingOrder billingOrder = this.billingOrderRepository.findOne(transIds.getTransactionId());
-				billingOrder.updateBillId(billId);
-				this.billingOrderRepository.save(billingOrder);
-				Invoice invoice = this.invoiceRepository.findOne(billingOrder.getInvoice().getId());
-				invoice.updateBillId(billId);
-				this.invoiceRepository.save(invoice);
+			for (final FinancialTransactionsData transIds : financialTransactionsDatas) {
+				if ("ADJUSTMENT".equalsIgnoreCase(transIds.getTransactionType())) {
+					Adjustment adjustment = this.adjustmentRepository.findOne(transIds.getTransactionId());
+					adjustment.updateBillId(billId);
+					this.adjustmentRepository.save(adjustment);
+				}
+				else if ("TAXES".equalsIgnoreCase(transIds.getTransactionType())) {
+					InvoiceTax tax = this.invoiceTaxRepository.findOne(transIds.getTransactionId());
+					tax.updateBillId(billId);
+					this.invoiceTaxRepository.save(tax);
+				}
+				else if (transIds.getTransactionType().contains("PAYMENT")) {
+					Payment payment = this.paymentRepository.findOne(transIds.getTransactionId());
+					payment.updateBillId(billId);
+					this.paymentRepository.save(payment);
+				}
+				else if ("SERVICE_CHARGES".equalsIgnoreCase(transIds.getTransactionType())) {
+					BillingOrder billingOrder = this.billingOrderRepository.findOne(transIds.getTransactionId());
+					billingOrder.updateBillId(billId);
+					this.billingOrderRepository.save(billingOrder);
+					Invoice invoice = this.invoiceRepository.findOne(billingOrder.getInvoice().getId());
+					invoice.updateBillId(billId);
+					this.invoiceRepository.save(invoice);
+				}
+				else if ("INVOICE".equalsIgnoreCase(transIds.getTransactionType())) {
+					Invoice invoice = this.invoiceRepository.findOne(transIds.getTransactionId());
+					invoice.updateBillId(billId);
+					this.invoiceRepository.save(invoice);
+				}
+				else if ("ONETIME_CHARGES".equalsIgnoreCase(transIds.getTransactionType())) {
+					BillingOrder billingOrder = this.billingOrderRepository.findOne(transIds.getTransactionId());
+					billingOrder.updateBillId(billId);
+					this.billingOrderRepository.save(billingOrder);
+					Invoice invoice = this.invoiceRepository.findOne(billingOrder.getInvoice().getId());
+					invoice.updateBillId(billId);
+					this.invoiceRepository.save(invoice);
 				
-            }
+				}
 
-		}
+			}
 		}catch(Exception exception){
 		
-			
 		}
 		
-
 	}
 
 	@Transactional
 	@Override
-	public void ireportPdf(Long billId) throws SQLException {
+	public void ireportPdf(final Long billId) throws SQLException {
 		try {
 			String fileLocation = FileUtils.MIFOSX_BASE_DIR;
 
@@ -552,47 +499,45 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 				new File(fileLocation).mkdirs();
 			}
 			BillMaster billMaster=this.billMasterRepository.findOne(billId);
-			String jpath = fileLocation+File.separator+"jasper"; //System.getProperty("user.home") + File.separator + "billing";
-			String printInvoicedetailsLocation = fileLocation + File.separator + "Bill_" +billMaster.getId()+ ".pdf";
+			final String jpath = fileLocation+File.separator+"jasper"; //System.getProperty("user.home") + File.separator + "billing";
+			final String printInvoicedetailsLocation = fileLocation + File.separator + "Bill_" + billMaster.getId() + ".pdf";
 			billMaster.setFileName(printInvoicedetailsLocation);
 			this.billMasterRepository.save(billMaster);
-			String jfilepath =jpath+File.separator+"Bill_Mainreport.jasper";
-			Long billNo=null;
-			Client client=this.clientRepository.findOne(billMaster.getClientId());
+			final String jfilepath =jpath+File.separator+"Bill_Mainreport.jasper";
+			Long billNum = null;
+			final Client client = this.clientRepository.findOne(billMaster.getClientId());
 			
 				if(client.getGroupName() != null){
-					billNo=client.getGroupName();
+					billNum = client.getGroupName();
 				}else{
-					billNo=billMaster.getId();
+					billNum = billMaster.getId();
 				}
 				
 			Map<String, Object> parameters = new HashMap();
 
-			//String id1 = String.valueOf(billMaster.getId());
-			Integer id=Integer.valueOf(billMaster.getId().toString());
+			final Integer id = Integer.valueOf(billMaster.getId().toString());
 			parameters.put("param1", id);
-			//parameters.put("param1",new LocalDate(billMaster.getBillDate())+"/"+billNo);
+			
 			parameters.put("SUBREPORT_DIR",jpath+""+File.separator);
-			Connection connection=this.dataSource.getConnection();
+			final Connection connection = this.dataSource.getConnection();
 			try{
-			JasperPrint jasperPrint = JasperFillManager.fillReport(jfilepath,parameters, connection);
-			JasperExportManager.exportReportToPdfFile(jasperPrint,printInvoicedetailsLocation);
+				final JasperPrint jasperPrint = JasperFillManager.fillReport(jfilepath, parameters, connection);
+				JasperExportManager.exportReportToPdfFile(jasperPrint, printInvoicedetailsLocation);
 			}finally{
 	            try {
 	            	connection.close();
-	            } catch (SQLException e) {
+	            } catch (final SQLException e) {
 	                e.printStackTrace();
 	            }
 			}
-		} catch (DataIntegrityViolationException exception) {
+		} catch (final DataIntegrityViolationException exception) {
 			exception.printStackTrace();
-		} catch (JRException e) {
-		 logger.error("unable to generate pdf"+e.getLocalizedMessage());
+		} catch (final JRException e) {
+			LOGGER.error("unable to generate pdf" + e.getLocalizedMessage());
 			e.printStackTrace();
-		} catch (SQLException e) {
-			logger.error("unable to retrieve data"+e.getLocalizedMessage());
+		} catch (final SQLException e) {
+			LOGGER.error("unable to retrieve data" + e.getLocalizedMessage());
 		}
 	}
 
-	
 }
