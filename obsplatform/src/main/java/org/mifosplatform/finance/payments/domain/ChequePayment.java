@@ -1,6 +1,5 @@
 package org.mifosplatform.finance.payments.domain;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -9,11 +8,9 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import org.joda.time.LocalDate;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
 import org.mifosplatform.useradministration.domain.AppUser;
-import org.springframework.data.jpa.domain.AbstractPersistable;
 
 @SuppressWarnings("serial")
 @Entity
@@ -52,12 +49,12 @@ public class ChequePayment extends AbstractAuditableCustom<AppUser,Long> {
 	
 	
 	
-	public static ChequePayment fromJson(JsonCommand command) {
-		Long paymentId = command.longValueOfParameterNamed("paymentId");
-		String chequeNo = command.stringValueOfParameterNamed("chequeNo");
-		Date chequeDate = command.DateValueOfParameterNamed("chequeDate");
-		String bankName = command.stringValueOfParameterNamed("bankName");
-		String branchName = command.stringValueOfParameterNamed("branchName");
+	public static ChequePayment fromJson(final JsonCommand command) {
+		final Long paymentId = command.longValueOfParameterNamed("paymentId");
+		final String chequeNo = command.stringValueOfParameterNamed("chequeNo");
+		final Date chequeDate = command.DateValueOfParameterNamed("chequeDate");
+		final String bankName = command.stringValueOfParameterNamed("bankName");
+		final String branchName = command.stringValueOfParameterNamed("branchName");
 		return new ChequePayment(paymentId,chequeNo, chequeDate, bankName, branchName);
 	}
 
@@ -65,7 +62,7 @@ public class ChequePayment extends AbstractAuditableCustom<AppUser,Long> {
 		return paymentId;
 	}
 
-	public void setPaymentId(Long paymentId) {
+	public void setPaymentId(final Long paymentId) {
 		this.paymentId = paymentId;
 	}
 
@@ -73,7 +70,7 @@ public class ChequePayment extends AbstractAuditableCustom<AppUser,Long> {
 		return chequeNo;
 	}
 
-	public void setChequeNo(String chequeNo) {
+	public void setChequeNo(final String chequeNo) {
 		this.chequeNo = chequeNo;
 	}
 
@@ -81,7 +78,7 @@ public class ChequePayment extends AbstractAuditableCustom<AppUser,Long> {
 		return chequeDate;
 	}
 
-	public void setChequeDate(Date chequeDate) {
+	public void setChequeDate(final Date chequeDate) {
 		this.chequeDate = chequeDate;
 	}
 
@@ -89,7 +86,7 @@ public class ChequePayment extends AbstractAuditableCustom<AppUser,Long> {
 		return bankName;
 	}
 
-	public void setBankName(String bankName) {
+	public void setBankName(final String bankName) {
 		this.bankName = bankName;
 	}
 
@@ -97,7 +94,7 @@ public class ChequePayment extends AbstractAuditableCustom<AppUser,Long> {
 		return branchName;
 	}
 
-	public void setBranchName(String branchName) {
+	public void setBranchName(final String branchName) {
 		this.branchName = branchName;
 	}
 

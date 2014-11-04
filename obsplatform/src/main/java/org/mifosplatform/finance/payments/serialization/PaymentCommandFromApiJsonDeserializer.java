@@ -67,22 +67,14 @@ public class PaymentCommandFromApiJsonDeserializer {
 
 		final JsonElement element = fromApiJsonHelper.parse(json);
 		
-		//final LocalDate paymentDate = fromApiJsonHelper.extractLocalDateNamed("paymentDate", element);
 		final String paymentCode = fromApiJsonHelper.extractStringNamed("paymentCode", element);
 		final BigDecimal amountPaid = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("amountPaid", element);
-		//final String remarks = fromApiJsonHelper.extractStringNamed("remarks", element);
-		
-		
 		String receiptNo = fromApiJsonHelper.extractStringNamed("receiptNo", element);
+		
+		baseDataValidator.reset().parameter("paymentCode").value(paymentCode).notBlank().notExceedingLengthOf(100);
+		baseDataValidator.reset().parameter("amountPaid").value(amountPaid).notBlank().notExceedingLengthOf(100);
 		baseDataValidator.reset().parameter("receiptNo").value(receiptNo).notBlank().notExceedingLengthOf(50);
-	//	baseDataValidator.reset().parameter("paymentDate").value(paymentDate)
-		//.notBlank().notExceedingLengthOf(100);
-		baseDataValidator.reset().parameter("paymentCode").value(paymentCode)
-		.notBlank().notExceedingLengthOf(100);
-		baseDataValidator.reset().parameter("amountPaid").value(amountPaid)
-		.notBlank().notExceedingLengthOf(100);
-		//baseDataValidator.reset().parameter("remarks").value(remarks)
-		//.notBlank().notExceedingLengthOf(100);
+		
 		if(fromApiJsonHelper.parameterExists("isChequeSelected", element)){
 			String isChequeSelected = fromApiJsonHelper.extractStringNamed("isChequeSelected", element);
 			if(isChequeSelected.equalsIgnoreCase("yes")){

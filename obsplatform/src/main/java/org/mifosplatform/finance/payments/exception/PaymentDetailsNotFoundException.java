@@ -6,7 +6,7 @@ public class PaymentDetailsNotFoundException extends AbstractPlatformDomainRuleE
 
 
 	private static final long serialVersionUID = -2726286660273906232L;
-	public PaymentDetailsNotFoundException(String paymentCode) {
+	public PaymentDetailsNotFoundException(final String paymentCode) {
 		super("error.msg.payments.payment.details.invalid", "Payment Details Not Found"+paymentCode+". ",paymentCode);
 	}
 }

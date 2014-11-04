@@ -30,11 +30,11 @@ public class AdjustmentReadPlatformServiceImpl implements AdjustmentReadPlatform
 	protected static final class AdjustmentMapperForId implements RowMapper<ClientBalanceData> {
 
 		@Override
-		public ClientBalanceData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum)
+		public ClientBalanceData mapRow(final ResultSet rs, final int rowNum)
 				throws SQLException {
-            Long id=JdbcSupport.getLong(rs, "id");
-			Long clientId = JdbcSupport.getLong(rs, "client_id");
-			BigDecimal balanceAmount = JdbcSupport.getBigDecimalDefaultToZeroIfNull(rs,"amount_paid");
+            final Long id=JdbcSupport.getLong(rs, "id");
+            final Long clientId = JdbcSupport.getLong(rs, "client_id");
+            final BigDecimal balanceAmount = JdbcSupport.getBigDecimalDefaultToZeroIfNull(rs,"amount_paid");
 			return new ClientBalanceData(id,clientId,balanceAmount);
 
 		}
@@ -49,10 +49,10 @@ public class AdjustmentReadPlatformServiceImpl implements AdjustmentReadPlatform
 
 
 	@Override
-	public List<ClientBalanceData> retrieveAllAdjustments(Long id){
+	public List<ClientBalanceData> retrieveAllAdjustments(final Long id){
 		 this.context.authenticatedUser();
-		 ClientBalanceMapper mapper = new ClientBalanceMapper();
-		String sql = "select " + mapper.schema()+ " where d.client_id=?";
+		 final ClientBalanceMapper mapper = new ClientBalanceMapper();
+		 final String sql = "select " + mapper.schema()+ " where d.client_id=?";
 		return this.jdbcTemplate.query(sql, mapper, new Object[] {id});
 	}
 
@@ -62,10 +62,9 @@ public class AdjustmentReadPlatformServiceImpl implements AdjustmentReadPlatform
 	@Override
 	public List<AdjustmentData> retrieveAllAdjustmentsCodes() {
 		 this.context.authenticatedUser();
-		 context.authenticatedUser();
-			PlanMapper mapper = new PlanMapper();
+		 final PlanMapper mapper = new PlanMapper();
 
-			String sql = "Select b.id,code_value from m_code a, m_code_value b where a.id = b.code_id and code_name='Adjustment Code';";
+		 final String sql = "Select b.id,code_value from m_code a, m_code_value b where a.id = b.code_id and code_name='Adjustment Code';";
 
 			return this.jdbcTemplate.query(sql, mapper, new Object[] {});
 
@@ -73,16 +72,11 @@ public class AdjustmentReadPlatformServiceImpl implements AdjustmentReadPlatform
 
 		private static final class PlanMapper implements RowMapper<AdjustmentData> {
 
-
-
 			@Override
-			public AdjustmentData mapRow(final ResultSet rs,
-					@SuppressWarnings("unused") final int rowNum)
-					throws SQLException {
+			public AdjustmentData mapRow(final ResultSet rs, final int rowNum) throws SQLException {
 
-				Long id = rs.getLong("id");
-				String adjustment_code = rs.getString("code_value");
-				
+				final Long id = rs.getLong("id");
+				final String adjustment_code = rs.getString("code_value");
 
 				return new AdjustmentData(id, adjustment_code);
 

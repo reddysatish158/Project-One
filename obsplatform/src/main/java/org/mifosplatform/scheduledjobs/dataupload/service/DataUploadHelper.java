@@ -15,12 +15,12 @@ import java.util.Map;
 import org.apache.poi.ss.usermodel.Row;
 import org.codehaus.jettison.json.JSONArray;
 import org.joda.time.LocalDate;
-import org.mifosplatform.billing.paymode.data.McodeData;
-import org.mifosplatform.billing.paymode.service.PaymodeReadPlatformService;
 import org.mifosplatform.finance.adjustment.data.AdjustmentData;
 import org.mifosplatform.finance.adjustment.exception.AdjustmentCodeNotFoundException;
 import org.mifosplatform.finance.adjustment.service.AdjustmentReadPlatformService;
+import org.mifosplatform.finance.payments.data.McodeData;
 import org.mifosplatform.finance.payments.exception.PaymentCodeNotFoundException;
+import org.mifosplatform.finance.payments.service.PaymentReadPlatformService;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.scheduledjobs.dataupload.data.MRNErrorData;
 import org.mifosplatform.scheduledjobs.dataupload.domain.DataUpload;
@@ -36,10 +36,10 @@ public class DataUploadHelper {
 	
 	private final DataUploadRepository dataUploadRepository;
 	private final AdjustmentReadPlatformService adjustmentReadPlatformService;
-	private final PaymodeReadPlatformService paymodeReadPlatformService;
+	private final PaymentReadPlatformService paymodeReadPlatformService;
 	
 	@Autowired
-	public DataUploadHelper(final DataUploadRepository dataUploadRepository,final PaymodeReadPlatformService paymodeReadPlatformService,
+	public DataUploadHelper(final DataUploadRepository dataUploadRepository,final PaymentReadPlatformService paymodeReadPlatformService,
 			final AdjustmentReadPlatformService adjustmentReadPlatformService){
 		
 		this.dataUploadRepository=dataUploadRepository;
@@ -135,7 +135,7 @@ public class DataUploadHelper {
 			List<AdjustmentData> adjustmentDataList=this.adjustmentReadPlatformService.retrieveAllAdjustmentsCodes();
 			if(!adjustmentDataList.isEmpty()){
 				 for(AdjustmentData adjustmentData:adjustmentDataList){
-					   if( adjustmentData.getAdjustment_code().equalsIgnoreCase(currentLineData[2].toString())){ 
+					   if( adjustmentData.getAdjustmentCode().equalsIgnoreCase(currentLineData[2].toString())){ 
 					        	 
 						   map.put("adjustment_code", adjustmentData.getId().toString());
 						   break;

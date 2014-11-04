@@ -13,13 +13,13 @@ public class CreateAdjustmentCommandHandler  implements NewCommandSourceHandler{
 	  private final AdjustmentWritePlatformService writePlatformService;
 		  
 	  @Autowired
-	    public CreateAdjustmentCommandHandler(AdjustmentWritePlatformService writePlatformService) {
+	    public CreateAdjustmentCommandHandler(final AdjustmentWritePlatformService writePlatformService) {
 	        this.writePlatformService = writePlatformService;
 	       
 	    }
 	
 	@Override
-	public CommandProcessingResult processCommand(JsonCommand command) {
+	public CommandProcessingResult processCommand(final JsonCommand command) {
 		
 		return writePlatformService.createAdjustments(command);
 		

@@ -169,7 +169,7 @@ public final class OrderCommandFromApiJsonDeserializer {
 		
 	}
 
-	public void validateForOrderSuspension(String json) {
+	public void validateForOrderSuspension(final String json) {
 		
 		if (StringUtils.isBlank(json)) { throw new InvalidJsonException(); }
 
@@ -182,8 +182,7 @@ public final class OrderCommandFromApiJsonDeserializer {
         baseDataValidator.reset().parameter("suspensionDate").value(suspensionDate).notBlank();
         final String suspensionReason = fromApiJsonHelper.extractStringNamed("suspensionReason", element);
         baseDataValidator.reset().parameter("suspensionReason").value(suspensionReason).notBlank();
-       /* final String suspensionDescription = fromApiJsonHelper.extractStringNamed("suspensionDescription", element);
-        baseDataValidator.reset().parameter("suspensionDescription").value(suspensionDescription).notBlank();*/
+        
         throwExceptionIfValidationWarningsExist(dataValidationErrors);
 		
 	}

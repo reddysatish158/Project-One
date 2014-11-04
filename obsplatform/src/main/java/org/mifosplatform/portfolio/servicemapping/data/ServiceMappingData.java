@@ -3,7 +3,7 @@ package org.mifosplatform.portfolio.servicemapping.data;
 import java.util.Collection;
 import java.util.List;
 
-import org.mifosplatform.billing.paymode.data.McodeData;
+import org.mifosplatform.finance.payments.data.McodeData;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
 import org.mifosplatform.infrastructure.dataqueries.data.ReportParameterData;
 

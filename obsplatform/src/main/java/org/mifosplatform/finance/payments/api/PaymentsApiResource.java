@@ -23,8 +23,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import org.json.JSONObject;
-import org.mifosplatform.billing.paymode.data.McodeData;
-import org.mifosplatform.billing.paymode.service.PaymodeReadPlatformService;
 import org.mifosplatform.billing.selfcare.domain.SelfCareTemporary;
 import org.mifosplatform.billing.selfcare.domain.SelfCareTemporaryRepository;
 import org.mifosplatform.billing.selfcare.exception.SelfCareTemporaryAlreadyExistException;
@@ -32,9 +30,11 @@ import org.mifosplatform.billing.selfcare.exception.SelfCareTemporaryEmailIdNotF
 import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
+import org.mifosplatform.finance.payments.data.McodeData;
 import org.mifosplatform.finance.payments.data.PaymentData;
 import org.mifosplatform.finance.payments.exception.DalpayRequestFailureException;
 import org.mifosplatform.finance.payments.exception.KortaRequestFailureException;
+import org.mifosplatform.finance.payments.service.PaymentReadPlatformService;
 import org.mifosplatform.infrastructure.codes.data.CodeData;
 import org.mifosplatform.infrastructure.core.api.ApiRequestParameterHelper;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
@@ -58,17 +58,17 @@ public class PaymentsApiResource {
 	private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(
 			Arrays.asList("id", "clientId", "paymentDate", "paymentCode",
 					"amountPaid", "statmentId", "externalId", "Remarks"));
-	private final String resourceNameForPermissions = "GETPAYMENT";
+	private final static String RESOURCENAMEFORPERMISSIONS = "PAYMENT";
 
 	private final PlatformSecurityContext context;
-	private final PaymodeReadPlatformService readPlatformService;
+	private final PaymentReadPlatformService readPlatformService;
 	private final DefaultToApiJsonSerializer<PaymentData> toApiJsonSerializer;
 	private final ApiRequestParameterHelper apiRequestParameterHelper;
 	private final PortfolioCommandSourceWritePlatformService writePlatformService;
 	private final SelfCareTemporaryRepository selfCareTemporaryRepository;
 
 	@Autowired
-	public PaymentsApiResource(final PlatformSecurityContext context,final PaymodeReadPlatformService readPlatformService,
+	public PaymentsApiResource(final PlatformSecurityContext context,final PaymentReadPlatformService readPlatformService,
 			final DefaultToApiJsonSerializer<PaymentData> toApiJsonSerializer,final ApiRequestParameterHelper apiRequestParameterHelper,
 			final PortfolioCommandSourceWritePlatformService writePlatformService, final SelfCareTemporaryRepository selfCareTemporaryRepository) {
 		this.context = context;
@@ -79,6 +79,9 @@ public class PaymentsApiResource {
 		this.selfCareTemporaryRepository = selfCareTemporaryRepository;
 	}
 
+	/**
+	 * This method is using for posting data to create payment
+	 */
 	@POST
 	@Path("{clientId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
@@ -88,15 +91,18 @@ public class PaymentsApiResource {
 		final CommandProcessingResult result = this.writePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 	}
-
+    
+	/**
+	 * This method is using for getting template data to create payment
+	 */
 	@GET
 	@Path("template")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String retrieveDetailsForPayments(@QueryParam("clientId") final Long clientId,@Context final UriInfo uriInfo) {
-		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		Collection<McodeData> data = this.readPlatformService.retrievemCodeDetails("Payment Mode");
-		PaymentData paymentData=new PaymentData(data);
+		context.authenticatedUser().validateHasReadPermission(RESOURCENAMEFORPERMISSIONS);
+		final Collection<McodeData> data = this.readPlatformService.retrievemCodeDetails("Payment Mode");
+		final PaymentData paymentData=new PaymentData(data);
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 		return this.toApiJsonSerializer.serialize(settings, paymentData,RESPONSE_DATA_PARAMETERS);
 
@@ -107,28 +113,30 @@ public class PaymentsApiResource {
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String retrieveAllDetailsForPayments(@PathParam("clientId") final Long clientId,@Context final UriInfo uriInfo) {
-		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		List<PaymentData> paymentData = readPlatformService.retrivePaymentsData(clientId);
+		context.authenticatedUser().validateHasReadPermission(RESOURCENAMEFORPERMISSIONS);
+		final List<PaymentData> paymentData = readPlatformService.retrivePaymentsData(clientId);
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 		return this.toApiJsonSerializer.serialize(settings, paymentData,RESPONSE_DATA_PARAMETERS);
 
 	}
 	
 	
-	
+	/**
+	 * This method is using for posting data to create payment using paypal
+	 */
 	 @POST
 	 @Path("paypal")
 	 @Consumes("application/x-www-form-urlencoded")
 	 @Produces({ MediaType.APPLICATION_JSON })
-	 public String Checkout(@FormParam("txn_id") String txnId,@FormParam("payment_date") Date Date,@FormParam("mc_gross") BigDecimal amount,
-			 @FormParam("address_name") String name,@FormParam("payer_email") String payerEmail,
-			 @FormParam("transaction_subject") String clientStringId){
+	 public String checkout(@FormParam("txn_id") final String txnId,@FormParam("payment_date") final Date paymentDate,@FormParam("mc_gross") final BigDecimal amount,
+			 @FormParam("address_name") final String name,@FormParam("payer_email") final String payerEmail,
+			 @FormParam("transaction_subject") final String clientStringId){
 	   try {
 		   
-		  Long clientId= Long.parseLong(clientStringId);
-		  SimpleDateFormat daformat=new SimpleDateFormat("dd MMMM yyyy");
-		  String date=daformat.format(Date);
-		  JsonObject object=new JsonObject();
+		  final Long clientId= Long.parseLong(clientStringId);
+		  final SimpleDateFormat daformat=new SimpleDateFormat("dd MMMM yyyy");
+		  final String date=daformat.format(paymentDate);
+		  final JsonObject object=new JsonObject();
 		  object.addProperty("txn_id", txnId);
 		  object.addProperty("dateFormat","dd MMMM yyyy");
 		  object.addProperty("locale","en");
@@ -149,6 +157,9 @@ public class PaymentsApiResource {
 	   }
 	 }
 	 
+	 /**
+	 * This method is using for cancelling payment with payment id
+	 */
 	 @PUT
 	 @Path("cancelpayment/{paymentId}")
 	 @Consumes({ MediaType.APPLICATION_JSON })
@@ -160,7 +171,10 @@ public class PaymentsApiResource {
 			return this.toApiJsonSerializer.serialize(result);
 		}	
 	 
-
+	 
+	 /**
+	 * This method is using for posting data to create payment using dalpay
+	 */
 	 @POST
 	 @Path("dalpay")
 	 @Consumes({ MediaType.APPLICATION_JSON })
@@ -168,19 +182,19 @@ public class PaymentsApiResource {
 	 public String dalpayCheckout(final String apiRequestBodyAsJson){
 
 		   try {
-			   	  JSONObject json= new JSONObject(apiRequestBodyAsJson);
-			   	  String orderNumber = json.getString("order_num");
-			   	  Long clientId = json.getLong("user1");
+			   	  final JSONObject json= new JSONObject(apiRequestBodyAsJson);
+			   	  final String orderNumber = json.getString("order_num");
+			   	  final Long clientId = json.getLong("user1");
 			   	  String returnUrl = json.getString("user2");
-			   	  String screenName = json.getString("user3");
-			   	  String EmailId = json.getString("cust_email");
-			   	  String amount = json.getString("total_amount");
-			   	  BigDecimal totalAmount = new BigDecimal(amount);
+			   	  final String screenName = json.getString("user3");
+			   	  final String EmailId = json.getString("cust_email");
+			   	  final String amount = json.getString("total_amount");
+			   	  final BigDecimal totalAmount = new BigDecimal(amount);
 			   	returnUrl = returnUrl.replace("index.html", "index.html#/"+screenName);
 			   	  
 				if (clientId !=null && clientId > 0) {
-					String date = new SimpleDateFormat("dd MMMM yyyy").format(new Date());
-					JsonObject object = new JsonObject();
+					final String date = new SimpleDateFormat("dd MMMM yyyy").format(new Date());
+					final JsonObject object = new JsonObject();
 					object.addProperty("txn_id", orderNumber);
 					object.addProperty("dateFormat", "dd MMMM yyyy");
 					object.addProperty("locale", "en");
@@ -192,11 +206,11 @@ public class PaymentsApiResource {
 					object.addProperty("paymentCode", 27);
 
 					final CommandWrapper commandRequest = new CommandWrapperBuilder().createPayment(clientId).withJson(object.toString()).build();
-					final CommandProcessingResult result = this.writePlatformService.logCommandSource(commandRequest);
+					this.writePlatformService.logCommandSource(commandRequest);
 					
 				}else if(clientId !=null && clientId == 0){
 					
-					SelfCareTemporary selfCareTemporary = this.selfCareTemporaryRepository.findOneByEmailId(EmailId);
+					final SelfCareTemporary selfCareTemporary = this.selfCareTemporaryRepository.findOneByEmailId(EmailId);
 					if(selfCareTemporary != null && selfCareTemporary.getPaymentStatus().equalsIgnoreCase("INACTIVE")){
 						
 						selfCareTemporary.setPaymentData(json.toString());
@@ -224,47 +238,35 @@ public class PaymentsApiResource {
 		   }
 		 }
 	 
-	 @POST
-	 @Path("authorizeNet")
-	 @Consumes("application/x-www-form-urlencoded")
-	 @Produces({ MediaType.TEXT_HTML})
-	 public String authorizeNetCheckout(@FormParam("x_email") String email,
-			 @FormParam("x_invoice_num") String invoiceNumber){
-	   try {
-		   	  System.out.println(invoiceNumber);
-			return "<!-- success--> <span>Order Accepted Successfully</span>";
-	  } 
-	   catch(Exception e){
-	    return e.getMessage();
-	   }
-	 }
-	 
 	@POST
 	@Path("paypalEnquirey/{clientId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String paypalEnquireyPayment(@PathParam("clientId") final Long clientId, final String apiRequestBodyAsJson) {
 
-		final CommandWrapper commandRequest = new CommandWrapperBuilder().PaypalPayment(clientId).withJson(apiRequestBodyAsJson).build();
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().paypalEnquireyPayment(clientId).withJson(apiRequestBodyAsJson).build();
 		final CommandProcessingResult result = this.writePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 	}
 
+	/**
+	 * This method is using for posting data to create payment using korta
+	 */
 	@POST
 	@Path("korta")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String KortaPayment(final String apiRequestBodyAsJson) {
+	public String kortaPayment(final String apiRequestBodyAsJson) {
 
 		try {
-			JSONObject json = new JSONObject(apiRequestBodyAsJson);
-			Long clientId = json.getLong("clientId");
-			String reference = json.getString("reference");
-			String totalAmount = json.getString("amount");
+			final JSONObject json = new JSONObject(apiRequestBodyAsJson);
+			final Long clientId = json.getLong("clientId");
+			final String reference = json.getString("reference");
+			final String totalAmount = json.getString("amount");
 			
 			if (clientId != null && clientId > 0) {
-				String date = new SimpleDateFormat("dd MMMM yyyy").format(new Date());
-				JsonObject object = new JsonObject();
+				final String date = new SimpleDateFormat("dd MMMM yyyy").format(new Date());
+				final JsonObject object = new JsonObject();
 				object.addProperty("txn_id", reference);
 				object.addProperty("dateFormat", "dd MMMM yyyy");
 				object.addProperty("locale", "en");
@@ -280,10 +282,10 @@ public class PaymentsApiResource {
 				return this.toApiJsonSerializer.serialize(result);
 
 			} else if (clientId != null && clientId == 0) {
-				String emailId = json.getString("emailId");
-				SelfCareTemporary selfCareTemporary = this.selfCareTemporaryRepository.findOneByEmailId(emailId);
+				final String emailId = json.getString("emailId");
+				final SelfCareTemporary selfCareTemporary = this.selfCareTemporaryRepository.findOneByEmailId(emailId);
 				if (selfCareTemporary != null && selfCareTemporary.getPaymentStatus().equalsIgnoreCase("INACTIVE")) {
-					JsonObject obj = new JsonObject();
+					final JsonObject obj = new JsonObject();
 					obj.addProperty("order_num", reference);
 					obj.addProperty("total_amount", totalAmount);
 					obj.addProperty("cust_email", emailId);

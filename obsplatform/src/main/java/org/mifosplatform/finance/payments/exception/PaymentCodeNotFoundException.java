@@ -11,7 +11,7 @@ public class PaymentCodeNotFoundException extends AbstractPlatformDomainRuleExce
 	 */
 	private static final long serialVersionUID = -2726286660273906232L;
 
-	public PaymentCodeNotFoundException(String paymentCode) {
+	public PaymentCodeNotFoundException(final String paymentCode) {
 		super("error.msg.payments.payment.code.invalid", "Invalid Payment Code "+paymentCode+". ",paymentCode);
 	}
 }

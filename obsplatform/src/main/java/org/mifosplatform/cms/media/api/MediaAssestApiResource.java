@@ -20,7 +20,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
-import org.mifosplatform.billing.paymode.data.McodeData;
 import org.mifosplatform.cms.media.data.MediaAssetData;
 import org.mifosplatform.cms.media.data.MediaassetAttribute;
 import org.mifosplatform.cms.media.data.MediaassetAttributeData;
@@ -29,6 +28,7 @@ import org.mifosplatform.cms.mediadetails.data.MediaLocationData;
 import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
+import org.mifosplatform.finance.payments.data.McodeData;
 import org.mifosplatform.infrastructure.core.api.ApiRequestParameterHelper;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;

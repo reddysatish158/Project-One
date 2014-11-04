@@ -21,13 +21,13 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
-import org.mifosplatform.billing.paymode.data.McodeData;
-import org.mifosplatform.billing.paymode.service.PaymodeReadPlatformService;
 import org.mifosplatform.billing.payterms.data.PaytermData;
 import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.mifosplatform.finance.billingorder.exceptions.BillingOrderNoRecordsFoundException;
+import org.mifosplatform.finance.payments.data.McodeData;
+import org.mifosplatform.finance.payments.service.PaymentReadPlatformService;
 import org.mifosplatform.infrastructure.configuration.domain.Configuration;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.ApiRequestParameterHelper;
@@ -67,7 +67,7 @@ public class OrdersApiResource {
 	  private final OrderReadPlatformService orderReadPlatformService;
 	  private final MCodeReadPlatformService mCodeReadPlatformService;
 	  private final ApiRequestParameterHelper apiRequestParameterHelper;
-	  private final PaymodeReadPlatformService paymodeReadPlatformService;
+	  private final PaymentReadPlatformService paymodeReadPlatformService;
 	  private final ConfigurationRepository configurationRepository;
 	  private final DefaultToApiJsonSerializer<OrderData> toApiJsonSerializer;
 	  private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
@@ -77,7 +77,7 @@ public class OrdersApiResource {
 	   public OrdersApiResource(final PlatformSecurityContext context,final ConfigurationRepository configurationRepository,  
 	   final DefaultToApiJsonSerializer<OrderData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper,
 	   final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,final OrderReadPlatformService orderReadPlatformService,
-	   final PlanReadPlatformService planReadPlatformService,final PaymodeReadPlatformService paymodeReadPlatformService,
+	   final PlanReadPlatformService planReadPlatformService,final PaymentReadPlatformService paymodeReadPlatformService,
 	   final MCodeReadPlatformService mCodeReadPlatformService) {
 
 		        this.context = context;
@@ -272,7 +272,12 @@ public class OrdersApiResource {
 	    return this.toApiJsonSerializer.serialize(settings, datas, RESPONSE_DATA_PARAMETERS);
 		}
 	 
-	 @POST
+	 /**
+	   * this method is using for posting data while command centre
+	   * @param uriInfo
+	   * @return
+	   */
+	 	@POST
 		@Path("retrackOsdmessage/{orderId}")
 		@Consumes({ MediaType.APPLICATION_JSON })
 		@Produces({ MediaType.APPLICATION_JSON })
@@ -358,6 +363,11 @@ public class OrdersApiResource {
 	  return this.toApiJsonSerializer.serialize(result);
 	}	   
 	
+	  /**
+	   * this method is using for getting template information in suspension
+	   * @param uriInfo
+	   * @return
+	   */
 	  @GET
 	  @Path("suspend")
 	  @Consumes({MediaType.APPLICATION_JSON})
@@ -365,18 +375,23 @@ public class OrdersApiResource {
 	  public String getSuspentationReasons(@Context final UriInfo uriInfo) {
 		  
 	        context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-			Collection<MCodeData> ReasonDatas=this.mCodeReadPlatformService.getCodeValue("Suspension Reason");
-	        OrderData orderData=new OrderData(null,ReasonDatas);
+			final Collection<MCodeData> reasonDatas=this.mCodeReadPlatformService.getCodeValue("Suspension Reason");
+	        final OrderData orderData=new OrderData(null,reasonDatas);
 	        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 	        return this.toApiJsonSerializer.serialize(settings, orderData, RESPONSE_DATA_PARAMETERS);
 	    }
 	
+   /**
+   * this method is using for update order status while suspension
+   * @param uriInfo
+   * @return
+   */
 	@PUT
 	@Path("suspend/{orderId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String suspendOrder(@PathParam("orderId") final Long orderId,final String apiRequestBodyAsJson) {
-    final CommandWrapper commandRequest = new CommandWrapperBuilder().suspendOrder(orderId).withJson(apiRequestBodyAsJson).build();
+    final CommandWrapper commandRequest = new CommandWrapperBuilder().orderSuspend(orderId).withJson(apiRequestBodyAsJson).build();
 	final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 	return this.toApiJsonSerializer.serialize(result);
 	}
