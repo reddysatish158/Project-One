@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.joda.time.LocalDate;
-import org.mifosplatform.billing.paymode.data.McodeData;
 import org.mifosplatform.billing.payterms.data.PaytermData;
+import org.mifosplatform.finance.payments.data.McodeData;
 import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
 import org.mifosplatform.portfolio.contract.data.SubscriptionData;
 import org.mifosplatform.portfolio.plan.data.PlanCodeData;
@@ -34,7 +34,7 @@ public class OrderData {
 	private LocalDate activeDate;
 	private String contractPeriod;
 //	private boolean flag;
-	private Collection<McodeData> disconnectDetails;
+	private Collection<MCodeData> disconnectDetails;
 	private List<OrderHistoryData> orderHistory;
 	private String isPrepaid;
 	private String allowtopup;
@@ -44,7 +44,7 @@ public class OrderData {
 	private OrderData orderData;
 	private String provisioningSys;
 	private boolean ispaymentEnable;
-	private Collection<McodeData> paymodes;
+	private Collection<MCodeData> paymodes;
 	private List<OrderLineData> orderServices;
 	private List<OrderDiscountData> orderDiscountDatas;
 	private LocalDate invoiceTilldate;
@@ -117,10 +117,10 @@ public class OrderData {
        
 	}
 
-	public OrderData(Collection<McodeData> disconnectDetails,List<SubscriptionData> subscriptionDatas, boolean isEnabled) {
-		this.disconnectDetails=disconnectDetails;
-		this.subscriptiondata=subscriptionDatas;
-		 this.ispaymentEnable=isEnabled;
+	public OrderData(final Collection<MCodeData> disconnectDetails, final List<SubscriptionData> subscriptionDatas, final boolean isEnabled) {
+		this.disconnectDetails = disconnectDetails;
+		this.subscriptiondata = subscriptionDatas;
+		this.ispaymentEnable = isEnabled;
 	}
 
 	public OrderData(Long clientId, List<OrderData> clientOrders) {
@@ -198,7 +198,7 @@ public class OrderData {
 		return contractPeriod;
 	}
 
-	public Collection<McodeData> getDisconnectDetails() {
+	public Collection<MCodeData> getDisconnectDetails() {
 		return disconnectDetails;
 	}
 
@@ -238,7 +238,7 @@ public class OrderData {
 		return ispaymentEnable;
 	}
 
-	public Collection<McodeData> getPaymodes() {
+	public Collection<MCodeData> getPaymodes() {
 		return paymodes;
 	}
 
@@ -326,8 +326,8 @@ public class OrderData {
 		this.paytermdata = data;
 	}
 
-	public void setDisconnectDetails(Collection<McodeData> disconnectDetails) {
-	this.disconnectDetails=disconnectDetails;
+	public void setDisconnectDetails(Collection<MCodeData> disconnectDetails) {
+	this.disconnectDetails = disconnectDetails;
 		
 	}
 
@@ -341,8 +341,8 @@ public class OrderData {
 		
 	}
 
-	public void setPaymodeData(Collection<McodeData> data) {
-		this.paymodes=data;
+	public void setPaymodeData(Collection<MCodeData> data) {
+		this.paymodes = data;
 		
 	}
 

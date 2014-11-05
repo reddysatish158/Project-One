@@ -10,12 +10,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class DeleteOneTimeSaleCommandHandler implements NewCommandSourceHandler {
+public class CancelOneTimeSaleCommandHandler implements NewCommandSourceHandler {
 
     private final OneTimeSaleWritePlatformService writePlatformService;
 
     @Autowired
-    public DeleteOneTimeSaleCommandHandler(final OneTimeSaleWritePlatformService writePlatformService) {
+    public CancelOneTimeSaleCommandHandler(final OneTimeSaleWritePlatformService writePlatformService) {
         this.writePlatformService = writePlatformService;
     }
 
@@ -23,6 +23,6 @@ public class DeleteOneTimeSaleCommandHandler implements NewCommandSourceHandler 
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
 
-        return this.writePlatformService.deleteOneTimeSale(command,command.entityId());
+        return this.writePlatformService.deleteOneTimeSale(command.entityId());
     }
 }

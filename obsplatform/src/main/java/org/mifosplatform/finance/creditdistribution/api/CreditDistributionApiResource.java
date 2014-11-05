@@ -23,7 +23,7 @@ import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformSer
 import org.mifosplatform.finance.creditdistribution.data.CreditDistributionData;
 import org.mifosplatform.finance.creditdistribution.service.CreditDistributionReadPlatformService;
 import org.mifosplatform.finance.payments.data.PaymentData;
-import org.mifosplatform.finance.payments.service.PaymentReadPlatformservice;
+import org.mifosplatform.finance.payments.service.PaymentReadPlatformService;
 import org.mifosplatform.infrastructure.codes.data.CodeData;
 import org.mifosplatform.infrastructure.core.api.ApiRequestParameterHelper;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
@@ -31,7 +31,6 @@ import org.mifosplatform.infrastructure.core.serialization.ApiRequestJsonSeriali
 import org.mifosplatform.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.mifosplatform.infrastructure.core.service.Page;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
-import org.mifosplatform.portfolio.transactionhistory.data.TransactionHistoryData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -52,13 +51,13 @@ public class CreditDistributionApiResource {
 	private final ApiRequestParameterHelper apiRequestParameterHelper;
 	private final PortfolioCommandSourceWritePlatformService writePlatformService;
 	private final InvoiceReadPlatformService invoiceReadPlatformService;
-	private final PaymentReadPlatformservice paymentReadPlatformservice;
+	private final PaymentReadPlatformService paymentReadPlatformservice;
 	private final CreditDistributionReadPlatformService creditDistributionReadPlatformService;
 	private final DefaultToApiJsonSerializer<CreditDistributionData> apiJsonSerializer;
 	@Autowired
 	public CreditDistributionApiResource(final PlatformSecurityContext context,final DefaultToApiJsonSerializer<CreditDistributionData> toApiJsonSerializer,
 			final ApiRequestParameterHelper apiRequestParameterHelper,final PortfolioCommandSourceWritePlatformService writePlatformService,
-			final InvoiceReadPlatformService invoiceReadPlatformService,final PaymentReadPlatformservice paymentReadPlatformservice,
+			final InvoiceReadPlatformService invoiceReadPlatformService,final PaymentReadPlatformService paymentReadPlatformservice,
 			final CreditDistributionReadPlatformService creditDistributionReadPlatformService,DefaultToApiJsonSerializer<CreditDistributionData> apiJsonSerializer) {
 		
 		this.context = context;

@@ -1,8 +1,5 @@
 package org.mifosplatform.portfolio.hardwareswapping.service;
 
-
-
-
 import java.util.Date;
 import java.util.List;
 
@@ -13,11 +10,12 @@ import org.mifosplatform.cms.eventorder.service.PrepareRequestWriteplatformServi
 import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
-import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
+import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.logistics.item.domain.ItemMaster;
 import org.mifosplatform.logistics.item.domain.ItemRepository;
@@ -41,12 +39,22 @@ import org.mifosplatform.portfolio.plan.domain.PlanRepository;
 import org.mifosplatform.portfolio.transactionhistory.service.TransactionHistoryWritePlatformService;
 import org.mifosplatform.provisioning.provisioning.api.ProvisioningApiConstants;
 import org.mifosplatform.provisioning.provisioning.service.ProvisioningWritePlatformService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * @author hugo
+ *
+ */
 @Service
 public class HardwareSwappingWriteplatformServiceImpl implements HardwareSwappingWriteplatformService {
-
+	
+	
+	private final static Logger LOGGER = LoggerFactory.getLogger(HardwareSwappingWriteplatformServiceImpl.class);
 	private final PlatformSecurityContext context;
 	private final HardwareAssociationWriteplatformService associationWriteplatformService;
 	private final ItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService;
@@ -55,7 +63,7 @@ public class HardwareSwappingWriteplatformServiceImpl implements HardwareSwappin
 	private final PlanRepository  planRepository;
 	private final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService;
 	private final HardwareSwappingCommandFromApiJsonDeserializer fromApiJsonDeserializer;
-	private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
+	private final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService;
 	private final OrderHistoryRepository orderHistoryRepository;
 	private final ConfigurationRepository globalConfigurationRepository;
 	private final OwnedHardwareJpaRepository hardwareJpaRepository;
@@ -67,7 +75,7 @@ public class HardwareSwappingWriteplatformServiceImpl implements HardwareSwappin
 	public HardwareSwappingWriteplatformServiceImpl(final PlatformSecurityContext context,final HardwareAssociationWriteplatformService associationWriteplatformService,
 			final ItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService,final PrepareRequestWriteplatformService prepareRequestWriteplatformService,
 			final OrderRepository orderRepository,final PlanRepository planRepository,final TransactionHistoryWritePlatformService historyWritePlatformService,
-			final HardwareSwappingCommandFromApiJsonDeserializer apiJsonDeserializer,final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
+			final HardwareSwappingCommandFromApiJsonDeserializer apiJsonDeserializer,final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService,
 			final OrderHistoryRepository orderHistoryRepository,final ConfigurationRepository configurationRepository,final OwnedHardwareJpaRepository hardwareJpaRepository,
 			final HardwareAssociationReadplatformService associationReadplatformService,final ItemRepository itemRepository,
 			final ProvisioningWritePlatformService provisioningWritePlatformService) {
@@ -80,7 +88,7 @@ public class HardwareSwappingWriteplatformServiceImpl implements HardwareSwappin
 		this.planRepository=planRepository;
 		this.transactionHistoryWritePlatformService=historyWritePlatformService;
 		this.fromApiJsonDeserializer=apiJsonDeserializer;
-		this.commandsSourceWritePlatformService=commandsSourceWritePlatformService;
+		this.commandSourceWritePlatformService=commandSourceWritePlatformService;
 		this.orderHistoryRepository=orderHistoryRepository;
 		this.globalConfigurationRepository=configurationRepository;
 		this.hardwareJpaRepository=hardwareJpaRepository;
@@ -92,26 +100,29 @@ public class HardwareSwappingWriteplatformServiceImpl implements HardwareSwappin
 	
 	
 	
-
+/* (non-Javadoc)
+ * @see #doHardWareSwapping(java.lang.Long, org.mifosplatform.infrastructure.core.api.JsonCommand)
+ */
+@Transactional
 @Override
-public CommandProcessingResult dohardWareSwapping(Long entityId,JsonCommand command) {
+public CommandProcessingResult doHardWareSwapping(final Long entityId,final JsonCommand command) {
 		
 	try{
-		Long userId=this.context.authenticatedUser().getId();
+		final Long userId=this.context.authenticatedUser().getId();
 		this.fromApiJsonDeserializer.validateForCreate(command.json());
-		Long associationId=command.longValueOfParameterNamed("associationId");
-		String serialNo=command.stringValueOfParameterNamed("serialNo");
-		Long orderId=command.longValueOfParameterNamed("orderId");
-		Long planId=command.longValueOfParameterNamed("planId");
-		Long saleId=command.longValueOfParameterNamed("saleId");
-		String provisionNum=command.stringValueOfParameterNamed("provisionNum");
+		final Long associationId=command.longValueOfParameterNamed("associationId");
+		final String serialNo=command.stringValueOfParameterNamed("serialNo");
+		final Long orderId=command.longValueOfParameterNamed("orderId");
+		//final Long planId=command.longValueOfParameterNamed("planId");
+		final Long saleId=command.longValueOfParameterNamed("saleId");
+		final String provisionNum=command.stringValueOfParameterNamed("provisionNum");
 		
 		//DeAssociate Hardware
 		this.associationWriteplatformService.deAssociationHardware(associationId);
-		String requstStatus =UserActionStatusTypeEnum.DISCONNECTION.toString();
+	    String requstStatus =UserActionStatusTypeEnum.DISCONNECTION.toString();
 		
-        Order order=this.orderRepository.findOne(orderId);
-		Plan plan=this.planRepository.findOne(order.getPlanId());
+        final Order order=this.orderRepository.findOne(orderId);
+		final Plan plan=this.planRepository.findOne(order.getPlanId());
 		
 		Configuration configurationProperty=this.globalConfigurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
 		
@@ -123,21 +134,18 @@ public CommandProcessingResult dohardWareSwapping(Long entityId,JsonCommand comm
 			
 			this.hardwareJpaRepository.saveAndFlush(ownedHardware);
 			
-			ItemMaster itemMaster=this.itemRepository.findOne(new Long(ownedHardware.getItemType()));
+			final ItemMaster itemMaster=this.itemRepository.findOne(Long.valueOf(ownedHardware.getItemType()));
 
 			
-	           List<HardwareAssociationData> allocationDetailsDatas=this.associationReadplatformService.retrieveClientAllocatedPlan(ownedHardware.getClientId(),itemMaster.getItemCode());
+	        List<HardwareAssociationData> allocationDetailsDatas=this.associationReadplatformService.retrieveClientAllocatedPlan(ownedHardware.getClientId(),itemMaster.getItemCode());
 	    
 	        if(!allocationDetailsDatas.isEmpty())
 	    		   {
 	    				this.associationWriteplatformService.createNewHardwareAssociation(ownedHardware.getClientId(),allocationDetailsDatas.get(0).getPlanId(),ownedHardware.getSerialNumber(),allocationDetailsDatas.get(0).getorderId());
 	    				transactionHistoryWritePlatformService.saveTransactionHistory(ownedHardware.getClientId(), "Association", new Date(),"Serial No:"
 	    				+ownedHardware.getSerialNumber(),"Item Code:"+allocationDetailsDatas.get(0).getItemCode());
-	    				
 	    		   }
-	    
-			
-		}else{
+	   }else{
 		
 		//DeAllocate HardWare
 		ItemDetailsAllocation inventoryItemDetailsAllocation=this.inventoryItemDetailsWritePlatformService.deAllocateHardware(serialNo, entityId);
@@ -166,14 +174,14 @@ public CommandProcessingResult dohardWareSwapping(Long entityId,JsonCommand comm
 		//ReAllocate HardWare
 			//this.inventoryItemDetailsWritePlatformService.allocateHardware(command);
 			CommandWrapper commandWrapper = new CommandWrapperBuilder().allocateHardware().withJson(allocation1.toString()).build();
-			this.commandsSourceWritePlatformService.logCommandSource(commandWrapper);
+			this.commandSourceWritePlatformService.logCommandSource(commandWrapper);
 		}
 			//for Reassociation With New SerialNumber
 			//this.associationWriteplatformService.createAssociation(command);
 		
 			if(!plan.getProvisionSystem().equalsIgnoreCase("None")){
 			requstStatus =UserActionStatusTypeEnum.DEVICE_SWAP.toString();
-			CommandProcessingResult processingResult=this.prepareRequestWriteplatformService.prepareNewRequest(order,plan,requstStatus);
+			final CommandProcessingResult processingResult=this.prepareRequestWriteplatformService.prepareNewRequest(order,plan,requstStatus);
 			order.setStatus( OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.PENDING).getId());
 			
 	            if(plan.getProvisionSystem().equalsIgnoreCase(ProvisioningApiConstants.PROV_PACKETSPAN)){
@@ -192,12 +200,21 @@ public CommandProcessingResult dohardWareSwapping(Long entityId,JsonCommand comm
 		
 				this.orderHistoryRepository.save(orderHistory);
 		return new CommandProcessingResult(entityId,order.getClientId());		
-	}catch(Exception exception){
+	   }catch(final Exception dve){
+		   if(dve.getCause() instanceof DataIntegrityViolationException){
+		   handleDataIntegrityIssues(command,dve);
+		   }
 		return new CommandProcessingResult(Long.valueOf(-1));
-	}
+	  }
 	
 	}
-	
-	
+
+  private void handleDataIntegrityIssues(final JsonCommand command,final Exception dve) {
+	  
+	  LOGGER.error(dve.getMessage(), dve);
+		final Throwable realCause=dve.getCause();
+		throw new PlatformDataIntegrityException("error.msg.could.unknown.data.integrity.issue",
+				"Unknown data integrity issue with resource: "+ realCause.getMessage());
+     }
 
 }

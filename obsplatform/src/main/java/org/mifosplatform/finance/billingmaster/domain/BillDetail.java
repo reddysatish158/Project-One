@@ -21,13 +21,13 @@ public class BillDetail {
 	private Long id;
 
 	@ManyToOne
-    @JoinColumn(name="bill_id")
+    @JoinColumn(name = "bill_id")
     private BillMaster billMaster;
 
-	@Column(name ="transaction_id")
+	@Column(name = "transaction_id")
 	private  Long transactionId;
 
-	@Column(name="Transaction_date")
+	@Column(name = "Transaction_date")
 	private Date transactionDate;
 
 	@Column(name = "Transaction_type")
@@ -47,8 +47,8 @@ public class BillDetail {
 
 	}
 
-	public BillDetail(final BillMaster billId,final Long transactionId ,final Date transactionDate, final String transactionType,
-			final BigDecimal amount,final String planCode, final String description) {
+	public BillDetail(final BillMaster billId, final Long transactionId, final Date transactionDate, final String transactionType,
+			final BigDecimal amount, final String planCode, final String description) {
 
 		this.billMaster = billId;
 		this.transactionId = transactionId;
@@ -64,7 +64,7 @@ public class BillDetail {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(final Long id) {
 		this.id = id;
 	}
 
@@ -72,7 +72,7 @@ public class BillDetail {
 		return billMaster;
 	}
 
-	public void setBillId(BillMaster billId) {
+	public void setBillId(final BillMaster billId) {
 		this.billMaster = billId;
 	}
 
@@ -80,7 +80,7 @@ public class BillDetail {
 		return transactionType;
 	}
 
-	public void setTransactionType(String transactionType) {
+	public void setTransactionType(final String transactionType) {
 		this.transactionType = transactionType;
 	}
 
@@ -88,7 +88,7 @@ public class BillDetail {
 		return amount;
 	}
 
-	public void setAmount(BigDecimal amount) {
+	public void setAmount(final BigDecimal amount) {
 		this.amount = amount;
 	}
 
@@ -96,7 +96,7 @@ public class BillDetail {
 		return transactionDate;
 	}
 
-	public void setTransactionDate(Date transactionDate) {
+	public void setTransactionDate(final Date transactionDate) {
 		this.transactionDate = transactionDate;
 	}
 
@@ -104,20 +104,19 @@ public class BillDetail {
 		return transactionId;
 	}
 
-	public void setTransactionId(Long transactionId) {
+	public void setTransactionId(final Long transactionId) {
 		this.transactionId = transactionId;
 	}
 
-	public void updateBillMaster(BillMaster billMaster) {
+	public void updateBillMaster(final BillMaster billMaster) {
            this.billMaster=billMaster;
-		
 	}
 
 	public String getPlanCode() {
 		return planCode;
 	}
 
-	public void setPlanCode(String planCode) {
+	public void setPlanCode(final String planCode) {
 		this.planCode = planCode;
 	}
 
@@ -125,9 +124,8 @@ public class BillDetail {
 		return description;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(final String description) {
 		this.description = description;
 	}
-    
-
+	
 }

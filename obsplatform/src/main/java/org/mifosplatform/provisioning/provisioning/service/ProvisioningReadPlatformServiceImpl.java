@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.mifosplatform.billing.paymode.data.McodeData;
+import org.mifosplatform.finance.payments.data.McodeData;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
 import org.mifosplatform.infrastructure.dataqueries.data.GenericResultsetData;

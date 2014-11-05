@@ -80,6 +80,7 @@ public void delete() {
 	
 	if(this.isDeleted == 'N'){
 		this.isDeleted='Y';
+		this.cityCode = this.cityCode+"_"+this.getId();
 	}
 }
 

@@ -11,6 +11,6 @@ public interface OneTimeSaleWritePlatformService {
 
 	ItemData calculatePrice(Long itemId, JsonQuery query);
 
-	CommandProcessingResult deleteOneTimeSale(JsonCommand command, Long entityId);
+	CommandProcessingResult deleteOneTimeSale(Long entityId);
 
 }

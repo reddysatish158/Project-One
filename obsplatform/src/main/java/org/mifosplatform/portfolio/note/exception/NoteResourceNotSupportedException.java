@@ -12,7 +12,9 @@ import org.mifosplatform.infrastructure.core.exception.AbstractPlatformResourceN
  */
 public class NoteResourceNotSupportedException extends AbstractPlatformResourceNotFoundException {
 
-    public NoteResourceNotSupportedException(final String resource) {
+	private static final long serialVersionUID = 1L;
+
+	public NoteResourceNotSupportedException(final String resource) {
         super("error.msg.note.resource.not.supported", "Note does not support resource " + resource);
     }
 }

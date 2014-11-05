@@ -106,7 +106,7 @@ public class HardwareAssociationWriteplatformServiceImpl implements HardwareAsso
 	
 	@Transactional
 	@Override
-	public CommandProcessingResult deAssociationHardware(Long associationId) {
+	public CommandProcessingResult deAssociationHardware(final Long associationId) {
 		
 		try {
 			

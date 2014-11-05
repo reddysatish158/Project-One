@@ -313,8 +313,10 @@ public class ProvisioningWritePlatformServiceImpl implements
 
 	@Transactional
 	@Override
+
 	public void postOrderDetailsForProvisioning(final Order order,final String planName,final String requestType, 
 			final Long prepareId,final String groupname,final String serialNo,final Long orderId) {
+
 		
 		try {
 			this.context.authenticatedUser();
@@ -451,6 +453,7 @@ public class ProvisioningWritePlatformServiceImpl implements
 		} catch (DataIntegrityViolationException dve) {
 			handleCodeDataIntegrityIssues(null, dve);
 		}
+	
 		return new CommandProcessingResult(orderId,
 				ipPoolManagement.getClientId());
 

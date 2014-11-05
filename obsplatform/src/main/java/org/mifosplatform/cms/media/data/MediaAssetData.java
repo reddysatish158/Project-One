@@ -5,8 +5,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.joda.time.LocalDate;
-import org.mifosplatform.billing.paymode.data.McodeData;
 import org.mifosplatform.cms.mediadetails.data.MediaLocationData;
+import org.mifosplatform.finance.payments.data.McodeData;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
 import org.mifosplatform.infrastructure.core.data.MediaEnumoptionData;
 import org.mifosplatform.organisation.mcodevalues.data.MCodeData;

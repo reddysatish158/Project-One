@@ -25,55 +25,49 @@ public class BillMaster {
 	@Column(name = "id")
 	private Long id;
 
-	@Column(name="bill_no")
+	@Column(name = "bill_no")
 	private Long billNumber;
 
-	@Column(name="client_id")
+	@Column(name = "client_id")
 	private Long clientId;
 
-	@Column(name="bill_date")
+	@Column(name = "bill_date")
 	private Date billDate;
 
-	@Column(name="bill_startdate")
+	@Column(name = "bill_startdate")
 	private Date billStartDate;
 
-	@Column(name="bill_enddate")
+	@Column(name = "bill_enddate")
 	private Date billEndDate;
 
-	@Column(name="due_date")
+	@Column(name = "due_date")
 	private Date dueDate;
 
-	@Column(name="previous_balance")
+	@Column(name = "previous_balance")
 	private BigDecimal previousBalance;
 
-	@Column(name="charges_amount")
+	@Column(name = "charges_amount")
 	private BigDecimal chargeAmount;
 
-	@Column(name="adjustment_amount")
+	@Column(name = "adjustment_amount")
 	private BigDecimal adjustmentAmount;
 
-	@Column(name="tax_amount")
+	@Column(name = "tax_amount")
 	private BigDecimal taxAmount;
 
-	@Column(name="paid_amount")
+	@Column(name = "paid_amount")
 	private BigDecimal paidAmount;
 
-	@Column(name="due_amount")
+	@Column(name = "due_amount")
 	private BigDecimal dueAmount;
 
-	@Column(name ="filename")
+	@Column(name = "filename")
 	private String fileName;
 
-	@Column(name="promotion_description")
+	@Column(name = "promotion_description")
 	private String promotionDescription;
-
-	/*@Column(name="bill_Period")
-	private String billPeriod;
-
-	@Column(name="adjustments_payments")
-	private BigDecimal adjustmentsAndPayments;*/
 	
-	@Column(name="parent_id")
+	@Column(name = "parent_id")
 	private Long parentId;
 	
 	@Column(name = "is_deleted")
@@ -88,12 +82,12 @@ public class BillMaster {
 
 	}
 
-	public BillMaster(final Long billNumber,final Long clientId,final Date billDate,
-			final Date billStartDate,final Date billEndDate,final Date dueDate,
-			final BigDecimal previousBalance,final BigDecimal chargeAmount,
-			final BigDecimal adjustmentAmount,final BigDecimal taxAmount,
-			final BigDecimal paidAmount,final BigDecimal dueAmount,final String fileName,
-			final String promotionDescription, Long parentId) {
+	public BillMaster(final Long billNumber, final Long clientId, final Date billDate,
+			final Date billStartDate, final Date billEndDate, final Date dueDate,
+			final BigDecimal previousBalance, final BigDecimal chargeAmount,
+			final BigDecimal adjustmentAmount, final BigDecimal taxAmount,
+			final BigDecimal paidAmount, final BigDecimal dueAmount, final String fileName,
+			final String promotionDescription, final Long parentId) {
 
 		this.billNumber = billNumber;
 		this.clientId = clientId;
@@ -108,10 +102,9 @@ public class BillMaster {
 		this.paidAmount = paidAmount;
 		this.dueAmount = dueAmount;
 		this.promotionDescription = promotionDescription;
-		this.fileName="invoice";
-		//this.billPeriod="monthly";
-		this.parentId=parentId;
-		this.isDeleted='N';
+		this.fileName = "invoice";
+		this.parentId = parentId;
+		this.isDeleted = 'N';
 
 	}
 
@@ -119,7 +112,7 @@ public class BillMaster {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(final Long id) {
 		this.id = id;
 	}
 
@@ -127,7 +120,7 @@ public class BillMaster {
 		return billNumber;
 	}
 
-	public void setBillNumber(Long billNumber) {
+	public void setBillNumber(final Long billNumber) {
 		this.billNumber = billNumber;
 	}
 
@@ -135,7 +128,7 @@ public class BillMaster {
 		return clientId;
 	}
 
-	public void setClientId(Long clientId) {
+	public void setClientId(final Long clientId) {
 		this.clientId = clientId;
 	}
 
@@ -143,7 +136,7 @@ public class BillMaster {
 		return billDate;
 	}
 
-	public void setBillDate(Date billDate) {
+	public void setBillDate(final Date billDate) {
 		this.billDate = billDate;
 	}
 
@@ -151,7 +144,7 @@ public class BillMaster {
 		return billStartDate;
 	}
 
-	public void setBillStartDate(Date billStartDate) {
+	public void setBillStartDate(final Date billStartDate) {
 		this.billStartDate = billStartDate;
 	}
 
@@ -159,7 +152,7 @@ public class BillMaster {
 		return billEndDate;
 	}
 
-	public void setBillEndDate(Date billEndDate) {
+	public void setBillEndDate(final Date billEndDate) {
 		this.billEndDate = billEndDate;
 	}
 
@@ -167,7 +160,7 @@ public class BillMaster {
 		return dueDate;
 	}
 
-	public void setDueDate(Date dueDate) {
+	public void setDueDate(final Date dueDate) {
 		this.dueDate = dueDate;
 	}
 
@@ -175,7 +168,7 @@ public class BillMaster {
 		return previousBalance;
 	}
 
-	public void setPreviousBalance(BigDecimal previousBalance) {
+	public void setPreviousBalance(final BigDecimal previousBalance) {
 		this.previousBalance = previousBalance;
 	}
 
@@ -183,7 +176,7 @@ public class BillMaster {
 		return chargeAmount;
 	}
 
-	public void setChargeAmount(BigDecimal chargeAmount) {
+	public void setChargeAmount(final BigDecimal chargeAmount) {
 		this.chargeAmount = chargeAmount;
 	}
 
@@ -191,7 +184,7 @@ public class BillMaster {
 		return adjustmentAmount;
 	}
 
-	public void setAdjustmentAmount(BigDecimal adjustmentAmount) {
+	public void setAdjustmentAmount(final BigDecimal adjustmentAmount) {
 		this.adjustmentAmount = adjustmentAmount;
 	}
 
@@ -199,7 +192,7 @@ public class BillMaster {
 		return taxAmount;
 	}
 
-	public void setTaxAmount(BigDecimal taxAmount) {
+	public void setTaxAmount(final BigDecimal taxAmount) {
 		this.taxAmount = taxAmount;
 	}
 
@@ -207,7 +200,7 @@ public class BillMaster {
 		return paidAmount;
 	}
 
-	public void setPaidAmount(BigDecimal paidAmount) {
+	public void setPaidAmount(final BigDecimal paidAmount) {
 		this.paidAmount = paidAmount;
 	}
 
@@ -215,7 +208,7 @@ public class BillMaster {
 		return dueAmount;
 	}
 
-	public void setDueAmount(BigDecimal dueAmount) {
+	public void setDueAmount(final BigDecimal dueAmount) {
 		this.dueAmount = dueAmount;
 	}
 
@@ -223,7 +216,7 @@ public class BillMaster {
 		return fileName;
 	}
 
-	public void setFileName(String fileName) {
+	public void setFileName(final String fileName) {
 		this.fileName = fileName;
 	}
 
@@ -231,16 +224,13 @@ public class BillMaster {
 		return promotionDescription;
 	}
 
-	public void setPromotionDescription(String promotionDescription) {
+	public void setPromotionDescription(final String promotionDescription) {
 		this.promotionDescription = promotionDescription;
 	}
 
-
 	public void addBillDetails(BillDetail billDetail) {
          billDetail.updateBillMaster(this);
-         
          this.billDetails.add(billDetail);
-		
 	}
 
 	public Long getparentId() {
@@ -255,7 +245,7 @@ public class BillMaster {
 		return isDeleted;
 	}
 
-	public void setIsDeleted(char isDeleted) {
+	public void setIsDeleted(final char isDeleted) {
 		this.isDeleted = isDeleted;
 	}
 	
@@ -264,5 +254,4 @@ public class BillMaster {
 		this.isDeleted = 'Y';
 	}
 	
-
 }

@@ -351,33 +351,26 @@ public class ReadWriteNonCoreDataServiceImpl implements
 			this.context.authenticatedUser();
 			this.fromApiJsonDeserializer.validateForUpdate(command.json());
 
-			final JsonElement element = this.fromJsonHelper.parse(command
-					.json());
-			final JsonArray changeColumns = this.fromJsonHelper
-					.extractJsonArrayNamed("changeColumns", element);
+			final JsonElement element = this.fromJsonHelper.parse(command.json());
+			
+			final JsonArray changeColumns = this.fromJsonHelper.extractJsonArrayNamed("changeColumns", element);
 
-			final JsonArray addColumns = this.fromJsonHelper
-					.extractJsonArrayNamed("addColumns", element);
+			final JsonArray addColumns = this.fromJsonHelper.extractJsonArrayNamed("addColumns", element);
 
-			final JsonArray dropColumns = this.fromJsonHelper
-					.extractJsonArrayNamed("dropColumns", element);
+			final JsonArray dropColumns = this.fromJsonHelper.extractJsonArrayNamed("dropColumns", element);
 
-			final String apptableName = this.fromJsonHelper.extractStringNamed(
-					"apptableName", element);
+			final String apptableName = this.fromJsonHelper.extractStringNamed("apptableName", element);
 
 			validateDatatableName(datatableName);
 
-			final List<ResultsetColumnHeaderData> columnHeaderData = this.genericDataService
-					.fillResultsetColumnHeaders(datatableName);
+			final List<ResultsetColumnHeaderData> columnHeaderData = this.genericDataService.fillResultsetColumnHeaders(datatableName);
 
 			final Map<String, ResultsetColumnHeaderData> mapColumnNameDefinition = new HashMap<String, ResultsetColumnHeaderData>();
 			for (final ResultsetColumnHeaderData columnHeader : columnHeaderData) {
-				mapColumnNameDefinition.put(columnHeader.getColumnName(),
-						columnHeader);
+				mapColumnNameDefinition.put(columnHeader.getColumnName(),columnHeader);
 			}
 
-			final boolean isConstraintApproach = this.configurationDomainService
-					.isConstraintApproachEnabledForDatatables();
+			final boolean isConstraintApproach = this.configurationDomainService.isConstraintApproachEnabledForDatatables();
 
 			if (!StringUtils.isBlank(apptableName)) {
 				validateAppTable(apptableName);

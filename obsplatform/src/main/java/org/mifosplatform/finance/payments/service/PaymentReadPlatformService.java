@@ -1,17 +1,17 @@
-package org.mifosplatform.billing.paymode.service;
+package org.mifosplatform.finance.payments.service;
 
 import java.util.Collection;
 import java.util.List;
 
-import org.mifosplatform.billing.paymode.data.McodeData;
+import org.mifosplatform.finance.payments.data.McodeData;
 import org.mifosplatform.finance.payments.data.PaymentData;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 
-public interface PaymodeReadPlatformService {
+public interface PaymentReadPlatformService {
 
 	McodeData retrieveSinglePaymode(Long paymodeId);
 
-	//Collection<PaymodeData> retrieveAllPaymodes();
+	List<PaymentData> retrieveClientPaymentDetails(Long clientId);
 
 	McodeData retrievePaymodeCode(JsonCommand command);
 

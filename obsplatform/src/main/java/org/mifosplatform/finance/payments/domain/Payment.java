@@ -57,7 +57,7 @@ public class Payment extends AbstractAuditableCustom<AppUser, Long> {
 	}
 
 	public Payment(final Long clientId, final Long paymentId,final Long externalId, final BigDecimal amountPaid,final Long statmentId,
-			final LocalDate paymentDate,final String remark, final Long paymodeCode, String transId,String receiptNo, Long invoiceId) {
+			final LocalDate paymentDate,final String remark, final Long paymodeCode, final String transId,final String receiptNo, final Long invoiceId) {
 
 
 		this.clientId = clientId;
@@ -72,7 +72,7 @@ public class Payment extends AbstractAuditableCustom<AppUser, Long> {
 
 	}
 
-	public static Payment fromJson(JsonCommand command, Long clientid) {
+	public static Payment fromJson(final JsonCommand command, final Long clientid) {
 		final LocalDate paymentDate = command
 				.localDateValueOfParameterNamed("paymentDate");
 		final Long paymentCode = command.longValueOfParameterNamed("paymentCode");
@@ -122,12 +122,12 @@ public class Payment extends AbstractAuditableCustom<AppUser, Long> {
 		return paymodeId;
 	}
 
-		public void updateBillId(Long billId) {
+		public void updateBillId(final Long billId) {
 		this.statementId=billId;
 
 	}
 
-		public void cancelPayment(JsonCommand command) {
+		public void cancelPayment(final JsonCommand command) {
 			
 			final String cancelRemarks=command.stringValueOfParameterNamed("cancelRemark");
 			this.cancelRemark=cancelRemarks;
@@ -151,7 +151,7 @@ public class Payment extends AbstractAuditableCustom<AppUser, Long> {
 			return cancelRemark;
 		}
 		
-	public void setInvoiceId(Long invoiceId){
+	public void setInvoiceId(final Long invoiceId){
 		this.invoiceId=invoiceId;
 	}
 

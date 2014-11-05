@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class UpdateClientBalance {
 
+	@SuppressWarnings("unused")
 	private final PlatformSecurityContext context;
 	private final ClientBalanceRepository clientBalanceRepository;
 	private final ClientRepository clientRepository;
@@ -31,8 +32,8 @@ public class UpdateClientBalance {
 
 	public ClientBalance doUpdateAdjustmentClientBalance(JsonCommand command, ClientBalance clientBalance) {
 
-		clientBalance = calculateUpdateClientBalance(Adjustment.fromJson(command).getAdjustment_type(),
-				Adjustment.fromJson(command).getAmount_paid(),clientBalance);
+		clientBalance = calculateUpdateClientBalance(Adjustment.fromJson(command).getAdjustmentType(),
+				Adjustment.fromJson(command).getAmountPaid(),clientBalance);
 
 		return clientBalance;
 
@@ -42,8 +43,8 @@ public class UpdateClientBalance {
 
 	public ClientBalance createAdjustmentClientBalance(JsonCommand command,ClientBalance clientBalance) {
 		
-		clientBalance = calculateCreateClientBalance(Adjustment.fromJson(command).getAdjustment_type(),
-				Adjustment.fromJson(command).getAmount_paid(),clientBalance,command.entityId());
+		clientBalance = calculateCreateClientBalance(Adjustment.fromJson(command).getAdjustmentType(),
+				Adjustment.fromJson(command).getAmountPaid(),clientBalance,command.entityId());
 
 		return clientBalance;
 	}

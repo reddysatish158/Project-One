@@ -83,7 +83,7 @@ public class DiscountWritePlatformServiceImpl implements
 
 		LOGGER.error(dve.getMessage(), dve);
 		throw new PlatformDataIntegrityException(
-				"error.msg.cund.unknown.data.integrity.issue",
+				"error.msg.could.unknown.data.integrity.issue",
 				"Unknown data integrity issue with resource: "
 						+ realCause.getMessage());
 

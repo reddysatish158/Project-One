@@ -3,7 +3,7 @@ package org.mifosplatform.provisioning.provisioning.service;
 import java.util.Collection;
 import java.util.List;
 
-import org.mifosplatform.billing.paymode.data.McodeData;
+import org.mifosplatform.finance.payments.data.McodeData;
 import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
 import org.mifosplatform.provisioning.provisioning.data.ProcessRequestData;
 import org.mifosplatform.provisioning.provisioning.data.ProvisioningCommandParameterData;
