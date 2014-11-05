@@ -31,14 +31,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author hugo
+ *This api class is use to create office payments
+ */
 @Path("/officepayments")
 @Component
 @Scope("singleton")
 public class OfficePaymentsApiResource {
 
-	private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(
-			Arrays.asList("id", "officeId", "paymentDate", "paymentCode",
-					"amountPaid", "statmentId", "externalId", "Remarks"));
+	private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(Arrays.asList("id", "officeId", "paymentDate", "paymentCode",
+					      "amountPaid", "statmentId", "externalId", "Remarks"));
 	
 	private static final String RESOURCENAMEFOR_PERMISSIONS = "OFFICEPAYMENT";
 	private final PlatformSecurityContext context;

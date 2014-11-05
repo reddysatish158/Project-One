@@ -74,11 +74,8 @@ public class AdjustmentApiResource {
     @Consumes({MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_JSON})
     public String retrieveTempleteInfo(@Context final UriInfo uriInfo) {
+    	
     	context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-    	/*final Collection<Discount> datass=new ArrayList<Discount>();
-        Discount d=new Discount();
-        d.setadjustment_type();
-        datass.add(d);*/
         List<AdjustmentData> data=this.readPlatformService.retrieveAllAdjustmentsCodes();
         AdjustmentCodeData datas=new AdjustmentCodeData(data);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());

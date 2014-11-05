@@ -15,11 +15,17 @@ import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
 import org.mifosplatform.useradministration.domain.AppUser;
 
 
+/**
+ * @author hugo
+ *
+ */
 @Entity
 @Table(name="b_itemsale")
 public class ItemSale extends AbstractAuditableCustom<AppUser, Long>{
 	
 	
+	private static final long serialVersionUID = 1L;
+
 	@Column(name="item_id")
 	private Long itemId;
 	
@@ -72,7 +78,7 @@ public class ItemSale extends AbstractAuditableCustom<AppUser, Long>{
 	}
 
 
-	public static ItemSale fromJson(JsonCommand command) {
+	public static ItemSale fromJson(final JsonCommand command) {
 		
 		final Long itemId=command.longValueOfParameterNamed("itemId");
 		final Long purchaseFrom=command.longValueOfParameterNamed("purchaseFrom");
