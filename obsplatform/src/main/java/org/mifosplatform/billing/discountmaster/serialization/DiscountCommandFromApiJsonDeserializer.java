@@ -58,7 +58,7 @@ public final class DiscountCommandFromApiJsonDeserializer {
 		final JsonElement element = fromApiJsonHelper.parse(json);
 
 		final String discountCode = fromApiJsonHelper.extractStringNamed("discountCode", element);
-		baseDataValidator.reset().parameter("discountCode").value(discountCode).notBlank();
+		baseDataValidator.reset().parameter("discountCode").value(discountCode).notBlank().notExceedingLengthOf(20);
 		
 		final LocalDate startDate = fromApiJsonHelper.extractLocalDateNamed("startDate", element);
 		baseDataValidator.reset().parameter("startDate").value(startDate).notBlank();

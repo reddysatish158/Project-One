@@ -10,7 +10,6 @@ import org.mifosplatform.billing.discountmaster.domain.DiscountMasterRepository;
 import org.mifosplatform.billing.discountmaster.exception.DiscountMasterNotFoundException;
 import org.mifosplatform.billing.planprice.data.PriceData;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
-import org.mifosplatform.portfolio.client.domain.AccountNumberGeneratorFactory;
 import org.mifosplatform.portfolio.contract.domain.Contract;
 import org.mifosplatform.portfolio.contract.domain.ContractRepository;
 import org.mifosplatform.portfolio.order.data.OrderStatusEnumaration;
@@ -114,9 +113,6 @@ public OrderAssembler(final OrderDetailsReadPlatformServices orderDetailsReadPla
 				order.addServiceDeatils(orderdetails);
 			}
 			
-			
-
-		
 		  return order;
 	
 	}

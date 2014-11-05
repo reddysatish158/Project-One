@@ -162,8 +162,8 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 		    final EventActionRepository eventActionRepository,final ContractPeriodReadPlatformService contractPeriodReadPlatformService,
 		   final HardwareAssociationRepository associationRepository,final ProvisioningWritePlatformService provisioningWritePlatformService,
 		   final PaymentFollowupRepository paymentFollowupRepository,final PriceRepository priceRepository,final ChargeCodeRepository chargeCodeRepository,
-		    final AccountNumberGeneratorFactory accountIdentifierGeneratorFactory) {
-		
+		   final AccountNumberGeneratorFactory accountIdentifierGeneratorFactory) {
+
 		this.context = context;
 		this.reverseInvoice=reverseInvoice;
 		this.subscriptionRepository = subscriptionRepository;
@@ -224,9 +224,8 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 					String requstStatus =UserActionStatusTypeEnum.ACTIVATION.toString();
 					
 						if(isNewPlan){
-							
-								final AccountNumberGenerator orderNoGenerator = this.accountIdentifierGeneratorFactory.determineClientAccountNoGenerator(order.getId());
-								order.updateOrderNum(orderNoGenerator.generate());
+							final AccountNumberGenerator orderNoGenerator = this.accountIdentifierGeneratorFactory.determineClientAccountNoGenerator(order.getId());
+							order.updateOrderNum(orderNoGenerator.generate());
 							Set<PlanDetails> planDetails=plan.getDetails();
 							ServiceMaster service=this.serviceMasterRepository.findOneByServiceCode(planDetails.iterator().next().getServiceCode());
                             Long commandId=Long.valueOf(0);
