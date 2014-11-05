@@ -81,14 +81,14 @@ public class AddressWritePlatformServiceImpl implements AddressWritePlatformServ
 		final Throwable realCause = dve.getMostSpecificCause(); 
 		String entityCode = command.stringValueOfParameterNamed("entityCode");
 		if(realCause.getMessage().contains("country_code")){
-			 throw new PlatformDataIntegrityException("Country Code with this '"+entityCode+ "' already exists",
-					 "error.msg.addressmaster.country.duplicate.countrycode","countryCode",entityCode);
+			 throw new PlatformDataIntegrityException("error.msg.addressmaster.country.duplicate.countrycode",
+					 "Country Code with this '"+entityCode+ "' already exists","countryCode",entityCode);
 		}else if(realCause.getMessage().contains("state_code")){
-			 throw new PlatformDataIntegrityException("State Code with this '"+entityCode+ "' already exists",
-					 "error.msg.addressmaster.state.duplicate.statecode", "stateCode",entityCode);
+			 throw new PlatformDataIntegrityException( "error.msg.addressmaster.state.duplicate.statecode",
+					 "State Code with this '"+entityCode+ "' already exists","stateCode",entityCode);
 		}else if(realCause.getMessage().contains("city_code")){
-			 throw new PlatformDataIntegrityException("City Code with this '"+entityCode+ "' already exists", 
-					 "error.msg.addressmaster.city.duplicate.citycode","cityCode",entityCode);
+			 throw new PlatformDataIntegrityException("error.msg.addressmaster.city.duplicate.citycode",
+					 "City Code with this '"+entityCode+ "' already exists","cityCode",entityCode);
 		}
 		  logger.error(dve.getMessage(), dve);
 		
