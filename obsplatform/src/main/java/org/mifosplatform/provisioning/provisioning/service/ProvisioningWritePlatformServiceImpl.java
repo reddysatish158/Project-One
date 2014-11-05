@@ -593,17 +593,16 @@ public class ProvisioningWritePlatformServiceImpl implements
 
 	@Transactional
 	@Override
-	public CommandProcessingResult updateIpDetails(Long orderId, JsonCommand command) {
+	public CommandProcessingResult updateIpDetails(final Long orderId, final JsonCommand command) {
 		
 		IpPoolManagementDetail ipPoolManagement = null;
+		Long clientId = null;
 		try {
 			this.context.authenticatedUser();
 			// this.fromApiJsonDeserializer.validateForUpDateIpDetails(command.json());
-			final Long clientId = command.longValueOfParameterNamed("clientId");
+			clientId = command.longValueOfParameterNamed("clientId");
 			final JsonElement element = fromJsonHelper.parse(command.json());
-			// final String[]
-			// exitIpsArray=fromApiJsonHelper.extractArrayNamed("existIps",element);
-
+			
 			final String[] removeIpsArray = fromApiJsonHelper.extractArrayNamed("removeIps", element);
 			final String[] newIpsArray = fromApiJsonHelper.extractArrayNamed("newIps", element);
 			// find duplicate ips in String Array
@@ -615,9 +614,11 @@ public class ProvisioningWritePlatformServiceImpl implements
 
 			JSONArray array = new JSONArray();
 			List<ServiceParameters> parameters = this.serviceParametersRepository.findDataByOrderId(orderId);
-
+			
+			if(parameters != null){
 			for (ServiceParameters serviceData : parameters) {
-				if (serviceData.getParameterName().equalsIgnoreCase(ProvisioningApiConstants.PROV_DATA_IPADDRESS)) {
+				
+				if (ProvisioningApiConstants.PROV_DATA_IPADDRESS.equalsIgnoreCase(serviceData.getParameterName())) {
 
 					for (String newIp : newIpsArray) {
 						array.put(newIp);
@@ -654,12 +655,14 @@ public class ProvisioningWritePlatformServiceImpl implements
 					this.serviceParametersRepository.save(serviceData);
 				}
 			}
+			}else{
+				
+			}
 		} catch (DataIntegrityViolationException dve) {
 			handleCodeDataIntegrityIssues(null, dve);
 		}
 	
-		return new CommandProcessingResult(orderId,
-				ipPoolManagement.getClientId());
+		return new CommandProcessingResult(orderId, clientId);
 
 	}
 
