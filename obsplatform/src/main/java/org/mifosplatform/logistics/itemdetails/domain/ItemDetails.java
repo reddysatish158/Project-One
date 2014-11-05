@@ -76,13 +76,24 @@ public class ItemDetails extends AbstractAuditableCustom<AppUser, Long>{
 		this.grnId=grnId;
 		this.provisioningSerialNumber=provisioningSerialNumber;
 		this.quality=quality;
-		this.status=status;
+		this.status=getStatusOnQaulity(quality);
 		this.warranty=warranty;
 		this.remarks=remarks;
 		this.itemModel=itemModel;
 		this.isDeleted='N';
 	}
 	
+	private String getStatusOnQaulity(String quality) {
+		String status=null;
+		if("Good".equalsIgnoreCase(quality) ||"Good".equalsIgnoreCase(quality)){
+			status="Available";
+		}else{
+			status="UnAvailable";
+		}
+		return status;
+	}
+
+
 	public ItemDetails(Long itemMasterId,String serialNumber,Long grnId,String provisioningSerialNumber,String quality,
 			String status,Long officeId,Long clientId,Long warranty,String remarks){
 		this.itemMasterId=itemMasterId;
@@ -200,12 +211,14 @@ public class ItemDetails extends AbstractAuditableCustom<AppUser, Long>{
 
 
 	public Map<String, Object> update(JsonCommand command) {
+		
 		 final Map<String, Object> actualChanges = new LinkedHashMap<String, Object>(1);
 		  final String quality = "quality";
 	        if (command.isChangeInStringParameterNamed(quality, this.quality)) {
 	            final String newValue = command.stringValueOfParameterNamed(quality);
 	            actualChanges.put(quality, newValue);
 	            this.quality = StringUtils.defaultIfEmpty(newValue, null);
+	            this.status=getStatusOnQaulity(this.quality);
 	        }
 	        
 	        final String provisionSerialNum = "provisioningSerialNumber";
@@ -236,8 +249,7 @@ public class ItemDetails extends AbstractAuditableCustom<AppUser, Long>{
 		Long grnId = command.longValueOfParameterNamed("grnId");
 		String serialNumber = command.stringValueOfParameterNamed("serialNumber");
 		String provisioningSerialNumber = command.stringValueOfParameterNamed("provisioningSerialNumber");
-		String  q = command.stringValueOfParameterNamed("quality");
-		String quality = q.equalsIgnoreCase("Good")?"Good":"Defective";
+		String  quality = command.stringValueOfParameterNamed("quality");
 		String status = command.stringValueOfParameterNamed("status");
 		String itemModel = command.stringValueOfParameterNamed("itemModel");
 		return new ItemDetails(itemMasterId,serialNumber,grnId,provisioningSerialNumber,quality,status,null,remarks,itemModel);

@@ -22,6 +22,7 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.AbstractPlatformDomainRuleException;
 import org.mifosplatform.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
+import org.mifosplatform.infrastructure.core.exception.UnsupportedParameterException;
 import org.mifosplatform.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.mifosplatform.infrastructure.core.service.FileUtils;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
@@ -398,8 +399,10 @@ public class DataUploadWritePlatformServiceImp implements DataUploadWritePlatfor
 		}else if(dve instanceof ItemNotFoundException){
 			errorData.add(new MRNErrorData((long)i,"Invalid Item id"));
 		
+		}else if(dve instanceof UnsupportedParameterException){
+			    errorData.add(new MRNErrorData((long)i,"Row Contains Improper data "));
 		}else {
-			errorData.add(new MRNErrorData((long)i,((PlatformApiDataValidationException) dve).getErrors().get(0).getDefaultUserMessage()));
+			errorData.add(new MRNErrorData((long)i,"Data insertion is failed"));
 	   }
 	}
 
