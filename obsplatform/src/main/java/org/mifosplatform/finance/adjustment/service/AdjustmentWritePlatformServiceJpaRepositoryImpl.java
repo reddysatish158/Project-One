@@ -18,7 +18,6 @@ import org.mifosplatform.portfolio.transactionhistory.service.TransactionHistory
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AdjustmentWritePlatformServiceJpaRepositoryImpl implements
@@ -39,6 +38,7 @@ public class AdjustmentWritePlatformServiceJpaRepositoryImpl implements
 			final UpdateClientBalance updateClientBalance,final ClientBalanceReadPlatformService clientBalanceReadPlatformService,
 			final AdjustmentReadPlatformService adjustmentReadPlatformService,
 			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService) {
+		
 		this.context = context;
 		this.adjustmentRepository = adjustmentRepository;
 		this.clientBalanceRepository = clientBalanceRepository;
@@ -50,10 +50,8 @@ public class AdjustmentWritePlatformServiceJpaRepositoryImpl implements
 	}
 
 	@SuppressWarnings("unused")
-	@Transactional
 	@Override
-	public Long createAdjustment(Long id2, Long id, Long clientid,
-			JsonCommand command) {
+	public Long createAdjustment(Long id2, Long id, Long clientid,JsonCommand command) {
 		// TODO Auto-generated method stub
 
 		try {

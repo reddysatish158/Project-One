@@ -52,12 +52,11 @@ public class SynchronousCommandProcessingService implements
 		this.configurationDomainService = configurationDomainService;
 	}
 
-	@Transactional
 	@Override
 	public CommandProcessingResult processAndLogCommand(
 			final CommandWrapper wrapper, final JsonCommand command,
 			final boolean isApprovedByChecker) {
-
+		
 		final boolean rollbackTransaction = this.configurationDomainService
 				.isMakerCheckerEnabledForTask(wrapper.taskPermissionName())
 				&& !isApprovedByChecker;

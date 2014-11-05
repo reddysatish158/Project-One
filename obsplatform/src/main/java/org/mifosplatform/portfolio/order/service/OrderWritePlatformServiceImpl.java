@@ -494,12 +494,14 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 				this.OrderPriceRepository.save(orderprice);
 				orderDetails.setNextBillableDay(null);
 			}
+			orderDetails.setContractPeriod(contractDetails.getId());
 			 orderDetails.setuserAction(requstStatus);
              orderDetails.setRenewalDate(newStartdate.toDate());
 		     this.orderRepository.save(orderDetails);
 		     
 		     Set<PlanDetails> planDetails=plan.getDetails();
 		     ServiceMaster serviceMaster=this.serviceMasterRepository.findOneByServiceCode(planDetails.iterator().next().getServiceCode());
+		     
 		     if(serviceMaster.isAuto() == 'Y' && requestStatusForProv != null){
 		    	 	this.prepareRequestWriteplatformService.prepareNewRequest(orderDetails,plan,requestStatusForProv);
 		     }else{

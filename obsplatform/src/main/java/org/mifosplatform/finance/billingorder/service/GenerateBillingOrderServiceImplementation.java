@@ -21,31 +21,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class GenerateBillingOrderServiceImplementation implements
-		GenerateBillingOrderService {
+public class GenerateBillingOrderServiceImplementation implements GenerateBillingOrderService {
 
 	private final GenerateBill generateBill;
 	private final BillingOrderReadPlatformService billingOrderReadPlatformService;
 	private final InvoiceRepository invoiceRepository;
 	private final DiscountMasterRepository discountMasterRepository;
 
-	// private final OrderRepository orderRepository;
+
 
 	@Autowired
-	public GenerateBillingOrderServiceImplementation(GenerateBill generateBill,
-			BillingOrderReadPlatformService billingOrderReadPlatformService,
-			InvoiceRepository invoiceRepository,
-			final DiscountMasterRepository discountMasterRepository) {
+	public GenerateBillingOrderServiceImplementation(GenerateBill generateBill,BillingOrderReadPlatformService billingOrderReadPlatformService,
+			InvoiceRepository invoiceRepository,final DiscountMasterRepository discountMasterRepository) {
+	
 		this.generateBill = generateBill;
 		this.billingOrderReadPlatformService = billingOrderReadPlatformService;
 		this.invoiceRepository = invoiceRepository;
 		this.discountMasterRepository = discountMasterRepository;
-		// this.orderRepository = orderRepository;
+	
 	}
 
 	@Override
-	public List<BillingOrderCommand> generatebillingOrder(
-			List<BillingOrderData> products) {
+	public List<BillingOrderCommand> generatebillingOrder(List<BillingOrderData> products) {
 
 		BillingOrderCommand billingOrderCommand = null;
 		List<BillingOrderCommand> billingOrderCommands = new ArrayList<BillingOrderCommand>();
@@ -55,27 +52,22 @@ public class GenerateBillingOrderServiceImplementation implements
 			for (BillingOrderData billingOrderData : products) {
 				// discount master
 				DiscountMasterData discountMasterData = null;
-
-				List<DiscountMasterData> discountMasterDatas = billingOrderReadPlatformService
-						.retrieveDiscountOrders(
-								billingOrderData.getClientOrderId(),
-								billingOrderData.getOderPriceId());
+				List<DiscountMasterData> discountMasterDatas = billingOrderReadPlatformService.retrieveDiscountOrders(billingOrderData.getClientOrderId(),
+						billingOrderData.getOderPriceId());
 
 				if (discountMasterDatas.size() != 0) {
 					discountMasterData = discountMasterDatas.get(0);
 				}
 
 				if (billingOrderData.getOrderStatus() == 3) {
-					billingOrderCommand = generateBill.getCancelledOrderBill(
-							billingOrderData, discountMasterData);
+					billingOrderCommand = generateBill.getCancelledOrderBill(billingOrderData, discountMasterData);
 					billingOrderCommands.add(billingOrderCommand);
 				}
 
 				else if (generateBill.isChargeTypeNRC(billingOrderData)) {
 
 					System.out.println("---- NRC ---");
-					billingOrderCommand = generateBill.getOneTimeBill(
-							billingOrderData, discountMasterData);
+					billingOrderCommand = generateBill.getOneTimeBill(billingOrderData, discountMasterData);
 					billingOrderCommands.add(billingOrderCommand);
 
 				} else if (generateBill.isChargeTypeRC(billingOrderData)) {
@@ -83,72 +75,52 @@ public class GenerateBillingOrderServiceImplementation implements
 					System.out.println("---- RC ----");
 
 					// monthly
-					if (billingOrderData.getDurationType().equalsIgnoreCase(
-							"month(s)")) {
-						if (billingOrderData.getBillingAlign()
-								.equalsIgnoreCase("N")) {
+					if (billingOrderData.getDurationType().equalsIgnoreCase("month(s)")) {
+						 if (billingOrderData.getBillingAlign().equalsIgnoreCase("N")) {
 
-							billingOrderCommand = generateBill.getMonthyBill(
-									billingOrderData, discountMasterData);
+							billingOrderCommand = generateBill.getMonthyBill(billingOrderData, discountMasterData);
 							billingOrderCommands.add(billingOrderCommand);
 
-						} else if (billingOrderData.getBillingAlign()
-								.equalsIgnoreCase("Y")) {
+						} else if (billingOrderData.getBillingAlign().equalsIgnoreCase("Y")) {
 
 							if (billingOrderData.getInvoiceTillDate() == null) {
 
-								billingOrderCommand = generateBill
-										.getProrataMonthlyFirstBill(
-												billingOrderData,
-												discountMasterData);
+								billingOrderCommand = generateBill.getProrataMonthlyFirstBill(billingOrderData,discountMasterData);
 								billingOrderCommands.add(billingOrderCommand);
 
 							} else if (billingOrderData.getInvoiceTillDate() != null) {
 
-								billingOrderCommand = generateBill
-										.getNextMonthBill(billingOrderData,
-												discountMasterData);
+								billingOrderCommand = generateBill.getNextMonthBill(billingOrderData,discountMasterData);
 								billingOrderCommands.add(billingOrderCommand);
-
 							}
 						}
 
 						// weekly
-					} else if (billingOrderData.getDurationType()
-							.equalsIgnoreCase("week(s)")) {
+					} else if (billingOrderData.getDurationType().equalsIgnoreCase("week(s)")) {
 
-						if (billingOrderData.getBillingAlign()
-								.equalsIgnoreCase("N")) {
-							billingOrderCommand = generateBill.getWeeklyBill(
-									billingOrderData, discountMasterData);
+						if (billingOrderData.getBillingAlign().equalsIgnoreCase("N")) {
+							
+							billingOrderCommand = generateBill.getWeeklyBill(billingOrderData, discountMasterData);
 							billingOrderCommands.add(billingOrderCommand);
 
-						} else if (billingOrderData.getBillingAlign()
-								.equalsIgnoreCase("Y")) {
+						} else if (billingOrderData.getBillingAlign().equalsIgnoreCase("Y")) {
 
 							if (billingOrderData.getInvoiceTillDate() == null) {
 
-								billingOrderCommand = generateBill
-										.getProrataWeeklyFirstBill(
-												billingOrderData,
-												discountMasterData);
+								billingOrderCommand = generateBill.getProrataWeeklyFirstBill(billingOrderData,discountMasterData);
 								billingOrderCommands.add(billingOrderCommand);
 
 							} else if (billingOrderData.getInvoiceTillDate() != null) {
 
-								billingOrderCommand = generateBill
-										.getNextWeeklyBill(billingOrderData,
-												discountMasterData);
+								billingOrderCommand = generateBill.getNextWeeklyBill(billingOrderData,discountMasterData);
 								billingOrderCommands.add(billingOrderCommand);
 							}
 						}
 
 						// daily
-					} else if (billingOrderData.getDurationType()
-							.equalsIgnoreCase("Day(s)")) {
+					} else if (billingOrderData.getDurationType().equalsIgnoreCase("Day(s)")) {
 
-						billingOrderCommand = generateBill.getDailyBill(
-								billingOrderData, discountMasterData);
+						billingOrderCommand = generateBill.getDailyBill(billingOrderData, discountMasterData);
 						billingOrderCommands.add(billingOrderCommand);
 
 					}
@@ -163,51 +135,33 @@ public class GenerateBillingOrderServiceImplementation implements
 	}
 
 	@Override
-	public Invoice generateInvoice(
-			List<BillingOrderCommand> billingOrderCommands) {
+	public Invoice generateInvoice(List<BillingOrderCommand> billingOrderCommands) {
 
 		BigDecimal invoiceAmount = BigDecimal.ZERO;
 		BigDecimal totalChargeAmount = BigDecimal.ZERO;
 		BigDecimal netTaxAmount = BigDecimal.ZERO;
 
-		// LocalDate invoiceDate = new LocalDate();
-		// List<BillingOrder> charges = new ArrayList<BillingOrder>();
+		TaxMappingRateData tax = this.billingOrderReadPlatformService.retriveExemptionTaxDetails(billingOrderCommands.get(0).getClientId());
 
-		// Get taxExemption status
-		TaxMappingRateData tax = this.billingOrderReadPlatformService
-				.retriveExemptionTaxDetails(billingOrderCommands.get(0)
-						.getClientId());
-
-		Invoice invoice = new Invoice(
-				billingOrderCommands.get(0).getClientId(),
-				new LocalDate().toDate(), invoiceAmount, invoiceAmount,
+		Invoice invoice = new Invoice(billingOrderCommands.get(0).getClientId(),new LocalDate().toDate(), invoiceAmount, invoiceAmount,
 				netTaxAmount, "active");
+		
 		for (BillingOrderCommand billingOrderCommand : billingOrderCommands) {
+			
 			BigDecimal netChargeTaxAmount = BigDecimal.ZERO;
-			BigDecimal discountAmount = billingOrderCommand
-					.getDiscountMasterData().getDiscountAmount();
-			BigDecimal netChargeAmount = billingOrderCommand.getPrice()
-					.subtract(discountAmount);
+			BigDecimal discountAmount = billingOrderCommand.getDiscountMasterData().getDiscountAmount();
+			BigDecimal netChargeAmount = billingOrderCommand.getPrice().subtract(discountAmount);
 
 			DiscountMaster discountMaster = null;
 			if (billingOrderCommand.getDiscountMasterData() != null) {
-				discountMaster = this.discountMasterRepository
-						.findOne(billingOrderCommand.getDiscountMasterData()
-								.getId());
+				discountMaster = this.discountMasterRepository.findOne(billingOrderCommand.getDiscountMasterData().getId());
 			}
 
-			List<InvoiceTaxCommand> invoiceTaxCommands = billingOrderCommand
-					.getListOfTax();
+			List<InvoiceTaxCommand> invoiceTaxCommands = billingOrderCommand.getListOfTax();
 
-			BillingOrder charge = new BillingOrder(
-					billingOrderCommand.getClientId(),
-					billingOrderCommand.getClientOrderId(),
-					billingOrderCommand.getOrderPriceId(),
-					billingOrderCommand.getChargeCode(),
-					billingOrderCommand.getChargeType(),
-					discountMaster.getDiscountCode(),
-					billingOrderCommand.getPrice(), discountAmount,
-					netChargeAmount, billingOrderCommand.getStartDate(),
+			BillingOrder charge = new BillingOrder(billingOrderCommand.getClientId(),billingOrderCommand.getClientOrderId(),
+					billingOrderCommand.getOrderPriceId(),billingOrderCommand.getChargeCode(),billingOrderCommand.getChargeType(),
+					discountMaster.getDiscountCode(),billingOrderCommand.getPrice(), discountAmount,netChargeAmount, billingOrderCommand.getStartDate(),
 					billingOrderCommand.getEndDate());
 
 			// client TaxExemption
@@ -215,15 +169,11 @@ public class GenerateBillingOrderServiceImplementation implements
 
 				for (InvoiceTaxCommand invoiceTaxCommand : invoiceTaxCommands) {
 
-					if (invoiceTaxCommand.getTaxAmount().compareTo(
-							BigDecimal.ZERO) > 0) {
-						netChargeTaxAmount = netChargeTaxAmount
-								.add(invoiceTaxCommand.getTaxAmount());
-						InvoiceTax invoiceTax = new InvoiceTax(invoice, charge,
-								invoiceTaxCommand.getTaxCode(),
-								invoiceTaxCommand.getTaxValue(),
-								invoiceTaxCommand.getTaxPercentage(),
-								invoiceTaxCommand.getTaxAmount());
+					if (invoiceTaxCommand.getTaxAmount().compareTo(BigDecimal.ZERO) > 0) {
+						
+						netChargeTaxAmount = netChargeTaxAmount.add(invoiceTaxCommand.getTaxAmount());
+						InvoiceTax invoiceTax = new InvoiceTax(invoice, charge,invoiceTaxCommand.getTaxCode(),
+								invoiceTaxCommand.getTaxValue(),invoiceTaxCommand.getTaxPercentage(),invoiceTaxCommand.getTaxAmount());
 						charge.addChargeTaxes(invoiceTax);
 					}
 				}
@@ -231,8 +181,7 @@ public class GenerateBillingOrderServiceImplementation implements
 				if (billingOrderCommand.getTaxInclusive() != null) {
 
 					if (isTaxInclusive(billingOrderCommand.getTaxInclusive())) {
-						netChargeAmount = netChargeAmount
-								.subtract(netChargeTaxAmount);
+						netChargeAmount = netChargeAmount.subtract(netChargeTaxAmount);
 						charge.setNetChargeAmount(netChargeAmount);
 						// charge.setChargeAmount(netChargeAmount);
 					}
@@ -257,8 +206,8 @@ public class GenerateBillingOrderServiceImplementation implements
 		return this.invoiceRepository.save(invoice);
 	}
 
-	public BigDecimal getInvoiceAmount(
-			List<BillingOrderCommand> billingOrderCommands) {
+	public BigDecimal getInvoiceAmount(List<BillingOrderCommand> billingOrderCommands) {
+		
 		BigDecimal invoiceAmount = BigDecimal.ZERO;
 		for (BillingOrderCommand billingOrderCommand : billingOrderCommands) {
 			invoiceAmount = invoiceAmount.add(billingOrderCommand.getPrice());

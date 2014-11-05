@@ -2512,11 +2512,11 @@ public CommandWrapperBuilder cancelBill(Long billId) {
 	
     }
 
-public CommandWrapperBuilder updateUploadFile(Long uploadStatusId) {
+public CommandWrapperBuilder updateUploadFile(Long uploadFileId) {
 	
 	this.actionName = "PROCESS";
 	this.entityName = "DATAUPLOADS";
-	this.entityId = uploadStatusId;
+	this.entityId = uploadFileId;
 	this.href = "/dataupload/" +clientId;
 	return this;
 }

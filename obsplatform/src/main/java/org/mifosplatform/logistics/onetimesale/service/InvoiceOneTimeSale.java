@@ -79,7 +79,7 @@ public class InvoiceOneTimeSale {
 				// To fetch record from client_balance table
 				List<ClientBalanceData> clientBalancesDatas = adjustmentReadPlatformService.retrieveAllAdjustments(clientId);
 				
-				this.billingOrderWritePlatformService.updateClientBalance(invoice,clientBalancesDatas);
+				this.billingOrderWritePlatformService.updateClientBalance(invoice,clientId);
 
 			 } else {
 

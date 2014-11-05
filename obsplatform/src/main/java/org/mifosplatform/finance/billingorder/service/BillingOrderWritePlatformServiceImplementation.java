@@ -53,29 +53,27 @@ public class BillingOrderWritePlatformServiceImplementation implements BillingOr
 	@Override
 	public CommandProcessingResult updateBillingOrder(List<BillingOrderCommand> commands) {
 		Order clientOrder = null;
+		
 		for (BillingOrderCommand billingOrderCommand : commands) {
+			
 			clientOrder = this.orderRepository.findOne(billingOrderCommand.getClientOrderId());
-
-			if (clientOrder != null) {
-				// if(billingOrderCommand.getChargeType().equalsIgnoreCase("RC")){
-				clientOrder.setNextBillableDay(billingOrderCommand.getNextBillableDate());
-				// }else
-				// if(billingOrderCommand.getChargeType().equalsIgnoreCase("NRC")){
-				// clientOrder.setNextBillableDay(new
-				// LocalDate("3099-12-12").toDate());
-				// }
-				
-			}
+				if (clientOrder != null) {
+						clientOrder.setNextBillableDay(billingOrderCommand.getNextBillableDate());
+						List<OrderPrice> orderPrices = clientOrder.getPrice();
+						
+						for (OrderPrice orderPriceData : orderPrices) {
+						
+							orderPriceData.setInvoiceTillDate(billingOrderCommand.getInvoiceTillDate());
+							orderPriceData.setNextBillableDay(billingOrderCommand.getNextBillableDate());
+						}
+				}
+				this.orderRepository.save(clientOrder);
 		}
-
-		// clientOrder.setEndDate(command.getEndDate());
-		this.orderRepository.save(clientOrder);
-
+	
 		return new CommandProcessingResult(Long.valueOf(clientOrder.getId()));
-
 	}
 
-	@Override
+/*	@Override
 	public CommandProcessingResult updateOrderPrice(
 			List<BillingOrderCommand> billingOrderCommands) {
 		Order orderData = null;
@@ -109,70 +107,27 @@ public class BillingOrderWritePlatformServiceImplementation implements BillingOr
 		}
 
 		return new CommandProcessingResult(Long.valueOf(orderData.getId()));
-	}
-
-	/*@Override
-	public Invoice createInvoice(InvoiceCommand invoiceCommand,
-			List<ClientBalanceData> clientBalanceDatas) {
-
-		Invoice invoice = new Invoice(invoiceCommand.getClientId(),
-				new LocalDate().toDate(), invoiceCommand.getInvoiceAmount(),
-				invoiceCommand.getNetChargeAmount(),
-				invoiceCommand.getTaxAmount(),
-				invoiceCommand.getInvoiceStatus());
-		
-		List<BillingOrder> charges = new ArrayList<BillingOrder>();
-		
-
-		Long clientBalanceId = null;
-		if (clientBalanceDatas.size() >= 1) {
-			clientBalanceId = clientBalanceDatas.get(0).getId();
-		}
-
-		ClientBalance clientBalance = null;
-		if (clientBalanceId != null) {
-			clientBalance = this.clientBalanceRepository.findOne(clientBalanceId);
-		}
-
-		if (clientBalance != null) {
-
-			clientBalance = updateClientBalance.calculateUpdateClientBalance("DEBIT",
-					invoice.getInvoiceAmount(),	clientBalance);
-		} else if (clientBalance == null) {
-			clientBalance = updateClientBalance.calculateCreateClientBalance("DEBIT",
-					invoice.getInvoiceAmount(), clientBalance,invoice.getClientId());
-		}
-
-		this.clientBalanceRepository.save(clientBalance);
-		invoice = this.invoiceRepository.save(invoice);
-
-		transactionHistoryWritePlatformService.saveTransactionHistory(invoice.getClientId(), "Invoice", invoice.getInvoiceDate(),"InvoiceID:"+invoice.getId(),
-				"AmountPaid:"+invoice.getInvoiceAmount(),"InvoiceStatus:"+invoice.getInvoiceStatus(),"NetChargeAmount:"+invoice.getNetChargeAmount(),"TaxAmount:"+invoice.getTaxAmount());
-		
-		return invoice;
 	}*/
 
 	@Override
-	public void updateClientBalance(Invoice invoice,
-			List<ClientBalanceData> clientBalancesDatas) {
-		Long clientBalanceId = null;
-		if (clientBalancesDatas.size() >= 1) {
-			clientBalanceId = clientBalancesDatas.get(0).getId();
+	public void updateClientBalance(Invoice invoice,Long clientId) {
+		
+		
+		
+		ClientBalance clientBalance = this.clientBalanceRepository.findByClientId(clientId);
+		
+		if(clientBalance == null){
+			clientBalance =new ClientBalance(clientId,invoice.getInvoiceAmount());
+		}else{
+			clientBalance.setBalanceAmount(clientBalance.getBalanceAmount().add(invoice.getInvoiceAmount()));
 		}
 
-		ClientBalance clientBalance = null;
-		if (clientBalanceId != null) {
-			clientBalance = this.clientBalanceRepository.findOne(clientBalanceId);
-		}
+		/*if (clientBalance != null) {
 
-		if (clientBalance != null) {
-
-			clientBalance = updateClientBalance.calculateUpdateClientBalance("DEBIT",
-					invoice.getInvoiceAmount(),	clientBalance);
+			clientBalance = updateClientBalance.calculateUpdateClientBalance("DEBIT",invoice.getInvoiceAmount(),clientBalance);
 		} else if (clientBalance == null) {
-			clientBalance = updateClientBalance.calculateCreateClientBalance("DEBIT",
-					invoice.getInvoiceAmount(), clientBalance,invoice.getClientId());
-		}
+			clientBalance = updateClientBalance.calculateCreateClientBalance("DEBIT",invoice.getInvoiceAmount(), clientBalance,invoice.getClientId());
+		}*/
 
 		this.clientBalanceRepository.save(clientBalance);
 		

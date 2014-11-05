@@ -25,18 +25,15 @@ public class BillingOrderCommand {
 	private final String billingAlign;
 	private final List<InvoiceTaxCommand> listOfTax;
 	private final Date billStartDate;
-	private Date billEndDate;
+	private final Date billEndDate;
 	private final DiscountMasterData discountMasterData;
 	private final Integer taxInclusive;
 
-	public BillingOrderCommand(Long clientOrderId, Long oderPriceId,
-			Long clientId, Date startDate, Date nextBillableDate, Date endDate,
-			String billingFrequency, String chargeCode, String chargeType,
-			Integer chargeDuration, String durationType, Date invoiceTillDate,
-			BigDecimal price, String billingAlign,
-			final List<InvoiceTaxCommand> listOfTax, final Date billStartDate,
-			final Date billEndDate,
+	public BillingOrderCommand(Long clientOrderId, Long oderPriceId,Long clientId, Date startDate, Date nextBillableDate, Date endDate,
+			String billingFrequency, String chargeCode, String chargeType,Integer chargeDuration, String durationType, Date invoiceTillDate,
+			BigDecimal price, String billingAlign,final List<InvoiceTaxCommand> listOfTax, final Date billStartDate,final Date billEndDate,
 			final DiscountMasterData discountMasterData, Integer taxInclusive) {
+		
 		this.clientOrderId = clientOrderId;
 		this.orderPriceId = (oderPriceId != null) ? oderPriceId : new Long(0);
 		this.clientId = clientId;
@@ -126,9 +123,7 @@ public class BillingOrderCommand {
 		return billEndDate;
 	}
 
-	public void setBillEndDate(Date billEndDate) {
-		this.billEndDate = billEndDate;
-	}
+
 
 	public DiscountMasterData getDiscountMasterData() {
 		return discountMasterData;

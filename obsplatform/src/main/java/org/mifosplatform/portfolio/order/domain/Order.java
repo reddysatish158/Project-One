@@ -321,13 +321,10 @@ public Order(Long clientId, Long planId, Long contractPeriod, String paytermCode
 		
 	}
 
-
 	public void updateActivationDate(Date activeDate) {
 	  this.activeDate=activeDate;	
-	 
-		
 	}
-	
-	
-
+	public void setContractPeriod(Long contarctPeriod) {
+		this.contarctPeriod=contarctPeriod;
+	}
 }

@@ -271,8 +271,7 @@ public String discountOrderSchema() {
 	public List<DiscountMasterData> retrieveDiscountOrders(Long orderId,Long orderPriceId) {
 		DiscountOrderMapper discountOrderMapper = new DiscountOrderMapper();
 		String sql = "select " + discountOrderMapper.discountOrderSchema();
-		return this.jdbcTemplate.query(sql, discountOrderMapper,
-				new Object[] {orderId,orderPriceId});
+		return this.jdbcTemplate.query(sql, discountOrderMapper,new Object[] {orderId,orderPriceId});
 
 	}
 

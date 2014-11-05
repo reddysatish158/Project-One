@@ -283,7 +283,7 @@ public class DataUploadHelper {
 		final String filelocation=dataUpload.getUploadFilePath();
 		dataUpload=null;
 		writeToFile(filelocation,errorData);
-		return new CommandProcessingResult(Long.valueOf(-1));
+		return new CommandProcessingResult(Long.valueOf(1));
 	}
 
 

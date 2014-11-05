@@ -37,9 +37,7 @@ import org.mifosplatform.portfolio.association.data.AssociationData;
 import org.mifosplatform.portfolio.association.data.HardwareAssociationData;
 import org.mifosplatform.portfolio.association.service.HardwareAssociationReadplatformService;
 import org.mifosplatform.portfolio.association.service.HardwareAssociationWriteplatformService;
-import org.mifosplatform.portfolio.order.data.CustomValidationData;
 import org.mifosplatform.portfolio.order.exceptions.NoGrnIdFoundException;
-import org.mifosplatform.portfolio.order.service.OrderDetailsReadPlatformServices;
 import org.mifosplatform.portfolio.order.service.OrderReadPlatformService;
 import org.mifosplatform.provisioning.provisioning.service.ProvisioningWritePlatformService;
 import org.mifosplatform.workflow.eventactionmapping.exception.EventActionMappingNotFoundException;
@@ -117,8 +115,7 @@ public class ItemDetailsWritePlatformServiceImp implements ItemDetailsWritePlatf
 	
 	
 	
-	@SuppressWarnings("unused")
-	@Transactional
+
 	@Override
 	public CommandProcessingResult addItem(final JsonCommand command,Long flag) {
 

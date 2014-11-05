@@ -125,12 +125,12 @@ import com.sun.jersey.multipart.FormDataParam;
 	 }
 	 
 	@PUT
-	@Path("{uploadStatusId}")
+	@Path("{uploadfileId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String processFile(@PathParam("uploadStatusId") final Long uploadStatusId, @Context final UriInfo uriInfo) {
+	public String processFile(@PathParam("uploadfileId") final Long uploadfileId, @Context final UriInfo uriInfo) {
 		
-		   final CommandWrapper commandRequest = new CommandWrapperBuilder().updateUploadFile(uploadStatusId).build();
+		   final CommandWrapper commandRequest = new CommandWrapperBuilder().updateUploadFile(uploadfileId).build();
 		   final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 		   return this.toApiJsonSerializer.serialize(result);
 	}
