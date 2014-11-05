@@ -51,44 +51,33 @@ public final class AgentItemSaleCommandFromApiJsonDeserializer {
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("itemsale");
 
         final JsonElement element = fromApiJsonHelper.parse(json);
+        
         final LocalDate purchaseDate = fromApiJsonHelper.extractLocalDateNamed("purchaseDate", element);
         baseDataValidator.reset().parameter("purchaseDate").value(purchaseDate).notBlank();
+        
         final String purchaseFrom = fromApiJsonHelper.extractStringNamed("purchaseFrom", element);
         baseDataValidator.reset().parameter("purchaseFrom").value(purchaseFrom).notNull();
+        
         final String itemId = fromApiJsonHelper.extractStringNamed("itemId", element);
         baseDataValidator.reset().parameter("itemId").value(itemId).notNull();
+        
         final String chargeCode = fromApiJsonHelper.extractStringNamed("chargeCode", element);
         baseDataValidator.reset().parameter("chargeCode").value(chargeCode).notNull();
 
         final Long orderQuantity = fromApiJsonHelper.extractLongNamed("orderQuantity", element);
         baseDataValidator.reset().parameter("orderQuantity").value(orderQuantity).notNull().integerGreaterThanZero();
+        
         final BigDecimal unitPrice = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("unitPrice", element);
         baseDataValidator.reset().parameter("unitPrice").value(unitPrice).notNull();
+        
         final String purchaseBy = fromApiJsonHelper.extractStringNamed("purchaseBy", element);
         baseDataValidator.reset().parameter("purchaseBy").value(purchaseBy).notNull();
+        
         final BigDecimal chargeAmount = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("chargeAmount", element);
         baseDataValidator.reset().parameter("chargeAmount").value(chargeAmount).notNull();
         
         throwExceptionIfValidationWarningsExist(dataValidationErrors);
         
-    }
-
-    public void validateForUpdate(final String json) {
-        if (StringUtils.isBlank(json)) { throw new InvalidJsonException(); }
-
-        final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
-        fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, supportedParameters);
-
-        final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
-        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("code");
-
-        final JsonElement element = fromApiJsonHelper.parse(json);
-        if (fromApiJsonHelper.parameterExists("name", element)) {
-            final String name = fromApiJsonHelper.extractStringNamed("name", element);
-            baseDataValidator.reset().parameter("name").value(name).notBlank().notExceedingLengthOf(100);
-        }
-
-        throwExceptionIfValidationWarningsExist(dataValidationErrors);
     }
 
     private void throwExceptionIfValidationWarningsExist(final List<ApiParameterError> dataValidationErrors) {

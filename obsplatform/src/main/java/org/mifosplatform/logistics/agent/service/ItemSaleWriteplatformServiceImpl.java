@@ -21,6 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+/**
+ * @author hugo
+ *
+ */
 @Service
 public class ItemSaleWriteplatformServiceImpl implements ItemSaleWriteplatformService{
 
@@ -42,54 +46,49 @@ public class ItemSaleWriteplatformServiceImpl implements ItemSaleWriteplatformSe
 		
 	}
 	
-	
-	
+	/* (non-Javadoc)
+	 * @see #createNewItemSale(org.mifosplatform.infrastructure.core.api.JsonCommand)
+	 */
 	@Transactional
 	@Override
-	public CommandProcessingResult createNewItemSale(JsonCommand command) {
+	public CommandProcessingResult createNewItemSale(final JsonCommand command) {
 
         try{
         	
         	this.context.authenticatedUser();
         	this.apiJsonDeserializer.validateForCreate(command.json());
-        	ItemSale itemSale=ItemSale.fromJson(command);
+        	final ItemSale itemSale=ItemSale.fromJson(command);
         	if(itemSale.getPurchaseFrom().equals(itemSale.getPurchaseBy())){
         		
         		throw new PlatformDataIntegrityException("invalid.move.operation", "invalid.move.operation", "invalid.move.operation");
         	}
-            ItemMaster itemMaster=this.itemRepository.findOne(itemSale.getItemId());
-            TaxMap taxMap=this.taxMapRepository.findOneByChargeCode(itemSale.getChargeCode());
+            final ItemMaster itemMaster=this.itemRepository.findOne(itemSale.getItemId());
+            final TaxMap taxMap=this.taxMapRepository.findOneByChargeCode(itemSale.getChargeCode());
           	ItemSaleInvoice invoice=ItemSaleInvoice.fromJson(command);
             BigDecimal taxAmount=BigDecimal.ZERO;
-            BigDecimal taxrate=BigDecimal.ZERO;
-           // BigDecimal taxPercentage=BigDecimal.ZERO;
+            BigDecimal taxRate=BigDecimal.ZERO;
             if(taxMap != null){
-            	taxrate=taxMap.getRate();
-            	//taxPercentage=taxMap.get
+            	taxRate=taxMap.getRate();
+            	
             	if(taxMap.getTaxType().equalsIgnoreCase("percentage")){
-            		taxAmount=invoice.getChargeAmount().multiply(taxrate.divide(new BigDecimal(100)));
-            		
+            		taxAmount=invoice.getChargeAmount().multiply(taxRate.divide(new BigDecimal(100)));
 
             	}else{
-            		taxAmount=invoice.getChargeAmount().add(taxrate);
+            		taxAmount=invoice.getChargeAmount().add(taxRate);
             	}
             }
             if(itemMaster == null){
         	  throw new ItemNotFoundException(itemSale.getItemId().toString());
             }
-          
-      
-        	//this.calculateTaxAmount(invoice.getChargeAmount(),invoice.getTaxPercantage());
- 
         	invoice.updateAmounts(taxAmount);
-        	invoice.setTaxpercentage(taxrate);
+        	invoice.setTaxpercentage(taxRate);
         	itemSale.setItemSaleInvoice(invoice);
         	
         	this.itemSaleRepository.save(itemSale);
            return new CommandProcessingResult(itemSale.getId());        	
         }catch(DataIntegrityViolationException dve){
         	handleCodeDataIntegrityIssues(command, dve);
-        	return new CommandProcessingResult(new Long(-1));
+        	return new CommandProcessingResult(Long.valueOf(-1L));
         	
         }
 		
@@ -104,15 +103,5 @@ public class ItemSaleWriteplatformServiceImpl implements ItemSaleWriteplatformSe
 	                "Unknown data integrity issue with resource: " + realCause.getMessage());
 		
 	}
-
-	/*private BigDecimal calculateTaxAmount(BigDecimal chargeAmount,BigDecimal taxPercantage) {
-		
-		BigDecimal taxAmount=BigDecimal.ZERO;
-		taxAmount=chargeAmount.multiply(taxPercantage.divide(new BigDecimal(100)));
-		return taxAmount;
-		
-		
-		
-	}*/
 
 }

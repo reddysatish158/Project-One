@@ -31,9 +31,8 @@ public class OfficeAdjustmentsCommandFromApiJsonDeserializer {
 	/**
 	 * The parameters supported for this command.
 	 */
-	private final Set<String> supportedParameters = new HashSet<String>(
-			Arrays.asList("adjustment_date", "adjustment_code", "adjustment_type",
-				    "amount_paid","Remarks", "locale", "dateFormat"));
+	private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("adjustmentDate", "adjustmentCode", "adjustmentType",
+				    "amountPaid","remarks", "locale", "dateFormat"));
 	
 	private final FromJsonHelper fromApiJsonHelper;
 	
@@ -47,34 +46,33 @@ public class OfficeAdjustmentsCommandFromApiJsonDeserializer {
 			throw new InvalidJsonException();
 		}
 		
-		final Type typeOfMap = new TypeToken<Map<String, Object>>() {
-		}.getType();
-		fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json,
-				supportedParameters);
+		final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
+		fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json,supportedParameters);
 		
 		final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
 		final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(
 				dataValidationErrors).resource("officeadjustment");
 		
 		final JsonElement element = fromApiJsonHelper.parse(json);
-		final LocalDate adjustment_date = fromApiJsonHelper.extractLocalDateNamed("adjustment_date", element);
-		final String adjustment_code = fromApiJsonHelper.extractStringNamed("adjustment_code", element);
-		final BigDecimal amount_paid = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("amount_paid", element);
-		final String adjustment_type = fromApiJsonHelper.extractStringNamed("adjustment_type", element);
+		
+		final LocalDate adjustmentDate = fromApiJsonHelper.extractLocalDateNamed("adjustmentDate", element);
+		baseDataValidator.reset().parameter("adjustmentDate").value(adjustmentDate).notBlank();
+		
+		final String adjustmentCode = fromApiJsonHelper.extractStringNamed("adjustmentCode", element);
+		baseDataValidator.reset().parameter("adjustment_code").value(adjustmentCode).notBlank().notExceedingLengthOf(100);
 		
 		
-		baseDataValidator.reset().parameter("adjustment_date").value(adjustment_date)
-		.notBlank().notExceedingLengthOf(100);
-		baseDataValidator.reset().parameter("adjustment_code").value(adjustment_code)
-		.notBlank().notExceedingLengthOf(100);
-		baseDataValidator.reset().parameter("amount_paid").value(amount_paid)
-		.notBlank().notExceedingLengthOf(100);
-		baseDataValidator.reset().parameter("adjustment_type").value(adjustment_type)
-		.notBlank().notExceedingLengthOf(100);
+		final BigDecimal amountPaid = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("amountPaid", element);
+		baseDataValidator.reset().parameter("amountPaid").value(amountPaid).notBlank().notExceedingLengthOf(100);
+		
+		final String adjustmentType = fromApiJsonHelper.extractStringNamed("adjustmentType", element);
+		baseDataValidator.reset().parameter("adjustmentType").value(adjustmentType).notBlank().notExceedingLengthOf(100);
+		
 		throwExceptionIfValidationWarningsExist(dataValidationErrors);
+	
 	}
-	private void throwExceptionIfValidationWarningsExist(
-			final List<ApiParameterError> dataValidationErrors) {
+	
+	private void throwExceptionIfValidationWarningsExist(final List<ApiParameterError> dataValidationErrors) {
 		if (!dataValidationErrors.isEmpty()) {
 			throw new PlatformApiDataValidationException(
 					"validation.msg.validation.errors.exist",

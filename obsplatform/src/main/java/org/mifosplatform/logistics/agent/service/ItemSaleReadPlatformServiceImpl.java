@@ -17,6 +17,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+/**
+ * @author hugo
+ *
+ */
 @Service
 public class ItemSaleReadPlatformServiceImpl implements ItemSaleReadPlatformService{
 	
@@ -32,6 +36,9 @@ public ItemSaleReadPlatformServiceImpl(final PlatformSecurityContext context,fin
 	}
 
 
+/* (non-Javadoc)
+ * @see #retrieveAllData()
+ */
 @Transactional
 @Override
 public List<AgentItemSaleData> retrieveAllData() {
@@ -39,7 +46,7 @@ public List<AgentItemSaleData> retrieveAllData() {
 	 try{
 		 
 		 this.context.authenticatedUser();
-		 ItemSaleMapper mapper=new ItemSaleMapper();
+		 final  ItemSaleMapper mapper=new ItemSaleMapper();
 		 final String sql="select "+mapper.schema();
 		 return this.jdbcTemplate.query(sql,mapper,new Object[]{});
 		 
@@ -62,31 +69,34 @@ private static final class ItemSaleMapper implements RowMapper<AgentItemSaleData
 	}
 
 	@Override
-	public AgentItemSaleData mapRow(final ResultSet rs,
-			@SuppressWarnings("unused") final int rowNum)
-			throws SQLException {
+	public AgentItemSaleData mapRow(final ResultSet rs, final int rowNum)throws SQLException {
 
-		Long id = rs.getLong("id");
-		Long itemId=rs.getLong("itemId");
-		Long agentId=rs.getLong("agentId");
-		Long orderQunatity=rs.getLong("orderQunatity");
-		String itemName = rs.getString("itemName");
-		String agentName = rs.getString("agentName");
-		BigDecimal chargeAmount=rs.getBigDecimal("chargeAmount");
-	    BigDecimal tax=rs.getBigDecimal("tax");
-	    BigDecimal invoiceAmount=rs.getBigDecimal("invoiceAmount");
+		final Long id = rs.getLong("id");
+		final Long itemId=rs.getLong("itemId");
+		final Long agentId=rs.getLong("agentId");
+		final Long orderQunatity=rs.getLong("orderQunatity");
+		final String itemName = rs.getString("itemName");
+		final String agentName = rs.getString("agentName");
+		final BigDecimal chargeAmount=rs.getBigDecimal("chargeAmount");
+	    final BigDecimal tax=rs.getBigDecimal("tax");
+	    final BigDecimal invoiceAmount=rs.getBigDecimal("invoiceAmount");
+	    
 		return new AgentItemSaleData(id,itemId,agentId,itemName,agentName,orderQunatity,chargeAmount,tax,invoiceAmount,null,null,null);
 
 	}
 }
 
+/* (non-Javadoc)
+ * @see #retrieveSingleItemSaleData(java.lang.Long)
+ */
 @Override
 public AgentItemSaleData retrieveSingleItemSaleData(Long id) {
  try{
 		 
 		 this.context.authenticatedUser();
-		 ItemSaleMapper mapper=new ItemSaleMapper();
+		 final ItemSaleMapper mapper=new ItemSaleMapper();
 		 final String sql="select "+mapper.schema()+" AND it.id=? ";
+		 
 		 return this.jdbcTemplate.queryForObject(sql,mapper,new Object[]{id});
 		 
 	 }catch(EmptyResultDataAccessException exception){
@@ -95,18 +105,26 @@ public AgentItemSaleData retrieveSingleItemSaleData(Long id) {
 
 }
 
+/* (non-Javadoc)
+ * @see #retriveItemsaleIds()
+ */
 public List<MRNDetailsData> retriveItemsaleIds() {
+	
 	final String sql = "select id as itemsaleId,(select item_description from b_item_master where id=item_id) as itemDescription,item_id as itemMasterId  from b_itemsale where order_quantity>0 order by purchase_date desc";//"select id as mrnId,(select item_description from b_item_master where id=item_master_id) as itemDescription, item_master_id as itemMasterId from b_mrn order by requested_date desc";
-	ItemSaleDetailsMrnIDsMapper rowMapper = new ItemSaleDetailsMrnIDsMapper();
+	final ItemSaleDetailsMrnIDsMapper rowMapper = new ItemSaleDetailsMrnIDsMapper();
+	
 	return jdbcTemplate.query(sql,rowMapper);
 }
 
-private final class ItemSaleDetailsMrnIDsMapper implements RowMapper<MRNDetailsData>{
+private static final class ItemSaleDetailsMrnIDsMapper implements RowMapper<MRNDetailsData>{
+	
 	@Override
 	public MRNDetailsData mapRow(ResultSet rs, int rowNum) throws SQLException {
+		
 		final String itemsaleId = rs.getString("itemsaleId");
 		final Long itemMasterId = rs.getLong("itemMasterId");
 		final String itemDescription = rs.getString("itemDescription");
+		
 		return new MRNDetailsData(null,itemDescription,itemMasterId,itemsaleId);
 	}
 }

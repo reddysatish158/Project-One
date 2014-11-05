@@ -72,6 +72,11 @@ public class ItemSaleAPiResource {
 	
 	}
 	
+/**
+ * @param uriInfo
+ * @return
+ * get dropdown template data
+ */
 @GET
 @Path("template")
 @Consumes({ MediaType.APPLICATION_JSON })
@@ -80,27 +85,31 @@ public String retrieveTemplateData(@Context final UriInfo uriInfo){
 	
 	this.context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
 	AgentItemSaleData  itemSaleData=null;
-	itemSaleData=handleAgenttemplateData(itemSaleData);
+    itemSaleData=handleAgentTemplateData(itemSaleData);
 	final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 	return this.toApiJsonSerializer.serialize(settings, itemSaleData, RESPONSE_AGENT_DATA_PARAMETERS);
 	
 }
 
+/**
+ * @param apiRequestBodyAsJson
+ * @return
+ */
 @POST
 @Consumes({ MediaType.APPLICATION_JSON })
 @Produces({ MediaType.APPLICATION_JSON })
-public String createOffice(final String apiRequestBodyAsJson) {
+public String createNewItemSale(final String apiRequestBodyAsJson) {
 
     final CommandWrapper commandRequest = new CommandWrapperBuilder().createItemSale().withJson(apiRequestBodyAsJson).build();
     final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
     return this.toApiJsonSerializer.serialize(result);
 }
 
-private AgentItemSaleData handleAgenttemplateData(AgentItemSaleData  itemSaleData) {
+private AgentItemSaleData handleAgentTemplateData(AgentItemSaleData  itemSaleData) {
 	
-	Collection<OfficeData> officeDatas=this.officeReadPlatformService.retrieveAllOffices();
-	List<ItemData> itemDatas=this.itemReadPlatformService.retrieveAllItems();
-	List<ChargesData> chargesDatas=this.itemReadPlatformService.retrieveChargeCode();
+	final Collection<OfficeData> officeDatas=this.officeReadPlatformService.retrieveAllOffices();
+	final List<ItemData> itemDatas=this.itemReadPlatformService.retrieveAllItems();
+	final List<ChargesData> chargesDatas=this.itemReadPlatformService.retrieveChargeCode();
 	if(itemSaleData == null){
 	return  AgentItemSaleData.withTemplateData(officeDatas,itemDatas,chargesDatas);
 	}else{
@@ -109,16 +118,27 @@ private AgentItemSaleData handleAgenttemplateData(AgentItemSaleData  itemSaleDat
 	}
 }
 
+/**
+ * @param uriInfo
+ * @return get list of itemsales 
+ */
 @GET
 @Consumes({ MediaType.APPLICATION_JSON })
 @Produces({ MediaType.APPLICATION_JSON })
 public String retrieveAllSaleData(@Context final UriInfo uriInfo){
 	
 	this.context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-	List<AgentItemSaleData> agentDatas=this.agentReadPlatformService.retrieveAllData();
+	final List<AgentItemSaleData> agentDatas=this.agentReadPlatformService.retrieveAllData();
 	final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 	return this.toApiJsonSerializer.serialize(settings, agentDatas, RESPONSE_AGENT_DATA_PARAMETERS);
 }
+
+/**
+ * @param id
+ * @param uriInfo
+ * @return
+ * single ItemSaleData
+ */
 @GET
 @Path("{id}")
 @Consumes({ MediaType.APPLICATION_JSON })
@@ -129,7 +149,7 @@ public String retrieveSingleItemSaleData(@PathParam("id") final Long id,@Context
 	AgentItemSaleData itemSaleData=this.agentReadPlatformService.retrieveSingleItemSaleData(id);
 	final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 	if(settings.isTemplate()){
-		itemSaleData=handleAgenttemplateData(itemSaleData);	
+		itemSaleData=handleAgentTemplateData(itemSaleData);	
 		
 	}
 	return this.toApiJsonSerializer.serialize(settings, itemSaleData, RESPONSE_AGENT_DATA_PARAMETERS);

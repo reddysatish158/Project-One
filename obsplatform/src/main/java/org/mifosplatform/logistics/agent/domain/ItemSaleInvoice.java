@@ -14,11 +14,16 @@ import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
 import org.mifosplatform.useradministration.domain.AppUser;
 
 
+/**
+ * @author hugo
+ *
+ */
 @Entity
 @Table(name="m_invoice")
 public class ItemSaleInvoice extends AbstractAuditableCustom<AppUser,Long>{
 	
-	
+	private static final long serialVersionUID = 1L;
+
 	@OneToOne
 	@JoinColumn(name="sale_id")
 	private ItemSale itemsale;
@@ -51,18 +56,14 @@ public class ItemSaleInvoice extends AbstractAuditableCustom<AppUser,Long>{
 		// TODO Auto-generated constructor stub
 	}
 
-	public static ItemSaleInvoice fromJson(JsonCommand command) {
+	public static ItemSaleInvoice fromJson(final JsonCommand command) {
 		
 		final BigDecimal chargeAmount=command.bigDecimalValueOfParameterNamed("chargeAmount");
 		final BigDecimal taxPercantage=command.bigDecimalValueOfParameterNamed("taxPercantage");
 		
 		return new ItemSaleInvoice(new Date(),chargeAmount,taxPercantage);
 		
-
-
 	}
-
-
 
 	public ItemSale getSale() {
 		return itemsale;

@@ -31,9 +31,8 @@ public class OfficePaymentsCommandFromApiJsonDeserializer {
 	/**
 	 * The parameters supported for this command.
 	 */
-	private final Set<String> supportedParameters = new HashSet<String>(
-			Arrays.asList("paymentDate", "paymentCode","amountPaid","dateFormat",
-					"locale", "remarks", "receiptNo", "chequeNo", "chequeDate", "bankName", "branchName"));
+	private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("paymentDate", "paymentCode","amountPaid","dateFormat",
+					"locale", "remarks", "receiptNo", "chequeNo", "chequeDate", "bankName", "branchName","isChequeSelected"));
 	
 	private final FromJsonHelper fromApiJsonHelper;
 
@@ -42,6 +41,10 @@ public class OfficePaymentsCommandFromApiJsonDeserializer {
 		this.fromApiJsonHelper = fromApiJsonHelper;
 	}
 
+	/**
+	 * @param json
+	 * check validation for create office payment
+	 */
 	public void validateForCreate(final String json) {
 
 		if (StringUtils.isBlank(json)) {
@@ -53,8 +56,7 @@ public class OfficePaymentsCommandFromApiJsonDeserializer {
 		fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, supportedParameters);
 
 		final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
-		final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(
-				dataValidationErrors).resource("officepayment");
+		final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("officepayment");
 
 		final JsonElement element = fromApiJsonHelper.parse(json);
 		
@@ -70,9 +72,9 @@ public class OfficePaymentsCommandFromApiJsonDeserializer {
 		.notBlank().notExceedingLengthOf(100);
 		
 		if(fromApiJsonHelper.parameterExists("isChequeSelected", element)){
-			final String isChequeSelected = fromApiJsonHelper.extractStringNamed("isChequeSelected", element);
+			final boolean isChequeSelected = fromApiJsonHelper.extractBooleanNamed("isChequeSelected", element);
 			
-			if("yes".equalsIgnoreCase(isChequeSelected)){
+			if(isChequeSelected){
 				
 				if(fromApiJsonHelper.parameterExists("chequeNo", element)){
 					final String chequeNo = fromApiJsonHelper.extractStringNamed("chequeNo", element);

@@ -246,6 +246,7 @@ public class PromotionCodeMaster extends AbstractPersistable<Long> {
 
 		if (this.isDeleted == 'N') {
 			this.isDeleted = 'Y';
+			this.promotionCode = this.promotionCode+"_"+this.getId();                                                                                                                     
 		}
 
 	}

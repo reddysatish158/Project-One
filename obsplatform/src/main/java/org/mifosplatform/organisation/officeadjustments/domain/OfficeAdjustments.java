@@ -12,6 +12,10 @@ import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
 import org.mifosplatform.useradministration.domain.AppUser;
 
+	/**
+	 * @author hugo
+	 *
+	 */
 	@Entity
 	@Table(name = "m_adjustments")
 	public class OfficeAdjustments extends AbstractAuditableCustom<AppUser, Long> {
@@ -48,11 +52,12 @@ import org.mifosplatform.useradministration.domain.AppUser;
 		
 		public static OfficeAdjustments fromJson(final JsonCommand command) {
 			
-			    final LocalDate adjustmentDate = command.localDateValueOfParameterNamed("adjustment_date");
-		        final Long adjustmentCode = command.longValueOfParameterNamed("adjustment_code");
-		        final String adjustmentType = command.stringValueOfParameterNamed("adjustment_type");
-		        final BigDecimal amountPaid = command.bigDecimalValueOfParameterNamed("amount_paid");
-		        final String remarks = command.stringValueOfParameterNamed("Remarks");
+			    final LocalDate adjustmentDate = command.localDateValueOfParameterNamed("adjustmentDate");
+		        final Long adjustmentCode = command.longValueOfParameterNamed("adjustmentCode");
+		        final String adjustmentType = command.stringValueOfParameterNamed("adjustmentType");
+		        final BigDecimal amountPaid = command.bigDecimalValueOfParameterNamed("amountPaid");
+		        final String remarks = command.stringValueOfParameterNamed("remarks");
+		        
 				return new OfficeAdjustments(command.entityId(), adjustmentDate, adjustmentCode, adjustmentType, amountPaid, remarks);
 		}
 		
@@ -68,13 +73,6 @@ import org.mifosplatform.useradministration.domain.AppUser;
 			
 		}
 		
-		public static OfficeAdjustments fromJson(final Long officeId, final LocalDate adjustmentDate, final Long adjustmentCode , final String adjustmentType,
-				final BigDecimal amountPaid, final String remarks){
-			
-			return new OfficeAdjustments(officeId, adjustmentDate , adjustmentCode,
-					adjustmentType, amountPaid, remarks);
-		}
-
 		public Long getOfficeId() {
 			return officeId;
 		}

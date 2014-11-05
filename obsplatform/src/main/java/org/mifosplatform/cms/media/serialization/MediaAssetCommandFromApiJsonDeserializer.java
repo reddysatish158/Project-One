@@ -119,15 +119,15 @@ public final class MediaAssetCommandFromApiJsonDeserializer {
 			
 			     final JsonElement attributeElement = fromApiJsonHelper.parse(mediaassetAttribute);
 			     final String mediaAttributeType = fromApiJsonHelper.extractStringNamed("attributeType", attributeElement);
-			     baseDataValidator.reset().parameter("attributeType").value(mediaAttributeType).notBlank();
+			     baseDataValidator.reset().parameter("attributeType").value(mediaAttributeType).notBlank().notExceedingLengthOf(60);
 			     final String attributeName = fromApiJsonHelper.extractStringNamed("attributeName", attributeElement);
-			     baseDataValidator.reset().parameter("attributeName").value(attributeName).notBlank();
+			     baseDataValidator.reset().parameter("attributeName").value(attributeName).notBlank().notExceedingLengthOf(60);
 			     final String attributevalue = fromApiJsonHelper.extractStringNamed("attributevalue", attributeElement);
-			     baseDataValidator.reset().parameter("attributevalue").value(attributevalue).notBlank();
+			     baseDataValidator.reset().parameter("attributevalue").value(attributevalue).notBlank().notExceedingLengthOf(60);
 			     final String attributeNickname = fromApiJsonHelper.extractStringNamed("attributeNickname", attributeElement);
-			     baseDataValidator.reset().parameter("attributeNickname").value(attributeNickname).notBlank();
+			     baseDataValidator.reset().parameter("attributeNickname").value(attributeNickname).notBlank().notExceedingLengthOf(60);
 			     final String attributeImage = fromApiJsonHelper.extractStringNamed("attributeImage", attributeElement);
-			     baseDataValidator.reset().parameter("attributeImage").value(attributeImage).notBlank();
+			     baseDataValidator.reset().parameter("attributeImage").value(attributeImage).notBlank().notExceedingLengthOf(150);
      
 		  }
         
@@ -150,11 +150,11 @@ public final class MediaAssetCommandFromApiJsonDeserializer {
 			 
 			     final JsonElement attributeElement = fromApiJsonHelper.parse(mediaAssetLocation);
 			     final Integer languageId = fromApiJsonHelper.extractIntegerSansLocaleNamed("languageId", attributeElement);
-			     baseDataValidator.reset().parameter("languageId").value(languageId).notBlank().integerGreaterThanZero();
+			     baseDataValidator.reset().parameter("languageId").value(languageId).notBlank().integerGreaterThanZero().notExceedingLengthOf(20);
 			     final String formatType = fromApiJsonHelper.extractStringNamed("formatType", attributeElement);
-			     baseDataValidator.reset().parameter("formatType").value(formatType).notBlank();
+			     baseDataValidator.reset().parameter("formatType").value(formatType).notBlank().notExceedingLengthOf(10);
 			     final String location = fromApiJsonHelper.extractStringNamed("location", attributeElement);
-			     baseDataValidator.reset().parameter("location").value(location).notBlank();
+			     baseDataValidator.reset().parameter("location").value(location).notBlank().notExceedingLengthOf(255);
 		  }
      
         }else{
@@ -209,15 +209,15 @@ public final class MediaAssetCommandFromApiJsonDeserializer {
 			
 			     final JsonElement attributeElement = fromApiJsonHelper.parse(mediaassetAttribute);
 			     final String mediaAttributeType = fromApiJsonHelper.extractStringNamed("attributeType", attributeElement);
-			     baseDataValidator.reset().parameter("attributeType").value(mediaAttributeType).notBlank();
+			     baseDataValidator.reset().parameter("attributeType").value(mediaAttributeType).notBlank().notExceedingLengthOf(60);
 			     final String attributeName = fromApiJsonHelper.extractStringNamed("attributeName", attributeElement);
-			     baseDataValidator.reset().parameter("attributeName").value(attributeName).notBlank();
+			     baseDataValidator.reset().parameter("attributeName").value(attributeName).notBlank().notExceedingLengthOf(60);
 			     final String attributevalue = fromApiJsonHelper.extractStringNamed("attributevalue", attributeElement);
-			     baseDataValidator.reset().parameter("attributevalue").value(attributevalue).notBlank();
+			     baseDataValidator.reset().parameter("attributevalue").value(attributevalue).notBlank().notExceedingLengthOf(60);
 			     final String attributeNickname = fromApiJsonHelper.extractStringNamed("attributeNickname", attributeElement);
-			     baseDataValidator.reset().parameter("attributeNickname").value(attributeNickname).notBlank();
+			     baseDataValidator.reset().parameter("attributeNickname").value(attributeNickname).notBlank().notExceedingLengthOf(60);
 			     final String attributeImage = fromApiJsonHelper.extractStringNamed("attributeImage", attributeElement);
-			     baseDataValidator.reset().parameter("attributeImage").value(attributeImage).notBlank();
+			     baseDataValidator.reset().parameter("attributeImage").value(attributeImage).notBlank().notExceedingLengthOf(150);
      
         	}
         }
@@ -235,11 +235,11 @@ public final class MediaAssetCommandFromApiJsonDeserializer {
 			 
 			     final JsonElement attributeElement = fromApiJsonHelper.parse(mediaAssetLocation);
 			     final Integer languageId = fromApiJsonHelper.extractIntegerSansLocaleNamed("languageId", attributeElement);
-			     baseDataValidator.reset().parameter("languageId").value(languageId).notBlank().integerGreaterThanZero();
+			     baseDataValidator.reset().parameter("languageId").value(languageId).notBlank().integerGreaterThanZero().notExceedingLengthOf(20);
 			     final String formatType = fromApiJsonHelper.extractStringNamed("formatType", attributeElement);
-			     baseDataValidator.reset().parameter("formatType").value(formatType).notBlank();
+			     baseDataValidator.reset().parameter("formatType").value(formatType).notBlank().notExceedingLengthOf(10);
 			     final String location = fromApiJsonHelper.extractStringNamed("location", attributeElement);
-			     baseDataValidator.reset().parameter("location").value(location).notBlank();
+			     baseDataValidator.reset().parameter("location").value(location).notBlank().notExceedingLengthOf(255);
         	}
         }
         throwExceptionIfValidationWarningsExist(dataValidationErrors);
