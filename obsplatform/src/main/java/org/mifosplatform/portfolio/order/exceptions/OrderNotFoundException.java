@@ -4,7 +4,12 @@ import org.mifosplatform.infrastructure.core.exception.AbstractPlatformDomainRul
 
 public class OrderNotFoundException extends AbstractPlatformDomainRuleException {
 
-	public OrderNotFoundException(Long orderId) {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public OrderNotFoundException(final Long orderId) {
 		super("error.msg.Order.not.found.with.this.identifier","Order not found with this identifier",orderId);
 		
 	}

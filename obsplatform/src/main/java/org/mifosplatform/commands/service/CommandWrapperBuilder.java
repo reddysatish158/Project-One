@@ -1362,11 +1362,11 @@ public CommandWrapperBuilder createMediaAsset() {
 	return this;
 }
 
-public CommandWrapperBuilder cancelOrder(Long orderId) {
-	this.actionName="UPDATE";
-	this.entityName="ORDER";
-	this.entityId=orderId;
-	this.href="order/template";
+public CommandWrapperBuilder updateOrder(Long orderId) {
+	this.actionName = "UPDATE";
+	this.entityName = "ORDER";
+	this.entityId = orderId;
+	this.href = "order/template";
 	return this;
 }
 
@@ -1725,8 +1725,8 @@ public CommandWrapperBuilder updateProspect(Long id) {
 	return this;
 }
 
-public CommandWrapperBuilder retrackOsdmessage(Long orderId) {
-	// TODO Auto-generated method stub
+public CommandWrapperBuilder retrackOsdmessage(final Long orderId) {
+	
 	this.actionName="RETRACKOSDMESSAGE";
 	this.entityName="ORDER";
 	this.entityId=orderId;
@@ -2118,7 +2118,7 @@ public CommandWrapperBuilder createSmtpConfiguration() {
 	return this;
 }
 
-public CommandWrapperBuilder PaypalPayment(Long clientId) {
+public CommandWrapperBuilder paypalEnquireyPayment(final Long clientId) {
 	this.actionName = "CREATEENQUIREY";
 	this.entityName = "PAYMENT";
 	this.entityId = clientId;
@@ -2411,7 +2411,7 @@ public CommandWrapperBuilder updateIpAddressStatus() {
 	return this;
 	}
 
-public CommandWrapperBuilder suspendOrder(Long orderId) {
+public CommandWrapperBuilder orderSuspend(Long orderId) {
 	
 	this.actionName = "SUSPEND";
 	this.entityName = "ORDER";
@@ -2448,11 +2448,11 @@ public CommandWrapperBuilder updateIpDetails(Long orderId) {
 	return this;
 }
 
-public CommandWrapperBuilder reactiveOrder(Long orderId) {
+public CommandWrapperBuilder orderReactive(Long orderId) {
 	this.actionName = "REACTIVE";
 	this.entityName = "ORDER";
-	this.entityId=orderId;
-	this.href = "reactive/"+orderId;
+	this.entityId = orderId;
+	this.href = "reactive/"+ orderId;
 	return this;
 }
 

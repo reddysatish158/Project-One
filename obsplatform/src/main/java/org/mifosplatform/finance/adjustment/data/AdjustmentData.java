@@ -2,59 +2,47 @@ package org.mifosplatform.finance.adjustment.data;
 
 import java.math.BigDecimal;
 
-import org.aspectj.weaver.patterns.ThisOrTargetAnnotationPointcut;
 import org.joda.time.LocalDate;
-import org.mifosplatform.infrastructure.codes.data.CodeData;
 
 public class AdjustmentData {
 	
 	
 
 
-	@SuppressWarnings("unused")
-	Long id;
-	@SuppressWarnings("unused")
-	Long client_id;
-	@SuppressWarnings("unused")
-	LocalDate adjustment_date;
-	@SuppressWarnings("unused")
-	String adjustment_code;
-	@SuppressWarnings("unused")
-	String adjustment_type;
-	@SuppressWarnings("unused")
-	BigDecimal amount_paid;
-	@SuppressWarnings("unused")
-	Long bill_id;
-	@SuppressWarnings("unused")
-	Long external_id;
-	@SuppressWarnings("unused")
-	String Remarks;
+	private Long id;
+	private Long clientId;
+	private LocalDate adjustmentDate;
+	private String adjustmentCode;
+	private String adjustmentType;
+	private BigDecimal amountPaid;
+	private Long billId;
+	private Long externalId;
+	private String remarks;
 	
-	public AdjustmentData(Long id, Long client_id,
-			LocalDate adjustment_date, String adjustment_code,
-			BigDecimal amount_paid, Long bill_id, Long external_id,String Remarks) {
+	public AdjustmentData(final Long id, final Long clientId,	final LocalDate adjustmentDate, final String adjustmentCode,
+			final BigDecimal amountPaid, final Long billId, final Long externalId, final String remarks) {
 		this.id = id;
-		this.client_id = client_id;
-		this.adjustment_date = adjustment_date;
-		this.adjustment_code = adjustment_code;
-		this.amount_paid = amount_paid;
-		this.bill_id = bill_id;
-		this.external_id = external_id;
-		this.Remarks = Remarks;
+		this.setClientId(clientId);
+		this.setAdjustmentDate(adjustmentDate);
+		this.adjustmentCode = adjustmentCode;
+		this.setAmountPaid(amountPaid);
+		this.setBillId(billId);
+		this.setExternalId(externalId);
+		this.setRemarks(remarks);
 	}
 
-	public AdjustmentData(Long id, String adjustment_code) {
+	public AdjustmentData(final Long id, final String adjustmentCode) {
 
 		this.id=id;
-		this.adjustment_code=adjustment_code;
+		this.adjustmentCode=adjustmentCode;
 		
 	}
 	
 	
-	public static AdjustmentData instance(Long id,Long client_id,LocalDate adjustment_date,String adjustment_code,
-			BigDecimal amount_paid,Long bill_id,Long external_id,String Remarks){
+	public static AdjustmentData instance(final Long id, final Long clientId, final LocalDate adjustmentDate, final String adjustmentCode,
+			final BigDecimal amountPaid, final Long billId, final Long externalId, final String remarks){
 		
-		return new AdjustmentData(id,client_id,adjustment_date,adjustment_code,amount_paid,bill_id,external_id,Remarks);
+		return new AdjustmentData(id,clientId,adjustmentDate,adjustmentCode,amountPaid,billId,externalId,remarks);
 		
 	}
 	
@@ -62,16 +50,72 @@ public class AdjustmentData {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(final Long id) {
 		this.id = id;
 	}
 
-	public String getAdjustment_code() {
-		return adjustment_code;
+	public String getAdjustmentCode() {
+		return adjustmentCode;
 	}
 
-	public void setAdjustment_code(String adjustment_code) {
-		this.adjustment_code = adjustment_code;
+	public void setAdjustmentCode(final String adjustmentCode) {
+		this.adjustmentCode = adjustmentCode;
+	}
+
+	public LocalDate getAdjustmentDate() {
+		return adjustmentDate;
+	}
+
+	public void setAdjustmentDate(final LocalDate adjustmentDate) {
+		this.adjustmentDate = adjustmentDate;
+	}
+
+	public Long getClientId() {
+		return clientId;
+	}
+
+	public void setClientId(final Long clientId) {
+		this.clientId = clientId;
+	}
+
+	public String getAdjustmentType() {
+		return adjustmentType;
+	}
+
+	public void setAdjustmentType(final String adjustmentType) {
+		this.adjustmentType = adjustmentType;
+	}
+
+	public BigDecimal getAmountPaid() {
+		return amountPaid;
+	}
+
+	public void setAmountPaid(final BigDecimal amountPaid) {
+		this.amountPaid = amountPaid;
+	}
+
+	public Long getBillId() {
+		return billId;
+	}
+
+	public void setBillId(final Long billId) {
+		this.billId = billId;
+	}
+
+	public Long getExternalId() {
+		return externalId;
+	}
+
+	public void setExternalId(final Long externalId) {
+		this.externalId = externalId;
+	}
+
+	public String getRemarks() {
+		return remarks;
+	}
+
+	public void setRemarks(final String remarks) {
+		this.remarks = remarks;
 	}
 	
 	

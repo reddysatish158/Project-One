@@ -70,7 +70,7 @@ public class PaypalEnquirey extends AbstractAuditableCustom<AppUser, Long> {
 		
 	}
 
-	public PaypalEnquirey(Long clientId, String state, String paymentid, Date date) {
+	public PaypalEnquirey(final Long clientId, final String state, final String paymentid, final Date date) {
 		
 		this.clientId=clientId;
 		this.paymentId=paymentid;
@@ -78,8 +78,8 @@ public class PaypalEnquirey extends AbstractAuditableCustom<AppUser, Long> {
 		this.paymentDate=date;
 	}
 
-	public void fromPaypalEnquireyTransaction(String emailId, String payerId,BigDecimal totalAmount, 
-			String currency, String description,String paymentState, String paymentMethod) {
+	public void fromPaypalEnquireyTransaction(final String emailId, final String payerId,final BigDecimal totalAmount, 
+			final String currency, final String description,final String paymentState, final String paymentMethod) {
 		
 		this.payerEmailId=emailId;
 		this.payerId=payerId;
@@ -91,8 +91,8 @@ public class PaypalEnquirey extends AbstractAuditableCustom<AppUser, Long> {
 			
 	}
 	
-	public void fromPaypalEnquireyTransaction(String cardNumber,String cardType, String cardExpiryDate, BigDecimal totalAmount,
-			String currency, String description, String paymentState,String paymentMethod) {
+	public void fromPaypalEnquireyTransaction(final String cardNumber,final String cardType, final String cardExpiryDate, final BigDecimal totalAmount,
+			final String currency, final String description, final String paymentState,final String paymentMethod) {
 		
 		this.cardNumber=cardNumber;
 		this.cardType=cardType;
@@ -110,7 +110,7 @@ public class PaypalEnquirey extends AbstractAuditableCustom<AppUser, Long> {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(final String status) {
 		this.status = status;
 	}
 
@@ -118,7 +118,7 @@ public class PaypalEnquirey extends AbstractAuditableCustom<AppUser, Long> {
 		return obsPaymentId;
 	}
 
-	public void setObsPaymentId(Long obsPaymentId) {
+	public void setObsPaymentId(final Long obsPaymentId) {
 		this.obsPaymentId = obsPaymentId;
 	}
 
@@ -126,7 +126,7 @@ public class PaypalEnquirey extends AbstractAuditableCustom<AppUser, Long> {
 		return description;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(final String description) {
 		this.description = description;
 	}
 

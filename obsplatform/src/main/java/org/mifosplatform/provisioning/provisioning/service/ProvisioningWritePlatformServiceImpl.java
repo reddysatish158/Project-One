@@ -415,8 +415,8 @@ public class ProvisioningWritePlatformServiceImpl implements
 
 	@Transactional
 	@Override
-	public void postOrderDetailsForProvisioning(Order order, String planName, String requestType, 
-			Long prepareId, String groupname, String serialNo, Long orderId) {
+	public void postOrderDetailsForProvisioning(final Order order, final String planName, final String requestType, 
+			final Long prepareId, final String groupname, final String serialNo, final Long orderId) {
 		
 		try {
 			this.context.authenticatedUser();

@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.Collection;
 
 import org.joda.time.LocalDate;
-import org.mifosplatform.billing.paymode.data.McodeData;
 
 public class PaymentData {
 	
@@ -18,14 +17,14 @@ public class PaymentData {
 	private String receiptNo;
 	private Long id;
 	private BigDecimal availAmount;
-	public PaymentData(Collection<McodeData> data){
+	public PaymentData(final Collection<McodeData> data){
 		this.data= data;
 		this.paymentDate=new LocalDate();
 		
 	}
 	
 	
-	public PaymentData(String clientName, String payMode,LocalDate paymentDate, BigDecimal amountPaid, Boolean isDeleted, Long billNumber, String receiptNumber) {
+	public PaymentData(final String clientName, final String payMode,final LocalDate paymentDate, final BigDecimal amountPaid, final Boolean isDeleted, final Long billNumber, final String receiptNumber) {
 		  this.clientName = clientName;
 		  this.payMode = payMode;
 		  this.paymentDate = paymentDate;
@@ -36,7 +35,7 @@ public class PaymentData {
 		 }
 
 
-	public PaymentData(Long id, LocalDate paymentdate, BigDecimal amount,String recieptNo, BigDecimal availAmount) {
+	public PaymentData(final Long id, final LocalDate paymentdate, final BigDecimal amount,final String recieptNo, final BigDecimal availAmount) {
 	
 		this.id=id;
 		this.paymentDate=paymentdate;

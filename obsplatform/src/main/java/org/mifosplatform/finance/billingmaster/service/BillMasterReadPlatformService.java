@@ -11,7 +11,7 @@ import org.mifosplatform.infrastructure.core.service.Page;
 public interface BillMasterReadPlatformService {
 
 	List<FinancialTransactionsData> retrieveFinancialData(Long clientId);
-	Page<FinancialTransactionsData> retrieveInvoiceFinancialData(SearchSqlQuery searchFinancialTransaction,Long clientId);
+	Page<FinancialTransactionsData> retrieveInvoiceFinancialData(SearchSqlQuery searchFinancialTransaction, Long clientId);
 	BillDetailsData retrievebillDetails(Long clientId);
 	List<FinancialTransactionsData> getFinancialTransactionData(Long id);
 	List<FinancialTransactionsData> retrieveStatments(Long clientId);
@@ -19,6 +19,6 @@ public interface BillMasterReadPlatformService {
 	List<FinancialTransactionsData> retrieveSingleInvoiceData(Long invoiceId);
 	List<BillDetailsData> retrievegetStatementDetails(Long billId);
 	Page<FinancialTransactionsData> retrieveSampleData(
-			SearchSqlQuery searchFinancialTransaction, Long clientId,String type);
-	List<FinancialTransactionsData> retriveDataForDownload(Long clientId,String fromDate,String toDate);
+			SearchSqlQuery searchFinancialTransaction, Long clientId, String type);
+	List<FinancialTransactionsData> retriveDataForDownload(Long clientId, String fromDate, String toDate);
 }

@@ -19,7 +19,7 @@ public class BillingOrderNoRecordsFoundException extends AbstractPlatformDomainR
 		 
 	}
 	
-	public BillingOrderNoRecordsFoundException(String msg,Long billId) {
+	public BillingOrderNoRecordsFoundException(final String msg, final Long billId) {
 		 super("error.msg.no.generate.pdf.file.for.this.statement", "No Generate Pdf File For This Statement ", billId);
 		 
 	}

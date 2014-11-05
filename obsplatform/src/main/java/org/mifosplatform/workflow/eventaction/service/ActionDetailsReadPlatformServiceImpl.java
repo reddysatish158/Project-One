@@ -59,7 +59,7 @@ public class ActionDetailsReadPlatformServiceImpl implements ActionDetailsReadPl
 		}
 
 		@Override
-		public ActionDetaislData mapRow(final ResultSet rs,@SuppressWarnings("unused") final int rowNum)
+		public ActionDetaislData mapRow(final ResultSet rs,final int rowNum)
 				throws SQLException {
 				Long id = rs.getLong("actionId");
 				String procedureName = rs.getString("processName");

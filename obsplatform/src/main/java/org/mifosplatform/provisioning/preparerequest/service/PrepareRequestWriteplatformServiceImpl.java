@@ -26,17 +26,17 @@ public class PrepareRequestWriteplatformServiceImpl implements PrepareRequestWri
 	}
 
 	@Override
-	public CommandProcessingResult prepareNewRequest(Order order,Plan plan,String requestType) {
+	public CommandProcessingResult prepareNewRequest(final Order order, final Plan plan, final String requestType) {
   
 		try{
 		//	this.context.authenticatedUser();
 			//String requstStatus= SavingStatusEnumaration.interestCompoundingPeriodType(StatusTypeEnum.CONNECT).getValue();
 		
-			PrepareRequest prepareRequest=new PrepareRequest(order.getClientId(),order.getId(),requestType,plan.getProvisionSystem(),'N',"NONE",plan.getPlanCode());
+			PrepareRequest prepareRequest=new PrepareRequest(order.getClientId(), order.getId(), requestType, plan.getProvisionSystem(), 'N', "NONE", plan.getPlanCode());
 			
 			this.prepareRequsetRepository.save(prepareRequest);
 			
-			return CommandProcessingResult.resourceResult(prepareRequest.getId(),order.getId());
+			return CommandProcessingResult.resourceResult(prepareRequest.getId(), order.getId());
           			
 		} catch (DataIntegrityViolationException dve) {
 			return CommandProcessingResult.empty();

@@ -28,6 +28,6 @@ public class CreateBillMasterCommandHandler implements NewCommandSourceHandler {
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
 
-        return this.writePlatformService.createBillMaster(command,command.entityId());
+        return this.writePlatformService.createBillMaster(command, command.entityId());
     }
 }

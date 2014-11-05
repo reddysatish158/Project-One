@@ -19,7 +19,6 @@ import org.json.JSONObject;
 import org.mifosplatform.billing.loginhistory.domain.LoginHistory;
 import org.mifosplatform.billing.loginhistory.domain.LoginHistoryRepository;
 import org.mifosplatform.billing.loginhistory.service.LoginHistoryReadPlatformService;
-import org.mifosplatform.billing.paymode.service.PaymodeReadPlatformService;
 import org.mifosplatform.billing.selfcare.data.SelfCareData;
 import org.mifosplatform.billing.selfcare.domain.SelfCare;
 import org.mifosplatform.billing.selfcare.exception.SelfCareIdNotFoundException;
@@ -36,8 +35,9 @@ import org.mifosplatform.finance.clientbalance.data.ClientBalanceData;
 import org.mifosplatform.finance.clientbalance.service.ClientBalanceReadPlatformService;
 import org.mifosplatform.finance.financialtransaction.data.FinancialTransactionsData;
 import org.mifosplatform.finance.payments.data.PaymentData;
-import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
+import org.mifosplatform.finance.payments.service.PaymentReadPlatformService;
 import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
@@ -72,7 +72,7 @@ public class SelfCareApiResource {
 	private final ClientBalanceReadPlatformService clientBalanceReadPlatformService;
 	private final OrderReadPlatformService orderReadPlatformService;
 	private final BillMasterReadPlatformService billMasterReadPlatformService;
-	private final PaymodeReadPlatformService paymentReadPlatformService;
+	private final PaymentReadPlatformService paymentReadPlatformService;
 	private final TicketMasterReadPlatformService ticketMasterReadPlatformService;
 	private final ConfigurationRepository configurationRepository;
 	private final SelfCareRepository selfCareRepository;
@@ -83,7 +83,7 @@ public class SelfCareApiResource {
 	public SelfCareApiResource(final PlatformSecurityContext context,final SelfCareRepository selfCareRepository,
 			final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService,final LoginHistoryRepository loginHistoryRepository, 
 			final DefaultToApiJsonSerializer<SelfCareData> toApiJsonSerializerForItem,final AddressReadPlatformService addressReadPlatformService,  
-			final SelfCareReadPlatformService selfCareReadPlatformService,final PaymodeReadPlatformService paymentReadPlatformService,  
+			final SelfCareReadPlatformService selfCareReadPlatformService,final PaymentReadPlatformService paymentReadPlatformService,  
 			final ClientBalanceReadPlatformService balanceReadPlatformService, final ClientReadPlatformService clientReadPlatformService, 
 			final OrderReadPlatformService  orderReadPlatformService, final BillMasterReadPlatformService billMasterReadPlatformService,
 			final TicketMasterReadPlatformService ticketMasterReadPlatformService,final ConfigurationRepository configurationRepository,

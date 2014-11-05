@@ -35,8 +35,8 @@ import org.springframework.stereotype.Component;
 @Scope("singleton")
 public class AdjustmentApiResource {
 	
-	 private final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(Arrays.asList("discountCode", "discountOptions"));
-	    private final String resourceNameForPermissions = "ADJUSTMENT";
+	private final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(Arrays.asList("discountCode", "discountOptions"));
+	private final static String RESOURCENAMEFORPERMISSIONS = "ADJUSTMENT";
 	private final PlatformSecurityContext context;
     private final AdjustmentReadPlatformService readPlatformService;
     private final DefaultToApiJsonSerializer<AdjustmentCodeData> toApiJsonSerializer;
@@ -55,6 +55,12 @@ public class AdjustmentApiResource {
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
     }
     
+    /**
+     * this method is used for creating adjustment
+     * @param clientId
+     * @param apiRequestBodyAsJson
+     * @return
+     */
     @POST
     @Path("{clientId}")
 	@Consumes({MediaType.APPLICATION_JSON})
@@ -68,16 +74,21 @@ public class AdjustmentApiResource {
         return this.toApiJsonSerializer.serialize(result);
     }
     
-    
+    /**
+     * this method is used for getting template data
+     * @param uriInfo
+     * @return
+     */
     @GET
     @Path("template")
     @Consumes({MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_JSON})
     public String retrieveTempleteInfo(@Context final UriInfo uriInfo) {
+
+    	context.authenticatedUser().validateHasReadPermission(RESOURCENAMEFORPERMISSIONS);
     	
-    	context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-        List<AdjustmentData> data=this.readPlatformService.retrieveAllAdjustmentsCodes();
-        AdjustmentCodeData datas=new AdjustmentCodeData(data);
+        final List<AdjustmentData> data=this.readPlatformService.retrieveAllAdjustmentsCodes();
+        final AdjustmentCodeData datas=new AdjustmentCodeData(data);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, datas, RESPONSE_DATA_PARAMETERS);
     }

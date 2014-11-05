@@ -49,10 +49,10 @@ import com.google.gson.JsonElement;
 @Component
 @Scope("singleton")
 public class BillingMasterApiResourse {
-	    private  final Set<String> RESPONSE_DATA_PARAMETERS=new HashSet<String>(Arrays.asList("transactionId","transactionDate","transactionType","amount","orderId",
-			"invoiceId","chrageAmount","taxAmount","chargeType","amount","billDate","dueDate","id","transaction","chargeStartDate","chargeEndDate"));
+	    private  final Set<String> RESPONSE_DATA_PARAMETERS=new HashSet<String>(Arrays.asList("transactionId", "transactionDate", "transactionType", "amount", "orderId",
+			"invoiceId", "chrageAmount", "taxAmount", "chargeType", "amount", "billDate", "dueDate", "id", "transaction", "chargeStartDate", "chargeEndDate"));
 	    
-        private final String resourceNameForPermissions = "BILLMASTER";
+        private static final String RESOURCENAMEFORPERMISSIONS = "BILLMASTER";
 	    private final PlatformSecurityContext context;
 	    private final DefaultToApiJsonSerializer<FinancialTransactionsData> toApiJsonSerializer;
 	    private final DefaultToApiJsonSerializer<BillDetailsData> ApiJsonSerializer;
@@ -74,13 +74,13 @@ public class BillingMasterApiResourse {
 			 this.context = context;
 		     this.toApiJsonSerializer = toApiJsonSerializer;
 		     this.apiRequestParameterHelper = apiRequestParameterHelper;
-		     this.billMasterReadPlatformService=billMasterReadPlatformService;
-		     this.billMasterRepository=billMasterRepository;
-		     this.fromApiJsonHelper=fromJsonHelper;
-		     this.billMasterWritePlatformService=billMasterWritePlatformService;
-		     this.billWritePlatformService=billWritePlatformService;
-		     this.ApiJsonSerializer=ApiJsonSerializer;
-		     this.commandSourceWritePlatformService=commandsSourceWritePlatformService;
+		     this.billMasterReadPlatformService = billMasterReadPlatformService;
+		     this.billMasterRepository = billMasterRepository;
+		     this.fromApiJsonHelper = fromJsonHelper;
+		     this.billMasterWritePlatformService = billMasterWritePlatformService;
+		     this.billWritePlatformService = billWritePlatformService;
+		     this.ApiJsonSerializer = ApiJsonSerializer;
+		     this.commandSourceWritePlatformService = commandsSourceWritePlatformService;
 		     
 		    }		
 		
@@ -89,21 +89,21 @@ public class BillingMasterApiResourse {
 	@Path("{clientId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrieveBillingProducts(@PathParam("clientId") final Long clientId,final String apiRequestBodyAsJson) {
+	public String retrieveBillingProducts(@PathParam("clientId") final Long clientId, final String apiRequestBodyAsJson) {
 		
-		 final JsonElement parsedCommand = this.fromApiJsonHelper.parse(apiRequestBodyAsJson.toString());
-         final JsonCommand command = JsonCommand.from(apiRequestBodyAsJson.toString(),parsedCommand,this.fromApiJsonHelper,
-        		 "BILLMASTER",clientId,null,null,clientId,null,null,null,null,null,null,null);
-       	final CommandProcessingResult result=this.billMasterWritePlatformService.createBillMaster(command,command.entityId());
-	    //this.billWritePlatformService.ireportPdf(result.resourceId());
+		final JsonElement parsedCommand = this.fromApiJsonHelper.parse(apiRequestBodyAsJson);
+        final JsonCommand command = JsonCommand.from(apiRequestBodyAsJson, parsedCommand,this.fromApiJsonHelper,
+        		 						"BILLMASTER", clientId, null, null, clientId, null, null, null, null, null, null, null);
+       	final CommandProcessingResult result = this.billMasterWritePlatformService.createBillMaster(command, command.entityId());
 	    return this.toApiJsonSerializer.serialize(result);
 	}
+	
 	@GET
 	@Path("{clientId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrieveBillStatements(@PathParam("clientId") final Long clientId,@Context final UriInfo uriInfo) {
-		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+	public String retrieveBillStatements(@PathParam("clientId") final Long clientId, @Context final UriInfo uriInfo) {
+		context.authenticatedUser().validateHasReadPermission(RESOURCENAMEFORPERMISSIONS);
 		final List<FinancialTransactionsData> data = this.billMasterReadPlatformService.retrieveStatments(clientId);
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 		return this.toApiJsonSerializer.serialize(settings, data, RESPONSE_DATA_PARAMETERS);
@@ -115,21 +115,21 @@ public class BillingMasterApiResourse {
 	@Produces({ MediaType.APPLICATION_JSON })
 	public Response printInvoice(@PathParam("billId") final Long billId) {
 		
-		BillMaster billMaster = this.billMasterRepository.findOne(billId);
-		String FileName = billMaster.getFileName();
+		final BillMaster billMaster = this.billMasterRepository.findOne(billId);
+		final String fileName = billMaster.getFileName();
 		    
-		   if(FileName.equalsIgnoreCase("invoice")){
-			   try {
-				   this.billWritePlatformService.ireportPdf(billId);
-			   } catch (SQLException e) {
+		if("invoice".equalsIgnoreCase(fileName)){
+			try {
+					this.billWritePlatformService.ireportPdf(billId);
+			} catch (SQLException e) {
 				   e.printStackTrace();
-			   }
-		   }
-		 BillMaster billMaster1=this.billMasterRepository.findOne(billId);
-		 String printFileName = billMaster1.getFileName();
-		 File file = new File(printFileName);
-		 ResponseBuilder response = Response.ok(file);
-		 response.header("Content-Disposition", "attachment; filename=\""+ printFileName + "\"");
+			}
+		 }
+		 final BillMaster updatedBillMaster = this.billMasterRepository.findOne(billId);
+		 final String printFileName = updatedBillMaster.getFileName();
+		 final File file = new File(printFileName);
+		 final ResponseBuilder response = Response.ok(file);
+		 response.header("Content-Disposition", "attachment; filename=\"" + printFileName + "\"");
 		 response.header("Content-Type", "application/pdf");
 		 return response.build();
 	}
@@ -138,28 +138,27 @@ public class BillingMasterApiResourse {
 	@Path("{billId}/billdetails")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String getBillDetails(@PathParam("billId") final Long billId,@Context final UriInfo uriInfo) {
-		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+	public String getBillDetails(@PathParam("billId") final Long billId, @Context final UriInfo uriInfo) {
+		context.authenticatedUser().validateHasReadPermission(RESOURCENAMEFORPERMISSIONS);
 		final List<BillDetailsData> data = this.billMasterReadPlatformService.retrievegetStatementDetails(billId);
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 		return this.ApiJsonSerializer.serialize(settings, data, RESPONSE_DATA_PARAMETERS);
 	}
-	
 	
 	@PUT
 	@Path("/email/{billId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String sendBillPathToMsg(@PathParam("billId") final Long billId) {
-			BillMaster billMaster = this.billMasterRepository.findOne(billId);
-			String FileName = billMaster.getFileName();	
-			if(FileName.equalsIgnoreCase("invoice")){
-				String msg="No Generate Pdf file For This Statement";
-				throw new BillingOrderNoRecordsFoundException(msg,billId);}
-		Long msgId=this.billMasterWritePlatformService.sendBillDetailFilePath(billMaster);
+		final BillMaster billMaster = this.billMasterRepository.findOne(billId);
+		final String fileName = billMaster.getFileName();	
+		if("invoice".equalsIgnoreCase(fileName)){
+			final String msg = "No Generate Pdf file For This Statement";
+			throw new BillingOrderNoRecordsFoundException(msg, billId);
+		}
+		final Long msgId = this.billMasterWritePlatformService.sendBillDetailFilePath(billMaster);
 	    return this.toApiJsonSerializer.serialize(CommandProcessingResult.resourceResult(msgId, null));
 	}
-	
 	
 	@DELETE
 	@Path("{billId}")
@@ -170,6 +169,5 @@ public class BillingMasterApiResourse {
         final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
         return this.toApiJsonSerializer.serialize(result);
 	}
-
-
+	
 }

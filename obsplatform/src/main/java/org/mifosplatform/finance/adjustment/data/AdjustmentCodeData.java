@@ -12,7 +12,7 @@ public class AdjustmentCodeData {
 	private final LocalDate adjustment_date;
 	private List<DiscountValues> discountOptions;
 
-	public AdjustmentCodeData(List<AdjustmentData> data) {
+	public AdjustmentCodeData(final List<AdjustmentData> data) {
 		this.data=data;
 		this.adjustment_date=new LocalDate();
 		this.discountOptions=setadjustment_type();

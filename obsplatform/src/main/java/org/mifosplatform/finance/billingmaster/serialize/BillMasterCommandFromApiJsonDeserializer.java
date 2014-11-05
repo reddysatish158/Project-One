@@ -30,7 +30,7 @@ public final class BillMasterCommandFromApiJsonDeserializer {
     /**
      * The parameters supported for this command.
      */
-    private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("locale", "dueDate","dateFormat","message"));
+    private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("locale", "dueDate", "dateFormat", "message"));
     private final FromJsonHelper fromApiJsonHelper;
 
     @Autowired
@@ -53,8 +53,6 @@ public final class BillMasterCommandFromApiJsonDeserializer {
         baseDataValidator.reset().parameter("dueDate").value(dueDate).notBlank();
         throwExceptionIfValidationWarningsExist(dataValidationErrors);
     }
-
- 
 
     private void throwExceptionIfValidationWarningsExist(final List<ApiParameterError> dataValidationErrors) {
         if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist",

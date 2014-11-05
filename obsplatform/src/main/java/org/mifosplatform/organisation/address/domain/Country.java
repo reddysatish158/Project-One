@@ -104,6 +104,7 @@ public void delete() {
 	// TODO Auto-generated method stub
 	if(this.isActive.equalsIgnoreCase(isActive)){
 		this.isActive="N";
+		this.countryCode = this.countryCode+"_"+this.getId();
 	}
 	
 }

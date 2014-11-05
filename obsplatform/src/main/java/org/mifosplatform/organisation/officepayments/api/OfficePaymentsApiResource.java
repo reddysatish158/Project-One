@@ -16,12 +16,12 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
-import org.mifosplatform.billing.paymode.data.McodeData;
-import org.mifosplatform.billing.paymode.service.PaymodeReadPlatformService;
 import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
+import org.mifosplatform.finance.payments.data.McodeData;
 import org.mifosplatform.finance.payments.data.PaymentData;
+import org.mifosplatform.finance.payments.service.PaymentReadPlatformService;
 import org.mifosplatform.infrastructure.core.api.ApiRequestParameterHelper;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
@@ -45,14 +45,14 @@ public class OfficePaymentsApiResource {
 	
 	private static final String RESOURCENAMEFOR_PERMISSIONS = "OFFICEPAYMENT";
 	private final PlatformSecurityContext context;
-	private final PaymodeReadPlatformService readPlatformService;
+	private final PaymentReadPlatformService readPlatformService;
 	private final DefaultToApiJsonSerializer<PaymentData> toApiJsonSerializer;
 	private final ApiRequestParameterHelper apiRequestParameterHelper;
 	private final PortfolioCommandSourceWritePlatformService writePlatformService;
 
 	@Autowired
 	public OfficePaymentsApiResource(final PlatformSecurityContext context,final ApiRequestParameterHelper apiRequestParameterHelper,
-										final PaymodeReadPlatformService readPlatformService,final DefaultToApiJsonSerializer<PaymentData> toApiJsonSerializer,
+										final PaymentReadPlatformService readPlatformService,final DefaultToApiJsonSerializer<PaymentData> toApiJsonSerializer,
 										final PortfolioCommandSourceWritePlatformService writePlatformService){
 		 this.context  = context;
 		 this.readPlatformService = readPlatformService;
