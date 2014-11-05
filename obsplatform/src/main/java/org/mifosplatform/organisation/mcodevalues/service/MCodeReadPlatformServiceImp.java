@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 public class MCodeReadPlatformServiceImp implements MCodeReadPlatformService {
 
 	private JdbcTemplate jdbcTemplate;
+	@SuppressWarnings("unused")
 	private PlatformSecurityContext context;
 	
 	@Autowired

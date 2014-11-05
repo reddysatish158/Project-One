@@ -1,4 +1,4 @@
-package org.mifosplatform.billing.paymode.data;
+package org.mifosplatform.finance.payments.data;
 
 import java.util.Collection;
 
@@ -11,7 +11,7 @@ public class McodeData {
 	private LocalDate startDate;
 	private Collection<McodeData> paymodeDatas;
 
-	public static McodeData instance(Long id, String paymodeCode) {
+	public static McodeData instance(final Long id, final String paymodeCode) {
 
 		return new McodeData(id, paymodeCode);
 	}
@@ -33,23 +33,23 @@ public class McodeData {
 		return paymodeDatas;
 	}
 
-	public McodeData(Long id, String paymodeCode) {
+	public McodeData(final Long id, final String paymodeCode) {
 		this.id = id;
 		this.mCodeValue = paymodeCode;
 
 	}
 
-	public McodeData(Collection<McodeData> data) {
+	public McodeData(final Collection<McodeData> data) {
 		this.paymodeDatas = data;
 		this.startDate = new LocalDate();
 	}
 
 
-	public static McodeData instance1(Long codeId) {
+	public static McodeData instance1(final Long codeId) {
 		
 		return  new McodeData(codeId);
 	}
-	public McodeData(Long id){
+	public McodeData(final Long id){
 		this.id=id;
 	}
 	

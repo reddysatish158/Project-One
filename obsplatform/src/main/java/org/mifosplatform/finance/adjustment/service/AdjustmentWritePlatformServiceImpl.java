@@ -21,10 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class AdjustmentWritePlatformServiceJpaRepositoryImpl implements
+public class AdjustmentWritePlatformServiceImpl implements
 		AdjustmentWritePlatformService {
 
-	private final org.mifosplatform.infrastructure.security.service.PlatformSecurityContext context;
+	private final PlatformSecurityContext context;
 	private final AdjustmentRepository adjustmentRepository;
 	private final ClientBalanceRepository clientBalanceRepository;
 	private final UpdateClientBalance updateClientBalance;
@@ -34,7 +34,7 @@ public class AdjustmentWritePlatformServiceJpaRepositoryImpl implements
 	private final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService;
 
 	@Autowired
-	public AdjustmentWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,final AdjustmentRepository adjustmentRepository,
+	public AdjustmentWritePlatformServiceImpl(final PlatformSecurityContext context,final AdjustmentRepository adjustmentRepository,
 			final ClientBalanceRepository clientBalanceRepository,final AdjustmentCommandFromApiJsonDeserializer fromApiJsonDeserializer,
 			final UpdateClientBalance updateClientBalance,final ClientBalanceReadPlatformService clientBalanceReadPlatformService,
 			final AdjustmentReadPlatformService adjustmentReadPlatformService,
@@ -49,11 +49,9 @@ public class AdjustmentWritePlatformServiceJpaRepositoryImpl implements
 		this.transactionHistoryWritePlatformService = transactionHistoryWritePlatformService;
 	}
 
-	@SuppressWarnings("unused")
 	@Transactional
 	@Override
-	public Long createAdjustment(Long id2, Long id, Long clientid,
-			JsonCommand command) {
+	public Long createAdjustment(final Long id2, final Long id, final Long clientid, final JsonCommand command) {
 		// TODO Auto-generated method stub
 
 		try {
@@ -61,8 +59,9 @@ public class AdjustmentWritePlatformServiceJpaRepositoryImpl implements
 			Adjustment adjustment = null;
 			adjustment = Adjustment.fromJson(command);
 			ClientBalance clientBalance = null;
-			if (id != null)
+			if (id != null){
 				clientBalance = clientBalanceRepository.findOne(id);
+			}
 
 			if (clientBalance != null) {
 			clientBalance = updateClientBalance	.doUpdateAdjustmentClientBalance(command, clientBalance);
@@ -74,7 +73,7 @@ public class AdjustmentWritePlatformServiceJpaRepositoryImpl implements
 			updateClientBalance.saveClientBalanceEntity(clientBalance);
 
 			this.adjustmentRepository.saveAndFlush(adjustment);
-			transactionHistoryWritePlatformService.saveTransactionHistory(adjustment.getClient_id(), "Adjustment", adjustment.getAdjustment_date(),"AmountPaid:"+adjustment.getAmount_paid(),"AdjustmentType:"+adjustment.getAdjustment_type(),"AdjustmentCode:"+adjustment.getAdjustment_code(),"Remarks:"+adjustment.getRemarks(),"AdjustmentID:"+adjustment.getId());
+			transactionHistoryWritePlatformService.saveTransactionHistory(adjustment.getClientId(), "Adjustment", adjustment.getAdjustmentDate(),"AmountPaid:"+adjustment.getAmountPaid(),"AdjustmentType:"+adjustment.getAdjustmentType(),"AdjustmentCode:"+adjustment.getAdjustmentCode(),"Remarks:"+adjustment.getRemarks(),"AdjustmentID:"+adjustment.getId());
 			return adjustment.getId();
 		} catch (DataIntegrityViolationException dve) {
 			return Long.valueOf(-1);
@@ -82,24 +81,26 @@ public class AdjustmentWritePlatformServiceJpaRepositoryImpl implements
 	}
 
 	@Override
-	public CommandProcessingResult createAdjustments(JsonCommand command) {
+	public CommandProcessingResult createAdjustments(final JsonCommand command) {
 
 		try {
 			context.authenticatedUser();
 
 			this.fromApiJsonDeserializer.validateForCreate(command.json());
-			List<ClientBalanceData> clientBalancedatas = clientBalanceReadPlatformService
+			final List<ClientBalanceData> clientBalancedatas = clientBalanceReadPlatformService
 					.retrieveAllClientBalances(command.entityId());
-			List<ClientBalanceData> adjustmentBalancesDatas = adjustmentReadPlatformService
+			final List<ClientBalanceData> adjustmentBalancesDatas = adjustmentReadPlatformService
 					.retrieveAllAdjustments(command.entityId());
 			Long id = Long.valueOf(-1);
-			if (clientBalancedatas.size() == 1 && adjustmentBalancesDatas.size() == 1)
+			if (clientBalancedatas.size() == 1 && adjustmentBalancesDatas.size() == 1){
 				id = createAdjustment(clientBalancedatas.get(0).getId(),
 						adjustmentBalancesDatas.get(0).getId(),
 						command.entityId(), command);
-			else
+			}
+			else{
 				id = createAdjustment(command.entityId(), command.entityId(),
 						command.entityId(), command);
+			}
 
 			return new CommandProcessingResultBuilder()
 					.withCommandId(command.commandId()).withEntityId(id).withClientId(command.entityId())

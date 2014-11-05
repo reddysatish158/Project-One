@@ -762,19 +762,19 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 	}
 
 	@Override
-	public CommandProcessingResult retrackOsdMessage(JsonCommand command) {
+	public CommandProcessingResult retrackOsdMessage(final JsonCommand command) {
 		try {
 			this.context.authenticatedUser();
 			this.fromApiJsonDeserializer.validateForRetrack(command.json());
 			String requstStatus = null;
 			String message = null;
-			String commandName = command.stringValueOfParameterNamed("commandName");
-			Order order = this.orderRepository.findOne(command.entityId());
+			final String commandName = command.stringValueOfParameterNamed("commandName");
+			final Order order = this.orderRepository.findOne(command.entityId());
 				if (order == null) {
 					throw new NoOrdersFoundException(command.entityId());
 				}
 				if (commandName.equalsIgnoreCase("RETRACK")) {
-					String restrict = orderReadPlatformService.checkRetrackInterval(command.entityId());
+					final String restrict = orderReadPlatformService.checkRetrackInterval(command.entityId());
 						if (restrict != null && restrict.equalsIgnoreCase("yes")) {	
 							requstStatus = UserActionStatusTypeEnum.RETRACK.toString();					 
 						} else {
@@ -784,44 +784,41 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 					requstStatus = UserActionStatusTypeEnum.MESSAGE.toString();
 					message = command.stringValueOfParameterNamed("message");
 				}
-				Plan plan = this.planRepository.findOne(order.getPlanId());
+				final Plan plan = this.planRepository.findOne(order.getPlanId());
 				if (plan == null) {
 					throw new NoOrdersFoundException(command.entityId());
 				}
 				if (requstStatus != null && plan!=null) {
-					Configuration configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
-					AllocationDetailsData detailsData = this.allocationReadPlatformService.getTheHardwareItemDetails(command.entityId(),configurationProperty.getValue());
-					/*ProcessRequest processRequest = new ProcessRequest(order.getClientId(),
-						order.getId(),plan.getProvisionSystem(), 'N', null, requstStatus,new Long(0));*/
-					ProcessRequest processRequest=new ProcessRequest(Long.valueOf(0),order.getClientId(),order.getId(),plan.getProvisionSystem(),requstStatus
+					final Configuration configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
+					final AllocationDetailsData detailsData = this.allocationReadPlatformService.getTheHardwareItemDetails(command.entityId(),configurationProperty.getValue());
+					final ProcessRequest processRequest=new ProcessRequest(Long.valueOf(0),order.getClientId(),order.getId(),plan.getProvisionSystem(),requstStatus
 							,'N','N');
 				  processRequest.setNotify();
-				  List<OrderLine> orderLineData = order.getServices();
+				  final List<OrderLine> orderLineData = order.getServices();
 				  	for (OrderLine orderLine : orderLineData) {
 				  		String hardWareId = null;
 				  			if (detailsData != null) {
 				  				hardWareId = detailsData.getSerialNo();
 				  			}
-				  			List<ProvisionServiceDetails> provisionServiceDetails = this.provisionServiceDetailsRepository.findOneByServiceId(orderLine.getServiceId());
-				  			ServiceMaster service = this.serviceMasterRepository.findOne(orderLine.getServiceId());
+				  			final List<ProvisionServiceDetails> provisionServiceDetails = this.provisionServiceDetailsRepository.findOneByServiceId(orderLine.getServiceId());
+				  			final ServiceMaster service = this.serviceMasterRepository.findOne(orderLine.getServiceId());
 				  			if (!provisionServiceDetails.isEmpty()) {
 				  				if (message == null) {
 				  					message = provisionServiceDetails.get(0).getServiceIdentification();
 				  				}
-				  				ProcessRequestDetails processRequestDetails = new ProcessRequestDetails(orderLine.getId(), orderLine.getServiceId(),message, "Recieved",
-				  				hardWareId,order.getStartDate(), order.getEndDate(), null,null, 'N',requstStatus,service.getServiceType());
+				  				final ProcessRequestDetails processRequestDetails = new ProcessRequestDetails(orderLine.getId(), orderLine.getServiceId(),message, "Recieved",
+								hardWareId,order.getStartDate(), order.getEndDate(), null,null, 'N',requstStatus,service.getServiceType());
+
 				  				processRequest.add(processRequestDetails);
 				  			}
 				  	}
 				this.processRequestRepository.save(processRequest);
 				this.orderRepository.save(order);
-				AppUser appUser = this.context.authenticatedUser();
-				Long userId = appUser.getId();
-				OrderHistory orderHistory = new OrderHistory(order.getId(),new LocalDate(), new LocalDate(), command.entityId(),
+				final AppUser appUser = this.context.authenticatedUser();
+				final Long userId = appUser.getId();
+				final OrderHistory orderHistory = new OrderHistory(order.getId(),new LocalDate(), new LocalDate(), command.entityId(),
 						requstStatus, userId,null);
 				this.orderHistoryRepository.save(orderHistory);
-				transactionHistoryWritePlatformService.saveTransactionHistory(order.getClientId(), "OSD Message",order.getStartDate(),"PlanId:" + order.getPlanId(),
-						"contarctPeriod:" + order.getContarctPeriod(), "OrderID:" + order.getId(),"BillingAlign:" + order.getbillAlign());
 				
 			}
 			return new CommandProcessingResult(order.getId(),order.getClientId());
@@ -1169,33 +1166,33 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 
 	@Transactional
 	@Override
-	public CommandProcessingResult orderSuspention(JsonCommand command,Long entityId) {
+	public CommandProcessingResult orderSuspention(final JsonCommand command, final Long entityId) {
 		
 		try{
-				AppUser appUser= this.context.authenticatedUser();
+				final AppUser appUser= this.context.authenticatedUser();
 				this.fromApiJsonDeserializer.validateForOrderSuspension(command.json());
-				Order order=this.orderRepository.findOne(entityId);
+				final Order order=this.orderRepository.findOne(entityId);
 				Long resourceId=Long.valueOf(0);
 					if(order == null){
 						throw new OrderNotFoundException(entityId);
 					}
 					
-					Long pendingId=this.enumDomainServiceRepository.findOneByEnumMessageProperty(StatusTypeEnum.PENDING.toString()).getEnumId();	
-				    Plan plan=this.planRepository.findOne(order.getPlanId());
+					final Long pendingId=this.enumDomainServiceRepository.findOneByEnumMessageProperty(StatusTypeEnum.PENDING.toString()).getEnumId();	
+				    final Plan plan=this.planRepository.findOne(order.getPlanId());
 
 				     if(!plan.getProvisionSystem().equalsIgnoreCase("None") && !plan.getProvisionSystem().equalsIgnoreCase(ProvisioningApiConstants.PROV_PACKETSPAN)){
 								order.setStatus(pendingId);
-                        CommandProcessingResult commandProcessingResult=this.prepareRequestWriteplatformService.prepareNewRequest(order,plan,UserActionStatusTypeEnum.SUSPENTATION.toString());
+                        final CommandProcessingResult commandProcessingResult=this.prepareRequestWriteplatformService.prepareNewRequest(order,plan,UserActionStatusTypeEnum.SUSPENTATION.toString());
                         resourceId =commandProcessingResult.resourceId();
 					}else{
-						EnumDomainService enumDomainService=this.enumDomainServiceRepository.findOneByEnumMessageProperty(StatusTypeEnum.SUSPENDED.toString());
+						final EnumDomainService enumDomainService=this.enumDomainServiceRepository.findOneByEnumMessageProperty(StatusTypeEnum.SUSPENDED.toString());
 								order.setStatus(enumDomainService.getEnumId());
 					}
 					order.setuserAction(UserActionStatusTypeEnum.SUSPENTATION.toString());
 				
 					
 					//Post Details in Payment followup
-					PaymentFollowup paymentFollowup=PaymentFollowup.fromJson(command,order.getClientId(),order.getId(),
+					final PaymentFollowup paymentFollowup=PaymentFollowup.fromJson(command,order.getClientId(),order.getId(),
 							StatusTypeEnum.ACTIVE.toString(),StatusTypeEnum.SUSPENDED.toString());
 					this.paymentFollowupRepository.save(paymentFollowup);
 					
@@ -1205,12 +1202,10 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 											resourceId, null, null,order.getId());
 					}
 					this.orderRepository.save(order);
-					OrderHistory orderHistory=new OrderHistory(order.getId(),new LocalDate(),new LocalDate(),resourceId,UserActionStatusTypeEnum.TERMINATION.toString(),
+					final OrderHistory orderHistory=new OrderHistory(order.getId(),new LocalDate(),new LocalDate(),resourceId,UserActionStatusTypeEnum.TERMINATION.toString(),
 							appUser.getId(),null);
                      this.orderHistoryRepository.save(orderHistory);	
-				    transactionHistoryWritePlatformService.saveTransactionHistory(order.getClientId(),"Order Suspentation", new Date(),
-										"User :"+appUser.getUsername(),"PlanId:"+order.getPlanId(),"contarctPeriod:"+order.getContarctPeriod(),
-										"Services:"+order.getAllServicesAsString(),"OrderID:"+order.getId(),"BillingAlign:"+order.getbillAlign());
+				    
 			return new CommandProcessingResult(entityId,order.getClientId());			
 		}catch(DataIntegrityViolationException dve){
 			handleCodeDataIntegrityIssues(command, dve);

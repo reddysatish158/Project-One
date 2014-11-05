@@ -81,6 +81,7 @@ public void delete() {
 	// TODO Auto-generated method stub
 	if(this.isDeleted == 'N'){
 		this.isDeleted='Y';
+		this.stateCode = this.stateCode+"_"+this.getId();
 	}
 }
 

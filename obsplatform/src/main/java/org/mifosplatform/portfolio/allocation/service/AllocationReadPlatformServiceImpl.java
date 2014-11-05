@@ -20,7 +20,8 @@ public class AllocationReadPlatformServiceImpl implements AllocationReadPlatform
 	
 	
 	    private final JdbcTemplate jdbcTemplate;
-	    private final PlatformSecurityContext context;
+	    @SuppressWarnings("unused")
+		private final PlatformSecurityContext context;
 	    
 	    @Autowired
 	    public AllocationReadPlatformServiceImpl(final PlatformSecurityContext context, final TenantAwareRoutingDataSource dataSource)
@@ -34,7 +35,7 @@ public class AllocationReadPlatformServiceImpl implements AllocationReadPlatform
 
 	
 	@Override
-	public AllocationDetailsData getTheHardwareItemDetails(Long orderId,String configProp) {
+	public AllocationDetailsData getTheHardwareItemDetails(final Long orderId,final String configProp) {
 		try {
 			
 			final ClientOrderMapper mapper = new ClientOrderMapper();
@@ -78,7 +79,7 @@ public class AllocationReadPlatformServiceImpl implements AllocationReadPlatform
 				}
 
 			@Override
-			public AllocationDetailsData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
+			public AllocationDetailsData mapRow(final ResultSet rs, final int rowNum) throws SQLException {
 
 			final Long id = rs.getLong("id");
 			final Long orderId = rs.getLong("orderId");
@@ -91,7 +92,7 @@ public class AllocationReadPlatformServiceImpl implements AllocationReadPlatform
 			}
 
 			@Override
-			public List<AllocationDetailsData> retrieveHardWareDetailsByItemCode(Long clientId, String planCode,String associationType) 
+			public List<AllocationDetailsData> retrieveHardWareDetailsByItemCode(final Long clientId, final String planCode,final String associationType) 
 			{
 				try {
 					
@@ -139,8 +140,7 @@ public class AllocationReadPlatformServiceImpl implements AllocationReadPlatform
 			}
 
 					@Override
-					public List<String> retrieveHardWareDetails(
-							Long clientId) {
+					public List<String> retrieveHardWareDetails(final Long clientId) {
 						try {
 							  
 							final ClientHardwareMapper mapper = new ClientHardwareMapper();
@@ -168,7 +168,7 @@ public class AllocationReadPlatformServiceImpl implements AllocationReadPlatform
 				}
 
 					@Override
-					public AllocationDetailsData getDisconnectedHardwareItemDetails(Long orderId,Long clientId,String associationType) {
+					public AllocationDetailsData getDisconnectedHardwareItemDetails(final Long orderId,final Long clientId,final String associationType) {
 
 						try {
 							

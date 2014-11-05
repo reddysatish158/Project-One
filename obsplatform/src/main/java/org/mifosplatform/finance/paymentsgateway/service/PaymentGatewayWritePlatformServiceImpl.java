@@ -7,9 +7,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
-import org.mifosplatform.billing.paymode.service.PaymodeReadPlatformService;
 import org.mifosplatform.finance.payments.exception.ReceiptNoDuplicateException;
 import org.mifosplatform.finance.payments.service.PaymentWritePlatformService;
+import org.mifosplatform.finance.payments.service.PaymentReadPlatformService;
 import org.mifosplatform.finance.paymentsgateway.domain.PaymentGateway;
 import org.mifosplatform.finance.paymentsgateway.domain.PaymentGatewayRepository;
 import org.mifosplatform.finance.paymentsgateway.serialization.PaymentGatewayCommandFromApiJsonDeserializer;
@@ -38,7 +38,7 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 	    private final FromJsonHelper fromApiJsonHelper;
 	    private final PaymentGatewayReadPlatformService readPlatformService;
 	    private final PaymentWritePlatformService paymentWritePlatformService;
-	    private final PaymodeReadPlatformService paymodeReadPlatformService;
+	    private final PaymentReadPlatformService paymodeReadPlatformService;
 	    private final PaymentGatewayReadPlatformService paymentGatewayReadPlatformService;
 	   
 	    @Autowired
@@ -47,7 +47,7 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 	    		final PaymentGatewayCommandFromApiJsonDeserializer paymentGatewayCommandFromApiJsonDeserializer,
 	    		final PaymentGatewayReadPlatformService readPlatformService,
 	    		final PaymentWritePlatformService paymentWritePlatformService,
-	    		final PaymodeReadPlatformService paymodeReadPlatformService,
+	    		final PaymentReadPlatformService paymodeReadPlatformService,
 	    		final PaymentGatewayReadPlatformService paymentGatewayReadPlatformService)
 	    {
 	    	this.context=context;
