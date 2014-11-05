@@ -104,7 +104,7 @@ public class OneTimeSaleWritePlatformServiceImpl implements OneTimeSaleWritePlat
 			final List<OneTimeSaleData> oneTimeSaleDatas = this.oneTimeSaleReadPlatformService.retrieveOnetimeSalesForInvoice(clientId);
 			JsonObject jsonObject = new JsonObject();
 			final String saleType = command.stringValueOfParameterNamed("saleType");
-			if (saleType.equalsIgnoreCase("SALE")) {
+			if (saleType.equalsIgnoreCase("NEWSALE")) {
 				for (OneTimeSaleData oneTimeSaleData : oneTimeSaleDatas) {
 					this.invoiceOneTimeSale.invoiceOneTimeSale(clientId,oneTimeSaleData);
 					updateOneTimeSale(oneTimeSaleData);

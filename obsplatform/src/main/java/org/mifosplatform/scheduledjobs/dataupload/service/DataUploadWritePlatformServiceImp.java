@@ -385,7 +385,8 @@ public class DataUploadWritePlatformServiceImp implements DataUploadWritePlatfor
 			errorData.add(new MRNErrorData((long)i, "Error: "+((AbstractPlatformDomainRuleException) dve).getDefaultUserMessage()));
 			
 		}else if(dve instanceof DataIntegrityViolationException){
-			errorData.add(new MRNErrorData((long)i, "Error: "+((PlatformApiDataValidationException) dve).getErrors().get(0).getDefaultUserMessage()));
+			
+			errorData.add(new MRNErrorData((long)i, "Error: "+((DataIntegrityViolationException) dve).getMessage()));
 		
 		}else if(dve instanceof ClientNotFoundException){
 			errorData.add(new MRNErrorData((long)i, "Error: "+((AbstractPlatformDomainRuleException) dve).getDefaultUserMessage()));

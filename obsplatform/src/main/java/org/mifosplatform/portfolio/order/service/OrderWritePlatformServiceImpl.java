@@ -36,6 +36,8 @@ import org.mifosplatform.portfolio.association.domain.HardwareAssociation;
 import org.mifosplatform.portfolio.association.exception.HardwareDetailsNotFoundException;
 import org.mifosplatform.portfolio.association.service.HardwareAssociationReadplatformService;
 import org.mifosplatform.portfolio.association.service.HardwareAssociationWriteplatformService;
+import org.mifosplatform.portfolio.client.domain.AccountNumberGenerator;
+import org.mifosplatform.portfolio.client.domain.AccountNumberGeneratorFactory;
 import org.mifosplatform.portfolio.client.domain.Client;
 import org.mifosplatform.portfolio.client.domain.ClientRepository;
 import org.mifosplatform.portfolio.client.domain.ClientStatus;
@@ -137,6 +139,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 	private final OrderPriceRepository OrderPriceRepository;
 	private final EventActionRepository eventActionRepository;
 	private final OrderHistoryRepository orderHistoryRepository;
+	private final AccountNumberGeneratorFactory accountIdentifierGeneratorFactory;
     
    
     
@@ -158,7 +161,8 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 		    final ActiondetailsWritePlatformService actiondetailsWritePlatformService,final EventValidationReadPlatformService eventValidationReadPlatformService,
 		    final EventActionRepository eventActionRepository,final ContractPeriodReadPlatformService contractPeriodReadPlatformService,
 		   final HardwareAssociationRepository associationRepository,final ProvisioningWritePlatformService provisioningWritePlatformService,
-		   final PaymentFollowupRepository paymentFollowupRepository,final PriceRepository priceRepository,final ChargeCodeRepository chargeCodeRepository) {
+		   final PaymentFollowupRepository paymentFollowupRepository,final PriceRepository priceRepository,final ChargeCodeRepository chargeCodeRepository,
+		    final AccountNumberGeneratorFactory accountIdentifierGeneratorFactory) {
 		
 		this.context = context;
 		this.reverseInvoice=reverseInvoice;
@@ -196,6 +200,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 		this.associationWriteplatformService=associationWriteplatformService;
 		this.actionDetailsReadPlatformService=actionDetailsReadPlatformService;
 		this.transactionHistoryWritePlatformService = transactionHistoryWritePlatformService;
+		this.accountIdentifierGeneratorFactory=accountIdentifierGeneratorFactory;
 
 		
 
@@ -220,6 +225,8 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 					
 						if(isNewPlan){
 							
+								final AccountNumberGenerator orderNoGenerator = this.accountIdentifierGeneratorFactory.determineClientAccountNoGenerator(order.getId());
+								order.updateOrderNum(orderNoGenerator.generate());
 							Set<PlanDetails> planDetails=plan.getDetails();
 							ServiceMaster service=this.serviceMasterRepository.findOneByServiceCode(planDetails.iterator().next().getServiceCode());
                             Long commandId=Long.valueOf(0);
@@ -495,12 +502,14 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 		     Set<PlanDetails> planDetails=plan.getDetails();
 		     ServiceMaster serviceMaster=this.serviceMasterRepository.findOneByServiceCode(planDetails.iterator().next().getServiceCode());
 		     
-		     if(serviceMaster.isAuto() == 'Y' && requestStatusForProv != null){
+		     if(!plan.getProvisionSystem().equalsIgnoreCase("None")){
+		    	 if(serviceMaster.isAuto() == 'Y' && requestStatusForProv != null){
 		    	 	this.prepareRequestWriteplatformService.prepareNewRequest(orderDetails,plan,requestStatusForProv);
-		     }else{
+		    	 }else{
 					this.provisioningWritePlatformService.postOrderDetailsForProvisioning(orderDetails,plan.getPlanCode(),UserActionStatusTypeEnum.ACTIVATION.toString(),
 						Long.valueOf(0),null,null,orderDetails.getId());
-			}
+		    	 }
+		     }
 
 		     //For Order History
    			OrderHistory orderHistory=new OrderHistory(orderDetails.getId(),new LocalDate(),newStartdate,null,requstStatus,getUserId(),description);
@@ -713,9 +722,11 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 		}
 		
 		Long processResuiltId=new Long(0);
+		
 			if(!plan.getProvisionSystem().equalsIgnoreCase("None")){
 				Set<PlanDetails> planDetails=plan.getDetails();
 				ServiceMaster serviceMaster=this.serviceMasterRepository.findOneByServiceCode(planDetails.iterator().next().getServiceCode());
+				
 				if(serviceMaster.isAuto() == 'Y'){
 					CommandProcessingResult processingResult=this.prepareRequestWriteplatformService.prepareNewRequest(newOrder,plan,UserActionStatusTypeEnum.CHANGE_PLAN.toString());
 					processResuiltId=processingResult.commandId();
@@ -965,21 +976,28 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 				final AppUser appUser= this.context.authenticatedUser();
 				this.fromApiJsonDeserializer.validateForOrderSuspension(command.json());
 				final Order order=this.orderRepository.findOne(entityId);
-				Long resourceId=Long.valueOf(0);
+				 Long resourceId=Long.valueOf(0);
 					if(order == null){
 						throw new OrderNotFoundException(entityId);
 					}
 					
-					final Long pendingId=this.enumDomainServiceRepository.findOneByEnumMessageProperty(StatusTypeEnum.PENDING.toString()).getEnumId();	
+					final EnumDomainService enumDomainService=this.enumDomainServiceRepository.findOneByEnumMessageProperty(StatusTypeEnum.SUSPENDED.toString());
+	    		  	order.setStatus(enumDomainService.getEnumId());
+					
+					
 				    final Plan plan=this.planRepository.findOne(order.getPlanId());
-
-				     if(!plan.getProvisionSystem().equalsIgnoreCase("None") && !plan.getProvisionSystem().equalsIgnoreCase(ProvisioningApiConstants.PROV_PACKETSPAN)){
-								order.setStatus(pendingId);
-                        final CommandProcessingResult commandProcessingResult=this.prepareRequestWriteplatformService.prepareNewRequest(order,plan,UserActionStatusTypeEnum.SUSPENTATION.toString());
-                        resourceId =commandProcessingResult.resourceId();
-					}else{
-						final EnumDomainService enumDomainService=this.enumDomainServiceRepository.findOneByEnumMessageProperty(StatusTypeEnum.SUSPENDED.toString());
-								order.setStatus(enumDomainService.getEnumId());
+				     if(!plan.getProvisionSystem().equalsIgnoreCase("None")){
+				    	 final Long pendingId=this.enumDomainServiceRepository.findOneByEnumMessageProperty(StatusTypeEnum.PENDING.toString()).getEnumId();	
+				    		order.setStatus(pendingId);
+				    	  ServiceMaster serviceMaster=this.serviceMasterRepository.findOneByServiceCode(plan.getDetails().iterator().next().getServiceCode());
+				    	  if(serviceMaster.isAuto() == 'Y'){
+								final CommandProcessingResult commandProcessingResult=this.prepareRequestWriteplatformService.prepareNewRequest(order,plan,UserActionStatusTypeEnum.SUSPENTATION.toString());
+								resourceId =commandProcessingResult.resourceId();
+				    	  }else{
+				    			this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order, plan.getCode(), UserActionStatusTypeEnum.SUSPENTATION.toString(), 
+										resourceId, null, null,order.getId());
+				    	  }
+				    		  
 					}
 					order.setuserAction(UserActionStatusTypeEnum.SUSPENTATION.toString());
 				
@@ -988,12 +1006,6 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 					final PaymentFollowup paymentFollowup=PaymentFollowup.fromJson(command,order.getClientId(),order.getId(),
 							StatusTypeEnum.ACTIVE.toString(),StatusTypeEnum.SUSPENDED.toString());
 					this.paymentFollowupRepository.save(paymentFollowup);
-					
-					if(plan.getProvisionSystem().equalsIgnoreCase(ProvisioningApiConstants.PROV_PACKETSPAN)){
-						order.setStatus(pendingId);
-							this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order, plan.getCode(), UserActionStatusTypeEnum.SUSPENTATION.toString(), 
-											resourceId, null, null,order.getId());
-					}
 					this.orderRepository.save(order);
 					final OrderHistory orderHistory=new OrderHistory(order.getId(),new LocalDate(),new LocalDate(),resourceId,UserActionStatusTypeEnum.TERMINATION.toString(),
 							appUser.getId(),null);

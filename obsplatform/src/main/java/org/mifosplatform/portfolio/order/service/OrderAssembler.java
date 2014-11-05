@@ -10,7 +10,6 @@ import org.mifosplatform.billing.discountmaster.domain.DiscountMasterRepository;
 import org.mifosplatform.billing.discountmaster.exception.DiscountMasterNotFoundException;
 import org.mifosplatform.billing.planprice.data.PriceData;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
-import org.mifosplatform.portfolio.client.domain.AccountNumberGenerator;
 import org.mifosplatform.portfolio.client.domain.AccountNumberGeneratorFactory;
 import org.mifosplatform.portfolio.contract.domain.Contract;
 import org.mifosplatform.portfolio.contract.domain.ContractRepository;
@@ -33,16 +32,15 @@ public class OrderAssembler {
 private final OrderDetailsReadPlatformServices orderDetailsReadPlatformServices;
 private final ContractRepository contractRepository;
 private final DiscountMasterRepository discountMasterRepository;
-private final AccountNumberGeneratorFactory accountIdentifierGeneratorFactory;
+
 
 @Autowired
 public OrderAssembler(final OrderDetailsReadPlatformServices orderDetailsReadPlatformServices,final ContractRepository contractRepository,
-		   final DiscountMasterRepository discountMasterRepository,final AccountNumberGeneratorFactory accountIdentifierGeneratorFactory){
+		   final DiscountMasterRepository discountMasterRepository){
 	
 	this.orderDetailsReadPlatformServices=orderDetailsReadPlatformServices;
 	this.contractRepository=contractRepository;
 	this.discountMasterRepository=discountMasterRepository;
-	this.accountIdentifierGeneratorFactory=accountIdentifierGeneratorFactory;
 	
 }
 
@@ -116,13 +114,6 @@ public OrderAssembler(final OrderDetailsReadPlatformServices orderDetailsReadPla
 				order.addServiceDeatils(orderdetails);
 			}
 			
-			boolean isNewPlan=command.booleanPrimitiveValueOfParameterNamed("isNewplan");
-			
-			
-				if(isNewPlan){
-					final AccountNumberGenerator orderNoGenerator = this.accountIdentifierGeneratorFactory.determineClientAccountNoGenerator(order.getId());
-					order.updateOrderNum(orderNoGenerator.generate());
-				}
 			
 
 		

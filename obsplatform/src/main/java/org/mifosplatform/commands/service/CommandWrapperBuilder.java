@@ -1227,9 +1227,9 @@ public class CommandWrapperBuilder {
 		return this;
 	}
 
-	public CommandWrapperBuilder createOneTimeSale(Long clientId) {
+	public CommandWrapperBuilder createOneTimeSale(Long clientId, String devicesaleTpye) {
 		this.actionName = "CREATE";
-		this.entityName = "ONETIMESALE";
+		this.entityName = devicesaleTpye;
 		this.entityId = clientId;
 		this.href = "/onetimesale/template";
 		return this;

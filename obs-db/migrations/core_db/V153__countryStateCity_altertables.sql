@@ -62,5 +62,7 @@ DELIMITER ;
 call alterMediaassetImage();
 Drop procedure IF EXISTS alterMediaassetImage; 
 
+insert ignore into  m_permission VALUES (null,'organization','CREATE_NEWSALE','NEWSALE','CREATE',0);
+insert ignore into  m_permission VALUES (null,'organization','CREATE_SECONDSALE','SECONDSALE','CREATE',0);
+insert ignore into  m_permission VALUES (null,'organization','CREATE_DEVICERENTAL','DEVICERENTAL','CREATE',0);
 
-update m_permission set code='READ_PAYMENT' , entity_name = 'PAYMENT' where code='READ_GETPAYMENT';
