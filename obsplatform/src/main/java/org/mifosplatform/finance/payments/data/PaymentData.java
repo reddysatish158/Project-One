@@ -19,8 +19,6 @@ public class PaymentData {
 	private BigDecimal availAmount;
 	public PaymentData(final Collection<McodeData> data){
 		this.data= data;
-		this.paymentDate=new LocalDate();
-		
 	}
 	
 	

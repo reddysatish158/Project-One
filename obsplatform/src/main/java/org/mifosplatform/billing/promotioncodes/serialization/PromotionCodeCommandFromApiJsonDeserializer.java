@@ -60,7 +60,7 @@ public final class PromotionCodeCommandFromApiJsonDeserializer {
 		final JsonElement element = fromApiJsonHelper.parse(json);
 
 		final String promotioncode = fromApiJsonHelper.extractStringNamed("promotionCode", element);
-		baseDataValidator.reset().parameter("promotionCode").value(promotioncode).notBlank();
+		baseDataValidator.reset().parameter("promotionCode").value(promotioncode).notBlank().notExceedingLengthOf(20);
 
 		final String promotionDescription = fromApiJsonHelper.extractStringNamed("promotionDescription", element);
 		baseDataValidator.reset().parameter("promotionDescription").value(promotionDescription).notBlank();

@@ -597,10 +597,8 @@ public class GenerateBill {
 
 		if (isDiscountPercentage(discountMasterData)) {
 
-			discountAmount = this.calculateDiscountPercentage(
-					discountMasterData.getDiscountRate(), chargePrice);
-			chargePrice = this.chargePriceNotLessThanZero(chargePrice,
-					discountAmount);
+			discountAmount = this.calculateDiscountPercentage(discountMasterData.getDiscountRate(), chargePrice);
+			chargePrice = this.chargePriceNotLessThanZero(chargePrice,discountAmount);
 			discountMasterData.setDiscountAmount(discountAmount);
 			discountMasterData.setDiscountedChargeAmount(chargePrice);
 
@@ -608,11 +606,9 @@ public class GenerateBill {
 
 		if (isDiscountFlat(discountMasterData)) {
 
-			BigDecimal netFlatAmount = this.calculateDiscountFlat(
-					discountMasterData.getDiscountRate(), chargePrice);
+			BigDecimal netFlatAmount = this.calculateDiscountFlat(discountMasterData.getDiscountRate(), chargePrice);
 			discountAmount = chargePrice.subtract(netFlatAmount);
-			netFlatAmount = this.chargePriceNotLessThanZero(chargePrice,
-					discountAmount);
+			netFlatAmount = this.chargePriceNotLessThanZero(chargePrice,discountAmount);
 			discountMasterData.setDiscountAmount(discountAmount);
 			discountMasterData.setDiscountedChargeAmount(netFlatAmount);
 		}
@@ -636,7 +632,7 @@ public class GenerateBill {
 		// if chargePrice is Zero then discount is Zero
 		if (chargePrice.compareTo(BigDecimal.ZERO) == 1) {
 			calculateDiscountFlat = chargePrice.subtract(discountRate)
-					.setScale(2, RoundingMode.HALF_UP);
+		        .setScale(2, RoundingMode.HALF_UP);
 		}
 		return calculateDiscountFlat;
 

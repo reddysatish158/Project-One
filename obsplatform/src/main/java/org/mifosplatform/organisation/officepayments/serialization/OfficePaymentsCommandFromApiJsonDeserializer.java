@@ -92,6 +92,8 @@ public class OfficePaymentsCommandFromApiJsonDeserializer {
 					final String branchName = fromApiJsonHelper.extractStringNamed("branchName", element);
 					baseDataValidator.reset().parameter("branchName").value(branchName).notBlank().notExceedingLengthOf(100);
 				}
+				
+				throwExceptionIfValidationWarningsExist(dataValidationErrors);
 			}
 		}
 
