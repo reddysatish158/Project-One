@@ -36,6 +36,8 @@ import org.mifosplatform.portfolio.association.domain.HardwareAssociation;
 import org.mifosplatform.portfolio.association.exception.HardwareDetailsNotFoundException;
 import org.mifosplatform.portfolio.association.service.HardwareAssociationReadplatformService;
 import org.mifosplatform.portfolio.association.service.HardwareAssociationWriteplatformService;
+import org.mifosplatform.portfolio.client.domain.AccountNumberGenerator;
+import org.mifosplatform.portfolio.client.domain.AccountNumberGeneratorFactory;
 import org.mifosplatform.portfolio.client.domain.Client;
 import org.mifosplatform.portfolio.client.domain.ClientRepository;
 import org.mifosplatform.portfolio.client.domain.ClientStatus;
@@ -137,6 +139,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 	private final OrderPriceRepository OrderPriceRepository;
 	private final EventActionRepository eventActionRepository;
 	private final OrderHistoryRepository orderHistoryRepository;
+	private final AccountNumberGeneratorFactory accountIdentifierGeneratorFactory;
     
    
     
@@ -158,7 +161,8 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 		    final ActiondetailsWritePlatformService actiondetailsWritePlatformService,final EventValidationReadPlatformService eventValidationReadPlatformService,
 		    final EventActionRepository eventActionRepository,final ContractPeriodReadPlatformService contractPeriodReadPlatformService,
 		   final HardwareAssociationRepository associationRepository,final ProvisioningWritePlatformService provisioningWritePlatformService,
-		   final PaymentFollowupRepository paymentFollowupRepository,final PriceRepository priceRepository,final ChargeCodeRepository chargeCodeRepository) {
+		   final PaymentFollowupRepository paymentFollowupRepository,final PriceRepository priceRepository,final ChargeCodeRepository chargeCodeRepository,
+		   final AccountNumberGeneratorFactory accountIdentifierGeneratorFactory) {
 		
 		this.context = context;
 		this.reverseInvoice=reverseInvoice;
@@ -196,6 +200,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 		this.associationWriteplatformService=associationWriteplatformService;
 		this.actionDetailsReadPlatformService=actionDetailsReadPlatformService;
 		this.transactionHistoryWritePlatformService = transactionHistoryWritePlatformService;
+		this.accountIdentifierGeneratorFactory=accountIdentifierGeneratorFactory;
 
 		
 
@@ -219,6 +224,8 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 					String requstStatus =UserActionStatusTypeEnum.ACTIVATION.toString();
 					
 						if(isNewPlan){
+							final AccountNumberGenerator orderNoGenerator = this.accountIdentifierGeneratorFactory.determineClientAccountNoGenerator(order.getId());
+							order.updateOrderNum(orderNoGenerator.generate());
 							
 							Set<PlanDetails> planDetails=plan.getDetails();
 							ServiceMaster service=this.serviceMasterRepository.findOneByServiceCode(planDetails.iterator().next().getServiceCode());
