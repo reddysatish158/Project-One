@@ -16,14 +16,13 @@ import org.mifosplatform.logistics.item.data.ItemData;
 import org.mifosplatform.logistics.item.domain.ItemMaster;
 import org.mifosplatform.logistics.item.domain.ItemRepository;
 import org.mifosplatform.logistics.item.service.ItemReadPlatformService;
-import org.mifosplatform.logistics.itemdetails.exception.ActivePlansFoundException;
 import org.mifosplatform.logistics.itemdetails.service.ItemDetailsWritePlatformService;
 import org.mifosplatform.logistics.onetimesale.data.OneTimeSaleData;
 import org.mifosplatform.logistics.onetimesale.domain.OneTimeSale;
 import org.mifosplatform.logistics.onetimesale.domain.OneTimeSaleRepository;
 import org.mifosplatform.logistics.onetimesale.serialization.OneTimesaleCommandFromApiJsonDeserializer;
-import org.mifosplatform.portfolio.order.data.CustomValidationData;
-import org.mifosplatform.portfolio.order.service.OrderDetailsReadPlatformServices;
+import org.mifosplatform.portfolio.transactionhistory.service.TransactionHistoryWritePlatformService;
+import org.mifosplatform.workflow.eventvalidation.service.EventValidationReadPlatformService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,20 +53,16 @@ public class OneTimeSaleWritePlatformServiceImpl implements OneTimeSaleWritePlat
 	private final DiscountReadPlatformService discountReadPlatformService;
 	private final OneTimeSaleReadPlatformService oneTimeSaleReadPlatformService;
 	private final ItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService;
-	private final OrderDetailsReadPlatformServices orderDetailsReadPlatformServices;
+	private final EventValidationReadPlatformService eventValidationReadPlatformService;
 
 	@Autowired
-	public OneTimeSaleWritePlatformServiceImpl(final PlatformSecurityContext context,
-			final OneTimeSaleRepository oneTimeSaleRepository,
-			final ItemRepository itemMasterRepository,
-			final OneTimesaleCommandFromApiJsonDeserializer apiJsonDeserializer,
-			final InvoiceOneTimeSale invoiceOneTimeSale,
-			final ItemReadPlatformService itemReadPlatformService,
-			final FromJsonHelper fromJsonHelper,
-			final OneTimeSaleReadPlatformService oneTimeSaleReadPlatformService,
-			final ItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService,
-			final OrderDetailsReadPlatformServices orderDetailsReadPlatformServices,
-			final DiscountReadPlatformService discountReadPlatformService) {
+	public OneTimeSaleWritePlatformServiceImpl(final PlatformSecurityContext context,final OneTimeSaleRepository oneTimeSaleRepository,
+			final ItemRepository itemMasterRepository,final OneTimesaleCommandFromApiJsonDeserializer apiJsonDeserializer,
+			final InvoiceOneTimeSale invoiceOneTimeSale,final ItemReadPlatformService itemReadPlatformService,
+			final FromJsonHelper fromJsonHelper,final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,
+			final OneTimeSaleReadPlatformService oneTimeSaleReadPlatformService,final ItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService,
+			final EventValidationReadPlatformService eventValidationReadPlatformService,final DiscountReadPlatformService discountReadPlatformService) {
+
 		
 		this.context = context;
 		this.fromJsonHelper = fromJsonHelper;
@@ -79,7 +74,7 @@ public class OneTimeSaleWritePlatformServiceImpl implements OneTimeSaleWritePlat
 		this.discountReadPlatformService = discountReadPlatformService;
 		this.oneTimeSaleReadPlatformService = oneTimeSaleReadPlatformService;
 		this.inventoryItemDetailsWritePlatformService = inventoryItemDetailsWritePlatformService;
-		this.orderDetailsReadPlatformServices = orderDetailsReadPlatformServices;
+		this.eventValidationReadPlatformService = eventValidationReadPlatformService;
 
 	}
 
@@ -99,12 +94,12 @@ public class OneTimeSaleWritePlatformServiceImpl implements OneTimeSaleWritePlat
 			ItemMaster item = this.itemMasterRepository.findOne(itemId);
 
 			// Check for Custome_Validation
-			CustomValidationData customValidationData = this.orderDetailsReadPlatformServices.checkForCustomValidations(clientId, "Rental",command.json());
-			
-			if (customValidationData.getErrorCode() != 0 && customValidationData.getErrorMessage() != null) {
-				throw new ActivePlansFoundException(customValidationData.getErrorMessage());
-			}
-		    final OneTimeSale oneTimeSale = OneTimeSale.fromJson(clientId,command,item);
+
+			this.eventValidationReadPlatformService.checkForCustomValidations(clientId, "Rental",command.json());
+			final OneTimeSale oneTimeSale = OneTimeSale.fromJson(clientId, command,item);
+
+
+
 			this.oneTimeSaleRepository.saveAndFlush(oneTimeSale);
 			final List<OneTimeSaleData> oneTimeSaleDatas = this.oneTimeSaleReadPlatformService.retrieveOnetimeSalesForInvoice(clientId);
 			JsonObject jsonObject = new JsonObject();

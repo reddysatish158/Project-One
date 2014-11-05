@@ -24,15 +24,13 @@ public class HardwareAssociationReadplatformServiceImpl implements HardwareAssoc
 	
 	
 	 private final JdbcTemplate jdbcTemplate;
-	 private final PlatformSecurityContext context;
 	 private final ConfigurationRepository configurationRepository;
 	
 	  
 	    @Autowired
-	    public HardwareAssociationReadplatformServiceImpl(final PlatformSecurityContext context,final ConfigurationRepository configurationRepository, 
+	    public HardwareAssociationReadplatformServiceImpl(final ConfigurationRepository configurationRepository, 
 	    		final TenantAwareRoutingDataSource dataSource)
 	    {
-	        this.context = context;
 	        this.jdbcTemplate = new JdbcTemplate(dataSource);
 	        this.configurationRepository=configurationRepository;
 	    }
@@ -349,22 +347,5 @@ public class HardwareAssociationReadplatformServiceImpl implements HardwareAssoc
 
 				}
 			}
-		@Override
-		public Long retrieveOrderAssociationDetails(Long orderid, Long clientId) {
-			  try
-	            {
-	          	  String sql=null;
-	          	 // GlobalConfigurationProperty configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
-	          //	ClientHarderwareMapper mapper = new ClientHarderwareMapper();
-	          	  
-	          	 
-				       sql = "select id as id from b_association where order_id=? and client_id=? limit 1";
-				      
-	          	
-				      return this.jdbcTemplate.queryForLong(sql, new Object[] {orderid,clientId});
-
-			}catch(EmptyResultDataAccessException accessException){
-				return null;
-			}
-			}
+		
 }

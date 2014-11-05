@@ -9,7 +9,7 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.portfolio.contract.domain.Contract;
-import org.mifosplatform.portfolio.contract.domain.SubscriptionRepository;
+import org.mifosplatform.portfolio.contract.domain.ContractRepository;
 import org.mifosplatform.portfolio.contract.serialization.ContractCommandFromApiJsonDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -21,11 +21,11 @@ public class ContractPeriodWritePlatformServiceImp implements ContractPeriodWrit
 
 	private final PlatformSecurityContext context;
 	 private final ContractCommandFromApiJsonDeserializer fromApiJsonDeserializer;
-	private final SubscriptionRepository subscriptionRepository;
+	private final ContractRepository subscriptionRepository;
 
 	@Autowired
 	 public ContractPeriodWritePlatformServiceImp(final PlatformSecurityContext context,
-			 final SubscriptionRepository subscriptionRepository,final ContractCommandFromApiJsonDeserializer fromApiJsonDeserializer)
+			 final ContractRepository subscriptionRepository,final ContractCommandFromApiJsonDeserializer fromApiJsonDeserializer)
 	{
 		this.context=context;
 		this.subscriptionRepository=subscriptionRepository;

@@ -25,7 +25,7 @@ IF EXISTS (
      WHERE COLUMN_NAME = 'sent_message' and DATA_TYPE='varchar' 
      and TABLE_NAME = 'b_process_request_detail'
      and TABLE_SCHEMA = DATABASE())THEN
-ALTER TABLE b_process_request_detail CHANGE COLUMN `sent_message` `sent_message` TEXT NOT NULL;
+ALTER TABLE b_process_request_detail CHANGE `sent_message` `sent_message` TEXT NOT NULL;
 END IF;
 END //
 DELIMITER ;

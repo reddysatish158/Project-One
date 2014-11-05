@@ -9,9 +9,9 @@ public interface DataUploadWritePlatformService {
 
 	CommandProcessingResult addItem(DataUploadCommand command);
 	
-	//DataUploadCommand convertJsonToUploadStatusCommand(Object object,String jsonRequestBody);
 	
 	CommandProcessingResult processDatauploadFile(Long fileId);
+
 	
 	
 	

@@ -60,4 +60,14 @@ public class EventValidation extends AbstractPersistable<Long> {
 
 	}
 
+	public char getPrePost() {
+		return prePost;
+	}
+
+	public char isDeleted() {
+		return isDeleted;
+	}
+	
+	
+
 }

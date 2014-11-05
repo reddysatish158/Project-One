@@ -10,14 +10,12 @@ import org.joda.time.LocalDate;
 import org.mifosplatform.billing.discountmaster.data.DiscountMasterData;
 import org.mifosplatform.billing.discountmaster.domain.DiscountMaster;
 import org.mifosplatform.billing.discountmaster.domain.DiscountMasterRepository;
-import org.mifosplatform.finance.adjustment.service.AdjustmentReadPlatformService;
 import org.mifosplatform.finance.billingorder.commands.BillingOrderCommand;
 import org.mifosplatform.finance.billingorder.data.BillingOrderData;
 import org.mifosplatform.finance.billingorder.domain.Invoice;
 import org.mifosplatform.finance.billingorder.service.BillingOrderWritePlatformService;
 import org.mifosplatform.finance.billingorder.service.GenerateBill;
 import org.mifosplatform.finance.billingorder.service.GenerateBillingOrderService;
-import org.mifosplatform.finance.clientbalance.data.ClientBalanceData;
 import org.mifosplatform.logistics.onetimesale.data.OneTimeSaleData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,17 +31,13 @@ public class InvoiceOneTimeSale {
 	private final GenerateBill generateBill;
 	private final BillingOrderWritePlatformService billingOrderWritePlatformService;
 	private final GenerateBillingOrderService generateBillingOrderService;
-	private final AdjustmentReadPlatformService adjustmentReadPlatformService;
 	private final DiscountMasterRepository discountMasterRepository;
 	@Autowired
 	public InvoiceOneTimeSale(final GenerateBill generateBill,final BillingOrderWritePlatformService billingOrderWritePlatformService,
-			final GenerateBillingOrderService generateBillingOrderService,
-			final AdjustmentReadPlatformService adjustmentReadPlatformService,
-			final DiscountMasterRepository discountMasterRepository) {
+			final GenerateBillingOrderService generateBillingOrderService,final DiscountMasterRepository discountMasterRepository) {
 		this.generateBill = generateBill;
 		this.billingOrderWritePlatformService = billingOrderWritePlatformService;
 		this.generateBillingOrderService = generateBillingOrderService;
-		this.adjustmentReadPlatformService = adjustmentReadPlatformService;
 		this.discountMasterRepository=discountMasterRepository;
 	}
 
@@ -76,11 +70,13 @@ public void invoiceOneTimeSale(final Long clientId, final OneTimeSaleData oneTim
 				Invoice invoice = this.generateBillingOrderService.generateInvoice(billingOrderCommands);
 
 				// To fetch record from client_balance table
-				List<ClientBalanceData> clientBalances = adjustmentReadPlatformService.retrieveAllAdjustments(clientId);
-				
-				this.billingOrderWritePlatformService.updateClientBalance(invoice,clientBalances);
-			
-		}
+				this.billingOrderWritePlatformService.updateClientBalance(invoice,clientId);
+
+		
+
+			}
+
+		
 	
 	// Discount Applicable Logic
 	public boolean isDiscountApplicable(final DiscountMasterData discountMasterData) {

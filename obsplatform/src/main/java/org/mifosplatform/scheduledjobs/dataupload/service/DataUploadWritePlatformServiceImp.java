@@ -22,6 +22,7 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.AbstractPlatformDomainRuleException;
 import org.mifosplatform.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
+import org.mifosplatform.infrastructure.core.exception.UnsupportedParameterException;
 import org.mifosplatform.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.mifosplatform.infrastructure.core.service.FileUtils;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
@@ -87,6 +88,9 @@ public class DataUploadWritePlatformServiceImp implements DataUploadWritePlatfor
 			line = csvFileBufferedReader.readLine();
 	
 	if(uploadProcess.equalsIgnoreCase("Hardware Items") && new File(fileLocation).getName().contains(".csv")){
+		
+		try{
+			
 		while((line = csvFileBufferedReader.readLine()) != null){
 			try{
 				final String[] currentLineData = line.split(splitLineRegX);
@@ -111,9 +115,24 @@ public class DataUploadWritePlatformServiceImp implements DataUploadWritePlatfor
 			i++;
 			
 		}
+		}catch(Exception exception){
+			exception.printStackTrace();
+		}
+		finally{
+			
+			if(csvFileBufferedReader!=null){
+				try{
+					csvFileBufferedReader.close();
+				}catch(Exception e){
+					e.printStackTrace();
+					
+				}
+			}
+		}
 	//	writeToFile(fileLocation,errorData);
 
    	}else if(uploadProcess.equalsIgnoreCase("Mrn") && new File(fileLocation).getName().contains(".csv")){
+   		
    		while((line = csvFileBufferedReader.readLine()) != null){
    			try{
    				String[] currentLineData = line.split(splitLineRegX);
@@ -319,20 +338,22 @@ public class DataUploadWritePlatformServiceImp implements DataUploadWritePlatfor
 		throw new PlatformDataIntegrityException("file.not.found", "file.not.found", "file.not.found", "file.not.found");					
 	}catch (Exception e) {
 		//errorData.add(new MRNErrorData((long)i, "Error: "+e.getCause().getLocalizedMessage()));
-		return new CommandProcessingResult(Long.valueOf(-1));
-	}finally{
+		//return new CommandProcessingResult(Long.valueOf(-1));
+	}
+		finally{
 		
 		if(csvFileBufferedReader!=null){
 			try{
 				csvFileBufferedReader.close();
 			}catch(Exception e){
-				//e.printStackTrace();
+				e.printStackTrace();
 				
 			}
 		}
+		
 	}
 		
-	
+		return new CommandProcessingResult(Long.valueOf(1));
 	}	
 	private void handleDataIntegrityIssues(final int i,final ArrayList<MRNErrorData> errorData,final Exception dve) {
 		
@@ -378,8 +399,10 @@ public class DataUploadWritePlatformServiceImp implements DataUploadWritePlatfor
 		}else if(dve instanceof ItemNotFoundException){
 			errorData.add(new MRNErrorData((long)i,"Invalid Item id"));
 		
+		}else if(dve instanceof UnsupportedParameterException){
+			    errorData.add(new MRNErrorData((long)i,"Row Contains Improper data "));
 		}else {
-			errorData.add(new MRNErrorData((long)i,((PlatformApiDataValidationException) dve).getErrors().get(0).getDefaultUserMessage()));
+			errorData.add(new MRNErrorData((long)i,"Data insertion is failed"));
 	   }
 	}
 

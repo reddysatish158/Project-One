@@ -43,6 +43,7 @@ import org.mifosplatform.workflow.eventaction.data.ActionDetaislData;
 import org.mifosplatform.workflow.eventaction.service.ActionDetailsReadPlatformService;
 import org.mifosplatform.workflow.eventaction.service.ActiondetailsWritePlatformService;
 import org.mifosplatform.workflow.eventaction.service.EventActionConstants;
+import org.mifosplatform.workflow.eventvalidation.service.EventValidationReadPlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -58,6 +59,7 @@ public class EventOrderWriteplatformServiceImpl implements EventOrderWriteplatfo
 	private final EventOrderRepository eventOrderRepository;
 	private final EventMasterRepository eventMasterRepository;
 	private final EventDetailsRepository eventDetailsRepository;
+	private final EventValidationReadPlatformService eventValidationReadPlatformService;
 	private final EventPriceRepository eventPricingRepository;
 	private final ConfigurationRepository configurationRepository; 
 	private final MediaDeviceReadPlatformService deviceReadPlatformService;
@@ -78,9 +80,14 @@ public class EventOrderWriteplatformServiceImpl implements EventOrderWriteplatfo
 			final EventDetailsRepository eventDetailsRepository,final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,
 			final ActionDetailsReadPlatformService actionDetailsReadPlatformService,final ActiondetailsWritePlatformService actiondetailsWritePlatformService,
 			final OrderDetailsReadPlatformServices orderDetailsReadPlatformServices,final ConfigurationRepository configurationRepository,
-			final ClientRepository clientRepository) {
+			final ClientRepository clientRepository,final EventValidationReadPlatformService eventValidationReadPlatformService) {
 		
 		this.context = context;
+		this.configurationRepository=configurationRepository;
+		this.deviceReadPlatformService = deviceReadPlatformService;
+		this.balanceReadPlatformService = balanceReadPlatformService;
+		this.eventValidationReadPlatformService=eventValidationReadPlatformService;
+		this.eventOrderReadplatformServie = eventOrderReadplatformServie;
 		this.clientRepository=clientRepository;
 		this.invoiceOneTimeSale = invoiceOneTimeSale;
 		this.apiJsonDeserializer = apiJsonDeserializer;
@@ -89,10 +96,6 @@ public class EventOrderWriteplatformServiceImpl implements EventOrderWriteplatfo
 		this.eventDetailsRepository=eventDetailsRepository;
 		this.eventMasterRepository = eventMasterRepository;
 		this.eventPricingRepository = eventPricingRepository;
-		this.configurationRepository=configurationRepository;
-		this.deviceReadPlatformService = deviceReadPlatformService;
-		this.balanceReadPlatformService = balanceReadPlatformService;
-		this.eventOrderReadplatformServie = eventOrderReadplatformServie;
 		this.actionDetailsReadPlatformService=actionDetailsReadPlatformService;
 		this.orderDetailsReadPlatformServices=orderDetailsReadPlatformServices;
 		this.actiondetailsWritePlatformService=actiondetailsWritePlatformService;
@@ -134,13 +137,7 @@ public class EventOrderWriteplatformServiceImpl implements EventOrderWriteplatfo
 			}
 			
 			//Check Client Custome Validation
-				CustomValidationData customValidationData = this.orderDetailsReadPlatformServices.checkForCustomValidations(clientId,EventActionConstants.EVENT_EVENT_ORDER, command.json());
-			
-				if(customValidationData.getErrorCode() != 0 && customValidationData.getErrorMessage() != null){
-				 throw new ActivePlansFoundException(customValidationData.getErrorMessage()); 
-			}
-			
-			
+			this.eventValidationReadPlatformService.checkForCustomValidations(clientId,EventActionConstants.EVENT_EVENT_ORDER, command.json());
 			final String formatType = command.stringValueOfParameterNamed("formatType");
 			final String optType=command.stringValueOfParameterNamed("optType");
 			

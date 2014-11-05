@@ -71,7 +71,7 @@ public boolean checkClientBalanceForOrderrenewal(OrderData orderData,Long client
          BigDecimal orderPrice=new BigDecimal(orderData.getPrice());
           
        if(this.generateBill.isDiscountApplicable(new LocalDate(),discountMasterData,new LocalDate().plusMonths(1))){
-          discountMasterData = this.generateBill.calculateDiscount(discountMasterData, BigDecimal.ZERO, orderPrice);
+          discountMasterData = this.generateBill.calculateDiscount(discountMasterData,  orderPrice);
           discountAmount=discountMasterData.getDiscountAmount();
          }
         orderPrice=orderPrice.subtract(discountAmount);

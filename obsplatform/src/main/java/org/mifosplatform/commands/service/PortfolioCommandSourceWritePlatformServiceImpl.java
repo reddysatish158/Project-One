@@ -44,6 +44,7 @@ public class PortfolioCommandSourceWritePlatformServiceImpl implements
 
 	@Override
 	public CommandProcessingResult logCommandSource(final CommandWrapper wrapper) {
+		
 
 		boolean isApprovedByChecker = false;
 		// check if is update of own account details
@@ -83,6 +84,7 @@ public class PortfolioCommandSourceWritePlatformServiceImpl implements
 		}
 
 		return result;
+		
 	}
 
 	@Override

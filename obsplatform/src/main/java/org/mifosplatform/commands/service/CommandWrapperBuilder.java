@@ -1104,6 +1104,7 @@ public class CommandWrapperBuilder {
 		this.href = "/onetimesale/" + saleId;
 		return this;
 	}
+
 	
 	public CommandWrapperBuilder cancelOneTimeSale(final Long saleId) {
 		this.actionName = "DELETE";
@@ -1112,6 +1113,7 @@ public class CommandWrapperBuilder {
 		this.href = "/onetimesale/"+saleId;
 		return this;
 	}
+
 
 	public CommandWrapperBuilder createAddress(Long clientId) {
 		this.actionName = "CREATE";
@@ -2510,11 +2512,11 @@ public CommandWrapperBuilder cancelBill(Long billId) {
 	
     }
 
-public CommandWrapperBuilder updateUploadFile(Long uploadStatusId) {
+public CommandWrapperBuilder updateUploadFile(Long uploadFileId) {
 	
 	this.actionName = "PROCESS";
 	this.entityName = "DATAUPLOADS";
-	this.entityId = uploadStatusId;
+	this.entityId = uploadFileId;
 	this.href = "/dataupload/" +clientId;
 	return this;
 }

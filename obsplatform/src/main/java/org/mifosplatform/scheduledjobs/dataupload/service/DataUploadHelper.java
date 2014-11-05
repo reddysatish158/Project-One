@@ -48,12 +48,13 @@ public class DataUploadHelper {
 	}
 	
 	
-	final HashMap<String, String> map = new HashMap<>();
+
 	
 	
 	public String buildJsonForHardwareItems(String[] currentLineData, ArrayList<MRNErrorData> errorData, int i)  {
 		
 		if(currentLineData.length>=8){
+			final HashMap<String, String> map = new HashMap<>();
 			map.put("itemMasterId",currentLineData[0]);
 			map.put("serialNumber",currentLineData[1]);
 			map.put("grnId",currentLineData[2]);
@@ -76,6 +77,7 @@ public class DataUploadHelper {
 	public String buildJsonForMrn(String[] currentLineData, ArrayList<MRNErrorData> errorData, int i) {
 		
 		if(currentLineData.length>=2){
+			final HashMap<String, String> map = new HashMap<>();
 			map.put("mrnId",currentLineData[0]);
 			map.put("serialNumber",currentLineData[1]);
 			map.put("type",currentLineData[2]);
@@ -92,6 +94,7 @@ public class DataUploadHelper {
 	public String buildJsonForMoveItems(String[] currentLineData, ArrayList<MRNErrorData> errorData, int i) {
 		
 		if(currentLineData.length>=2){
+			final HashMap<String, String> map = new HashMap<>();
 			map.put("itemId",currentLineData[0]);
 			map.put("serialNumber",currentLineData[1]);
 			map.put("type",currentLineData[2]);
@@ -107,6 +110,7 @@ public class DataUploadHelper {
 	public String buildJsonForEpg(String[] currentLineData, ArrayList<MRNErrorData> errorData, int i) throws ParseException {
 		
 		if(currentLineData.length >=11){
+			final HashMap<String, String> map = new HashMap<>();
 			map.put("channelName",currentLineData[0]);
 			map.put("channelIcon",currentLineData[1]);
 			map.put("programDate",new SimpleDateFormat("dd/MM/yyyy").parse(currentLineData[2]).toString());
@@ -132,6 +136,7 @@ public class DataUploadHelper {
 	public String buildJsonForAdjustment(String[] currentLineData, ArrayList<MRNErrorData> errorData, int i) {
 
 		if(currentLineData.length >= 6){
+			final HashMap<String, String> map = new HashMap<>();
 			List<AdjustmentData> adjustmentDataList=this.adjustmentReadPlatformService.retrieveAllAdjustmentsCodes();
 			if(!adjustmentDataList.isEmpty()){
 				 for(AdjustmentData adjustmentData:adjustmentDataList){
@@ -170,6 +175,7 @@ public class DataUploadHelper {
 		
 	
 		if(currentLineData.length >=6){
+			final HashMap<String, String> map = new HashMap<>();
 			Collection<McodeData> paymodeDataList = this.paymodeReadPlatformService.retrievemCodeDetails("Payment Mode");
 				if(!paymodeDataList.isEmpty()){
 					for(McodeData paymodeData:paymodeDataList){
@@ -205,7 +211,7 @@ public class DataUploadHelper {
 
 
 	public String buildForMediaAsset(Row mediaRow, Row mediaAttributeRow, Row mediaLocationRow) {
-	
+		final HashMap<String, String> map = new HashMap<>();
 		map.put("mediaTitle",mediaRow.getCell(0).getStringCellValue());//-
 		map.put("mediaType",mediaRow.getCell(1).getStringCellValue());//-
 		map.put("mediaCategoryId",mediaRow.getCell(2).getStringCellValue());//-
@@ -249,7 +255,7 @@ public class DataUploadHelper {
 
 
 	public String buildforitemSale(String[] currentLineData,ArrayList<MRNErrorData> errorData, int i)  throws ParseException {
-		
+		final HashMap<String, String> map = new HashMap<>();
 		if(currentLineData.length>=6){
 		map.put("agentId",currentLineData[0]);
 		map.put("itemId",currentLineData[1]);
@@ -283,7 +289,7 @@ public class DataUploadHelper {
 		final String filelocation=dataUpload.getUploadFilePath();
 		dataUpload=null;
 		writeToFile(filelocation,errorData);
-		return new CommandProcessingResult(Long.valueOf(-1));
+		return new CommandProcessingResult(Long.valueOf(1));
 	}
 
 

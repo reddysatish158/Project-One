@@ -39,6 +39,7 @@ public class AdjustmentWritePlatformServiceImpl implements
 			final UpdateClientBalance updateClientBalance,final ClientBalanceReadPlatformService clientBalanceReadPlatformService,
 			final AdjustmentReadPlatformService adjustmentReadPlatformService,
 			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService) {
+		
 		this.context = context;
 		this.adjustmentRepository = adjustmentRepository;
 		this.clientBalanceRepository = clientBalanceRepository;
@@ -48,6 +49,7 @@ public class AdjustmentWritePlatformServiceImpl implements
 		this.fromApiJsonDeserializer = fromApiJsonDeserializer;
 		this.transactionHistoryWritePlatformService = transactionHistoryWritePlatformService;
 	}
+
 
 	@Transactional
 	@Override

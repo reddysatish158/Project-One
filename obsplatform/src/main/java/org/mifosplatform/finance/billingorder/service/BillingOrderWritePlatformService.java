@@ -4,14 +4,15 @@ import java.util.List;
 
 import org.mifosplatform.finance.billingorder.commands.BillingOrderCommand;
 import org.mifosplatform.finance.billingorder.domain.Invoice;
-import org.mifosplatform.finance.clientbalance.data.ClientBalanceData;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 
 public interface BillingOrderWritePlatformService {
 
 	//List<BillingOrder> createBillingProduct(List<BillingOrderCommand> billingOrderCommands);
 	CommandProcessingResult updateBillingOrder(List<BillingOrderCommand> billingOrderCommands);
-	CommandProcessingResult updateOrderPrice(List<BillingOrderCommand> billingOrderCommands);
-	void updateClientBalance(Invoice invoice,List<ClientBalanceData> clientBalancesDatas);
+	
+	//CommandProcessingResult updateOrderPrice(List<BillingOrderCommand> billingOrderCommands);
+	
+	void updateClientBalance(Invoice invoice,Long clientId);
 
 }

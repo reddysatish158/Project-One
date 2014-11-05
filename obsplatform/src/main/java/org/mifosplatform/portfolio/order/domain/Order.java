@@ -23,8 +23,6 @@ import org.mifosplatform.useradministration.domain.AppUser;
 @Table(name = "b_orders")
 public class Order extends AbstractAuditableCustom<AppUser, Long> {
 
-	
-	
 	@Column(name = "client_id")
 	private Long clientId;
 
@@ -323,13 +321,10 @@ public Order(Long clientId, Long planId, Long contractPeriod, String paytermCode
 		
 	}
 
-
 	public void updateActivationDate(Date activeDate) {
 	  this.activeDate=activeDate;	
-	 
-		
 	}
-	
-	
-
+	public void setContractPeriod(Long contarctPeriod) {
+		this.contarctPeriod=contarctPeriod;
+	}
 }

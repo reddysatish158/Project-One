@@ -7,8 +7,6 @@ import org.mifosplatform.logistics.itemdetails.service.ItemDetailsWritePlatformS
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.google.gson.JsonElement;
-
 @Service
 public class CreateInventoryItemsCommandHandler implements NewCommandSourceHandler {
 	

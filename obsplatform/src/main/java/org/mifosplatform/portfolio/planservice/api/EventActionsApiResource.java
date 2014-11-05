@@ -19,7 +19,7 @@ import org.mifosplatform.infrastructure.core.serialization.ApiRequestJsonSeriali
 import org.mifosplatform.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.portfolio.contract.domain.Contract;
-import org.mifosplatform.portfolio.contract.domain.SubscriptionRepository;
+import org.mifosplatform.portfolio.contract.domain.ContractRepository;
 import org.mifosplatform.portfolio.order.data.SchedulingOrderData;
 import org.mifosplatform.portfolio.plan.domain.Plan;
 import org.mifosplatform.portfolio.plan.domain.PlanRepository;
@@ -41,13 +41,13 @@ public class EventActionsApiResource {
 	private final ApiRequestParameterHelper apiRequestParameterHelper;
 	private final ActionDetailsReadPlatformService actionDetailsReadPlatformService; 
 	private final PlanRepository planRepository;
-	private final SubscriptionRepository subscriptionRepository;
+	private final ContractRepository subscriptionRepository;
 	
 	    
 	     @Autowired
 	    public EventActionsApiResource(final PlatformSecurityContext context,final DefaultToApiJsonSerializer<SchedulingOrderData> toApiJsonSerializer, 
 	    		final ApiRequestParameterHelper apiRequestParameterHelper,final ActionDetailsReadPlatformService actionDetailsReadPlatformService,
-	    		final PlanRepository planRepository,final SubscriptionRepository subscriptionRepository)
+	    		final PlanRepository planRepository,final ContractRepository subscriptionRepository)
 	     {
 		        this.context = context;
 		        this.toApiJsonSerializer = toApiJsonSerializer;
