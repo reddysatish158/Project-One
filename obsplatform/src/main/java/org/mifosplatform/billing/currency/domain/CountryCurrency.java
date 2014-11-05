@@ -40,7 +40,7 @@ public class CountryCurrency extends AbstractPersistable<Long> {
 	private BigDecimal conversionRate;
 
 	@Column(name = "is_deleted")
-	private String isDeleted = "N";
+	private char isDeleted = 'N';
 
 	public CountryCurrency() {
 	}
@@ -120,8 +120,10 @@ public class CountryCurrency extends AbstractPersistable<Long> {
 
 	public void delete() {
 
-		this.isDeleted = "y";
-
+	if (this.isDeleted == 'N') {
+		this.isDeleted = 'Y';
+		this.country = this.country+"_"+this.getId();
+	}
 	}
 
 	/**

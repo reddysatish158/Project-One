@@ -207,7 +207,7 @@ public class DiscountMaster extends AbstractPersistable<Long> {
 
 		if (this.isDelete == 'N') {
 			this.isDelete = 'Y';
-			this.discountCode = this.discountCode + "_Deleted";
+			this.discountCode = this.discountCode+"_"+this.getId();
 		}
 
 	}

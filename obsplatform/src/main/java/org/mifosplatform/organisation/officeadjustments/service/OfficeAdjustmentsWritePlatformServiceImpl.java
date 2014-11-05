@@ -11,6 +11,10 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * @author hugo
+ *
+ */
 @Service
 public class OfficeAdjustmentsWritePlatformServiceImpl implements
 		OfficeAdjustmentsWritePlatformService {
@@ -20,13 +24,17 @@ public class OfficeAdjustmentsWritePlatformServiceImpl implements
 	private final OfficeAdjustmentsCommandFromApiJsonDeserializer fromApiJsonDeserializer;
 	
 	@Autowired
-	public OfficeAdjustmentsWritePlatformServiceImpl(final PlatformSecurityContext context,final OfficeAdjustmentsRepository officeAdjustmentsRepository,
-												final OfficeAdjustmentsCommandFromApiJsonDeserializer	fromApiJsonDeserializer){
+	public OfficeAdjustmentsWritePlatformServiceImpl(final PlatformSecurityContext context,
+			final OfficeAdjustmentsRepository officeAdjustmentsRepository,
+			final OfficeAdjustmentsCommandFromApiJsonDeserializer fromApiJsonDeserializer){
 		this.context = context;
 		this.officeAdjustmentsRepository = officeAdjustmentsRepository;
 		this.fromApiJsonDeserializer = fromApiJsonDeserializer;
 	}
 	
+	/* (non-Javadoc)
+	 * @see #createOfficeAdjustment(org.mifosplatform.infrastructure.core.api.JsonCommand)
+	 */
 	@Transactional
 	@Override
 	public CommandProcessingResult createOfficeAdjustment(final JsonCommand command) {
@@ -38,7 +46,7 @@ public class OfficeAdjustmentsWritePlatformServiceImpl implements
 			this.officeAdjustmentsRepository.save(officeAdjustment);
 			return new CommandProcessingResult(Long.valueOf(officeAdjustment.getId()));
 		}catch(DataIntegrityViolationException dve) {
-			return CommandProcessingResult.empty();
+			return new CommandProcessingResult(Long.valueOf(-1L));
 		}
 	}
 

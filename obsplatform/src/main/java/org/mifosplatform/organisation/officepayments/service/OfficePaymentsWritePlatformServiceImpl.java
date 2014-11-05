@@ -14,6 +14,10 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * @author hugo
+ *
+ */
 @Service
 public class OfficePaymentsWritePlatformServiceImpl implements OfficePaymentsWritePlatformService {
 	
@@ -21,6 +25,7 @@ public class OfficePaymentsWritePlatformServiceImpl implements OfficePaymentsWri
 	private final PlatformSecurityContext context;
 	private final OfficePaymentsRepository officePaymentsRepository;
 	private final OfficePaymentsCommandFromApiJsonDeserializer fromApiJsonDeserializer;
+	
 	@Autowired
 	public OfficePaymentsWritePlatformServiceImpl(final PlatformSecurityContext context, 
 				final OfficePaymentsRepository  officePaymentsRepository,
@@ -31,6 +36,9 @@ public class OfficePaymentsWritePlatformServiceImpl implements OfficePaymentsWri
 		this.fromApiJsonDeserializer = fromApiJsonDeserializer;
 	}
 
+	/* (non-Javadoc)
+	 * @see #createOfficePayment(org.mifosplatform.infrastructure.core.api.JsonCommand)
+	 */
 	@Transactional
 	@Override
 	public CommandProcessingResult createOfficePayment(final JsonCommand command) {
@@ -57,7 +65,7 @@ public class OfficePaymentsWritePlatformServiceImpl implements OfficePaymentsWri
 	     }
 
 	     LOGGER.error(dve.getMessage(), dve);
-	     throw new PlatformDataIntegrityException("error.msg.cund.unknown.data.integrity.issue",
+	     throw new PlatformDataIntegrityException("error.msg.could.unknown.data.integrity.issue",
 	                "Unknown data integrity issue with resource: " + realCause.getMessage());
 		
 	}

@@ -59,14 +59,15 @@ public void invoiceOneTimeSale(final Long clientId, final OneTimeSaleData oneTim
 				BillingOrderData billingOrderData = new BillingOrderData(oneTimeSaleData.getId(),oneTimeSaleData.getClientId(),	new LocalDate().toDate(),
 						oneTimeSaleData.getChargeCode(),oneTimeSaleData.getChargeType(),oneTimeSaleData.getTotalPrice(),oneTimeSaleData.getTaxInclusive());
 				
-				BigDecimal discountAmount = BigDecimal.ZERO; 
+				
 				DiscountMaster discountMaster=this.discountMasterRepository.findOne(oneTimeSaleData.getDiscountId());
 				
 				DiscountMasterData discountMasterData=new DiscountMasterData(discountMaster.getId(),discountMaster.getDiscountCode(),discountMaster.getDiscountDescription(),
 						discountMaster.getDiscountType(),discountMaster.getDiscountRate(),null,null);
 				
-			    discountMasterData = this.calculateDiscount(discountMasterData, discountAmount, billingOrderData.getPrice());
+			    discountMasterData = this.calculateDiscount(discountMasterData,billingOrderData.getPrice());
 			    
+
 			    BillingOrderCommand   billingOrderCommand = this.generateBill.getOneTimeBill(billingOrderData, discountMasterData);
 				        
 			    billingOrderCommands.add(billingOrderCommand);
@@ -121,8 +122,9 @@ public void invoiceOneTimeSale(final Long clientId, final OneTimeSaleData oneTim
 	
 
 	// Discount calculation 
-	public DiscountMasterData calculateDiscount(final DiscountMasterData discountMasterData, BigDecimal discountAmount,
-			    BigDecimal chargePrice){
+	public DiscountMasterData calculateDiscount(final DiscountMasterData discountMasterData, BigDecimal chargePrice){
+		
+		BigDecimal discountAmount=BigDecimal.ZERO;
 		if(isDiscountPercentage(discountMasterData)){
 			
 			if(discountMasterData.getDiscountRate().compareTo(new BigDecimal(100)) ==-1 ||

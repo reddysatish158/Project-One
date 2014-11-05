@@ -30,12 +30,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author hugo
+ *This api class use to create adjustments for  payment mistakes
+ */
 @Path("/officeadjustments")
 @Component
 @Scope("singleton")
 public class OfficeAdjustmentsApiResource {
 
-	private final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(Arrays.asList("discountCode", "discountOptions"));
+	private final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(Arrays.asList("discountCode", "discountOptions","Amount"));
     private static final String RESOURCENAMEFORPERMISSIONS = "OFFICEADJUSTMENT";
     private final PlatformSecurityContext context;
     private final AdjustmentReadPlatformService readPlatformService;
@@ -59,6 +63,7 @@ public class OfficeAdjustmentsApiResource {
     @Consumes({MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_JSON})
     public String retrieveTempleteInfo(@Context final UriInfo uriInfo) {
+    	
     	context.authenticatedUser().validateHasReadPermission(RESOURCENAMEFORPERMISSIONS);
         final List<AdjustmentData> data = this.readPlatformService.retrieveAllAdjustmentsCodes();
         final AdjustmentCodeData datas = new AdjustmentCodeData(data);
@@ -73,7 +78,6 @@ public class OfficeAdjustmentsApiResource {
 	public String addNewOfficeAdjustment(@PathParam("officeId") final Long officeId, final String apiRequestBodyAsJson) {
     	
     	final CommandWrapper commandRequest = new CommandWrapperBuilder().createOfficeAdjustment(officeId).withJson(apiRequestBodyAsJson).build();
-
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 
     	return this.toApiJsonSerializer.serialize(result);

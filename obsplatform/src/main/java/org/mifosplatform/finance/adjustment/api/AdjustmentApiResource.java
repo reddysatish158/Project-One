@@ -84,6 +84,7 @@ public class AdjustmentApiResource {
     @Consumes({MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_JSON})
     public String retrieveTempleteInfo(@Context final UriInfo uriInfo) {
+
     	context.authenticatedUser().validateHasReadPermission(RESOURCENAMEFORPERMISSIONS);
     	
         final List<AdjustmentData> data=this.readPlatformService.retrieveAllAdjustmentsCodes();
