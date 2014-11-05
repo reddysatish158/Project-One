@@ -19,7 +19,7 @@ public class UpdateIpDetailsCommandHandler implements NewCommandSourceHandler {
 	    }
 
 		@Override
-		public CommandProcessingResult processCommand(JsonCommand command) {
-	       return this.writePlatformService.updateIpDetails(command.entityId(),command);
+		public CommandProcessingResult processCommand(final JsonCommand command) {
+	       return this.writePlatformService.updateIpDetails(command.entityId(), command);
 		}
 }
