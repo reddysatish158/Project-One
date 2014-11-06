@@ -38,7 +38,6 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
-import org.mifosplatform.portfolio.transactionhistory.service.TransactionHistoryWritePlatformService;
 import org.mifosplatform.workflow.eventaction.data.ActionDetaislData;
 import org.mifosplatform.workflow.eventaction.service.ActionDetailsReadPlatformService;
 import org.mifosplatform.workflow.eventaction.service.ActiondetailsWritePlatformService;
@@ -78,13 +77,12 @@ public class PaymentWritePlatformServiceImpl implements PaymentWritePlatformServ
 	private final ActionDetailsReadPlatformService actionDetailsReadPlatformService; 
 	private final ClientBalanceReadPlatformService clientBalanceReadPlatformService;
 	private final ActiondetailsWritePlatformService actiondetailsWritePlatformService;
-	private final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService;
 
 	@Autowired
 	public PaymentWritePlatformServiceImpl(final PlatformSecurityContext context,final PaymentRepository paymentRepository,
 			final PaymentCommandFromApiJsonDeserializer fromApiJsonDeserializer,final ClientBalanceReadPlatformService clientBalanceReadPlatformService,
 			final ClientBalanceRepository clientBalanceRepository,final ChequePaymentRepository chequePaymentRepository,
-			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,final ActionDetailsReadPlatformService actionDetailsReadPlatformService,
+			final ActionDetailsReadPlatformService actionDetailsReadPlatformService,
 			final UpdateClientBalance updateClientBalance,final ActiondetailsWritePlatformService actiondetailsWritePlatformService,final PaymentReadPlatformService paymodeReadPlatformService,
 			final InvoiceRepository invoiceRepository,final ConfigurationRepository globalConfigurationRepository,
 			final PaypalEnquireyRepository paypalEnquireyRepository,final FromJsonHelper fromApiJsonHelper) {
@@ -103,7 +101,6 @@ public class PaymentWritePlatformServiceImpl implements PaymentWritePlatformServ
 		this.actionDetailsReadPlatformService=actionDetailsReadPlatformService;
 		this.clientBalanceReadPlatformService=clientBalanceReadPlatformService;
 		this.actiondetailsWritePlatformService=actiondetailsWritePlatformService; 
-		this.transactionHistoryWritePlatformService = transactionHistoryWritePlatformService;
 		
 	}
 
@@ -178,9 +175,6 @@ public class PaymentWritePlatformServiceImpl implements PaymentWritePlatformServ
 				
 			}
 		
-			transactionHistoryWritePlatformService.saveTransactionHistory(payment.getClientId(), "PAYMENT", payment.getPaymentDate(),
-					"AmountPaid:"+payment.getAmountPaid(),"PayMode:"+payModeData.getPaymodeCode(),"Remarks:"+payment.getRemarks(),
-					"ReceiptNo: "+payment.getReceiptNo());
 			return payment.getId();
 
 		} catch (DataIntegrityViolationException dve) {
@@ -205,8 +199,6 @@ public class PaymentWritePlatformServiceImpl implements PaymentWritePlatformServ
 			clientBalance.setBalanceAmount(clientBalance.getBalanceAmount().add(payment.getAmountPaid()));
 			this.clientBalanceRepository.save(clientBalance);
 			
-			transactionHistoryWritePlatformService.saveTransactionHistory(payment.getClientId(), "Cancel Payment", payment.getPaymentDate(),
-					"Amount :"+payment.getAmountPaid(),"Remarks:"+payment.getCancelRemark(),"ReceiptNo: "+payment.getReceiptNo());
 			return new CommandProcessingResult(paymentId,payment.getClientId());
 			
 			

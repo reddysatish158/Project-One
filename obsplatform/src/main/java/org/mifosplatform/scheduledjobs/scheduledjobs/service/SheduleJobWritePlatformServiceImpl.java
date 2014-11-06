@@ -28,7 +28,6 @@ import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.mifosplatform.crm.ticketmaster.api.TicketMasterApiResource;
-import org.mifosplatform.crm.ticketmaster.data.ProblemsData;
 import org.mifosplatform.crm.ticketmaster.service.TicketMasterReadPlatformService;
 import org.mifosplatform.finance.billingmaster.api.BillingMasterApiResourse;
 import org.mifosplatform.finance.billingorder.exceptions.BillingOrderNoRecordsFoundException;
@@ -56,7 +55,6 @@ import org.mifosplatform.portfolio.order.data.OrderData;
 import org.mifosplatform.portfolio.order.domain.Order;
 import org.mifosplatform.portfolio.order.domain.OrderRepository;
 import org.mifosplatform.portfolio.order.service.OrderReadPlatformService;
-import org.mifosplatform.portfolio.transactionhistory.service.TransactionHistoryWritePlatformService;
 import org.mifosplatform.provisioning.entitlements.data.ClientEntitlementData;
 import org.mifosplatform.provisioning.entitlements.data.EntitlementsData;
 import org.mifosplatform.provisioning.entitlements.service.EntitlementReadPlatformService;
@@ -112,49 +110,42 @@ private final OrderRepository orderRepository;
 private final MCodeReadPlatformService codeReadPlatformService;
 private  String ReceiveMessage;
 
-
-
 @Autowired
 public SheduleJobWritePlatformServiceImpl(final InvoiceClient invoiceClient,final FromJsonHelper fromApiJsonHelper,
-final BillingMasterApiResourse billingMasterApiResourse,final ProcessRequestRepository processRequestRepository,
-final SheduleJobReadPlatformService sheduleJobReadPlatformService,
-final OrderReadPlatformService orderReadPlatformService,final BillingMessageDataWritePlatformService billingMessageDataWritePlatformService,
-final ActionDetailsReadPlatformService actionDetailsReadPlatformService,final ProcessEventActionService actiondetailsWritePlatformService,
-final PrepareRequestReadplatformService prepareRequestReadplatformService,
-final ProcessRequestReadplatformService processRequestReadplatformService,final ProcessRequestWriteplatformService processRequestWriteplatformService,
-final BillingMesssageReadPlatformService billingMesssageReadPlatformService,final MessagePlatformEmailService messagePlatformEmailService,
-final ScheduleJob scheduleJob,final EntitlementReadPlatformService entitlementReadPlatformService,
-final EntitlementWritePlatformService entitlementWritePlatformService,final ReadReportingService readExtraDataAndReportingService,
-final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,final OrderRepository orderRepository,
-final ConfigurationRepository globalConfigurationRepository,
-final TicketMasterApiResource ticketMasterApiResource, 
-final TicketMasterReadPlatformService ticketMasterReadPlatformService,
-final MCodeReadPlatformService codeReadPlatformService) {
+	   final BillingMasterApiResourse billingMasterApiResourse,final ProcessRequestRepository processRequestRepository,
+	   final SheduleJobReadPlatformService sheduleJobReadPlatformService,final OrderReadPlatformService orderReadPlatformService,
+	   final BillingMessageDataWritePlatformService billingMessageDataWritePlatformService,final ActionDetailsReadPlatformService actionDetailsReadPlatformService,
+	   final ProcessEventActionService actiondetailsWritePlatformService,final PrepareRequestReadplatformService prepareRequestReadplatformService,
+	   final ProcessRequestReadplatformService processRequestReadplatformService,final ProcessRequestWriteplatformService processRequestWriteplatformService,
+	   final BillingMesssageReadPlatformService billingMesssageReadPlatformService,final MessagePlatformEmailService messagePlatformEmailService,
+	   final ScheduleJob scheduleJob,final EntitlementReadPlatformService entitlementReadPlatformService,
+	   final EntitlementWritePlatformService entitlementWritePlatformService,final ReadReportingService readExtraDataAndReportingService,
+	   final OrderRepository orderRepository,final ConfigurationRepository globalConfigurationRepository,final TicketMasterApiResource ticketMasterApiResource, 
+	   final TicketMasterReadPlatformService ticketMasterReadPlatformService,final MCodeReadPlatformService codeReadPlatformService) {
 
-this.sheduleJobReadPlatformService = sheduleJobReadPlatformService;
-this.invoiceClient = invoiceClient;
-this.billingMasterApiResourse = billingMasterApiResourse;
-this.fromApiJsonHelper = fromApiJsonHelper;
-this.orderReadPlatformService = orderReadPlatformService;
-this.billingMessageDataWritePlatformService = billingMessageDataWritePlatformService;
-this.prepareRequestReadplatformService = prepareRequestReadplatformService;
-this.processRequestReadplatformService = processRequestReadplatformService;
-this.processRequestWriteplatformService = processRequestWriteplatformService;
-this.processRequestRepository = processRequestRepository;
-this.billingMesssageReadPlatformService = billingMesssageReadPlatformService;
-this.messagePlatformEmailService = messagePlatformEmailService;
-this.entitlementReadPlatformService = entitlementReadPlatformService;
-this.entitlementWritePlatformService = entitlementWritePlatformService;
-this.actionDetailsReadPlatformService = actionDetailsReadPlatformService;
-this.actiondetailsWritePlatformService = actiondetailsWritePlatformService;
-this.scheduleJob = scheduleJob;
-this.orderRepository = orderRepository;
-this.readExtraDataAndReportingService = readExtraDataAndReportingService;
-this.globalConfigurationRepository = globalConfigurationRepository;
-this.ticketMasterApiResource = ticketMasterApiResource;
-this.ticketMasterReadPlatformService = ticketMasterReadPlatformService;
-this.codeReadPlatformService = codeReadPlatformService;
-
+	this.sheduleJobReadPlatformService = sheduleJobReadPlatformService;
+	this.invoiceClient = invoiceClient;
+	this.billingMasterApiResourse = billingMasterApiResourse;
+	this.fromApiJsonHelper = fromApiJsonHelper;
+	this.orderReadPlatformService = orderReadPlatformService;
+	this.billingMessageDataWritePlatformService = billingMessageDataWritePlatformService;
+	this.prepareRequestReadplatformService = prepareRequestReadplatformService;
+	this.processRequestReadplatformService = processRequestReadplatformService;
+	this.processRequestWriteplatformService = processRequestWriteplatformService;
+	this.processRequestRepository = processRequestRepository;
+	this.billingMesssageReadPlatformService = billingMesssageReadPlatformService;
+	this.messagePlatformEmailService = messagePlatformEmailService;
+	this.entitlementReadPlatformService = entitlementReadPlatformService;
+	this.entitlementWritePlatformService = entitlementWritePlatformService;
+	this.actionDetailsReadPlatformService = actionDetailsReadPlatformService;
+	this.actiondetailsWritePlatformService = actiondetailsWritePlatformService;
+	this.scheduleJob = scheduleJob;
+	this.orderRepository = orderRepository;
+	this.readExtraDataAndReportingService = readExtraDataAndReportingService;
+	this.globalConfigurationRepository = globalConfigurationRepository;
+	this.ticketMasterApiResource = ticketMasterApiResource;
+	this.ticketMasterReadPlatformService = ticketMasterReadPlatformService;
+	this.codeReadPlatformService = codeReadPlatformService;
 }
 
 
@@ -429,7 +420,7 @@ try {
 						jsonobject.put("assignedTo", userId);
 						jsonobject.put("priority",priorityData.get(0).getValue());
 						jsonobject.put("problemCode", problemsData.iterator().next().getId());
-						String resourceId = this.ticketMasterApiResource.createTicketMaster(processRequest.getClientId(), jsonobject.toString());
+						this.ticketMasterApiResource.createTicketMaster(processRequest.getClientId(), jsonobject.toString());
  		  
 					}
 				}

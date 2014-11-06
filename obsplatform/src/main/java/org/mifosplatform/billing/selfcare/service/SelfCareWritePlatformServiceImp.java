@@ -3,8 +3,6 @@ package org.mifosplatform.billing.selfcare.service;
 import java.util.Date;
 import java.util.List;
 
-import net.fortuna.ical4j.model.parameter.Language;
-
 import org.apache.commons.lang.RandomStringUtils;
 import org.mifosplatform.billing.loginhistory.domain.LoginHistory;
 import org.mifosplatform.billing.loginhistory.domain.LoginHistoryRepository;
@@ -15,8 +13,6 @@ import org.mifosplatform.billing.selfcare.exception.SelfCareAlreadyVerifiedExcep
 import org.mifosplatform.billing.selfcare.exception.SelfCareEmailIdDuplicateException;
 import org.mifosplatform.billing.selfcare.exception.SelfCareTemporaryGeneratedKeyNotFoundException;
 import org.mifosplatform.billing.selfcare.exception.SelfcareEmailIdNotFoundException;
-import org.mifosplatform.infrastructure.configuration.domain.Configuration;
-import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -30,14 +26,12 @@ import org.mifosplatform.portfolio.client.domain.Client;
 import org.mifosplatform.portfolio.client.domain.ClientRepository;
 import org.mifosplatform.portfolio.client.exception.ClientNotFoundException;
 import org.mifosplatform.portfolio.client.exception.ClientStatusException;
-import org.mifosplatform.portfolio.transactionhistory.service.TransactionHistoryWritePlatformService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -52,27 +46,24 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 	private SelfCareTemporaryRepository selfCareTemporaryRepository;
 	private final BillingMessageTemplateRepository billingMessageTemplateRepository;
 	private SelfCareCommandFromApiJsonDeserializer selfCareCommandFromApiJsonDeserializer;
-	private TransactionHistoryWritePlatformService transactionHistoryWritePlatformService;
 	private final static Logger logger = (Logger) LoggerFactory.getLogger(SelfCareWritePlatformServiceImp.class);
-	private final ConfigurationRepository globalConfigurationRepository; 
+
 	@Autowired
 	public SelfCareWritePlatformServiceImp(final PlatformSecurityContext context, final SelfCareRepository selfCareRepository, 
 		    final SelfCareCommandFromApiJsonDeserializer selfCareCommandFromApiJsonDeserializer,final SelfCareReadPlatformService selfCareReadPlatformService, 
-			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,final SelfCareTemporaryRepository selfCareTemporaryRepository,
+			final SelfCareTemporaryRepository selfCareTemporaryRepository,
 			final BillingMessageTemplateRepository billingMessageTemplateRepository,final MessagePlatformEmailService messagePlatformEmailService,
-			ClientRepository clientRepository,final LoginHistoryRepository loginHistoryRepository,final ConfigurationRepository globalConfigurationRepository) {
+			ClientRepository clientRepository,final LoginHistoryRepository loginHistoryRepository) {
 		
 		this.context = context;
 		this.selfCareRepository = selfCareRepository;
 		this.selfCareCommandFromApiJsonDeserializer = selfCareCommandFromApiJsonDeserializer;
 		this.selfCareReadPlatformService = selfCareReadPlatformService;
-		this.transactionHistoryWritePlatformService = transactionHistoryWritePlatformService;
 		this.selfCareTemporaryRepository = selfCareTemporaryRepository;
 		this.messagePlatformEmailService = messagePlatformEmailService;
 		this.billingMessageTemplateRepository = billingMessageTemplateRepository;
 		this.messagePlatformEmailService= messagePlatformEmailService;
 		this.clientRepository=clientRepository;
-		this.globalConfigurationRepository=globalConfigurationRepository;
 		this.loginHistoryRepository=loginHistoryRepository;
 				
 	}
@@ -105,7 +96,6 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 			
 			boolean mailnotification=command.booleanPrimitiveValueOfParameterNamed("mailNotification");
 			
-				String message=null;
 			if(clientId !=null && clientId > 0 ){
 				
 				selfCare.setClientId(clientId);
@@ -124,48 +114,8 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 				StringBuilder prepareEmail =new StringBuilder();
 				prepareEmail.append(header);
 				prepareEmail.append("\t").append(body);
-				//prepareEmail.append("\n").append("\n");
 				prepareEmail.append(messageDetails.get(0).getFooter());
-				 message = messagePlatformEmailService.sendGeneralMessage(selfCare.getUniqueReference(), prepareEmail.toString().trim(), subject);
-			
-				
-				/*//
-				
-				
-				StringBuilder builder = new StringBuilder();
-				builder.append("Dear " + selfCare.getUserName() + "\n");
-				builder.append("\n");
-				builder.append("Your Selfcare User Account has been successfully created.");
-				builder.append("Following are the User login Details. ");
-				builder.append("\n");
-				builder.append("userName :" + selfCare.getUniqueReference() + ".");
-				builder.append("\n");
-				builder.append("password :" + selfCare.getPassword() + ".");
-				builder.append("\n");
-				builder.append("Thankyou");
-=======
-				Client client= this.clientRepository.findOne(clientId);
-				BillingMessageTemplate messageDetails=this.billingMessageTemplateRepository.findByTemplateDescription("SELF CARE");
-				String subject=messageDetails.getSubject();
-				String body=messageDetails.getBody();
-				String header=messageDetails.getHeader().replace("PARAM1", client.getDisplayName()+","+"\n");
-				body=body.replace("PARAM2"," "+email );
-				body=body.replace("PARAM3",messageDetails.getFooter());
-				body=body.replace("PARAM4",selfCare.getUserName());
-				body=body.replace("PARAM5", unencodedPassword);
-				StringBuilder body1 =new StringBuilder(header).append(body+"\n").append("\n"+"Thanks"+"\n"+messageDetails.getFooter());
-				body=new String(body1);
-				messagePlatformEmailService.sendGeneralMessage(email, body, subject);
-				/*platformEmailService.sendToUserAccount(new EmailDetail("Hugo Self Care Organisation ", "SelfCare",email, selfCare.getUserName()), unencodedPassword);
-
-
-				
-				String message = this.messagePlatformEmailService.sendGeneralMessage(selfCare.getUniqueReference(), builder.toString(), emailSubject);		
-				*/
-				
-				transactionHistoryWritePlatformService.saveTransactionHistory(clientId, "Self Care user activation", new Date(), "USerName: "+selfCare.getUserName()+" ClientId" 
-						+ selfCare.getClientId() + "Email Sending Result :" + message);
-			
+				  messagePlatformEmailService.sendGeneralMessage(selfCare.getUniqueReference(), prepareEmail.toString().trim(), subject);
 				}
 				}else{
 				throw new PlatformDataIntegrityException("client does not exist", "client not registered","clientId", "client is null ");
@@ -203,7 +153,6 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 
 			selfCareRepository.save(selfCare);
 			String username=selfCare.getUserName();
-			transactionHistoryWritePlatformService.saveTransactionHistory(clientId, "Self Care user activation", new Date(), "USerName: "+username+" ClientId"+selfCare.getClientId());
 			LoginHistory loginHistory=new LoginHistory(ipAddress,null,session,new Date(),null,username,"ACTIVE");
     		this.loginHistoryRepository.save(loginHistory);
     		loginHistoryId=loginHistory.getId();
@@ -323,30 +272,9 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 				StringBuilder prepareEmail =new StringBuilder();
 				prepareEmail.append(header);
 				prepareEmail.append("\t").append(body);
-			//	prepareEmail.append("\n").append("\n");
 				prepareEmail.append(messageDetails.get(0).getFooter());
 				
-				/*StringBuilder body = new StringBuilder();
-				body.append("hi");
-				body.append("\n");
-				body.append("\n");
-				body.append("Your Registration has been successfully completed.");
-				body.append("\n");
-				body.append("To approve this Registration please click on this link:");
-				body.append("\n");
-				body.append("URL: " + returnUrl + generatedKey);
-				body.append("\n");
-				body.append("\n");
-				body.append("Thankyou");
-				
-				String subject = "Register Conformation";*/
-				
-			//	String translatedText = Translate.execute("Bonjour le monde", "IS","en");
-					
-				String result = messagePlatformEmailService.sendGeneralMessage(selfCareTemporary.getUserName(), prepareEmail.toString().trim(), subject);
-					
-				transactionHistoryWritePlatformService.saveTransactionHistory(clientId, "Self Care User Registration", new Date(),
-						"EmailId: "+selfCareTemporary.getUserName() + ", returnUrl: "+ returnUrl +", Email Sending Resopnse: " + result);
+				this.messagePlatformEmailService.sendGeneralMessage(selfCareTemporary.getUserName(), prepareEmail.toString().trim(), subject);
 				return new CommandProcessingResultBuilder().withEntityId(selfCareTemporary.getId()).withClientId(clientId).build();
 			}
 				
@@ -379,11 +307,7 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 					
 					selfCareTemporary.setStatus("PENDING");
 					
-					transactionHistoryWritePlatformService.saveTransactionHistory(clientId, "Self Care User Registration is Verified Through Email", new Date(),
-							"EmailId: "+selfCareTemporary.getUserName());			
 				} else{
-					transactionHistoryWritePlatformService.saveTransactionHistory(clientId, "Self Care User Registration is Already Verified Through this GeneratedKey"+verificationKey, new Date(),
-							"EmailId: "+selfCareTemporary.getUserName());	
 					throw new SelfCareAlreadyVerifiedException(verificationKey);		
 				}
 			}
@@ -425,25 +349,8 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 				prepareEmail.append("\t").append(body);
 				//prepareEmail.append("\n").append("\n");
 				prepareEmail.append(messageDetails.get(0).getFooter());
-				
-				/*StringBuilder body = new StringBuilder();
-				body.append("Dear "+selfCare.getUserName() + ",");
-				body.append("\n");
-				body.append("\n");
-				body.append("The password for your SelfCare User Portal Account- "+ uniqueReference +" was reset. .");
-				body.append("\n");
-				body.append("Password:"+ generatedKey);
-				body.append("\n");
-				body.append("\n");
-				body.append("Thankyou");
-				
-				String subject = "Reset Password";*/
-				
+				messagePlatformEmailService.sendGeneralMessage(selfCare.getUniqueReference(), prepareEmail.toString().trim(), subject);
 					
-				String result = messagePlatformEmailService.sendGeneralMessage(selfCare.getUniqueReference(), prepareEmail.toString().trim(), subject);
-					
-				transactionHistoryWritePlatformService.saveTransactionHistory(selfCare.getClientId(), "Self Care Password Reset", new Date(),
-						"EmailId: "+selfCare.getUniqueReference() + ", Email Sending Resopnse: " + result);
 			}
 			
 			return new CommandProcessingResultBuilder().withEntityId(selfCare.getId()).withClientId(selfCare.getClientId()).build();
@@ -475,8 +382,7 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 				selfCare.setPassword(password);
 				this.selfCareRepository.save(selfCare);
 				
-				transactionHistoryWritePlatformService.saveTransactionHistory(selfCare.getClientId(), "Self Care Password Reset", new Date(),
-						"EmailId: "+selfCare.getUniqueReference());
+				
 			}
 			
 			return new CommandProcessingResultBuilder().withEntityId(selfCare.getId()).withClientId(selfCare.getClientId()).build();
@@ -486,15 +392,4 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 		}
 		
 	}
-	/*@Override
-	public void verifyActiveViewers(String serialNo, Long clientId) {
-	   		
-       	OwnedHardware ownedHardware =this.ownedHardwareJpaRepository.findBySerialNumber(serialNo, clientId);
-       	ownedHardware.setStatus("ACTIVE");
-       	this.ownedHardwareJpaRepository.saveAndFlush(ownedHardware);
-       	
-      }*/
-
-
-	
 }
