@@ -15,7 +15,6 @@ import org.mifosplatform.finance.billingorder.serialization.BillingOrderCommandF
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
-import org.mifosplatform.portfolio.transactionhistory.service.TransactionHistoryWritePlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -27,21 +26,18 @@ public class InvoiceClient {
 	private final GenerateBillingOrderService generateBillingOrderService;
 	private final BillingOrderWritePlatformService billingOrderWritePlatformService;
 	private final BillingOrderCommandFromApiJsonDeserializer apiJsonDeserializer;
-	private final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService; 
 	
 	
 	
 	
 	@Autowired
 	InvoiceClient(final BillingOrderReadPlatformService billingOrderReadPlatformService,final GenerateBillingOrderService generateBillingOrderService,
-			final BillingOrderWritePlatformService billingOrderWritePlatformService,final BillingOrderCommandFromApiJsonDeserializer apiJsonDeserializer,
-			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService) {
+			final BillingOrderWritePlatformService billingOrderWritePlatformService,final BillingOrderCommandFromApiJsonDeserializer apiJsonDeserializer) {
 
 		this.billingOrderReadPlatformService = billingOrderReadPlatformService;
 		this.generateBillingOrderService = generateBillingOrderService;
 		this.billingOrderWritePlatformService = billingOrderWritePlatformService;
 		this.apiJsonDeserializer=apiJsonDeserializer;
-		this.transactionHistoryWritePlatformService=transactionHistoryWritePlatformService;
 	}
 	
 	
@@ -88,10 +84,6 @@ public class InvoiceClient {
 			// Update order-price
 			 billingOrderWritePlatformService.updateBillingOrder(billingOrderCommands);
 			 System.out.println("---------------------"+billingOrderCommands.get(0).getNextBillableDate());
-
-			 transactionHistoryWritePlatformService.saveTransactionHistory(clientId,"Invoice", new Date(),"Amount:"
-	    				+invoice.getInvoiceAmount(),"Charge Startdate:"+billingOrderCommands.get(0).getBillStartDate(),
-	    				"Charge Enddate:"+billingOrderCommands.get(0).getEndDate());
 			 
                if(invoice.getInvoiceAmount() == null){
             	   return null;

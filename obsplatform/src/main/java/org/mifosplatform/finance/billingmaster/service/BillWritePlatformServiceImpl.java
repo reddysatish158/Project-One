@@ -504,7 +504,7 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 			billMaster.setFileName(printInvoicedetailsLocation);
 			this.billMasterRepository.save(billMaster);
 			final String jfilepath =jpath+File.separator+"Bill_Mainreport.jasper";
-			Long billNum = null;
+			/*Long billNum = null;
 			final Client client = this.clientRepository.findOne(billMaster.getClientId());
 			
 				if(client.getGroupName() != null){
@@ -512,8 +512,8 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 				}else{
 					billNum = billMaster.getId();
 				}
-				
-			Map<String, Object> parameters = new HashMap();
+				*/
+			Map<String, Object> parameters = new HashMap<String, Object>();
 
 			final Integer id = Integer.valueOf(billMaster.getId().toString());
 			parameters.put("param1", id);

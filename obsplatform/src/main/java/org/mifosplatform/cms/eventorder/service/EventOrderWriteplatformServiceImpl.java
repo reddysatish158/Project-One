@@ -22,23 +22,20 @@ import org.mifosplatform.cms.mediadevice.data.MediaDeviceData;
 import org.mifosplatform.cms.mediadevice.service.MediaDeviceReadPlatformService;
 import org.mifosplatform.finance.clientbalance.data.ClientBalanceData;
 import org.mifosplatform.finance.clientbalance.service.ClientBalanceReadPlatformService;
-import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
-import org.mifosplatform.logistics.itemdetails.exception.ActivePlansFoundException;
 import org.mifosplatform.logistics.onetimesale.data.OneTimeSaleData;
 import org.mifosplatform.logistics.onetimesale.serialization.EventOrderCommandFromApiJsonDeserializer;
 import org.mifosplatform.logistics.onetimesale.service.InvoiceOneTimeSale;
 import org.mifosplatform.logistics.onetimesale.service.OneTimeSaleReadPlatformService;
 import org.mifosplatform.portfolio.client.domain.Client;
 import org.mifosplatform.portfolio.client.domain.ClientRepository;
-import org.mifosplatform.portfolio.order.data.CustomValidationData;
 import org.mifosplatform.portfolio.order.service.OrderDetailsReadPlatformServices;
-import org.mifosplatform.portfolio.transactionhistory.service.TransactionHistoryWritePlatformService;
 import org.mifosplatform.workflow.eventaction.data.ActionDetaislData;
 import org.mifosplatform.workflow.eventaction.service.ActionDetailsReadPlatformService;
 import org.mifosplatform.workflow.eventaction.service.ActiondetailsWritePlatformService;
@@ -67,9 +64,7 @@ public class EventOrderWriteplatformServiceImpl implements EventOrderWriteplatfo
 	private final ClientBalanceReadPlatformService balanceReadPlatformService;
 	private final EventOrderCommandFromApiJsonDeserializer apiJsonDeserializer;
 	private final ActionDetailsReadPlatformService actionDetailsReadPlatformService;
-    private final OrderDetailsReadPlatformServices orderDetailsReadPlatformServices; 
 	private final ActiondetailsWritePlatformService actiondetailsWritePlatformService;
-	private final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService;
 
 	@Autowired
 	public EventOrderWriteplatformServiceImpl(final PlatformSecurityContext context,final EventOrderRepository eventOrderRepository,
@@ -77,9 +72,8 @@ public class EventOrderWriteplatformServiceImpl implements EventOrderWriteplatfo
 			final InvoiceOneTimeSale invoiceOneTimeSale,final OneTimeSaleReadPlatformService oneTimeSaleReadPlatformService,
 			final EventMasterRepository eventMasterRepository,final MediaAssetRepository mediaAssetRepository,final EventPriceRepository eventPricingRepository,
 			final MediaDeviceReadPlatformService deviceReadPlatformService,final ClientBalanceReadPlatformService balanceReadPlatformService,
-			final EventDetailsRepository eventDetailsRepository,final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,
+			final EventDetailsRepository eventDetailsRepository,final ConfigurationRepository configurationRepository,
 			final ActionDetailsReadPlatformService actionDetailsReadPlatformService,final ActiondetailsWritePlatformService actiondetailsWritePlatformService,
-			final OrderDetailsReadPlatformServices orderDetailsReadPlatformServices,final ConfigurationRepository configurationRepository,
 			final ClientRepository clientRepository,final EventValidationReadPlatformService eventValidationReadPlatformService) {
 		
 		this.context = context;
@@ -97,9 +91,7 @@ public class EventOrderWriteplatformServiceImpl implements EventOrderWriteplatfo
 		this.eventMasterRepository = eventMasterRepository;
 		this.eventPricingRepository = eventPricingRepository;
 		this.actionDetailsReadPlatformService=actionDetailsReadPlatformService;
-		this.orderDetailsReadPlatformServices=orderDetailsReadPlatformServices;
 		this.actiondetailsWritePlatformService=actiondetailsWritePlatformService;
-		this.transactionHistoryWritePlatformService = transactionHistoryWritePlatformService;
 
 	}
 
@@ -182,10 +174,6 @@ public class EventOrderWriteplatformServiceImpl implements EventOrderWriteplatfo
 				   if(!actionDetaislDatas.isEmpty()){
 					  response = this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,clientId,eventOrder.getId().toString(),null);
 				   }		
-				   transactionHistoryWritePlatformService.saveTransactionHistory(eventOrder.getClientId(), "Event Order", eventOrder.getEventBookedDate(),
-						   "CancelFlag:"+eventOrder.getCancelFlag(),"bookedPrice:"+eventOrder.getBookedPrice(),"EventValidTillDate:"+eventOrder.getEventValidtill(),
-						   "EventId:"+eventOrder.getEventId(),"EventOrderID:"+eventOrder.getId());
-			
 		        return new CommandProcessingResult(eventOrder.getEventOrderdetials().get(0).getMovieLink(),eventOrder.getClientId());
 			    //return new CommandProcessingResultBuilder().withEntityId(eventMaster.getId()).withResourceIdAsString(response).build();
 			

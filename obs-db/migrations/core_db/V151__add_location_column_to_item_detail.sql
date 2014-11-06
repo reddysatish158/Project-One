@@ -16,12 +16,18 @@ call addlocation();
 Drop procedure IF EXISTS addlocation;
 
 
+
+
+delete from m_code_value where code_id=(select id from m_code where m_code.code_name='Item Quality');
+delete from m_code where code_name='Item Quality';
 insert ignore into m_code (id,code_name,is_system_defined,code_description) VALUES (null,'Item Quality',0,'define haraware condition');
 select @a_lid:=(select id from m_code where code_name='Item Quality');
 insert ignore into m_code_value VALUES (null,@a_lid,'Good',0);
 insert ignore into m_code_value VALUES (null,@a_lid,'Refurbished',0);
 insert ignore into m_code_value VALUES (null,@a_lid,'Faulty',0);
 
+delete from m_code_value where code_id=(select id from m_code where m_code.code_name='Item Status');
+delete from m_code where code_name='Item Status';
 insert ignore into m_code (id,code_name,is_system_defined,code_description) VALUES (null,'Item Status',0,'define haraware staus');
 select @a_lid:=(select id from m_code where code_name='Item Status');
 insert ignore into m_code_value VALUES (null,@a_lid,'Available',0);

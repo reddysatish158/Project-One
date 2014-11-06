@@ -57,6 +57,7 @@ import com.google.gson.JsonElement;
 public class ItemDetailsWritePlatformServiceImp implements ItemDetailsWritePlatformService{
 	
 	private final static Logger logger = (Logger) LoggerFactory.getLogger(ItemDetailsWritePlatformServiceImp.class);
+	public  final static String CONFIG_PROPERTY="Implicit Association";
 	private final FromJsonHelper fromJsonHelper;
 	private final PlatformSecurityContext context;
 	private final ItemRepository itemRepository;
@@ -64,7 +65,6 @@ public class ItemDetailsWritePlatformServiceImp implements ItemDetailsWritePlatf
 	private final InventoryGrnRepository inventoryGrnRepository;
 	private final ConfigurationRepository configurationRepository;
 	private final OrderReadPlatformService orderReadPlatformService;
-	public  final static String CONFIG_PROPERTY="Implicit Association";
 	private final ItemDetailsRepository inventoryItemDetailsRepository;
 	private final OneTimeSaleReadPlatformService oneTimeSaleReadPlatformService;
 	private final HardwareAssociationReadplatformService associationReadplatformService;
@@ -143,6 +143,7 @@ public class ItemDetailsWritePlatformServiceImp implements ItemDetailsWritePlatf
 			}
 			
 			this.inventoryItemDetailsRepository.save(inventoryItemDetails);
+			
 			//InventoryTransactionHistory transactionHistory = InventoryTransactionHistory.logTransaction(new LocalDate().toDate(), inventoryItemDetails.getId(),"Item Detail",inventoryItemDetails.getSerialNumber(), inventoryItemDetails.getItemMasterId(), inventoryItemDetails.getGrnId(), inventoryGrn.getOfficeId());
 			//InventoryTransactionHistory transactionHistory = InventoryTransactionHistory.logTransaction(new LocalDate().toDate(),inventoryItemDetails.getId(),"Item Detail",inventoryItemDetails.getSerialNumber(),inventoryGrn.getOfficeId(),inventoryItemDetails.getClientId(),inventoryItemDetails.getItemMasterId());
 			//inventoryTransactionHistoryJpaRepository.save(transactionHistory);

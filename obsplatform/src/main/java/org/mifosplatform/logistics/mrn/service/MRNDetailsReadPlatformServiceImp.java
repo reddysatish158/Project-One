@@ -77,8 +77,7 @@ public class MRNDetailsReadPlatformServiceImp implements MRNDetailsReadPlatformS
 		@Override
 		public InventoryTransactionHistoryData mapRow(ResultSet rs, int rowNum)
 				throws SQLException {
-			final Long id = rs.getLong("id");
-			final Long mrnId = rs.getLong("mrnId");
+
 			final String itemDescription = rs.getString("itemDescription");
 			final String serialNumber = rs.getString("serialNumber");
 			final LocalDate transactionDate =JdbcSupport.getLocalDate(rs,"transactionDate");
@@ -86,7 +85,7 @@ public class MRNDetailsReadPlatformServiceImp implements MRNDetailsReadPlatformS
 			final String toOffice = rs.getString("destination");
 			final String refType = rs.getString("refType");
 			final String movement = rs.getString("movement");
-			return new InventoryTransactionHistoryData(id, transactionDate, mrnId, itemDescription, fromOffice, toOffice,serialNumber,refType,movement);
+			return new InventoryTransactionHistoryData(transactionDate,itemDescription, fromOffice, toOffice,serialNumber,refType,movement);
 		}
 	}
 	
@@ -186,32 +185,33 @@ public class MRNDetailsReadPlatformServiceImp implements MRNDetailsReadPlatformS
 	
 	@Override
 	public Page<InventoryTransactionHistoryData> retriveHistory(SearchSqlQuery searchItemHistory) {
-		//final String sql = "select id as id, ref_id as mrnId, ref_type as refType, (select item_description from b_item_master where id=item_master_id) as itemDescription, serial_number as serialNumber, transaction_date as transactionDate, (select name from m_office where id=from_office) as fromOffice, (select name from m_office where id=to_office) as toOffice from b_item_history";
 		
-		final String sql = " SQL_CALC_FOUND_ROWS * from (select id as id, ref_id as mrnId, ref_type as refType,"+ 
-""+" (select item_description from b_item_master where id=item_master_id) as itemDescription,"+ 
-""+" serial_number as serialNumber, transaction_date as transactionDate, 'From Office to To Office' movement,"+
-""+" (select name from m_office where id=from_office) as source,"+
-""+"(select name from m_office where id=to_office) as destination from b_item_history where ref_type='MRN'"+
-""+" union all"+
-""+" select id as id, ref_id as mrnId, ref_type as refType,"+ 
-""+" (select item_description from b_item_master where id=item_master_id) as itemDescription,"+ 
-""+" serial_number as serialNumber, transaction_date as transactionDate, 'From Supplier to To Office' movement,"+
-""+" (select b.supplier_description from b_grn a, b_supplier b where a.supplier_id=b.id and a.id=from_office) as source,"+ 
-""+" (select name from m_office where id=to_office) as destination from b_item_history where ref_type='Item Detail'"+
-""+" union all"+
-""+" select id as id, ref_id as mrnId, ref_type as refType," +
-  " (select item_description from b_item_master where id=item_master_id) as itemDescription," +
-  " serial_number as serialNumber, transaction_date as transactionDate, 'From Client to To Office' movement," +
-  " (select b.supplier_description from b_grn a, b_supplier b where a.supplier_id=b.id and a.id=from_office) as source," +
-  " (select name from m_office where id=to_office) as destination from b_item_history where ref_type='De Allocation'" +
-  " union all" +
-""+" select id as id, ref_id as mrnId, ref_type as refType,"+ 
-""+" (select item_description from b_item_master where id=item_master_id) as itemDescription,"+ 
-""+" serial_number as serialNumber, transaction_date as transactionDate, 'From Office to To Client' movement,"+
-""+" (select name from m_office where id=from_office) as source,"+ 
-""+" (Select concat(id,' - ', display_name)  from m_client where id=to_office) as destination"+ 
-""+" from b_item_history where ref_type='Allocation' ) a  where id is not null ";
+		final String sql = 
+				
+				"  SQL_CALC_FOUND_ROWS  * FROM ( " +
+				" Select 'Item Detail' as refType, (SELECT item_description FROM b_item_master  " +
+				" WHERE id = item_master_id) AS itemDescription, serial_no  AS serialNumber, created_date AS transactionDate," +
+				" 'From Supplier to To Office' AS movement, (SELECT b.supplier_description FROM b_grn a, b_supplier b " +
+				" WHERE a.supplier_id = b.id AND a.id = grn_id ) AS source, (SELECT name FROM m_office WHERE id = location_id) AS destination" +
+				" from b_item_detail " +
+				
+				" UNION ALL " +
+				" SELECT ref_type AS refType, (SELECT item_description FROM b_item_master WHERE id = item_master_id)" +
+				" AS itemDescription,serial_number AS serialNumber,transaction_date AS transactionDate,'From Office to To Office' movement," +
+				" (SELECT name FROM m_office WHERE id = from_office) AS source, (SELECT name FROM m_office WHERE id = to_office) AS destination" +
+				" FROM b_item_history WHERE ref_type = 'MRN' " +
+				
+				" UNION ALL" +
+				" SELECT ref_type AS refType, (SELECT item_description FROM b_item_master WHERE id = item_master_id) AS itemDescription, serial_number AS serialNumber," +
+				" transaction_date AS transactionDate, 'From Office to To Client' movement, (SELECT name FROM m_office WHERE id = from_office) AS source," +
+				" (SELECT concat(id, ' - ', display_name) FROM m_client WHERE id = to_office) AS destination " +
+				" FROM b_item_history WHERE ref_type = 'Allocation'" +
+				
+				" UNION ALL " +
+				" SELECT ref_type AS refType,(SELECT item_description FROM b_item_master WHERE id = item_master_id) AS itemDescription,serial_number AS serialNumber," +
+				" transaction_date AS transactionDate, 'From Client to To Office' movement, (SELECT concat(id, ' - ', display_name) FROM m_client " +
+				" WHERE id = from_office) AS source, (SELECT name FROM m_office WHERE id = to_office) AS destination " +
+				" FROM b_item_history WHERE ref_type = 'De Allocation') a ";
 		
 		MRNDetailsHistoryMapper detailsHistoryMapper = new MRNDetailsHistoryMapper();
 		
@@ -222,11 +222,7 @@ public class MRNDetailsReadPlatformServiceImp implements MRNDetailsReadPlatformS
         String extraCriteria = "";
 	    if (sqlSearch != null) {
 	    	sqlSearch=sqlSearch.trim();
-	    	extraCriteria = " and (itemDescription like '%"+sqlSearch+"%' OR "
-    				+ " source like '%"+sqlSearch+"%' OR "
-    				+ " destination like '%"+sqlSearch+"%' OR "
-    				+ " movement like '%"+sqlSearch+"%' OR "
-    				+ " serialNumber like '%"+sqlSearch+"%') " ;
+	    	extraCriteria = " where serialNumber LIKE '%"+sqlSearch+"%' order by transactionDate";
 	    }
             sqlBuilder.append(extraCriteria);
         if (searchItemHistory.isLimited()) {
@@ -242,6 +238,7 @@ public class MRNDetailsReadPlatformServiceImp implements MRNDetailsReadPlatformS
 	}
 	@Override
 	public MRNDetailsData retriveSingleMrnDetail(final Long mrnId) {
+		
 		final String sql = "select mrn.id as mrnId, mrn.requested_date as requestedDate, (select item_description from b_item_master where id=mrn.item_master_id) as item," +
 				          "  (select name from m_office where id=mrn.from_office) as fromOffice, (select name from m_office where id = mrn.to_office) as toOffice," +
 				          "   mrn.orderd_quantity as orderdQuantity, mrn.received_quantity as receivedQuantity, mrn.status as status from b_mrn mrn where mrn.id=?";

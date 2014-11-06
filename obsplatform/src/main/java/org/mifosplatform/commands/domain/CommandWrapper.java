@@ -1204,4 +1204,9 @@ public class CommandWrapper {
 		public boolean isProcess() {
 			return this.actionName.equalsIgnoreCase("PROCESS") && this.entityName.equalsIgnoreCase("DATAUPLOADS");
 		}
+
+		public boolean isDeviceSaleResource() {
+			  return  this.entityName.equalsIgnoreCase("NEWSALE") || this.entityName.equalsIgnoreCase("SECONDSALE") 
+					   ||this.entityName.equalsIgnoreCase("DEVICERENTAL");
+		}
 }

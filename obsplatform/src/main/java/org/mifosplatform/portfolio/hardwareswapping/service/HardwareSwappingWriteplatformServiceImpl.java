@@ -36,7 +36,6 @@ import org.mifosplatform.portfolio.order.domain.StatusTypeEnum;
 import org.mifosplatform.portfolio.order.domain.UserActionStatusTypeEnum;
 import org.mifosplatform.portfolio.plan.domain.Plan;
 import org.mifosplatform.portfolio.plan.domain.PlanRepository;
-import org.mifosplatform.portfolio.transactionhistory.service.TransactionHistoryWritePlatformService;
 import org.mifosplatform.provisioning.provisioning.api.ProvisioningApiConstants;
 import org.mifosplatform.provisioning.provisioning.service.ProvisioningWritePlatformService;
 import org.slf4j.Logger;
@@ -61,7 +60,6 @@ public class HardwareSwappingWriteplatformServiceImpl implements HardwareSwappin
 	private final PrepareRequestWriteplatformService prepareRequestWriteplatformService;
 	private final OrderRepository orderRepository;
 	private final PlanRepository  planRepository;
-	private final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService;
 	private final HardwareSwappingCommandFromApiJsonDeserializer fromApiJsonDeserializer;
 	private final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService;
 	private final OrderHistoryRepository orderHistoryRepository;
@@ -74,11 +72,10 @@ public class HardwareSwappingWriteplatformServiceImpl implements HardwareSwappin
 	@Autowired
 	public HardwareSwappingWriteplatformServiceImpl(final PlatformSecurityContext context,final HardwareAssociationWriteplatformService associationWriteplatformService,
 			final ItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService,final PrepareRequestWriteplatformService prepareRequestWriteplatformService,
-			final OrderRepository orderRepository,final PlanRepository planRepository,final TransactionHistoryWritePlatformService historyWritePlatformService,
+			final OrderRepository orderRepository,final PlanRepository planRepository,final ProvisioningWritePlatformService provisioningWritePlatformService,
 			final HardwareSwappingCommandFromApiJsonDeserializer apiJsonDeserializer,final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService,
 			final OrderHistoryRepository orderHistoryRepository,final ConfigurationRepository configurationRepository,final OwnedHardwareJpaRepository hardwareJpaRepository,
-			final HardwareAssociationReadplatformService associationReadplatformService,final ItemRepository itemRepository,
-			final ProvisioningWritePlatformService provisioningWritePlatformService) {
+			final HardwareAssociationReadplatformService associationReadplatformService,final ItemRepository itemRepository) {
  
 		this.context=context;
 		this.associationWriteplatformService=associationWriteplatformService;
@@ -86,7 +83,6 @@ public class HardwareSwappingWriteplatformServiceImpl implements HardwareSwappin
 		this.prepareRequestWriteplatformService=prepareRequestWriteplatformService;
 		this.orderRepository=orderRepository;
 		this.planRepository=planRepository;
-		this.transactionHistoryWritePlatformService=historyWritePlatformService;
 		this.fromApiJsonDeserializer=apiJsonDeserializer;
 		this.commandSourceWritePlatformService=commandSourceWritePlatformService;
 		this.orderHistoryRepository=orderHistoryRepository;
@@ -139,11 +135,8 @@ public CommandProcessingResult doHardWareSwapping(final Long entityId,final Json
 			
 	        List<HardwareAssociationData> allocationDetailsDatas=this.associationReadplatformService.retrieveClientAllocatedPlan(ownedHardware.getClientId(),itemMaster.getItemCode());
 	    
-	        if(!allocationDetailsDatas.isEmpty())
-	    		   {
+	        if(!allocationDetailsDatas.isEmpty()){
 	    				this.associationWriteplatformService.createNewHardwareAssociation(ownedHardware.getClientId(),allocationDetailsDatas.get(0).getPlanId(),ownedHardware.getSerialNumber(),allocationDetailsDatas.get(0).getorderId());
-	    				transactionHistoryWritePlatformService.saveTransactionHistory(ownedHardware.getClientId(), "Association", new Date(),"Serial No:"
-	    				+ownedHardware.getSerialNumber(),"Item Code:"+allocationDetailsDatas.get(0).getItemCode());
 	    		   }
 	   }else{
 		
@@ -191,10 +184,7 @@ public CommandProcessingResult doHardWareSwapping(final Long entityId,final Json
 				}
 			}
 					
-			this.orderRepository.save(order);
-				//For Transaction History
-				transactionHistoryWritePlatformService.saveTransactionHistory(order.getClientId(), "Hardware Swap",new Date(),"Old Serial No:"+serialNo
-						+ " is replaced with New "+provisionNum);
+ 			this.orderRepository.save(order);
 				//For Order History
 				OrderHistory orderHistory=new OrderHistory(order.getId(),new LocalDate(),new LocalDate(),null,"DEVICE SWAP",userId,null);
 		
