@@ -13,6 +13,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
@@ -109,9 +110,10 @@ public class OneTimeSalesApiResource {
 	@Path("{clientId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String createNewSale(@PathParam("clientId") final Long clientId,final String apiRequestBodyAsJson) {
+	public String createNewSale(@PathParam("clientId") final Long clientId,
+			@QueryParam("devicesaleTpye") final String devicesaleTpye,final String apiRequestBodyAsJson) {
 		
-		final CommandWrapper commandRequest = new CommandWrapperBuilder().createOneTimeSale(clientId).withJson(apiRequestBodyAsJson).build();
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().createOneTimeSale(clientId,devicesaleTpye).withJson(apiRequestBodyAsJson).build();
 		final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 	}

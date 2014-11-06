@@ -26,8 +26,8 @@ import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.mifosplatform.infrastructure.codes.domain.CodeValue;
 import org.mifosplatform.infrastructure.codes.domain.CodeValueRepository;
-import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
@@ -63,7 +63,6 @@ import org.mifosplatform.portfolio.order.domain.UserActionStatusTypeEnum;
 import org.mifosplatform.portfolio.order.service.OrderReadPlatformService;
 import org.mifosplatform.portfolio.plan.domain.Plan;
 import org.mifosplatform.portfolio.plan.domain.PlanRepository;
-import org.mifosplatform.portfolio.transactionhistory.service.TransactionHistoryWritePlatformService;
 import org.mifosplatform.provisioning.provisioning.domain.ServiceParameters;
 import org.mifosplatform.provisioning.provisioning.domain.ServiceParametersRepository;
 import org.mifosplatform.provisioning.provisioning.service.ProvisioningWritePlatformService;
@@ -103,7 +102,6 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     private final ActionDetailsReadPlatformService actionDetailsReadPlatformService;
     private final ActiondetailsWritePlatformService actiondetailsWritePlatformService;
     private final PrepareRequestWriteplatformService prepareRequestWriteplatformService;
-    private final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService;
 	private final PortfolioCommandSourceWritePlatformService  portfolioCommandSourceWritePlatformService;
   
     
@@ -112,14 +110,13 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     @Autowired
     public ClientWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,final AddressRepository addressRepository,
             final ClientRepositoryWrapper clientRepository, final OfficeRepository officeRepository,final ClientDataValidator fromApiJsonDeserializer, 
-            final AccountNumberGeneratorFactory accountIdentifierGeneratorFactory,final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,
-            final ServiceParametersRepository serviceParametersRepository,final ActiondetailsWritePlatformService actiondetailsWritePlatformService,
+            final AccountNumberGeneratorFactory accountIdentifierGeneratorFactory,final ServiceParametersRepository serviceParametersRepository,
+            final ActiondetailsWritePlatformService actiondetailsWritePlatformService,final ConfigurationRepository configurationRepository,
             final ActionDetailsReadPlatformService actionDetailsReadPlatformService,final CodeValueRepository codeValueRepository,
             final OrderReadPlatformService orderReadPlatformService,final ProvisioningWritePlatformService  ProvisioningWritePlatformService,
             final GroupsDetailsRepository groupsDetailsRepository,final OrderRepository orderRepository,final PlanRepository planRepository,
             final PrepareRequestWriteplatformService prepareRequestWriteplatformService,final ClientReadPlatformService clientReadPlatformService,
-            final SelfCareRepository selfCareRepository,final ConfigurationRepository configurationRepository,
-            final PortfolioCommandSourceWritePlatformService  portfolioCommandSourceWritePlatformService) {
+            final SelfCareRepository selfCareRepository,final PortfolioCommandSourceWritePlatformService  portfolioCommandSourceWritePlatformService) {
     	
         this.context = context;
         this.planRepository=planRepository;
@@ -140,7 +137,6 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         this.actiondetailsWritePlatformService=actiondetailsWritePlatformService;
         this.accountIdentifierGeneratorFactory = accountIdentifierGeneratorFactory;
         this.prepareRequestWriteplatformService=prepareRequestWriteplatformService;
-        this.transactionHistoryWritePlatformService = transactionHistoryWritePlatformService;
         this.portfolioCommandSourceWritePlatformService=portfolioCommandSourceWritePlatformService;
        
     }
@@ -288,8 +284,6 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             this.actiondetailsWritePlatformService.AddNewActions(actionDetailsDatas,newClient.getId(),newClient.getId().toString(),null);
             }
             
-            transactionHistoryWritePlatformService.saveTransactionHistory(newClient.getId(), "New Client", newClient.getActivationDate(),
-            		"Name:"+newClient.getName(),"ImageKey:"+newClient.imageKey(),"AccountNumber:"+newClient.getAccountNo());
             
             return new CommandProcessingResultBuilder() 
                     .withCommandId(command.commandId()) 
@@ -353,8 +347,6 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             		
             	}
            
-            transactionHistoryWritePlatformService.saveTransactionHistory(clientForUpdate.getId(), "Update Client", clientForUpdate.getActivationDate(),
-            		"Changes:"+changes.toString(),"Name:"+clientForUpdate.getName(),"ImageKey:"+clientForUpdate.imageKey(),"AccountNumber:"+clientForUpdate.getAccountNo());
             return new CommandProcessingResultBuilder() 
                     .withCommandId(command.commandId()) 
                     .withOfficeId(clientForUpdate.officeId()) 
@@ -383,8 +375,6 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             client.activate(fmt, activationDate);
 
             this.clientRepository.saveAndFlush(client);
-            transactionHistoryWritePlatformService.saveTransactionHistory(client.getId(), "ActivateClient", client.getActivationDate(),
-            		"Name:"+client.getName(),"ImageKey:"+client.imageKey(),"AccountNumber:"+client.getAccountNo());
 
             return new CommandProcessingResultBuilder() //
                     .withCommandId(command.commandId()) //

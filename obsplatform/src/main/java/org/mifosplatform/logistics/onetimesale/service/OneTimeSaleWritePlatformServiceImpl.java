@@ -21,7 +21,6 @@ import org.mifosplatform.logistics.onetimesale.data.OneTimeSaleData;
 import org.mifosplatform.logistics.onetimesale.domain.OneTimeSale;
 import org.mifosplatform.logistics.onetimesale.domain.OneTimeSaleRepository;
 import org.mifosplatform.logistics.onetimesale.serialization.OneTimesaleCommandFromApiJsonDeserializer;
-import org.mifosplatform.portfolio.transactionhistory.service.TransactionHistoryWritePlatformService;
 import org.mifosplatform.workflow.eventvalidation.service.EventValidationReadPlatformService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,8 +58,8 @@ public class OneTimeSaleWritePlatformServiceImpl implements OneTimeSaleWritePlat
 	public OneTimeSaleWritePlatformServiceImpl(final PlatformSecurityContext context,final OneTimeSaleRepository oneTimeSaleRepository,
 			final ItemRepository itemMasterRepository,final OneTimesaleCommandFromApiJsonDeserializer apiJsonDeserializer,
 			final InvoiceOneTimeSale invoiceOneTimeSale,final ItemReadPlatformService itemReadPlatformService,
-			final FromJsonHelper fromJsonHelper,final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,
-			final OneTimeSaleReadPlatformService oneTimeSaleReadPlatformService,final ItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService,
+			final FromJsonHelper fromJsonHelper,final OneTimeSaleReadPlatformService oneTimeSaleReadPlatformService,
+			final ItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService,
 			final EventValidationReadPlatformService eventValidationReadPlatformService,final DiscountReadPlatformService discountReadPlatformService) {
 
 		
@@ -104,7 +103,7 @@ public class OneTimeSaleWritePlatformServiceImpl implements OneTimeSaleWritePlat
 			final List<OneTimeSaleData> oneTimeSaleDatas = this.oneTimeSaleReadPlatformService.retrieveOnetimeSalesForInvoice(clientId);
 			JsonObject jsonObject = new JsonObject();
 			final String saleType = command.stringValueOfParameterNamed("saleType");
-			if (saleType.equalsIgnoreCase("SALE")) {
+			if (saleType.equalsIgnoreCase("NEWSALE")) {
 				for (OneTimeSaleData oneTimeSaleData : oneTimeSaleDatas) {
 					this.invoiceOneTimeSale.invoiceOneTimeSale(clientId,oneTimeSaleData);
 					updateOneTimeSale(oneTimeSaleData);

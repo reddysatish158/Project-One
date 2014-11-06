@@ -20,7 +20,6 @@ import org.mifosplatform.infrastructure.core.service.FileUtils;
 import org.mifosplatform.infrastructure.documentmanagement.command.DocumentCommand;
 import org.mifosplatform.infrastructure.documentmanagement.exception.DocumentManagementException;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
-import org.mifosplatform.portfolio.transactionhistory.service.TransactionHistoryWritePlatformService;
 import org.mifosplatform.useradministration.domain.AppUser;
 import org.mifosplatform.workflow.eventaction.data.ActionDetaislData;
 import org.mifosplatform.workflow.eventaction.service.ActionDetailsReadPlatformService;
@@ -42,7 +41,6 @@ public class TicketMasterWritePlatformServiceImpl implements TicketMasterWritePl
 	private TicketMasterFromApiJsonDeserializer fromApiJsonDeserializer;
 	private TicketMasterRepository ticketMasterRepository;
 	private TicketDetailsRepository detailsRepository;
-	private final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService;
 	private final ActionDetailsReadPlatformService actionDetailsReadPlatformService; 
 	private final ActiondetailsWritePlatformService actiondetailsWritePlatformService;
 	
@@ -50,8 +48,7 @@ public class TicketMasterWritePlatformServiceImpl implements TicketMasterWritePl
 	public TicketMasterWritePlatformServiceImpl(final PlatformSecurityContext context,
 			final TicketMasterRepository repository,final TicketDetailsRepository ticketDetailsRepository, 
 			final TicketMasterFromApiJsonDeserializer fromApiJsonDeserializer,final TicketMasterRepository ticketMasterRepository,
-			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,TicketDetailsRepository detailsRepository,
-			final ActionDetailsReadPlatformService actionDetailsReadPlatformService,
+			TicketDetailsRepository detailsRepository,final ActionDetailsReadPlatformService actionDetailsReadPlatformService,
 			final ActiondetailsWritePlatformService actiondetailsWritePlatformService) {
 		
 		this.context = context;
@@ -60,7 +57,6 @@ public class TicketMasterWritePlatformServiceImpl implements TicketMasterWritePl
 		this.fromApiJsonDeserializer = fromApiJsonDeserializer;
 		this.ticketMasterRepository = ticketMasterRepository;
 		this.detailsRepository = detailsRepository;
-		this.transactionHistoryWritePlatformService = transactionHistoryWritePlatformService;
 		this.actionDetailsReadPlatformService = actionDetailsReadPlatformService;
 		this.actiondetailsWritePlatformService = actiondetailsWritePlatformService;
 	}
@@ -95,9 +91,6 @@ public class TicketMasterWritePlatformServiceImpl implements TicketMasterWritePl
          ticketMaster.updateTicket(ticketMasterCommand);
          this.ticketMasterRepository.save(ticketMaster);
          this.ticketDetailsRepository.save(detail);
-         transactionHistoryWritePlatformService.saveTransactionHistory(ticketMaster.getClientId(), "UpdateTicketDetails", ticketMaster.getCreatedDate(),
-					"Comments:"+ticketMaster.getDescription(),"AssignedTo:"+ticketMaster.getAssignedTo(),"TicketMasterID:"+ticketMaster.getId());
-         
          List<ActionDetaislData> actionDetaislDatas = this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_EDIT_TICKET);
   		 if(actionDetaislDatas.size() != 0){
   			this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,ticketMaster.getClientId(), ticketMaster.getId().toString(),ticketURL);
@@ -128,9 +121,6 @@ public class TicketMasterWritePlatformServiceImpl implements TicketMasterWritePl
 			if (!ticketMaster.getStatus().equalsIgnoreCase("CLOSED")) {
 				ticketMaster.closeTicket(command,this.context.authenticatedUser().getId());
 				this.repository.save(ticketMaster);
-				transactionHistoryWritePlatformService.saveTransactionHistory(ticketMaster.getClientId(), "TicketClose", ticketMaster.getClosedDate(),
-						"Status:" + ticketMaster.getStatus(), "ResolutionDescription:" + ticketMaster.getResolutionDescription(), "TicketMasterID:" + ticketMaster.getId());
-				
 				List<ActionDetaislData> actionDetaislDatas = this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_CLOSE_TICKET);
 		  		 if(actionDetaislDatas.size() != 0){
 		  			this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas, ticketMaster.getClientId(), ticketMaster.getId().toString(), ticketURL);
@@ -184,8 +174,6 @@ public class TicketMasterWritePlatformServiceImpl implements TicketMasterWritePl
 			details.setTicketId(ticketMaster.getId());
 			details.setCreatedbyId(created);
 			this.detailsRepository.saveAndFlush(details);
-			transactionHistoryWritePlatformService.saveTransactionHistory(ticketMaster.getClientId(), "Ticket", ticketMaster.getTicketDate(), "Description:" + ticketMaster.getDescription(),
-					"Priority:" + ticketMaster.getPriority(), "AssignedTo:" + ticketMaster.getAssignedTo(), "Source:" + ticketMaster.getSource(), "TicketMasterID:" + ticketMaster.getId());
 			List<ActionDetaislData> actionDetaislDatas = this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_CREATE_TICKET);
 		
 			if(!actionDetaislDatas.isEmpty()){

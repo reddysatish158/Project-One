@@ -113,8 +113,6 @@ public OrderAssembler(final OrderDetailsReadPlatformServices orderDetailsReadPla
 				order.addServiceDeatils(orderdetails);
 			}
 			
-		
-		
 		  return order;
 	
 	}

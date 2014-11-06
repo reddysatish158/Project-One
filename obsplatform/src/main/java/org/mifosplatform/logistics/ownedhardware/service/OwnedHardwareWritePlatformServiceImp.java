@@ -1,12 +1,11 @@
 package org.mifosplatform.logistics.ownedhardware.service;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.mifosplatform.billing.discountmaster.exception.DiscountMasterNotFoundException;
-import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
@@ -25,7 +24,6 @@ import org.mifosplatform.portfolio.association.service.HardwareAssociationReadpl
 import org.mifosplatform.portfolio.association.service.HardwareAssociationWriteplatformService;
 import org.mifosplatform.portfolio.order.domain.HardwareAssociationRepository;
 import org.mifosplatform.portfolio.order.service.OrderReadPlatformService;
-import org.mifosplatform.portfolio.transactionhistory.service.TransactionHistoryWritePlatformService;
 import org.mifosplatform.provisioning.provisioning.service.ProvisioningWritePlatformService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +45,6 @@ public class OwnedHardwareWritePlatformServiceImp implements OwnedHardwareWriteP
 	private final ConfigurationRepository globalConfigurationRepository;
 	private final HardwareAssociationWriteplatformService hardwareAssociationWriteplatformService;
 	private final HardwareAssociationReadplatformService associationReadplatformService;
-	private final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService;
 	private final OrderReadPlatformService orderReadPlatformService; 
 	private final HardwareAssociationRepository associationRepository;
 	private final ProvisioningWritePlatformService provisioningWritePlatformService;
@@ -59,8 +56,8 @@ public class OwnedHardwareWritePlatformServiceImp implements OwnedHardwareWriteP
 			final OwnedHardwareFromApiJsonDeserializer apiJsonDeserializer,final OwnedHardwareReadPlatformService ownedHardwareReadPlatformService,
 			final ItemDetailsReadPlatformService inventoryItemDetailsReadPlatformService,final ConfigurationRepository globalConfigurationRepository,
 			final HardwareAssociationWriteplatformService hardwareAssociationWriteplatformService,final HardwareAssociationReadplatformService hardwareAssociationReadplatformService,
-			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,final OrderReadPlatformService orderReadPlatformService,
-			final HardwareAssociationRepository associationRepository,final ProvisioningWritePlatformService provisioningWritePlatformService) {
+			final OrderReadPlatformService orderReadPlatformService,final HardwareAssociationRepository associationRepository,
+			final ProvisioningWritePlatformService provisioningWritePlatformService) {
 		
 		this.context = context;
 		this.apiJsonDeserializer = apiJsonDeserializer;
@@ -71,7 +68,6 @@ public class OwnedHardwareWritePlatformServiceImp implements OwnedHardwareWriteP
 		this.provisioningWritePlatformService=provisioningWritePlatformService;
 		this.ownedHardwareReadPlatformService = ownedHardwareReadPlatformService;
 		this.associationReadplatformService=hardwareAssociationReadplatformService;
-        this.transactionHistoryWritePlatformService=transactionHistoryWritePlatformService;
 		this.inventoryItemDetailsReadPlatformService = inventoryItemDetailsReadPlatformService;
 		this.hardwareAssociationWriteplatformService=hardwareAssociationWriteplatformService;
 		
@@ -115,13 +111,9 @@ public class OwnedHardwareWritePlatformServiceImp implements OwnedHardwareWriteP
 			
 		           List<HardwareAssociationData> allocationDetailsDatas=this.associationReadplatformService.retrieveClientAllocatedPlan(ownedHardware.getClientId(),ownedHardware.getItemType());
 		    
-		        if(!allocationDetailsDatas.isEmpty())
-		    		   {
+		        if(!allocationDetailsDatas.isEmpty()){
 		    				this.hardwareAssociationWriteplatformService.createNewHardwareAssociation(ownedHardware.getClientId(),allocationDetailsDatas.get(0).getPlanId(),ownedHardware.getSerialNumber(),allocationDetailsDatas.get(0).getorderId());
-		    				transactionHistoryWritePlatformService.saveTransactionHistory(ownedHardware.getClientId(), "Association", new Date(),"Serial No:"
-		    				+ownedHardware.getSerialNumber(),"Item Code:"+allocationDetailsDatas.get(0).getItemCode());
-		    				
-		    		   }
+		       }
 		    }
 		}
 		/*GlobalConfigurationProperty balanceCheckconfigurationProperty=this.globalConfigurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_BALANCE_CHECK);

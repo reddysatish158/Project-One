@@ -84,7 +84,7 @@ public final class OneTimesaleCommandFromApiJsonDeserializer {
         final Long officeId = fromApiJsonHelper.extractLongNamed("officeId", element);
         baseDataValidator.reset().parameter("officeId").value(officeId).notNull();
         
-        	if(saleType.equalsIgnoreCase("RENTAL")){
+        	if(saleType.equalsIgnoreCase("DEVICERENTAL")){
         		final String contractPeriod = fromApiJsonHelper.extractStringNamed("contractPeriod", element);
                 baseDataValidator.reset().parameter("contractPeriod").value(contractPeriod).notBlank();
         		

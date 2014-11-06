@@ -567,10 +567,15 @@ public class SynchronousCommandProcessingService implements
 			if (wrapper.isUpdatePrice()) {
 				handler = applicationContext.getBean("updateOrderPriceCommandHandler",NewCommandSourceHandler.class);
 			}
-		} else if (wrapper.isOneTimeSaleResource()) {
-			if (wrapper.isCreate()) {
+	   } else if(wrapper.isDeviceSaleResource()){
+		   if (wrapper.isCreate()) {
 				handler = applicationContext.getBean("createOneTimeSaleCommandHandler",NewCommandSourceHandler.class);
-			} else if (wrapper.isUpdate()) {
+			}else{
+				 throw new UnsupportedCommandException(wrapper.commandName());
+			}
+		   
+	   }else if (wrapper.isOneTimeSaleResource()) {
+			if (wrapper.isUpdate()) {
 				handler = applicationContext.getBean("updateOneTimeSaleCommandHandler",NewCommandSourceHandler.class);
 			} else if (wrapper.isDelete()) {
 				handler = applicationContext.getBean("cancelOneTimeSaleCommandHandler",NewCommandSourceHandler.class);
