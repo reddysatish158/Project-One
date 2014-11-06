@@ -19,9 +19,12 @@ import org.mifosplatform.finance.billingorder.domain.InvoiceTax;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * @author hugo
+ *
+ */
 @Service
-public class GenerateReverseBillingOrderServiceImplementation implements
-		GenerateReverseBillingOrderService {
+public class GenerateReverseBillingOrderServiceImp implements GenerateReverseBillingOrderService {
 
 	private final BillingOrderReadPlatformService billingOrderReadPlatformService;
 	private final GenerateDisconnectionBill generateDisconnectionBill;
@@ -30,8 +33,9 @@ public class GenerateReverseBillingOrderServiceImplementation implements
 
 	
 	@Autowired
-	public GenerateReverseBillingOrderServiceImplementation(BillingOrderReadPlatformService billingOrderReadPlatformService,
-			GenerateDisconnectionBill generateDisconnectionBill,InvoiceRepository invoiceRepository,DiscountMasterRepository discountMasterRepository) {
+	public GenerateReverseBillingOrderServiceImp(final BillingOrderReadPlatformService billingOrderReadPlatformService,
+			final GenerateDisconnectionBill generateDisconnectionBill,final InvoiceRepository invoiceRepository,
+			final DiscountMasterRepository discountMasterRepository) {
 
 		this.billingOrderReadPlatformService = billingOrderReadPlatformService;
 		this.generateDisconnectionBill = generateDisconnectionBill;
@@ -40,23 +44,19 @@ public class GenerateReverseBillingOrderServiceImplementation implements
 	}
 
 	@Override
-	public List<BillingOrderCommand> generateReverseBillingOrder(
-			List<BillingOrderData> billingOrderProducts,
-			LocalDate disconnectDate) {
+	public List<BillingOrderCommand> generateReverseBillingOrder(final List<BillingOrderData> billingOrderProducts,final LocalDate disconnectDate) {
 
 		BillingOrderCommand billingOrderCommand = null;
 		List<BillingOrderCommand> billingOrderCommands = new ArrayList<BillingOrderCommand>();
+		
 		if (billingOrderProducts.size() != 0) {
 
 			for (BillingOrderData billingOrderData : billingOrderProducts) {
 
 				DiscountMasterData discountMasterData = null;
 
-				List<DiscountMasterData> discountMasterDatas = billingOrderReadPlatformService
-						.retrieveDiscountOrders(
-								billingOrderData.getClientOrderId(),
-								billingOrderData.getOderPriceId());
-
+		      List<DiscountMasterData> discountMasterDatas = billingOrderReadPlatformService.retrieveDiscountOrders(billingOrderData.getClientOrderId(),
+		    		                                               billingOrderData.getOderPriceId());
 				if (discountMasterDatas.size() != 0) {
 					discountMasterData = discountMasterDatas.get(0);
 				}
@@ -72,14 +72,11 @@ public class GenerateReverseBillingOrderServiceImplementation implements
 						billingOrderCommands.add(billingOrderCommand);
 
 					}
-
-					// weekly
-				 else if (billingOrderData.getDurationType().equalsIgnoreCase("week(s)")) {
+					// weekly	
+					else if (billingOrderData.getDurationType().equalsIgnoreCase("week(s)")) {
 
 						billingOrderCommand = generateDisconnectionBill.getReverseWeeklyBill(billingOrderData,discountMasterData,disconnectDate);
 						billingOrderCommands.add(billingOrderCommand);
-
-					
 				 }
 				}
 			}
@@ -90,14 +87,12 @@ public class GenerateReverseBillingOrderServiceImplementation implements
 	}
 
 	@Override
-	public Invoice generateNegativeInvoice(List<BillingOrderCommand> billingOrderCommands) {
+	public Invoice generateNegativeInvoice(final List<BillingOrderCommand> billingOrderCommands) {
 		
 		BigDecimal invoiceAmount = BigDecimal.ZERO;
 		BigDecimal totalChargeAmount = BigDecimal.ZERO;
 		BigDecimal netTaxAmount = BigDecimal.ZERO;
 		
-		//LocalDate invoiceDate = new LocalDate();
-		//List<BillingOrder> charges = new ArrayList<BillingOrder>();
 		
 		TaxMappingRateData tax=this.billingOrderReadPlatformService.retriveExemptionTaxDetails(billingOrderCommands.get(0).getClientId());
 		
@@ -105,11 +100,10 @@ public class GenerateReverseBillingOrderServiceImplementation implements
 				netTaxAmount, "active");
 		
 		for (BillingOrderCommand billingOrderCommand : billingOrderCommands) {
+			
 			BigDecimal netChargeTaxAmount = BigDecimal.ZERO;
 			BigDecimal discountAmount = billingOrderCommand.getDiscountMasterData().getDiscountAmount();
-			
 			BigDecimal netChargeAmount = billingOrderCommand.getPrice().subtract(discountAmount);
-			
 			
 			DiscountMaster discountMaster = null;
 			if(billingOrderCommand.getDiscountMasterData()!= null){
@@ -166,8 +160,7 @@ public class GenerateReverseBillingOrderServiceImplementation implements
 	public Boolean isTaxInclusive(Integer taxInclusive){
 		
 		Boolean isTaxInclusive = false;
-		if(taxInclusive == 1) isTaxInclusive = true;
-
+		if(taxInclusive == 1){ isTaxInclusive = true;}
 		return isTaxInclusive;
 	}
 }

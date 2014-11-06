@@ -83,9 +83,7 @@ public class GenerateBill {
 
 		// check startDate is monthStartDate
 		if (startDate.equals(monthStartDate)) {
-			endDate = startDate
-					.plusMonths(billingOrderData.getChargeDuration())
-					.minusDays(1);// durationDate
+			endDate = startDate.plusMonths(billingOrderData.getChargeDuration()).minusDays(1);// durationDate
 		} else {
 			endDate = startDate.dayOfMonth().withMaximumValue();
 		}
@@ -99,19 +97,7 @@ public class GenerateBill {
 				int maximumDaysInYear = new LocalDate().dayOfYear().withMaximumValue().getDayOfYear();
 				pricePerDay = price.divide(new BigDecimal(maximumDaysInYear),Integer.parseInt(roundingDecimal()),RoundingMode.HALF_UP);
 
-			}/* else if (billingOrderData.getChargeDuration() == 6 && !startDate.equals(monthStartDate)) {
-				
-				pricePerDay = price.divide(new BigDecimal(totalDays),Integer.parseInt(roundingDecimal()),RoundingMode.HALF_UP);
-
-			} else if (billingOrderData.getChargeDuration() == 3 && !startDate.equals(monthStartDate)) {
-				
-				pricePerDay = price.divide(new BigDecimal(totalDays),Integer.parseInt(roundingDecimal()),RoundingMode.HALF_UP);
-
-			} else if (billingOrderData.getChargeDuration() == 2 && !startDate.equals(monthStartDate)) {
-				
-				pricePerDay = price.divide(new BigDecimal(totalDays),Integer.parseInt(roundingDecimal()),RoundingMode.HALF_UP);
-
-			} */else if (!startDate.equals(monthStartDate)) {
+			}else if(!startDate.equals(monthStartDate)) {
 				
 				pricePerDay = price.divide(new BigDecimal(totalDays),Integer.parseInt(roundingDecimal()),RoundingMode.HALF_UP);
 
@@ -126,11 +112,9 @@ public class GenerateBill {
 			}
 
 			// plan with No prorata and not start day of month
-			if (plan.getBillRule() == 300
-					&& startDate.compareTo(monthStartDate) > 0) {
+			if (plan.getBillRule() == 300 && startDate.compareTo(monthStartDate) > 0) {
 				price = BigDecimal.ZERO;
-			} else {
-			}
+			} else { }
 
 		} else if (endDate.toDate().after(billingOrderData.getBillEndDate())) {
 			endDate = new LocalDate(billingOrderData.getBillEndDate());
@@ -493,10 +477,9 @@ public class GenerateBill {
 	public List<InvoiceTaxCommand> calculateTax(BillingOrderData billingOrderData, BigDecimal billPrice) {
 
 		// Get State level taxes
-		List<TaxMappingRateData> taxMappingRateDatas = billingOrderReadPlatformService.retrieveTaxMappingDate(billingOrderData.getClientId(),
-						billingOrderData.getChargeCode());
+		List<TaxMappingRateData> taxMappingRateDatas = billingOrderReadPlatformService.retrieveTaxMappingData(billingOrderData.getClientId(),	billingOrderData.getChargeCode());
 		if (taxMappingRateDatas.isEmpty()) {
-				taxMappingRateDatas = billingOrderReadPlatformService.retrieveDefaultTaxMappingDate(billingOrderData.getClientId(),billingOrderData.getChargeCode());
+				taxMappingRateDatas = billingOrderReadPlatformService.retrieveDefaultTaxMappingData(billingOrderData.getClientId(),billingOrderData.getChargeCode());
 		}
 		
 		List<InvoiceTaxCommand> invoiceTaxCommand = generateInvoiceTax(taxMappingRateDatas, billPrice, billingOrderData.getClientId());

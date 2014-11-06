@@ -65,17 +65,17 @@ public final class PromotionCodeCommandFromApiJsonDeserializer {
 		final String promotionDescription = fromApiJsonHelper.extractStringNamed("promotionDescription", element);
 		baseDataValidator.reset().parameter("promotionDescription").value(promotionDescription).notBlank();
 
-		final String durationtype = fromApiJsonHelper.extractStringNamed("durationType", element);
-		baseDataValidator.reset().parameter("durationtype").value(durationtype).notBlank();
+		final String durationType = fromApiJsonHelper.extractStringNamed("durationType", element);
+		baseDataValidator.reset().parameter("durationType").value(durationType).notBlank();
+		
+		final String discountType = fromApiJsonHelper.extractStringNamed("discountType", element);
+		baseDataValidator.reset().parameter("discountType").value(discountType).notBlank();
+		
+		final BigDecimal discountRate = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("discountRate", element);
+		baseDataValidator.reset().parameter("discountRate").value(discountRate).notBlank();
 
 		final Long duration = fromApiJsonHelper.extractLongNamed("duration",element);
 		baseDataValidator.reset().parameter("duration").value(duration).notBlank();
-
-		final String discounttype = fromApiJsonHelper.extractStringNamed("discountType", element);
-		baseDataValidator.reset().parameter("discounttype").value(discounttype).notBlank();
-
-		final BigDecimal discountRate = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("discountRate", element);
-		baseDataValidator.reset().parameter("discountRate").value(discountRate).notBlank();
 
 		throwExceptionIfValidationWarningsExist(dataValidationErrors);
 
