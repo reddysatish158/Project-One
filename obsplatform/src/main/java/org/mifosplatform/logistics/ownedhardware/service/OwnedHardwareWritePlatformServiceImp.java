@@ -105,7 +105,7 @@ public class OwnedHardwareWritePlatformServiceImp implements OwnedHardwareWriteP
 		
 		if(configurationProperty.isEnabled()){
 			
-			configurationProperty=this.globalConfigurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
+			configurationProperty=this.globalConfigurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);
 			
 			if(configurationProperty.getValue().equalsIgnoreCase(ConfigurationConstants.CONFIR_PROPERTY_OWN)){
 			

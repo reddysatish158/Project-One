@@ -1,8 +1,5 @@
 package org.mifosplatform.portfolio.transactionhistory.data;
 
-import java.util.Date;
-
-import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 public class TransactionHistoryData {

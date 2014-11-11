@@ -43,11 +43,6 @@ public class InvoiceTax {
 	private Long billId;
 	
 
-
-	private InvoiceTax() {
-
-	}
-
 	public InvoiceTax(final Invoice invoice, final BillingOrder charge,
 			final String taxCode, final BigDecimal taxValue,
 			final BigDecimal taxPercentage, final BigDecimal taxAmount) {

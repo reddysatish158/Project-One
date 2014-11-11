@@ -2,8 +2,6 @@ package org.mifosplatform.logistics.itemdetails.command;
 
 import java.util.Set;
 
-import org.apache.xmlbeans.impl.store.Locale;
-
 
 public class ItemDetailsCommand {
 

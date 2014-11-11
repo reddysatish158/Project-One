@@ -14,6 +14,7 @@ import java.util.List;
 import org.joda.time.LocalDate;
 import org.mifosplatform.cms.media.domain.MediaTypeEnumaration;
 import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.data.MediaEnumoptionData;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
@@ -338,7 +339,7 @@ public class BillingMesssageReadPlatformServiceImpl implements
 			if (messgeType == 'O') {
 				String requstStatus = UserActionStatusTypeEnum.MESSAGE.toString();
 				Long clientId = billingMesssageReadPlatformService.retrieveClientId(columndata.get(0).toString());
-				Configuration configuration = globalConfigurationRepository.findOneByName("OSD_ProvisioningSystem");
+				Configuration configuration = globalConfigurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_OSD_PROVISIONING_SYSTEM);
 				
 				if (clientId != null && configuration != null) {
 					Long id = Long.valueOf(0);

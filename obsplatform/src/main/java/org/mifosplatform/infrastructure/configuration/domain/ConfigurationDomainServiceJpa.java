@@ -39,9 +39,9 @@ public class ConfigurationDomainServiceJpa implements ConfigurationDomainService
         final Permission thisTask = this.permissionRepository.findOneByCode(taskPermissionCode);
         if (thisTask == null) { throw new PermissionNotFoundException(taskPermissionCode); }
 
-        final String makerCheckerConfigurationProperty = "maker-checker";
-        final Configuration property = this.globalConfigurationRepository.findOneByName(makerCheckerConfigurationProperty);
-        if (property == null) { throw new ConfigurationPropertyNotFoundException(makerCheckerConfigurationProperty); }
+       
+        final Configuration property = this.globalConfigurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_MAKER_CHECKER);
+        if (property == null) { throw new ConfigurationPropertyNotFoundException(ConfigurationConstants.CONFIG_PROPERTY_MAKER_CHECKER); }
 
         return thisTask.hasMakerCheckerEnabled() && property.isEnabled();
     }
@@ -63,8 +63,7 @@ public class ConfigurationDomainServiceJpa implements ConfigurationDomainService
     
     @Override
     public boolean isConstraintApproachEnabledForDatatables() {
-        final String propertyName = "constraint_approach_for_datatables";
-        final Configuration property = this.globalConfigurationRepository.findOneByName(propertyName);
+        final Configuration property = this.globalConfigurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_CONSTAINT_APPROACH_FOR_DATATABLES);
         return property.isEnabled();
     }
     

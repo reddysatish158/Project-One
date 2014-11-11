@@ -33,6 +33,7 @@ import org.mifosplatform.finance.billingmaster.api.BillingMasterApiResourse;
 import org.mifosplatform.finance.billingorder.exceptions.BillingOrderNoRecordsFoundException;
 import org.mifosplatform.finance.billingorder.service.InvoiceClient;
 import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
@@ -228,7 +229,7 @@ public void processRequest() {
 			   LocalTime date=new LocalTime(zone);
 	           String dateTime=date.getHourOfDay()+"_"+date.getMinuteOfHour()+"_"+date.getSecondOfMinute();
 	           String path=FileUtils.generateLogFileDirectory()+JobName.REQUESTOR.toString()+ File.separator +"Requester_"+new LocalDate().toString().replace("-","")+"_"+dateTime+".log";
-	           Configuration globalConfiguration=this.globalConfigurationRepository.findOneByName("CPE_TYPE");
+	           Configuration globalConfiguration=this.globalConfigurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);
 	           File fileHandler = new File(path.trim());
 	           fileHandler.createNewFile();
 	           FileWriter fw = new FileWriter(fileHandler);
@@ -1381,6 +1382,7 @@ public void eventActionProcessor() {
 		}
 	}
 
+@SuppressWarnings("null")
 @Override
 @CronTarget(jobName = JobName.REPORT_EMAIL)
 public void reportEmail() {
@@ -1413,6 +1415,7 @@ public void reportEmail() {
 					 String pdfFileName = this.readExtraDataAndReportingService.generateEmailReport(scheduleJobData.getBatchName(), "report",reportParams,fileLocation);
 
 					 if(pdfFileName!=null){
+						 
 						 fw.append("PDF file location is :" + pdfFileName +" \r\n");
 						 fw.append("Sending the Email....... \r\n");
 						 String result=this.messagePlatformEmailService.createEmail(pdfFileName,data.getEmailId());
@@ -1421,9 +1424,10 @@ public void reportEmail() {
 							 fw.append("Email sent successfully to "+data.getEmailId()+" \r\n");
 						 }else{
 							 fw.append("Email sending failed to "+data.getEmailId()+", \r\n");
+						 
+						 }if(pdfFileName.isEmpty()){
+							 fw.append("PDF file name is Empty and PDF file doesnot Create Properly \r\n");
 						 }
-					 }else if(pdfFileName.isEmpty()){
-						 fw.append("PDF file name is Empty and PDF file doesnot Create Properly \r\n");
 					 }else{
 						 fw.append("PDF file Creation Failed \r\n");
 					 }

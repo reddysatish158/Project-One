@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.joda.time.LocalDate;
 import org.mifosplatform.billing.payterms.data.PaytermData;
-import org.mifosplatform.finance.payments.data.McodeData;
 import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
 import org.mifosplatform.portfolio.contract.data.SubscriptionData;
 import org.mifosplatform.portfolio.plan.data.PlanCodeData;

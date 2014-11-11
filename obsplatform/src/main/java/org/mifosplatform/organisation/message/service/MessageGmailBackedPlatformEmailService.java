@@ -33,6 +33,7 @@ import org.joda.time.LocalDate;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.configuration.exception.ConfigurationPropertyNotFoundException;
 import org.mifosplatform.organisation.message.data.BillingMessageDataForProcessing;
@@ -73,7 +74,7 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 	public void smtpDataProcessing() {
 		try {
 			
-			 configuration = repository.findOneByName("SMTP");
+			 configuration = repository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_SMTP);
 			String value = configuration.getValue();
 			JSONObject object = new JSONObject(value);
 			
