@@ -2,10 +2,8 @@ package org.mifosplatform.billing.planprice.handler;
 
 import org.mifosplatform.billing.planprice.service.PriceWritePlatformService;
 import org.mifosplatform.commands.handler.NewCommandSourceHandler;
-import org.mifosplatform.infrastructure.codes.service.CodeWritePlatformService;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
-import org.mifosplatform.portfolio.contract.service.ContractPeriodWritePlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

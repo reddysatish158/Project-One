@@ -31,6 +31,7 @@ import org.mifosplatform.finance.payments.exception.PaymentDetailsNotFoundExcept
 import org.mifosplatform.finance.payments.exception.ReceiptNoDuplicateException;
 import org.mifosplatform.finance.payments.serialization.PaymentCommandFromApiJsonDeserializer;
 import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
@@ -360,7 +361,7 @@ public class PaymentWritePlatformServiceImpl implements PaymentWritePlatformServ
 				prop.load(is);
 				final PaypalEnquirey paypalEnquirey = this.paypalEnquireyRepository.findOne(paypalEnquireyId);
 				com.paypal.api.payments.Payment.initConfig(prop);
-				final Configuration paypalGlobalData = this.globalConfigurationRepository.findOneByName("Is_Paypal");
+				final Configuration paypalGlobalData = this.globalConfigurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_PAYPAL_CHECK);
 				final JSONObject object = new JSONObject(paypalGlobalData.getValue());
 				final String paypalClientId = object.getString("clientId");
 				final String paypalsecretCode = object.getString("secretCode");

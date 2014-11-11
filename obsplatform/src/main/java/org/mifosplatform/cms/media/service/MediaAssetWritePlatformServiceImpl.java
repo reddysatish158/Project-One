@@ -234,7 +234,7 @@ public class MediaAssetWritePlatformServiceImpl implements MediaAssetWritePlatfo
 		context.authenticatedUser();
 		final MediaAsset mediaAsset=retriveMessageBy(command.entityId());
 		if (mediaAsset == null) {
-			throw new DataIntegrityViolationException(mediaAsset.toString());
+			throw new DataIntegrityViolationException(command.entityId().toString());
 		}
 		mediaAsset.isDelete();
 		this.assetRepository.save(mediaAsset);

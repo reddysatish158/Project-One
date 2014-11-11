@@ -6,7 +6,6 @@
 package org.mifosplatform.portfolio.group.service;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.mifosplatform.portfolio.client.service.GroupData;
 import org.mifosplatform.portfolio.group.data.GroupAccountSummaryCollectionData;

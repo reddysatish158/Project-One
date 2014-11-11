@@ -13,6 +13,7 @@ import org.apache.commons.mail.SimpleEmail;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.domain.EmailDetail;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,7 @@ public class GmailBackedPlatformEmailService implements PlatformEmailService {
         String authpwd ="kirankiran"; //"openbs@13";
 
 =======*/
-        Configuration configuration=repository.findOneByName("SMTP");
+        Configuration configuration=repository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_SMTP);
         String value= configuration.getValue();
        
         try {

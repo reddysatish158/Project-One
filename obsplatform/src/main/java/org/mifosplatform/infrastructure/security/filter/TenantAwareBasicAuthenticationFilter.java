@@ -6,8 +6,6 @@
 package org.mifosplatform.infrastructure.security.filter;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.Map;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -17,10 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.time.StopWatch;
-import org.mifosplatform.billing.loginhistory.data.LoginHistoryData;
-import org.mifosplatform.billing.loginhistory.domain.LoginHistory;
-import org.mifosplatform.billing.loginhistory.domain.LoginHistoryRepository;
-import org.mifosplatform.billing.loginhistory.service.LoginHistoryReadPlatformService;
 import org.mifosplatform.infrastructure.cache.domain.CacheType;
 import org.mifosplatform.infrastructure.cache.service.CacheWritePlatformService;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationDomainService;
@@ -38,13 +32,13 @@ import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.NullRememberMeServices;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.core.AuthenticationException;
 
 /**
  * A customised version of spring security's {@link BasicAuthenticationFilter}.
@@ -69,8 +63,7 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
     //ashok changed
     private AuthenticationDetailsSource<HttpServletRequest,?> authenticationDetailsSource = new WebAuthenticationDetailsSource();
     private RememberMeServices rememberMeServices = new NullRememberMeServices();
-    private final LoginHistoryReadPlatformService loginHistoryReadPlatformService;
-    private final LoginHistoryRepository loginHistoryRepository;
+   
    
     @Autowired
     private AuthenticationEntryPoint authenticationEntryPoint;
@@ -87,16 +80,13 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
     @Autowired
     public TenantAwareBasicAuthenticationFilter(final AuthenticationManager authenticationManager,final AuthenticationEntryPoint authenticationEntryPoint,
     		final ConfigurationDomainService configurationDomainService,final CacheWritePlatformService cacheWritePlatformService,
-    		final TenantDetailsService tenantDetailsService,final ToApiJsonSerializer<PlatformRequestLog> toApiJsonSerializer,
-    		final LoginHistoryReadPlatformService loginHistoryReadPlatformService,final LoginHistoryRepository loginHistoryRepository) {
+    		final TenantDetailsService tenantDetailsService,final ToApiJsonSerializer<PlatformRequestLog> toApiJsonSerializer) {
     	
         super(authenticationManager, authenticationEntryPoint);
         this.configurationDomainService=configurationDomainService;
         this.cacheWritePlatformService=cacheWritePlatformService;
         this.tenantDetailsService=tenantDetailsService;
         this.toApiJsonSerializer=toApiJsonSerializer;
-        this.loginHistoryReadPlatformService=loginHistoryReadPlatformService;
-        this.loginHistoryRepository=loginHistoryRepository;
     }
 
     @Override

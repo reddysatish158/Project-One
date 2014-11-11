@@ -246,7 +246,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 						//For Plan And HardWare Association
 						Configuration configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY);
 							if(configurationProperty.isEnabled()){
-								configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
+								configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);
 									if(plan.isHardwareReq() == 'Y'){
 										List<AllocationDetailsData> allocationDetailsDatas=this.allocationReadPlatformService.retrieveHardWareDetailsByItemCode(clientId,plan.getPlanCode(),configurationProperty.getValue());
 											if(!allocationDetailsDatas.isEmpty()){
@@ -620,7 +620,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 					throw new NoOrdersFoundException(command.entityId());
 				}
 				if (requstStatus != null && plan!=null) {
-					final Configuration configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
+					final Configuration configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);
 					final AllocationDetailsData detailsData = this.allocationReadPlatformService.getTheHardwareItemDetails(command.entityId(),configurationProperty.getValue());
 					final ProcessRequest processRequest=new ProcessRequest(Long.valueOf(0),order.getClientId(),order.getId(),plan.getProvisionSystem(),requstStatus
 							,'N','N');

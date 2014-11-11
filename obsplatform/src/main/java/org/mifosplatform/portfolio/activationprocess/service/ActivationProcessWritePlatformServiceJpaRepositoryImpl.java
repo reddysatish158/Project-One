@@ -164,7 +164,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 	        	resultClient=this.clientWritePlatformService.createClient(comm,true);
 	        }
 
-	        Configuration configuration=configurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
+	        Configuration configuration=configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);
 	        if(configuration.getValue().equalsIgnoreCase(ConfigurationConstants.CONFIR_PROPERTY_SALE)){
 	             
 	        	for(JsonElement sale:saleData){
@@ -280,7 +280,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 						null, null);
 				resultClient = this.clientWritePlatformService.createClient(clientCommand,false);
 
-				if (resultClient == null && resultClient.getClientId() == null && resultClient.getClientId() <= 0) {
+				if (resultClient == null) {
 					throw new PlatformDataIntegrityException("error.msg.client.creation.failed", "Client Creation Failed","Client Creation Failed");
 				}
 				
@@ -292,7 +292,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 					if(deviceStatusConfiguration.isEnabled()){
 						JSONObject bookDevice = new JSONObject();
 						 deviceStatusConfiguration = configurationRepository.
-								findOneByName(ConfigurationConstants.CPE_TYPE);
+								findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);
 						 
 						 if(deviceStatusConfiguration != null && deviceStatusConfiguration.isEnabled() &&
 								 deviceStatusConfiguration.getValue().equalsIgnoreCase(ConfigurationConstants.CONFIR_PROPERTY_SALE)){

@@ -252,7 +252,7 @@ public class ItemDetailsWritePlatformServiceImp implements ItemDetailsWritePlatf
 						Configuration configurationProperty=this.configurationRepository.findOneByName(CONFIG_PROPERTY);
 						
 						if(configurationProperty.isEnabled()){
-							configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
+							configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);
 							
 							if(configurationProperty.getValue().equalsIgnoreCase(ConfigurationConstants.CONFIR_PROPERTY_SALE)){
 								ItemMaster itemMaster=this.itemRepository.findOne(inventoryItemDetails.getItemMasterId());

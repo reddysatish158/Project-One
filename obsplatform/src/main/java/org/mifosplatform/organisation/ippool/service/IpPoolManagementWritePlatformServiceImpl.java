@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.apache.commons.collections.map.HashedMap;
 import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
@@ -73,7 +74,7 @@ public class IpPoolManagementWritePlatformServiceImpl implements
 				
 				String ipData = ipAddress + "/" + subnet;
 				IpGeneration util = new IpGeneration(ipData, this.ipPoolManagementReadPlatformService);
-				Configuration configuration = globalConfigurationRepository.findOneByName("include-network-broadcast-ip");
+				Configuration configuration = globalConfigurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_INCLUDE_NETWORK_BROADCAST_IP);
 
 				util.setInclusiveHostCount(configuration.getValue().equalsIgnoreCase("true"));
 				String[] data = util.getInfo().getAllAddresses();
@@ -190,7 +191,7 @@ public class IpPoolManagementWritePlatformServiceImpl implements
 		Map<String, Object> generatedIPPoolID = new HashedMap();
 		String search = command.stringValueOfParameterNamed("ipAndSubnet");
 		IpGeneration ipGeneration = new IpGeneration(search, this.ipPoolManagementReadPlatformService);
-		Configuration configuration = globalConfigurationRepository.findOneByName("include-network-broadcast-ip");
+		Configuration configuration = globalConfigurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_INCLUDE_NETWORK_BROADCAST_IP);
 		ipGeneration.setInclusiveHostCount(configuration.getValue().equalsIgnoreCase("true"));
 		String[] data = ipGeneration.getInfo().getsubnetAddresses();
 		String ipPoolDescription = ipGeneration.getInfo().getNetmask();

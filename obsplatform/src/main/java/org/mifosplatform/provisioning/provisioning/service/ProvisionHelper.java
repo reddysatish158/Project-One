@@ -9,6 +9,7 @@ import net.sf.json.JSONObject;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
 import org.mifosplatform.organisation.ippool.data.IpGeneration;
@@ -95,7 +96,7 @@ public ProvisionHelper(final FromJsonHelper fromJsonHelper,final ServiceParamete
 				final String ipAddress = fromJsonHelper.extractStringNamed("paramValue", jsonElement);
 				String ipData = ipAddress + "/" + subnet;
 				IpGeneration ipGeneration = new IpGeneration(ipData, this.ipPoolManagementReadPlatformService);
-				final Configuration configuration = this.configurationRepository.findOneByName("include-network-broadcast-ip");
+				final Configuration configuration = this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_INCLUDE_NETWORK_BROADCAST_IP);
 				ipGeneration.setInclusiveHostCount(configuration.getValue().equalsIgnoreCase("true"));
 				ipAddressArray = ipGeneration.getInfo().getsubnetAddresses();
 				

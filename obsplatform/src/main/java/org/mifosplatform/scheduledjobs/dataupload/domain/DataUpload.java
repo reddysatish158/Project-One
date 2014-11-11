@@ -10,7 +10,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 
 
 @Entity
-@Table(name="uploads_status")
+@Table(name="b_data_uploads")
 public class DataUpload extends AbstractPersistable<Long>{
 
 	@Column(name="file_name", nullable=true, length=100)

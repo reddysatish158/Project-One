@@ -7,6 +7,7 @@ import net.sf.json.JSONObject;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
@@ -146,7 +147,7 @@ public class ProvisioningServiceParamsWriteplatformServiceImpl implements
 									String ipData = ipAddress + "/" + subnet;
 									IpGeneration ipGeneration = new IpGeneration(ipData, this.ipPoolManagementReadPlatformService);
 									// ipAddressArray=this.ipGeneration.getInfo().getAllAddresses(ipData);//
-									Configuration configuration = globalConfigurationRepository.findOneByName("include-network-broadcast-ip");
+									Configuration configuration = globalConfigurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_PAYPAL_CHECK);
 									ipGeneration.setInclusiveHostCount(configuration.getValue().equalsIgnoreCase("true"));
 									ipAddressArray = ipGeneration.getInfo().getsubnetAddresses();
 
