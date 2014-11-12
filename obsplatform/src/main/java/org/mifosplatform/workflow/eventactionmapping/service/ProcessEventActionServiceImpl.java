@@ -64,6 +64,7 @@ public class ProcessEventActionServiceImpl implements ProcessEventActionService 
 		 JsonElement parsedCommand =null;
 		try{
 			switch (eventAction.getActionName()) {
+			
 			case EventActionConstants.ACTION_RENEWAL:
 				 parsedCommand = this.fromApiJsonHelper.parse(jsonObject);
 	            command = JsonCommand.from(jsonObject,parsedCommand,this.fromApiJsonHelper,"RenewalOrder",

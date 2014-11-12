@@ -7,8 +7,6 @@ public interface SheduleJobWritePlatformService {
 	
 	void processRequest();
 	
-	//void processResponse();
-	
 	void processSimulator();
 	
 	void generateStatment();

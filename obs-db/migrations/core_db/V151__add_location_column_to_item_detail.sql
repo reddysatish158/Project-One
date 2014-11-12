@@ -33,3 +33,7 @@ select @a_lid:=(select id from m_code where code_name='Item Status');
 insert ignore into m_code_value VALUES (null,@a_lid,'Available',0);
 insert ignore into m_code_value VALUES (null,@a_lid,'UnAvailable',0);
 insert ignore into m_code_value VALUES (null,@a_lid,'In Use',0);
+
+ update b_item_detail set status ='Available' where status='NEW' and quality ='Good';
+ update b_item_detail set status ='UnAvailable' where status='NEW' and quality !='Good';
+ update b_item_detail set status ='In Use' where status='Used';

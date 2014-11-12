@@ -36,6 +36,7 @@ import org.mifosplatform.logistics.onetimesale.service.OneTimeSaleReadPlatformSe
 import org.mifosplatform.portfolio.client.domain.Client;
 import org.mifosplatform.portfolio.client.domain.ClientRepository;
 import org.mifosplatform.portfolio.order.service.OrderDetailsReadPlatformServices;
+import org.mifosplatform.useradministration.domain.AppUser;
 import org.mifosplatform.workflow.eventaction.data.ActionDetaislData;
 import org.mifosplatform.workflow.eventaction.service.ActionDetailsReadPlatformService;
 import org.mifosplatform.workflow.eventaction.service.ActiondetailsWritePlatformService;
@@ -43,6 +44,8 @@ import org.mifosplatform.workflow.eventaction.service.EventActionConstants;
 import org.mifosplatform.workflow.eventvalidation.service.EventValidationReadPlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -113,7 +116,8 @@ public class EventOrderWriteplatformServiceImpl implements EventOrderWriteplatfo
 			final String deviceId = command.stringValueOfParameterNamed("deviceId");
 			 Long clientId = command.longValueOfParameterNamed("clientId");
 			Long clientType=Long.valueOf(0);
-			//GlobalConfigurationProperty configuration=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIR_PROPERTY_REGISTRATION_DEVICE);
+			
+			final Long userId=getUserId();
 			
 			if(configuration != null && configuration.isEnabled()){
 				MediaDeviceData deviceData = this.deviceReadPlatformService.retrieveDeviceDetails(deviceId);
@@ -129,7 +133,7 @@ public class EventOrderWriteplatformServiceImpl implements EventOrderWriteplatfo
 			}
 			
 			//Check Client Custome Validation
-			this.eventValidationReadPlatformService.checkForCustomValidations(clientId,EventActionConstants.EVENT_EVENT_ORDER, command.json());
+			this.eventValidationReadPlatformService.checkForCustomValidations(clientId,EventActionConstants.EVENT_EVENT_ORDER, command.json(),userId);
 			final String formatType = command.stringValueOfParameterNamed("formatType");
 			final String optType=command.stringValueOfParameterNamed("optType");
 			
@@ -184,6 +188,19 @@ public class EventOrderWriteplatformServiceImpl implements EventOrderWriteplatfo
 
 		}
 
+private Long getUserId() {
+		
+		Long userId=null;
+		SecurityContext context = SecurityContextHolder.getContext();
+			if(context.getAuthentication() != null){
+				AppUser appUser=this.context.authenticatedUser();
+				userId=appUser.getId();
+			}else {
+				userId=new Long(0);
+			}
+			
+			return userId;
+	}
 	
 	@Override
 	public CommandProcessingResult updateEventOrderPrice(JsonCommand command) {
