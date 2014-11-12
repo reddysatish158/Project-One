@@ -42,7 +42,7 @@ public class StaffReadPlatformServiceImpl implements StaffReadPlatformService {
         }
 
         @Override
-        public StaffData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
+        public StaffData mapRow(final ResultSet rs,  final int rowNum) throws SQLException {
 
             final Long id = rs.getLong("id");
             final String firstname = rs.getString("firstname");
@@ -74,7 +74,7 @@ public class StaffReadPlatformServiceImpl implements StaffReadPlatformService {
         }
 
         @Override
-        public StaffData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
+        public StaffData mapRow(final ResultSet rs,  final int rowNum) throws SQLException {
 
             final Long id = rs.getLong("id");
             final String displayName = rs.getString("displayName");

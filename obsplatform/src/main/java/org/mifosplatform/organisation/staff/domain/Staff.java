@@ -134,7 +134,7 @@ public class Staff extends AbstractPersistable<Long> {
 
     private void deriveDisplayName(final String firstname) {
         if (!StringUtils.isBlank(firstname)) {
-            this.displayName = this.lastname + ", " + this.firstname;
+            this.displayName = this.firstname + " " + this.lastname;
         } else {
             this.displayName = this.lastname;
         }

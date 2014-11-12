@@ -114,13 +114,14 @@ public class PlanMappingApiResource {
 			@Context final UriInfo uriInfo) {
 		this.context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
 		final PlanMappingData planMappingData = this.planMappingReadPlatformService.getPlanMapping(planMappingId);
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		if(settings.isTemplate()){
 		final List<EnumOptionData> status = this.planReadPlatformService.retrieveNewStatus();
 		final List<PlanCodeData> planCodeData = this.planMappingReadPlatformService.getPlanCode();
 		planMappingData.setStatus(status);
 		planMappingData.setPlanCodeData(planCodeData);
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-		return this.toApiJsonSerializer.serialize(settings, planMappingData,
-				RESPONSE_DATA_PARAMETERS);
+		}
+		return this.toApiJsonSerializer.serialize(settings, planMappingData,RESPONSE_DATA_PARAMETERS);
 	}
 	
 	@PUT

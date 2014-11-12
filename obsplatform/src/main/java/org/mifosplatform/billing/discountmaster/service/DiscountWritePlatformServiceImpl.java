@@ -78,7 +78,7 @@ public class DiscountWritePlatformServiceImpl implements
 			throw new PlatformDataIntegrityException(
 					"error.msg.discount.duplicate.name",
 					"A discount with Code'" + name + "'already exists",
-					"displayName", name);
+					"discountCode", name);
 		}
 
 		LOGGER.error(dve.getMessage(), dve);
