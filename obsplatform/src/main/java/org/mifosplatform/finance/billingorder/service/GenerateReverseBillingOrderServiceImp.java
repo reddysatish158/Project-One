@@ -97,7 +97,7 @@ public class GenerateReverseBillingOrderServiceImp implements GenerateReverseBil
 		TaxMappingRateData tax=this.billingOrderReadPlatformService.retriveExemptionTaxDetails(billingOrderCommands.get(0).getClientId());
 		
 		Invoice invoice = new Invoice(billingOrderCommands.get(0).getClientId(), new LocalDate().toDate(), invoiceAmount, invoiceAmount, 
-				netTaxAmount, "active");
+				                         netTaxAmount, "active");
 		
 		for (BillingOrderCommand billingOrderCommand : billingOrderCommands) {
 			
@@ -132,7 +132,6 @@ public class GenerateReverseBillingOrderServiceImp implements GenerateReverseBil
 				  if(isTaxInclusive(billingOrderCommand.getTaxInclusive())){
 					netChargeAmount = netChargeAmount.subtract(netChargeTaxAmount);
 					charge.setNetChargeAmount(netChargeAmount);
-
 				}
 			}
 

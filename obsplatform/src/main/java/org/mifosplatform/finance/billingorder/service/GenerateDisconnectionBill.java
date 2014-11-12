@@ -32,14 +32,14 @@ public class GenerateDisconnectionBill {
 		this.billingOrderReadPlatformService = billingOrderReadPlatformService;
 	}
 
-	BigDecimal pricePerMonth = null;
-	LocalDate startDate = null;
-	LocalDate endDate = null;
-	BigDecimal price = null;
-	LocalDate billEndDate = null;
-	LocalDate invoiceTillDate = null;
-	LocalDate nextbillDate = null;
-	BillingOrderCommand billingOrderCommand = null;
+	BigDecimal pricePerMonth=BigDecimal.ZERO;
+	BigDecimal price=BigDecimal.ZERO;
+	LocalDate startDate=null;
+	LocalDate endDate=null;
+	LocalDate billEndDate=null;
+	LocalDate invoiceTillDate=null;
+	LocalDate nextbillDate=null;
+	BillingOrderCommand billingOrderCommand=null;
 
 	public boolean isChargeTypeNRC(final BillingOrderData billingOrderData) {
 		boolean chargeType = false;
@@ -315,7 +315,7 @@ public class GenerateDisconnectionBill {
 					BigDecimal numberOfMonthsPrice = BigDecimal.ZERO;
 					BigDecimal numberOfDaysPrice = BigDecimal.ZERO;
 					BigDecimal pricePerDay = BigDecimal.ZERO;
-					 BigDecimal pricePerMonth = BigDecimal.ZERO;
+					BigDecimal pricePerMonth = BigDecimal.ZERO;
 					LocalDate durationDate=disconnectionDate.plusMonths(billingOrderData.getChargeDuration()).minusDays(1);
 					int totalDays = Days.daysBetween(disconnectionDate, durationDate).getDays();
 				    int numberOfMonths = Months.monthsBetween(disconnectionDate,new LocalDate(billingOrderData.getInvoiceTillDate())).getMonths();
@@ -334,17 +334,7 @@ public class GenerateDisconnectionBill {
 					           numberOfMonthsPrice = pricePerMonth.multiply(new BigDecimal(numberOfMonths));
 				    	       pricePerDay = taxFlat.divide(new BigDecimal(maximumDaysInYear), 2,RoundingMode.HALF_UP);
 				    	       numberOfDaysPrice = pricePerDay.multiply(new BigDecimal(numberOfDays));
-				      }else if(billingOrderData.getChargeDuration()==6){
-						       pricePerMonth = taxFlat.divide(new BigDecimal(billingOrderData.getChargeDuration()), 2,RoundingMode.HALF_UP);
-						       numberOfMonthsPrice = pricePerMonth.multiply(new BigDecimal(numberOfMonths));
-				    	       pricePerDay = taxFlat.divide(new BigDecimal(totalDays), 2,RoundingMode.HALF_UP);
-				    	       numberOfDaysPrice = pricePerDay.multiply(new BigDecimal(numberOfDays));
-				      }else if(billingOrderData.getChargeDuration()==3){
-						       pricePerMonth = taxFlat.divide(new BigDecimal(billingOrderData.getChargeDuration()), 2,RoundingMode.HALF_UP);
-						       numberOfMonthsPrice = pricePerMonth.multiply(new BigDecimal(numberOfMonths));
-				    	       pricePerDay = taxFlat.divide(new BigDecimal(totalDays), 2,RoundingMode.HALF_UP);
-				    	       numberOfDaysPrice = pricePerDay.multiply(new BigDecimal(numberOfDays));
-				      }else if(billingOrderData.getChargeDuration()==2){
+				      }else if(billingOrderData.getChargeDuration()!=1){
 						       pricePerMonth = taxFlat.divide(new BigDecimal(billingOrderData.getChargeDuration()), 2,RoundingMode.HALF_UP);
 						       numberOfMonthsPrice = pricePerMonth.multiply(new BigDecimal(numberOfMonths));
 				    	       pricePerDay = taxFlat.divide(new BigDecimal(totalDays), 2,RoundingMode.HALF_UP);
@@ -364,13 +354,12 @@ public class GenerateDisconnectionBill {
 				       }
 					}  
 					taxAmount = numberOfDaysPrice.add(numberOfMonthsPrice);
-					
 					// taxAmount = taxFlat;
 				}
 				}
 			
 				invoiceTaxCommand = new InvoiceTaxCommand(billingOrderData.getClientId(), null, null,
-						taxCode, null, taxPercentage, taxAmount);
+						                  taxCode, null, taxPercentage, taxAmount);
 				invoiceTaxCommands.add(invoiceTaxCommand);
 			}
 
@@ -380,8 +369,7 @@ public class GenerateDisconnectionBill {
 	}
 
 	// create billing order command
-	public BillingOrderCommand createBillingOrderCommand(
-			BillingOrderData billingOrderData, LocalDate chargeStartDate,
+	public BillingOrderCommand createBillingOrderCommand(BillingOrderData billingOrderData, LocalDate chargeStartDate,
 			LocalDate chargeEndDate, LocalDate invoiceTillDate,
 			LocalDate nextBillableDate, BigDecimal price,
 			List<InvoiceTaxCommand> listOfTaxes,
