@@ -11,6 +11,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import org.mifosplatform.crm.clientprospect.service.SearchSqlQuery;
+import org.mifosplatform.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.mifosplatform.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.mifosplatform.infrastructure.core.service.Page;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
@@ -52,6 +53,20 @@ public class TransactionHistoryApiResource {
 		context.authenticatedUser().validateHasReadPermission(resourceType);
 		final SearchSqlQuery searchTransactionHistory =SearchSqlQuery.forSearch(sqlSearch, offset,limit );
 		Page<TransactionHistoryData> transactionHistory = transactionHistoryReadPlatformService.retriveTransactionHistoryClientId(searchTransactionHistory,clientId);
+		return apiJsonSerializer.serialize(transactionHistory);
+	}
+	
+
+	@GET
+	@Path("template/{clientId}")
+	@Produces({MediaType.APPLICATION_JSON})
+	@Consumes({MediaType.APPLICATION_JSON})
+	public String retriveTransactionHistoryById(@PathParam("clientId") final Long clientId, @Context final UriInfo uriInfo,
+			@QueryParam("sqlSearch") final String sqlSearch, @QueryParam("limit") final Integer limit, @QueryParam("offset") final Integer offset){
+		
+		context.authenticatedUser().validateHasReadPermission(resourceType);
+		final SearchSqlQuery searchTransactionHistory =SearchSqlQuery.forSearch(sqlSearch, offset,limit );
+		Page<TransactionHistoryData> transactionHistory = transactionHistoryReadPlatformService.retriveTransactionHistoryById(searchTransactionHistory,clientId);
 		return apiJsonSerializer.serialize(transactionHistory);
 	}
 	

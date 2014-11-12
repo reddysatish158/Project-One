@@ -20,7 +20,6 @@ public class ConfigurationConstants {
 	public static final String CONFIR_PROPERTY_OWN = "OWN";
 	public static final String CONFIR_PROPERTY_SELF_REGISTRATION = "register-plan";
 	public static final String CONFIR_PROPERTY_REGISTRATION_DEVICE = "registration-requires-device";
-	public static final String CONFIG_PROPERTY = "Implicit Association";
 	public static final String CONFIG_DISCONNECT = "disconnection-credit";
 	public static final String CONFIG_CHANGE_PLAN_ALIGN_DATES = "change-plan-align-dates";
 	public static final String CONFIG_IS_SELFCAREUSER = "is-selfcareuser";

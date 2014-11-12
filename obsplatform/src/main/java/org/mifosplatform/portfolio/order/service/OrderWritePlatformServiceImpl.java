@@ -244,7 +244,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 						
 
 						//For Plan And HardWare Association
-						Configuration configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY);
+						Configuration configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IMPLICIT_ASSOCIATION);
 							if(configurationProperty.isEnabled()){
 								configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);
 									if(plan.isHardwareReq() == 'Y'){

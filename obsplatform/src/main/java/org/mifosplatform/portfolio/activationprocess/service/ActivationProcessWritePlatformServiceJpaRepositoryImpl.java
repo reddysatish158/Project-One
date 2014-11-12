@@ -147,13 +147,13 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
             context.authenticatedUser();
             CommandProcessingResult resultClient=null;
             CommandProcessingResult resultSale=null;
-            CommandProcessingResult resultAllocate=null;
+          ///  CommandProcessingResult resultAllocate=null;
             CommandProcessingResult resultOrder=null;
             final JsonElement element = fromJsonHelper.parse(command.json());
 	        JsonArray clientData = fromJsonHelper.extractJsonArrayNamed("client", element);
 	        JsonArray saleData = fromJsonHelper.extractJsonArrayNamed("sale", element);
 	        JsonArray owndevices= fromJsonHelper.extractJsonArrayNamed("owndevice", element);
-	        JsonArray allocateData = fromJsonHelper.extractJsonArrayNamed("allocate", element);
+	       // JsonArray allocateData = fromJsonHelper.extractJsonArrayNamed("allocate", element);
 	        JsonArray bookOrder = fromJsonHelper.extractJsonArrayNamed("bookorder", element);
 	        
 	        

@@ -8,4 +8,6 @@ public interface TransactionHistoryReadPlatformService {
 
 	
 	public Page<TransactionHistoryData> retriveTransactionHistoryClientId(SearchSqlQuery searchTransactionHistory, Long clientId);
+
+	public Page<TransactionHistoryData> retriveTransactionHistoryById(SearchSqlQuery searchTransactionHistory, Long clientId);
 }

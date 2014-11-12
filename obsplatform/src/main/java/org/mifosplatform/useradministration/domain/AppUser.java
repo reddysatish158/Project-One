@@ -457,5 +457,9 @@ public class AppUser extends AbstractPersistable<Long> implements PlatformUser {
         if (hasNotPermissionForDatatable(datatable, "READ")) { throw new NoAuthorizationException("Not authorised to read datatable: "
                 + datatable); }
     }
+
+	public boolean isSupeUser() {
+		  return hasAllFunctionsPermission();
+	}
     
 }

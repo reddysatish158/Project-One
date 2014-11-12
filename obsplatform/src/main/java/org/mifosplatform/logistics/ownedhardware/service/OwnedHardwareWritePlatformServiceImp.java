@@ -48,7 +48,7 @@ public class OwnedHardwareWritePlatformServiceImp implements OwnedHardwareWriteP
 	private final OrderReadPlatformService orderReadPlatformService; 
 	private final HardwareAssociationRepository associationRepository;
 	private final ProvisioningWritePlatformService provisioningWritePlatformService;
-	public static final String ACTIVE_DEVICE="Active Devices"; 
+
 	
 	
 	@Autowired
@@ -138,7 +138,7 @@ public class OwnedHardwareWritePlatformServiceImp implements OwnedHardwareWriteP
 	private boolean checkforClientActiveDevices(Long clientId) {
 		
 		boolean isCheck=true;
-		Configuration configurationProperty=this.globalConfigurationRepository.findOneByName(ACTIVE_DEVICE);
+		Configuration configurationProperty=this.globalConfigurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_ACTIVE_DEVICES);
 		
 		if(configurationProperty.isEnabled()){
 			int clientDevices=this.ownedHardwareReadPlatformService.retrieveClientActiveDevices(clientId);

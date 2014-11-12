@@ -57,7 +57,6 @@ import com.google.gson.JsonElement;
 public class ItemDetailsWritePlatformServiceImp implements ItemDetailsWritePlatformService{
 	
 	private final static Logger logger = (Logger) LoggerFactory.getLogger(ItemDetailsWritePlatformServiceImp.class);
-	public  final static String CONFIG_PROPERTY="Implicit Association";
 	private final FromJsonHelper fromJsonHelper;
 	private final PlatformSecurityContext context;
 	private final ItemRepository itemRepository;
@@ -249,7 +248,7 @@ public class ItemDetailsWritePlatformServiceImp implements ItemDetailsWritePlatf
 					//	i++;
 						
 						  //For Plan And HardWare Association
-						Configuration configurationProperty=this.configurationRepository.findOneByName(CONFIG_PROPERTY);
+						Configuration configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IMPLICIT_ASSOCIATION);
 						
 						if(configurationProperty.isEnabled()){
 							configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);
