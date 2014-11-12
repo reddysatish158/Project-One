@@ -40,12 +40,15 @@ import org.mifosplatform.portfolio.association.service.HardwareAssociationWritep
 import org.mifosplatform.portfolio.order.exceptions.NoGrnIdFoundException;
 import org.mifosplatform.portfolio.order.service.OrderReadPlatformService;
 import org.mifosplatform.provisioning.provisioning.service.ProvisioningWritePlatformService;
+import org.mifosplatform.useradministration.domain.AppUser;
 import org.mifosplatform.workflow.eventactionmapping.exception.EventActionMappingNotFoundException;
 import org.mifosplatform.workflow.eventvalidation.service.EventValidationReadPlatformService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,7 +60,6 @@ import com.google.gson.JsonElement;
 public class ItemDetailsWritePlatformServiceImp implements ItemDetailsWritePlatformService{
 	
 	private final static Logger logger = (Logger) LoggerFactory.getLogger(ItemDetailsWritePlatformServiceImp.class);
-	public  final static String CONFIG_PROPERTY="Implicit Association";
 	private final FromJsonHelper fromJsonHelper;
 	private final PlatformSecurityContext context;
 	private final ItemRepository itemRepository;
@@ -249,7 +251,7 @@ public class ItemDetailsWritePlatformServiceImp implements ItemDetailsWritePlatf
 					//	i++;
 						
 						  //For Plan And HardWare Association
-						Configuration configurationProperty=this.configurationRepository.findOneByName(CONFIG_PROPERTY);
+						Configuration configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IMPLICIT_ASSOCIATION);
 						
 						if(configurationProperty.isEnabled()){
 							configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);
@@ -332,7 +334,7 @@ public class ItemDetailsWritePlatformServiceImp implements ItemDetailsWritePlatf
         	  final Long clientId=command.longValueOfParameterNamed("clientId");
         	   
 		        //Check for Custome_Validation
-				this.eventValidationReadPlatformService.checkForCustomValidations(clientId,"UnPairing", command.json());
+				this.eventValidationReadPlatformService.checkForCustomValidations(clientId,"UnPairing", command.json(),getUserId());
         	   final Long activeorders=this.orderReadPlatformService.retrieveClientActiveOrderDetails(clientId,serialNo);
         	   	if(activeorders!= 0){
         	   		throw new ActivePlansFoundException();
@@ -357,6 +359,19 @@ public class ItemDetailsWritePlatformServiceImp implements ItemDetailsWritePlatf
            }
 		}
 		
+		 private Long getUserId() {
+				Long userId=null;
+				SecurityContext context = SecurityContextHolder.getContext();
+					if(context.getAuthentication() != null){
+						AppUser appUser=this.context.authenticatedUser();
+						userId=appUser.getId();
+					}else {
+						userId=new Long(0);
+					}
+					
+					return userId;
+			}
+		 
 		@Transactional
 		@Override
 		public CommandProcessingResult deleteItem(Long id,JsonCommand command)

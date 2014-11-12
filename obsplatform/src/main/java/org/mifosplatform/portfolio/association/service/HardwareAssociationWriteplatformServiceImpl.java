@@ -13,9 +13,12 @@ import org.mifosplatform.portfolio.association.exception.HardwareDetailsNotFound
 import org.mifosplatform.portfolio.order.domain.HardwareAssociationRepository;
 import org.mifosplatform.portfolio.order.domain.Order;
 import org.mifosplatform.portfolio.order.domain.OrderRepository;
+import org.mifosplatform.useradministration.domain.AppUser;
 import org.mifosplatform.workflow.eventvalidation.service.EventValidationReadPlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,14 +64,14 @@ public class HardwareAssociationWriteplatformServiceImpl implements HardwareAsso
 	public CommandProcessingResult createAssociation(JsonCommand command) {
 		try {
 			context.authenticatedUser();
+			final Long userId=getUserId();
 			this.fromApiJsonDeserializer.validateForCreate(command.json());
-			//Long planId = command.longValueOfParameterNamed("planId");
 			Long orderId = command.longValueOfParameterNamed("orderId");
 			Order order=this.orderRepository.findOne(orderId);
 			String provisionNum = command.stringValueOfParameterNamed("provisionNum");
 			HardwareAssociation hardwareAssociation = new HardwareAssociation(command.entityId(), order.getPlanId(), provisionNum, orderId);
 			//Check for Custome_Validation
-			this.eventValidationReadPlatformService.checkForCustomValidations(hardwareAssociation.getClientId(),"Pairing", command.json());
+			this.eventValidationReadPlatformService.checkForCustomValidations(hardwareAssociation.getClientId(),"Pairing", command.json(),userId);
 			this.associationRepository.saveAndFlush(hardwareAssociation);
 			return new CommandProcessingResultBuilder().withEntityId(
 					hardwareAssociation.getId()).withClientId(command.entityId()).build();
@@ -80,6 +83,19 @@ public class HardwareAssociationWriteplatformServiceImpl implements HardwareAsso
 
 	private void handleCodeDataIntegrityIssues(JsonCommand command,DataIntegrityViolationException dve) {
 		
+	}
+	
+   private Long getUserId() {
+		Long userId=null;
+		SecurityContext context = SecurityContextHolder.getContext();
+			if(context.getAuthentication() != null){
+				AppUser appUser=this.context.authenticatedUser();
+				userId=appUser.getId();
+			}else {
+				userId=new Long(0);
+			}
+			
+			return userId;
 	}
 
 	@Override
@@ -122,7 +138,7 @@ public class HardwareAssociationWriteplatformServiceImpl implements HardwareAsso
 		      
 		       
 		        //Check for Custome_Validation
-             this.eventValidationReadPlatformService.checkForCustomValidations(association.getClientId(),"UnPairing", jsonObject.toString());
+             this.eventValidationReadPlatformService.checkForCustomValidations(association.getClientId(),"UnPairing", jsonObject.toString(),getUserId());
              
     		   association.delete();
     		   this.associationRepository.save(association);

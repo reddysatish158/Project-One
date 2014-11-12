@@ -9,6 +9,6 @@ public interface EventValidationReadPlatformService {
 
 	List<EventValidationData> retrieveAllEventValidation();
 
-	void checkForCustomValidations(Long clientId,String eventName, String strjson);
+	void checkForCustomValidations(Long clientId,String eventName, String strjson, Long userId);
 	
 }

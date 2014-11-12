@@ -21,11 +21,14 @@ import org.mifosplatform.logistics.onetimesale.data.OneTimeSaleData;
 import org.mifosplatform.logistics.onetimesale.domain.OneTimeSale;
 import org.mifosplatform.logistics.onetimesale.domain.OneTimeSaleRepository;
 import org.mifosplatform.logistics.onetimesale.serialization.OneTimesaleCommandFromApiJsonDeserializer;
+import org.mifosplatform.useradministration.domain.AppUser;
 import org.mifosplatform.workflow.eventvalidation.service.EventValidationReadPlatformService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -94,10 +97,8 @@ public class OneTimeSaleWritePlatformServiceImpl implements OneTimeSaleWritePlat
 
 			// Check for Custome_Validation
 
-			this.eventValidationReadPlatformService.checkForCustomValidations(clientId, "Rental",command.json());
+			this.eventValidationReadPlatformService.checkForCustomValidations(clientId, "Rental",command.json(),getUserId());
 			final OneTimeSale oneTimeSale = OneTimeSale.fromJson(clientId, command,item);
-
-
 
 			this.oneTimeSaleRepository.saveAndFlush(oneTimeSale);
 			final List<OneTimeSaleData> oneTimeSaleDatas = this.oneTimeSaleReadPlatformService.retrieveOnetimeSalesForInvoice(clientId);
@@ -128,6 +129,19 @@ public class OneTimeSaleWritePlatformServiceImpl implements OneTimeSaleWritePlat
 			return new CommandProcessingResult(Long.valueOf(-1));
 		}
 	}
+	
+	 private Long getUserId() {
+			Long userId=null;
+			SecurityContext context = SecurityContextHolder.getContext();
+				if(context.getAuthentication() != null){
+					AppUser appUser=this.context.authenticatedUser();
+					userId=appUser.getId();
+				}else {
+					userId=new Long(0);
+				}
+				
+				return userId;
+		}
 
 	private void handleCodeDataIntegrityIssues(final JsonCommand command,
 			final DataIntegrityViolationException dve) {

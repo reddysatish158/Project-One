@@ -14,6 +14,7 @@ import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext
 import org.mifosplatform.portfolio.transactionhistory.data.TransactionHistoryData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
@@ -97,5 +98,60 @@ public class TransactionHistoryReadPlatformServiceImp implements TransactionHist
 			return new TransactionHistoryData(id,clientId, transactionType, transactionDate, resourceId, history,user);
 		}
 
+	}
+	
+private class ClientOldTransactionHistoryMapper implements RowMapper<TransactionHistoryData>{
+		
+	
+		
+		@Override
+		public TransactionHistoryData mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Long id = rs.getLong("id");
+			Long clientId = rs.getLong("clientId");
+			String transactionType = rs.getString("transactionType");
+			LocalDate transactionDate=JdbcSupport.getLocalDate(rs,"transactionDate");
+			String history = rs.getString("history");
+			String user=rs.getString("userName");
+			return new TransactionHistoryData(id,clientId, transactionType, transactionDate, null, history,user);
+		}
+
+	}
+	
+	private String query(){
+		return " SQL_CALC_FOUND_ROWS th.id AS id,th.client_id AS clientId,th.transaction_type AS transactionType,th.transaction_date AS transactionDate,th.history AS history," +
+		" a.username as userName FROM b_transaction_history th,m_appuser a WHERE a.id = th.createdby_id ";
+		}
+
+	@Override
+	public Page<TransactionHistoryData> retriveTransactionHistoryById(SearchSqlQuery searchTransactionHistory, Long clientId) {context.authenticatedUser();
+	
+		try{
+			String sql = "select "+query()+" and th.client_id = ? order by transactionDate desc ";
+			ClientOldTransactionHistoryMapper rowMapper = new ClientOldTransactionHistoryMapper();
+			StringBuilder sqlBuilder = new StringBuilder(200);
+			sqlBuilder.append(sql);
+			String sqlSearch = searchTransactionHistory.getSqlSearch();
+			String extraCriteria = "";
+			
+			if (sqlSearch != null) {
+				sqlSearch=sqlSearch.trim();
+				extraCriteria = " and (th.transaction_type like '%"+sqlSearch+"%' OR "
+						+ " th.transaction_date like '%"+sqlSearch+"%' OR "
+						+ " a.username like '%"+sqlSearch+"%' OR "
+						+ " th.history like '%"+sqlSearch+"%') " ;
+			}
+			sqlBuilder.append(extraCriteria);
+			if (searchTransactionHistory.isLimited()) {
+				sqlBuilder.append(" limit ").append(searchTransactionHistory.getLimit());
+			}
+			if (searchTransactionHistory.isOffset()) {
+				sqlBuilder.append(" offset ").append(searchTransactionHistory.getOffset());
+			}
+	
+	return this.paginationHelper.fetchPage(this.jdbcTemplate, "SELECT FOUND_ROWS()",sqlBuilder.toString(),new Object[] {clientId}, rowMapper);
+	
+		}catch(EmptyResultDataAccessException accessException){
+			return null;
+		}
 	}
 }

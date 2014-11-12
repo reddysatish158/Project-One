@@ -208,14 +208,14 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 		try{
 		    
 			this.fromApiJsonDeserializer.validateForCreate(command.json());
-			
+			final Long userId=getUserId();
 			//Check for Custome_Validation
-			this.eventValidationReadPlatformService.checkForCustomValidations(clientId,EventActionConstants.EVENT_CREATE_ORDER,command.json());
+			this.eventValidationReadPlatformService.checkForCustomValidations(clientId,EventActionConstants.EVENT_CREATE_ORDER,command.json(),userId);
 			
 			Plan plan = this.planRepository.findOne(command.longValueOfParameterNamed("planCode"));
 			Order order=this.orderAssembler.assembleOrderDetails(command,clientId,plan);
 			this.orderRepository.save(order);
-			Long userId=getUserId();
+			
 			boolean isNewPlan=command.booleanPrimitiveValueOfParameterNamed("isNewplan");
 					String requstStatus =UserActionStatusTypeEnum.ACTIVATION.toString();
 					
@@ -244,7 +244,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 						
 
 						//For Plan And HardWare Association
-						Configuration configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY);
+						Configuration configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IMPLICIT_ASSOCIATION);
 							if(configurationProperty.isEnabled()){
 								configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);
 									if(plan.isHardwareReq() == 'Y'){
@@ -429,9 +429,10 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 			LocalDate newStartdate=null;
 			String requstStatus=null;
 			String requestStatusForProv=null;
+			final Long userId=getUserId();
 			this.fromApiJsonDeserializer.validateForRenewalOrder(command.json());
 			Order orderDetails=retrieveOrderById(orderId);
-		    this.eventValidationReadPlatformService.checkForCustomValidations(orderDetails.getClientId(),EventActionConstants.EVENT_ORDER_RENEWAL,command.json());	
+		    this.eventValidationReadPlatformService.checkForCustomValidations(orderDetails.getClientId(),EventActionConstants.EVENT_ORDER_RENEWAL,command.json(),userId);	
 			List<OrderPrice>  orderPrices=orderDetails.getPrice();
 			final Long contractPeriod = command.longValueOfParameterNamed("renewalPeriod");
 			final String description=command.stringValueOfParameterNamed("description");
@@ -505,7 +506,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 		     }
 
 		     //For Order History
-   			OrderHistory orderHistory=new OrderHistory(orderDetails.getId(),new LocalDate(),newStartdate,null,requstStatus,getUserId(),description);
+   			OrderHistory orderHistory=new OrderHistory(orderDetails.getId(),new LocalDate(),newStartdate,null,requstStatus,userId,description);
    			this.orderHistoryRepository.save(orderHistory);
    			
    			return new CommandProcessingResult(Long.valueOf(orderDetails.getClientId()),orderDetails.getClientId());
@@ -785,9 +786,10 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 		//final String eventType=command.stringValueOfParameterNamed("eventType");
 		EventAction  eventAction=null;
 		JSONObject jsonObject=new JSONObject();
+		Long userId=getUserId();
 		
 		//Check for Custome_Validation
-		this.eventValidationReadPlatformService.checkForCustomValidations(clientId,EventActionConstants.EVENT_CREATE_ORDER,command.json());
+		this.eventValidationReadPlatformService.checkForCustomValidations(clientId,EventActionConstants.EVENT_CREATE_ORDER,command.json(),userId);
 			
 	    	  	//Check for Active Orders	
 	    	  Long activeorderId=this.orderReadPlatformService.retrieveClientActiveOrderDetails(clientId,null);

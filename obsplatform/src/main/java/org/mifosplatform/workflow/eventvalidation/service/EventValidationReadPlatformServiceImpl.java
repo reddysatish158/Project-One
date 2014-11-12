@@ -82,15 +82,18 @@ public class EventValidationReadPlatformServiceImpl implements
 	
 	
 	@Override
-	public void checkForCustomValidations(Long clientId,String eventName,String strjson) {
+	public void checkForCustomValidations(Long clientId,String eventName,String strjson,final Long userId) {
 	       
 		
-		EventValidation eventValidation=this.eventValidationRepository.findOneByEventName(eventName);
+		//EventValidation eventValidation=this.eventValidationRepository.findOneByEventName(eventName);
 		
-		if(eventValidation != null && eventValidation.isDeleted() == 'N'){
+	//	if(eventValidation != null && eventValidation.isDeleted() == 'N'){
+		
+		try{
 
 			jdbcCall.setProcedureName("custom_validation");
 			MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+			parameterSource.addValue("p_userid", userId, Types.INTEGER);
 			parameterSource.addValue("p_clientid", clientId, Types.INTEGER);
 			parameterSource.addValue("jsonstr", strjson, Types.VARCHAR);
 			parameterSource.addValue("event_name", eventName, Types.VARCHAR);
@@ -103,9 +106,11 @@ public class EventValidationReadPlatformServiceImpl implements
 				errMsg=(String)out.get("err_msg");
 			}
 				  
-					if(errCode != 0 && errMsg != null){
-						throw new ActivePlansFoundException(errMsg); 
-					}
+			if(errCode != 0 && errMsg != null){
+			  throw new ActivePlansFoundException(errMsg); 
+		   }
+		}catch(Exception exception){
+			
 		}
 	}
 

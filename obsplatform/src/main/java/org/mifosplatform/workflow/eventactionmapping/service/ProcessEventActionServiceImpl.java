@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.mifosplatform.finance.billingorder.service.InvoiceClient;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
-import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
 import org.mifosplatform.portfolio.association.data.HardwareAssociationData;
 import org.mifosplatform.portfolio.association.service.HardwareAssociationReadplatformService;
@@ -60,54 +59,53 @@ public class ProcessEventActionServiceImpl implements ProcessEventActionService 
 	public void processEventActions(EventActionData eventActionData) {
 		
 		EventAction eventAction=this.eventActionRepository.findOne(eventActionData.getId());
+		String jsonObject=eventActionData.getJsonData();
+		 JsonCommand command=null;
+		 JsonElement parsedCommand =null;
 		try{
-			 
-			if(eventActionData.getActionName().equalsIgnoreCase(EventActionConstants.ACTION_RENEWAL)){
-				
-				String jsonObject=eventActionData.getJsonData();
-				final JsonElement parsedCommand = this.fromApiJsonHelper.parse(jsonObject);
-				final JsonCommand command = JsonCommand.from(jsonObject,parsedCommand,this.fromApiJsonHelper,"RenewalOrder",eventActionData.getClientId(), null,
-						null,eventActionData.getClientId(), null, null, null,null, null, null,null);
-				
+			switch (eventAction.getActionName()) {
+			
+			case EventActionConstants.ACTION_RENEWAL:
+				 parsedCommand = this.fromApiJsonHelper.parse(jsonObject);
+	            command = JsonCommand.from(jsonObject,parsedCommand,this.fromApiJsonHelper,"RenewalOrder",
+						eventActionData.getClientId(), null,null,eventActionData.getClientId(), null, null, null,null, null, null,null);
 			    	this.orderWritePlatformService.renewalClientOrder(command,eventActionData.getOrderId());
-			    
-			}else if(eventActionData.getActionName().equalsIgnoreCase(EventActionConstants.ACTION_ACTIVE)){
+			    break;
+			
+			case EventActionConstants.ACTION_ACTIVE :
 				this.orderWritePlatformService.reconnectOrder(eventActionData.getOrderId());
-			
-			}else if(eventActionData.getActionName().equalsIgnoreCase(EventActionConstants.ACTION_DISCONNECT)){
+				break;
 				
-				String jsonObject=eventActionData.getJsonData();
-				final JsonElement parsedCommand = this.fromApiJsonHelper.parse(jsonObject);
-				final JsonCommand command = JsonCommand.from(jsonObject,parsedCommand,this.fromApiJsonHelper,"DissconnectOrder",eventActionData.getClientId(), null,
+			case EventActionConstants.ACTION_DISCONNECT :
+					
+					 parsedCommand = this.fromApiJsonHelper.parse(jsonObject);
+					 command = JsonCommand.from(jsonObject,parsedCommand,this.fromApiJsonHelper,"DissconnectOrder",eventActionData.getClientId(), null,
 						null,eventActionData.getClientId(), null, null, null,null, null, null,null);
-				this.orderWritePlatformService.disconnectOrder(command,	eventActionData.getOrderId());
+					 this.orderWritePlatformService.disconnectOrder(command,	eventActionData.getOrderId());
+				 break;
 				
-			}else if(eventActionData.getActionName().equalsIgnoreCase(EventActionConstants.ACTION_NEW)){
+			case EventActionConstants.ACTION_NEW :
 
-				String jsonObject=eventActionData.getJsonData();
-				final JsonElement parsedCommand = this.fromApiJsonHelper.parse(jsonObject);
-				final JsonCommand command = JsonCommand.from(jsonObject,parsedCommand,this.fromApiJsonHelper,"CreateOrder",eventActionData.getClientId(), null,
+               parsedCommand = this.fromApiJsonHelper.parse(jsonObject);
+				command = JsonCommand.from(jsonObject,parsedCommand,this.fromApiJsonHelper,"CreateOrder",eventActionData.getClientId(), null,
 						null,eventActionData.getClientId(), null, null, null,null, null, null,null);
-			
-				CommandProcessingResult commandProcessingResult=this.orderWritePlatformService.createOrder(eventActionData.getClientId(), command);
+				this.orderWritePlatformService.createOrder(eventActionData.getClientId(), command);
+				break;	
 				
-			
-			}else if(eventActionData.getActionName().equalsIgnoreCase(EventActionConstants.ACTION_INVOICE)){
-
+			case EventActionConstants.ACTION_INVOICE :
 				try{
-					String jsonObject=eventActionData.getJsonData();
-					final JsonElement parsedCommand = this.fromApiJsonHelper.parse(jsonObject);
-					final JsonCommand command = JsonCommand.from(jsonObject,parsedCommand,this.fromApiJsonHelper,"CreateInvoice",eventActionData.getClientId(), null,
+					parsedCommand = this.fromApiJsonHelper.parse(jsonObject);
+					command = JsonCommand.from(jsonObject,parsedCommand,this.fromApiJsonHelper,"CreateInvoice",eventActionData.getClientId(), null,
 						null,eventActionData.getClientId(), null, null, null,null, null, null,null);
 					this.invoiceClient.createInvoiceBill(command);
 				}catch(Exception exception){
 					
 				}
-			}else if(eventActionData.getActionName().equalsIgnoreCase(EventActionConstants.ACTION_SEND_PROVISION)){
-
+				break;
+				
+			case EventActionConstants.ACTION_SEND_PROVISION :
 				try{
 					final List<HardwareAssociationData> associationDatas= this.hardwareAssociationReadplatformService.retrieveClientAllocatedHardwareDetails(eventActionData.getClientId());
-					
 					if(!associationDatas.isEmpty()){
 						Long none=Long.valueOf(0);
 						final ProcessRequest processRequest=new ProcessRequest(none,eventActionData.getClientId(),none,ProvisioningApiConstants.PROV_BEENIUS,
@@ -120,15 +118,17 @@ public class ProcessEventActionServiceImpl implements ProcessEventActionService 
 				}catch(Exception exception){
 					
 				}
+				break;
+			
+			default:
+				break;
 			}
 	    	eventAction.updateStatus('Y');
 	    	this.eventActionRepository.save(eventAction);
-	    	
 		}catch(DataIntegrityViolationException exception){
 			eventAction.updateStatus('F');
 	    	this.eventActionRepository.save(eventAction);
 			exception.printStackTrace();
-		
 		}catch (Exception exception) {
 	    	eventAction.updateStatus('F');
 	    	this.eventActionRepository.save(eventAction);

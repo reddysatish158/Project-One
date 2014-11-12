@@ -53,7 +53,7 @@ public class InventoryGrn extends  AbstractPersistable<Long>{
 		this.receivedQuantity = receivedQuantity;
 		this.supplierId = supplierId;
 		this.officeId = officeId;
-		this.purchaseNo = purchaseNo;
+		this.purchaseNo = StringUtils.isEmpty(purchaseNo)?null:purchaseNo;
 		
 	}
 	

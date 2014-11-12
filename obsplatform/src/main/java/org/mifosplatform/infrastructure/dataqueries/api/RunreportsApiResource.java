@@ -70,6 +70,9 @@ public class RunreportsApiResource {
 		boolean parameterType = ApiParameterHelper.parameterType(uriInfo.getQueryParameters());
 		boolean exportPdf = ApiParameterHelper.exportPdf(uriInfo.getQueryParameters());
 		checkUserPermissionForReport(reportName, parameterType);
+		if(!checkIsSuperUser() && "ClientCounts".equalsIgnoreCase(reportName)){
+				return null;
+		}
 
 		String parameterTypeValue = null;
 		if (!parameterType) {
@@ -83,7 +86,6 @@ public class RunreportsApiResource {
 		}
 
 		// PDF format
-
 		if (exportPdf) {
 			Map<String, String> reportParams = getReportParams(queryParams,false);
 			String pdfFileName = this.readExtraDataAndReportingService.retrieveReportPDF(reportName, parameterTypeValue,reportParams);
@@ -119,6 +121,15 @@ public class RunreportsApiResource {
 		StreamingOutput result = this.readExtraDataAndReportingService.retrieveReportCSV(reportName, parameterTypeValue, reportParams);
 		return Response.ok().entity(result).type("application/x-msdownload").header("Content-Disposition","attachment;filename=" + reportName.replaceAll(" ", "")
 								+ ".csv").build();
+	}
+
+	private boolean checkIsSuperUser() {
+		AppUser currentUser = context.authenticatedUser();
+		if(currentUser.isSupeUser()){
+			return true;
+		}else{
+			return false;			
+		}
 	}
 
 	private void checkUserPermissionForReport(final String reportName,final boolean parameterType) {
