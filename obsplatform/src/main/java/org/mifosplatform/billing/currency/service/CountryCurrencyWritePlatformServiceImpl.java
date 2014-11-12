@@ -75,9 +75,9 @@ public class CountryCurrencyWritePlatformServiceImpl implements CountryCurrencyW
 		if (realCause.getMessage().contains("country_key")) {
 			final String name = command.stringValueOfParameterNamed("country");
 			throw new PlatformDataIntegrityException(
-					"error.msg.currency.duplicate.configuration",
+					"error.msg.countrycurrency.duplicate.configuration",
 					"Country is already configured with'" + name + "'",
-					"displayName", name);
+					"country", name);
 		}
 
 		LOGGER.error(dve.getMessage(), dve);

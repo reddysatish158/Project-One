@@ -57,14 +57,14 @@ public final class PlanCommandFromApiJsonDeserializer {
         baseDataValidator.reset().parameter("planDescription").value(planDescription).notBlank();
         final LocalDate startDate = fromApiJsonHelper.extractLocalDateNamed("startDate", element);
         baseDataValidator.reset().parameter("startDate").value(startDate).notBlank();
-        final String[] services = fromApiJsonHelper.extractArrayNamed("services", element);
-        baseDataValidator.reset().parameter("services").value(services).arrayNotEmpty();
-        final String provisioingSystem = fromApiJsonHelper.extractStringNamed("provisioingSystem", element);
-        baseDataValidator.reset().parameter("provisioingSystem").value(provisioingSystem).notBlank();
         final Long status = fromApiJsonHelper.extractLongNamed("status", element);
         baseDataValidator.reset().parameter("status").value(status).notNull();
         final Long billRule = fromApiJsonHelper.extractLongNamed("billRule", element);
         baseDataValidator.reset().parameter("billRule").value(billRule).notNull();
+        final String provisioingSystem = fromApiJsonHelper.extractStringNamed("provisioingSystem", element);
+        baseDataValidator.reset().parameter("provisioingSystem").value(provisioingSystem).notBlank();
+        final String[] services = fromApiJsonHelper.extractArrayNamed("services", element);
+        baseDataValidator.reset().parameter("services").value(services).arrayNotEmpty();
         final boolean isPrepaid=fromApiJsonHelper.extractBooleanNamed("isPrepaid", element);
         if(isPrepaid){
         	final String volumeType=fromApiJsonHelper.extractStringNamed("volume", element);

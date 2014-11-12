@@ -125,16 +125,16 @@ public class ServiceMappingApiResource {
 			@Context final UriInfo uriInfo) {
 		this.context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
 		final ServiceMappingData serviceMappingData = serviceMappingReadPlatformService.getServiceMapping(serviceMappingId);
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		if(settings.isTemplate()){
 		final List<EnumOptionData> status = this.planReadPlatformService.retrieveNewStatus();
 		final Collection<McodeData> categories = this.paymodeReadPlatformService.retrievemCodeDetails("Service Category");
 		final Collection<McodeData> subCategories = this.paymodeReadPlatformService.retrievemCodeDetails("Asset language");
-
 		serviceMappingData.setServiceCodeData(this.serviceMappingReadPlatformService.getServiceCode());
 		serviceMappingData.setStatusData(status);
 		serviceMappingData.setCategories(categories);
 		serviceMappingData.setSubCategories(subCategories);
-		
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		}
 		return this.toApiJsonSerializer.serialize(settings, serviceMappingData, RESPONSE_PARAMETERS);
 	}
 

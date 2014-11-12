@@ -28,7 +28,8 @@ public class BillingOrderData {
 	private Long invoiceId;
 	
 	
-	public BillingOrderData(final Long orderId,final String durationType,final Date startDate, Date nextBillableDate){
+	public BillingOrderData(final Long orderId,final String durationType,final Date startDate, final Date nextBillableDate){
+		
 		this.orderId = orderId;
 		this.durationType = durationType;
 		this.startDate = startDate;
@@ -42,7 +43,9 @@ public class BillingOrderData {
 			final Date nextBillableDate,final Date endDate,final String billingFrequency,
 			final String chargeCode,final String chargeType,final Integer chargeDuration,
 			final String durationType,final Date invoiceTillDate,final BigDecimal price,
-			final String billingAlign,final Date billStartDate,final Date billEndDate,final Long orderstatus,final Integer taxInclusive) {
+			final String billingAlign,final Date billStartDate,final Date billEndDate,
+			final Long orderstatus,final Integer taxInclusive) {
+		
 		this.clientOrderId = clientOrderId;
 		this.OderPriceId = OderPriceId;
 		this.planId = planId;
@@ -79,10 +82,10 @@ public class BillingOrderData {
 		
 	}
 
-	public BillingOrderData(Long clientOderId, Long orderPriceId, Long planId,Long clientId, Date startDate, Date nextBillableDate,
-			Date endDate, String billingFrequency, String chargeCode,String chargeType, Integer chargeDuration, String durationType,
-			Date invoiceTillDate, BigDecimal price, String billingAlign,Date billStartDate, Date billEndDate, Long orderStatus,
-			Integer taxInclusive, Long invoiceId) {
+	public BillingOrderData(final Long clientOderId, final Long orderPriceId, final Long planId,final Long clientId, final Date startDate, final Date nextBillableDate,
+			final Date endDate, final String billingFrequency, final String chargeCode,final String chargeType, final Integer chargeDuration, final String durationType,
+			final Date invoiceTillDate, final BigDecimal price, final String billingAlign,final Date billStartDate, final Date billEndDate, final Long orderStatus,
+			final Integer taxInclusive, final Long invoiceId) {
 		
 		this.clientOrderId=clientOderId;
 		this.OderPriceId=orderPriceId;
@@ -103,7 +106,7 @@ public class BillingOrderData {
 		this.billEndDate=billEndDate;
 		this.orderstatus=orderStatus;
 		this.taxInclusive=taxInclusive;
-		this.invoiceId=invoiceId;
+		this.setInvoiceId(invoiceId);
 		
 	}
 
@@ -242,7 +245,11 @@ public class BillingOrderData {
 	public void setTaxInclusive(Integer taxInclusive) {
 		this.taxInclusive = taxInclusive;
 	}
-	
-	
+	public Long getInvoiceId() {
+		return invoiceId;
+	}
+	public void setInvoiceId(Long invoiceId) {
+		this.invoiceId = invoiceId;
+	}
 	
 }
