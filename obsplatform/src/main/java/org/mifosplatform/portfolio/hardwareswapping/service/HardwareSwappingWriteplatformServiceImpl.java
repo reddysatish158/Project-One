@@ -1,6 +1,5 @@
 package org.mifosplatform.portfolio.hardwareswapping.service;
 
-import java.util.Date;
 import java.util.List;
 
 import org.codehaus.jettison.json.JSONArray;
@@ -120,7 +119,7 @@ public CommandProcessingResult doHardWareSwapping(final Long entityId,final Json
         final Order order=this.orderRepository.findOne(orderId);
 		final Plan plan=this.planRepository.findOne(order.getPlanId());
 		
-		Configuration configurationProperty=this.globalConfigurationRepository.findOneByName(ConfigurationConstants.CPE_TYPE);
+		Configuration configurationProperty=this.globalConfigurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);
 		
 		
 		if(configurationProperty.getValue().equalsIgnoreCase(ConfigurationConstants.CONFIR_PROPERTY_OWN)){

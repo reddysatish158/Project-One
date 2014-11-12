@@ -20,6 +20,7 @@ import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.mifosplatform.crm.clientprospect.service.SearchSqlQuery;
 import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.serialization.DefaultToApiJsonSerializer;
@@ -119,7 +120,7 @@ public class IpPoolManagementApiResource {
 		if(sqlSearch !=null && sqlSearch.contains("/")){
   		  sqlSearch.trim();
   		  IpGeneration ipGeneration=new IpGeneration(sqlSearch,this.ipPoolManagementReadPlatformService);
-  		  Configuration configuration = globalConfigurationRepository.findOneByName("include-network-broadcast-ip");
+  		  Configuration configuration = globalConfigurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_INCLUDE_NETWORK_BROADCAST_IP);
   		  ipGeneration.setInclusiveHostCount(configuration.getValue().equalsIgnoreCase("true"));
           data=ipGeneration.getInfo().getsubnetAddresses();
 			

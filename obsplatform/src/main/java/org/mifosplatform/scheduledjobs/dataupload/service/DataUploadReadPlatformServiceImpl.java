@@ -6,7 +6,6 @@ import java.sql.SQLException;
 
 import org.joda.time.LocalDate;
 import org.mifosplatform.crm.clientprospect.service.SearchSqlQuery;
-import org.mifosplatform.infrastructure.codes.exception.CodeNotFoundException;
 import org.mifosplatform.infrastructure.core.domain.JdbcSupport;
 import org.mifosplatform.infrastructure.core.service.Page;
 import org.mifosplatform.infrastructure.core.service.PaginationHelper;
@@ -14,7 +13,6 @@ import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSourc
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.scheduledjobs.dataupload.data.UploadStatusData;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
@@ -37,7 +35,7 @@ public class DataUploadReadPlatformServiceImpl implements DataUploadReadPlatform
         public String schema() {
             return " u.id as Id ,u.upload_process as uploadProcess,u.upload_filepath as uploadFilePath,u.total_records as totalRecords,u.process_date as processDate," +
             		"u.process_status as processStatus,u.process_records as processRecords,u.unprocess_records as unprocessRecords,u.error_message as errorMessage " +
-            		"from uploads_status u ";
+            		"from b_data_uploads u ";
         }
 
         @Override
@@ -61,16 +59,6 @@ public class DataUploadReadPlatformServiceImpl implements DataUploadReadPlatform
         }
     }
 
-  /*  @Override
-    public Collection<UploadStatusData> retrieveAllCodes() {
-        context.authenticatedUser();
-
-        final UploadStatusMapper rm = new UploadStatusMapper();
-        final String sql = "select " + rm.schema() + " order by u.id";
-
-        return this.jdbcTemplate.query(sql, rm, new Object[] {});
-    }*/
-    
     @Override
     public Page<UploadStatusData> retrieveAllUploadStatusData(final SearchSqlQuery searchUploads) {
         
@@ -91,33 +79,4 @@ public class DataUploadReadPlatformServiceImpl implements DataUploadReadPlatform
         return this.paginationHelper.fetchPage(this.jdbcTemplate, "SELECT FOUND_ROWS()",sqlBuilder.toString(),
 	            new Object[] {}, rm);
     }
-
-
-   /* @Override
-    public UploadStatusData retrieveCode(final Long codeId) {
-        try {
-            context.authenticatedUser();
-
-            final UploadStatusMapper rm = new UploadStatusMapper();
-            final String sql = "select " + rm.schema() + " where u.id = ?";
-
-            return this.jdbcTemplate.queryForObject(sql, rm, new Object[] { codeId });
-        } catch (EmptyResultDataAccessException e) {
-            throw new CodeNotFoundException(codeId);
-        }
-    }
-*/
-	/*@Override
-	public UploadStatusData retrieveSingleFileDetails(final Long fileId) {
-
-		 try {
-			 context.authenticatedUser();
-			 final UploadStatusMapper rm = new UploadStatusMapper();
-			 final String sql = "select " + rm.schema() + "where u.id = ?" ;
-			 return this.jdbcTemplate.queryForObject(sql, rm, new Object[] { fileId });
-		 
-		 } catch (EmptyResultDataAccessException e) {
-	            return null;
-	        }
-    }*/
 }

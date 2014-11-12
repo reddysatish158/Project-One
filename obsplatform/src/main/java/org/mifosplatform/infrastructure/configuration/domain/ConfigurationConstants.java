@@ -7,21 +7,33 @@ import java.util.Set;
 
 public class ConfigurationConstants {
 	
-	public static final String CONFIG_PROPERTY_IMPLICIT_ASSOCIATION = "Implicit Association";
-	public static final String CONFIG_PROPERTY_BALANCE_CHECK = "Forcible Balance Check";
+	public static final String CONFIG_PROPERTY_MAKER_CHECKER="maker-checker";
+	public static final String CONFIG_PROPERTY_AMAZON_C3="amazon-S3";
+	public static final String CONFIG_PROPERTY_IMPLICIT_ASSOCIATION = "implicit-association";
+	public static final String CONFIG_PROPERTY_BALANCE_CHECK = "forcible-balance-check";
 	public static final String CONFIG_PROPERTY_AUTO_RENEWAL = "renewal";
-	public static final String CONFIG_PROPERTY_LOGIN = "Login";
-	public static final String CONFIG_PROPERTY_DATEFORMAT = "DateFormat";
-	public static final String CONFIG_PROPERTY_ROUNDING = "Rounding";
-	public static final String CPE_TYPE = "CPE_TYPE";
+	public static final String CONFIG_PROPERTY_LOGIN = "login";
+	public static final String CONFIG_PROPERTY_DATEFORMAT = "date-format";
+	public static final String CONFIG_PROPERTY_ROUNDING = "rounding";
+	public static final String CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE = "device-agrement-type";
 	public static final String CONFIR_PROPERTY_SALE = "SALE";
 	public static final String CONFIR_PROPERTY_OWN = "OWN";
-	public static final String CONFIR_PROPERTY_SELF_REGISTRATION = "Register_plan";
-	public static final String CONFIR_PROPERTY_REGISTRATION_DEVICE = "Registration_requires_device";
+	public static final String CONFIR_PROPERTY_SELF_REGISTRATION = "register-plan";
+	public static final String CONFIR_PROPERTY_REGISTRATION_DEVICE = "registration-requires-device";
 	public static final String CONFIG_PROPERTY = "Implicit Association";
-	public static final String CONFIG_DISCONNECT = "Disconnection Credit";
-	public static final String CONFIG_CHANGE_PLAN_ALIGN_DATES = "CHANGE_PLAN_ALIGN_DATES";
-	public static final String CONFIG_IS_SELFCAREUSER = "is_selfcareuser";  
+	public static final String CONFIG_DISCONNECT = "disconnection-credit";
+	public static final String CONFIG_CHANGE_PLAN_ALIGN_DATES = "change-plan-align-dates";
+	public static final String CONFIG_IS_SELFCAREUSER = "is-selfcareuser";
+	public static final String CONFIG_PROPERTY_IS_PAYPAL_CHECK = "is-paypal";
+	public static final String CONFIG_PROPERTY_IS_PAYPAL_CHECK_IOS = "is-paypal-for-ios";
+	public static final String CONFIG_PROPERTY_IS_ACTIVE_VIEWERS = "active-viewers";
+	public static final String CONFIG_PROPERTY_IS_ACTIVE_DEVICES = "active-devices";
+	public static final String CONFIG_PROPERTY_INCLUDE_NETWORK_BROADCAST_IP = "include-network-broadcast-ip";
+	public static final String CONFIG_PROPERTY_CONSTAINT_APPROACH_FOR_DATATABLES= "constraint-approach-for-datatables";
+	public static final String CONFIG_PROPERTY_SELFCATE_REQUIRES_EMAIL= "selfcare-requires-email";
+	public static final String CONFIG_PROPERTY_OSD_PROVISIONING_SYSTEM= "osd-provisioningSystem";
+	
+	public static final String CONFIG_PROPERTY_SMTP= "smtp";
 
 	public static final String ENABLED = "enabled";
 	public static final String VALUE = "value";
@@ -35,9 +47,7 @@ public class ConfigurationConstants {
 	public static final String CONFIGURATION_RESOURCE_NAME = "globalConfiguration";
 	public static final Set<String> UPDATE_CONFIGURATION_DATA_PARAMETERS = new HashSet<String>(Arrays.asList(ENABLED, VALUE));
 	public static final Set<String> CREATE_CONFIGURATION_DATA_PARAMETERS = new HashSet<String>(Arrays.asList(NAME, MAIL,PASSWORD,HOSTNAME,PORT,STARTTLS));
-	public static final String CONFIG_PROPERTY_IS_PAYPAL_CHECK = "Is_Paypal";
-	public static final String CONFIG_PROPERTY_IS_PAYPAL_CHECK_IOS = "Is_Paypal_For_Ios";
-	public static final String CONFIG_PROPERTY_IS_ACTIVE_VIEWERS = "Active Viewers";
+	
 
 	//Constants
 	public static final char CONST_IS_Y = 'Y';

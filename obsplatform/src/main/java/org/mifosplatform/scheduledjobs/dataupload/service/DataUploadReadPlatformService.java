@@ -6,11 +6,5 @@ import org.mifosplatform.scheduledjobs.dataupload.data.UploadStatusData;
 
 public interface DataUploadReadPlatformService {
 
-   // Collection<UploadStatusData> retrieveAllCodes();
-    
     Page<UploadStatusData> retrieveAllUploadStatusData(SearchSqlQuery searchUploads);
-
-    //UploadStatusData retrieveCode(Long codeId);
-    
-	//UploadStatusData retrieveSingleFileDetails(Long fileId);
 }

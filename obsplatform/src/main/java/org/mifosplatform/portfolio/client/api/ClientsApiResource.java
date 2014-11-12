@@ -103,7 +103,7 @@ public class ClientsApiResource {
         	
         clientData = this.clientReadPlatformService.retrieveAllClosureReasons(ClientApiConstants.CLIENT_CLOSURE_REASON);
         }
-        final Configuration configurationProperty=this.configurationRepository.findOneByName("LOGIN");
+        final Configuration configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_LOGIN);
         clientData.setConfigurationProperty(configurationProperty);
         clientData=handleAddressTemplateData(clientData);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());

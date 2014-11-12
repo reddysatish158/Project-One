@@ -2,8 +2,6 @@ package org.mifosplatform.infrastructure.jobs.data;
 
 import java.util.Date;
 
-import org.joda.time.LocalDate;
-
 public class JobDetailHistoryData {
 
     @SuppressWarnings("unused")

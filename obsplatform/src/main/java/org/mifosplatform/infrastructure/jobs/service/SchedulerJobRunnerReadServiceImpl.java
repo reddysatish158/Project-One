@@ -5,8 +5,6 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
-import org.joda.time.LocalDate;
-import org.mifosplatform.infrastructure.core.domain.JdbcSupport;
 import org.mifosplatform.infrastructure.core.service.Page;
 import org.mifosplatform.infrastructure.core.service.PaginationHelper;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;

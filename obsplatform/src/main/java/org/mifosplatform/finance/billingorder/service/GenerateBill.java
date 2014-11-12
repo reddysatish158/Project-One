@@ -14,6 +14,7 @@ import org.mifosplatform.finance.billingorder.commands.BillingOrderCommand;
 import org.mifosplatform.finance.billingorder.commands.InvoiceTaxCommand;
 import org.mifosplatform.finance.billingorder.data.BillingOrderData;
 import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.configuration.exception.ConfigurationPropertyNotFoundException;
 import org.mifosplatform.portfolio.plan.domain.Plan;
@@ -646,12 +647,11 @@ public class GenerateBill {
 
 	public String roundingDecimal() {
 
-		final String makerCheckerConfigurationProperty = "Rounding";
+		
 		final Configuration property = this.globalConfigurationRepository
-				.findOneByName(makerCheckerConfigurationProperty);
+				.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_ROUNDING);
 		if (property == null) {
-			throw new ConfigurationPropertyNotFoundException(
-					makerCheckerConfigurationProperty);
+			throw new ConfigurationPropertyNotFoundException(ConfigurationConstants.CONFIG_PROPERTY_MAKER_CHECKER);
 		}
 
 		return property.getValue();

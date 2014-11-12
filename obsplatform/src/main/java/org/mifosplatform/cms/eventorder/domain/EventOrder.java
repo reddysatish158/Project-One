@@ -16,7 +16,6 @@ import org.mifosplatform.cms.eventmaster.domain.EventMaster;
 import org.mifosplatform.cms.eventprice.domain.EventPrice;
 import org.mifosplatform.cms.media.exceptions.NoEventPriceFoundException;
 import org.mifosplatform.cms.media.exceptions.NoPricesFoundException;
-import org.mifosplatform.cms.mediadevice.data.MediaDeviceData;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
 import org.mifosplatform.useradministration.domain.AppUser;
