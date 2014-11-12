@@ -1,5 +1,6 @@
 package org.mifosplatform.logistics.itemdetails.service;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -10,10 +11,11 @@ import org.mifosplatform.infrastructure.core.service.Page;
 import org.mifosplatform.infrastructure.core.service.PaginationHelper;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
+import org.mifosplatform.logistics.item.data.ItemData;
 import org.mifosplatform.logistics.itemdetails.data.AllocationHardwareData;
-import org.mifosplatform.logistics.itemdetails.data.ItemSerialNumberData;
 import org.mifosplatform.logistics.itemdetails.data.ItemDetailsData;
 import org.mifosplatform.logistics.itemdetails.data.ItemMasterIdData;
+import org.mifosplatform.logistics.itemdetails.data.ItemSerialNumberData;
 import org.mifosplatform.logistics.itemdetails.data.QuantityData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -266,5 +268,33 @@ private final class SerialNumberForValidation implements RowMapper<String>{
 		}
 		
 		}
+
+	@Override
+	public ItemData retriveItemDetailsDataBySerialNum(final String query) {
+	  
+		   	context.authenticatedUser();
+			final ItemMastersDataMapper rowMapper = new ItemMastersDataMapper();
+	
+			final String sql="SELECT m.id AS id, m.item_code AS itemCode,m.item_description AS itemDescription,m.charge_code AS chargeCode,"
+								+ "m.unit_price AS unitPrice FROM b_item_detail itd, b_item_master m "
+								+ " WHERE itd.serial_no = '"+query+"' AND itd.client_id IS NULL and m.id=itd.item_master_id";
+	
+			return this.jdbcTemplate.queryForObject(sql,rowMapper,new Object[]{});
+		
+	}
+	
+	private class ItemMastersDataMapper implements RowMapper<ItemData>{
+
+		@Override
+		public ItemData mapRow(final ResultSet rs, final int rowNum)throws SQLException {
+			final Long id = rs.getLong("id");
+			final String itemCode = rs.getString("itemCode");
+			final String itemDescription = rs.getString("itemDescription");
+			final String chargeCode = rs.getString("chargeCode");
+			final BigDecimal unitPrice = rs.getBigDecimal("unitPrice") ;
+			
+			return new ItemData(id,itemCode,itemDescription,chargeCode,unitPrice);
+		}
+	}
 
 }
