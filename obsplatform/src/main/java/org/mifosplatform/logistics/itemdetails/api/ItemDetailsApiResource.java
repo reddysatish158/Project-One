@@ -156,14 +156,14 @@ public class ItemDetailsApiResource {
 	@Path("{itemmasterId}/{officeId}")
 	@Consumes({MediaType.APPLICATION_JSON})
 	@Produces({MediaType.APPLICATION_JSON})
-	public String retriveItemSerialNumbers(@PathParam("itemmasterId") final Long itemmasterId,@PathParam("officeId") final Long officeId,@QueryParam("query") final String query, @Context final UriInfo uriInfo){
-		
+	public String retriveItemSerialNumbers(@PathParam("itemmasterId") final Long itemmasterId,@PathParam("officeId") final Long officeId,
+			@QueryParam("query") final String query, @Context final UriInfo uriInfo){
+			
 		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissionsAllocation);
-		
-			List<String> itemSerialNumbers = this.itemDetailsReadPlatformService.retriveSerialNumbersOnKeyStroke(itemmasterId,query,officeId);
-			ItemSerialNumberData InventoryItemSerialNumberData = new ItemSerialNumberData(itemSerialNumbers);
-			final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-			return this.toApiJsonSerializerForAllocationHardware.serialize(settings, InventoryItemSerialNumberData, RESPONSE_DATA_SERIAL_NUMBER_PARAMETERS);
+		List<String> itemSerialNumbers = this.itemDetailsReadPlatformService.retriveSerialNumbersOnKeyStroke(itemmasterId,query,officeId);
+		ItemSerialNumberData InventoryItemSerialNumberData = new ItemSerialNumberData(itemSerialNumbers);
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		return this.toApiJsonSerializerForAllocationHardware.serialize(settings, InventoryItemSerialNumberData, RESPONSE_DATA_SERIAL_NUMBER_PARAMETERS);
 	}
 	
 	
