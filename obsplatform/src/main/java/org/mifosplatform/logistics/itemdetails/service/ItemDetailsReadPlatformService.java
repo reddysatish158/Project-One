@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.mifosplatform.crm.clientprospect.service.SearchSqlQuery;
 import org.mifosplatform.infrastructure.core.service.Page;
+import org.mifosplatform.logistics.item.data.ItemData;
 import org.mifosplatform.logistics.itemdetails.data.AllocationHardwareData;
 import org.mifosplatform.logistics.itemdetails.data.ItemDetailsData;
 import org.mifosplatform.logistics.itemdetails.data.ItemSerialNumberData;
@@ -24,6 +25,9 @@ public interface ItemDetailsReadPlatformService {
 	public List<String> retriveSerialNumbersOnKeyStroke(Long oneTimeSaleId,String query, Long officeId);
 
 	public List<ItemDetailsData> retriveSerialNumbersOnKeyStroke(String query);
-
+	
 	public ItemDetailsData retriveSingleItemDetail(Long itemId);
+
+	public ItemData retriveItemDetailsDataBySerialNum(String query);
+	
 }
