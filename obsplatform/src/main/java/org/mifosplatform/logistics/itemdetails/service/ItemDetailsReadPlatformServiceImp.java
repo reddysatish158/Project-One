@@ -272,6 +272,7 @@ private final class SerialNumberForValidation implements RowMapper<String>{
 	@Override
 	public ItemData retriveItemDetailsDataBySerialNum(final String query) {
 	  
+		try {
 		   	context.authenticatedUser();
 			final ItemMastersDataMapper rowMapper = new ItemMastersDataMapper();
 	
@@ -280,6 +281,9 @@ private final class SerialNumberForValidation implements RowMapper<String>{
 								+ " WHERE itd.serial_no = '"+query+"' AND itd.client_id IS NULL and m.id=itd.item_master_id";
 	
 			return this.jdbcTemplate.queryForObject(sql,rowMapper,new Object[]{});
+		}catch(EmptyResultDataAccessException e){
+			return null;
+		}
 		
 	}
 	
