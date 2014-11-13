@@ -32,14 +32,12 @@ import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext
 import org.mifosplatform.logistics.grn.service.GrnReadPlatformService;
 import org.mifosplatform.logistics.item.data.ItemData;
 import org.mifosplatform.logistics.itemdetails.data.InventoryGrnData;
-import org.mifosplatform.logistics.itemdetails.data.ItemSerialNumberData;
 import org.mifosplatform.logistics.itemdetails.data.ItemDetailsData;
+import org.mifosplatform.logistics.itemdetails.data.ItemSerialNumberData;
 import org.mifosplatform.logistics.itemdetails.domain.ItemDetailsAllocation;
 import org.mifosplatform.logistics.itemdetails.service.ItemDetailsReadPlatformService;
-import org.mifosplatform.logistics.onetimesale.data.OneTimeSaleData;
 import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
 import org.mifosplatform.organisation.mcodevalues.service.MCodeReadPlatformService;
-import org.mifosplatform.organisation.office.data.OfficeData;
 import org.mifosplatform.organisation.office.service.OfficeReadPlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -71,7 +69,6 @@ public class ItemDetailsApiResource {
 	private final DefaultToApiJsonSerializer<ItemDetailsAllocation> toApiJsonSerializerForItemAllocation;
 	private final MCodeReadPlatformService mCodeReadPlatformService;
 	private final DefaultToApiJsonSerializer<ItemData> toApiJsonSerializerForItemData;
-	private final OfficeReadPlatformService officeReadPlatformService;
 	
     
 	@Autowired
@@ -81,8 +78,7 @@ public class ItemDetailsApiResource {
 			final DefaultToApiJsonSerializer<ItemDetailsAllocation> toApiJsonSerializerForItemAllocation,
 			final DefaultToApiJsonSerializer<ItemSerialNumberData> toApiJsonSerializerForAllocationHardware,
 			final ItemDetailsReadPlatformService itemDetailsReadPlatformService,
-			final DefaultToApiJsonSerializer<ItemData> toApiJsonSerializerForItemData,
-			final OfficeReadPlatformService officeReadPlatformService) {
+			final DefaultToApiJsonSerializer<ItemData> toApiJsonSerializerForItemData) {
 		
 		this.context=context;
 		this.mCodeReadPlatformService=mCodeReadPlatformService;
@@ -94,7 +90,6 @@ public class ItemDetailsApiResource {
 	    this.toApiJsonSerializerForItemAllocation = toApiJsonSerializerForItemAllocation;
 	    this.toApiJsonSerializerForAllocationHardware = toApiJsonSerializerForAllocationHardware;
 	    this.toApiJsonSerializerForItemData = toApiJsonSerializerForItemData;
-	    this.officeReadPlatformService = officeReadPlatformService;
 	}
 
 	/*
