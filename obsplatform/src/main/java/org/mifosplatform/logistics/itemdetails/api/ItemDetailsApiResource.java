@@ -30,13 +30,17 @@ import org.mifosplatform.infrastructure.core.serialization.DefaultToApiJsonSeria
 import org.mifosplatform.infrastructure.core.service.Page;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.logistics.grn.service.GrnReadPlatformService;
+import org.mifosplatform.logistics.item.data.ItemData;
 import org.mifosplatform.logistics.itemdetails.data.InventoryGrnData;
 import org.mifosplatform.logistics.itemdetails.data.ItemSerialNumberData;
 import org.mifosplatform.logistics.itemdetails.data.ItemDetailsData;
 import org.mifosplatform.logistics.itemdetails.domain.ItemDetailsAllocation;
 import org.mifosplatform.logistics.itemdetails.service.ItemDetailsReadPlatformService;
+import org.mifosplatform.logistics.onetimesale.data.OneTimeSaleData;
 import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
 import org.mifosplatform.organisation.mcodevalues.service.MCodeReadPlatformService;
+import org.mifosplatform.organisation.office.data.OfficeData;
+import org.mifosplatform.organisation.office.service.OfficeReadPlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -51,6 +55,8 @@ public class ItemDetailsApiResource {
 	private final Set<String> RESPONSE_ITEM_DETAILS_PARAMETERS = new HashSet<String>(Arrays.asList("id", "purchaseDate", "supplierId",
             "itemMasterId","orderdQuantity", "receivedQuantity","id", "itemMasterId", "serialNumber", "grnId","provisioningSerialNumber",
             "quality", "status","warranty", "remarks"));
+	private final Set<String> RESPONSE_ITEM_MASTER_DETAILS_PARAMETERS = new HashSet<String>(Arrays.asList("id", "itemCode", "itemDescription",
+																							"chargeCode","unitPrice"));
 
 	private final String resourceNameForPermissions = "INVENTORY";
     private final String resourceNameForGrnPermissions = "GRN";
@@ -64,6 +70,8 @@ public class ItemDetailsApiResource {
 	private final ItemDetailsReadPlatformService itemDetailsReadPlatformService;
 	private final DefaultToApiJsonSerializer<ItemDetailsAllocation> toApiJsonSerializerForItemAllocation;
 	private final MCodeReadPlatformService mCodeReadPlatformService;
+	private final DefaultToApiJsonSerializer<ItemData> toApiJsonSerializerForItemData;
+	private final OfficeReadPlatformService officeReadPlatformService;
 	
     
 	@Autowired
@@ -72,7 +80,9 @@ public class ItemDetailsApiResource {
 			final GrnReadPlatformService inventoryGrnReadPlatformService,final MCodeReadPlatformService mCodeReadPlatformService,
 			final DefaultToApiJsonSerializer<ItemDetailsAllocation> toApiJsonSerializerForItemAllocation,
 			final DefaultToApiJsonSerializer<ItemSerialNumberData> toApiJsonSerializerForAllocationHardware,
-			final ItemDetailsReadPlatformService itemDetailsReadPlatformService) {
+			final ItemDetailsReadPlatformService itemDetailsReadPlatformService,
+			final DefaultToApiJsonSerializer<ItemData> toApiJsonSerializerForItemData,
+			final OfficeReadPlatformService officeReadPlatformService) {
 		
 		this.context=context;
 		this.mCodeReadPlatformService=mCodeReadPlatformService;
@@ -83,6 +93,8 @@ public class ItemDetailsApiResource {
 	    this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
 	    this.toApiJsonSerializerForItemAllocation = toApiJsonSerializerForItemAllocation;
 	    this.toApiJsonSerializerForAllocationHardware = toApiJsonSerializerForAllocationHardware;
+	    this.toApiJsonSerializerForItemData = toApiJsonSerializerForItemData;
+	    this.officeReadPlatformService = officeReadPlatformService;
 	}
 
 	/*
@@ -212,6 +224,23 @@ public class ItemDetailsApiResource {
 			
 		}
 		return this.toApiJsonSerializerForItem.serialize(settings, itemSerialNumbers, RESPONSE_DATA_SERIAL_NUMBER_PARAMETERS);
+	}
+	
+	/**
+	 * This is for getting item code,charge code and prices using serialNumber
+	 * */
+	@GET
+	@Path("serialnum")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public String retriveItemDetailsBySerialNum(@QueryParam("query") final String query,@Context final UriInfo uriInfo){
+		
+			 context.authenticatedUser().validateHasReadPermission(resourceNameForPermissionsAllocation);
+			 final ItemData itemMasterData = this.itemDetailsReadPlatformService.retriveItemDetailsDataBySerialNum(query);
+			 ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+			
+		
+		return this.toApiJsonSerializerForItemData.serialize(settings, itemMasterData, RESPONSE_ITEM_MASTER_DETAILS_PARAMETERS);
 	}
 
 }
