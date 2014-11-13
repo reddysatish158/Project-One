@@ -443,7 +443,7 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 		   }else{
 			   orderDetails.setStatus(StatusTypeEnum.ACTIVE.getValue().longValue());
 			}
-		  requestStatusForProv=UserActionStatusTypeEnum.ACTIVATION.toString();
+		  requestStatusForProv="RENEWAL_AE";//UserActionStatusTypeEnum.ACTIVATION.toString();
 	  }
 	  LocalDate renewalEndDate=this.orderAssembler.calculateEndDate(newStartdate,contractDetails.getSubscriptionType(),contractDetails.getUnits());
 	  orderDetails.setEndDate(renewalEndDate);
