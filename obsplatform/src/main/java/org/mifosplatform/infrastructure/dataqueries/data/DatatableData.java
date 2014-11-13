@@ -22,8 +22,7 @@ public class DatatableData {
 	public static DatatableData create(final String applicationTableName,
 			final String registeredTableName,
 			final List<ResultsetColumnHeaderData> columnHeaderData) {
-		return new DatatableData(applicationTableName, registeredTableName,
-				columnHeaderData);
+		return new DatatableData(applicationTableName, registeredTableName,columnHeaderData);
 	}
 
 	public DatatableData(final String applicationTableName,
