@@ -158,6 +158,32 @@ public class OneTimeSale extends AbstractAuditableCustom<AppUser, Long> {
 		
 	}
 	
+	
+	
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	public Long getBillId() {
+		return billId;
+	}
+
+	public Long getDiscountId() {
+		return discountId;
+	}
+
+	public Long getOfficeId() {
+		return officeId;
+	}
+
+	public String getDeviceMode() {
+		return deviceMode;
+	}
+
+	public Long getContractPeriod() {
+		return contractPeriod;
+	}
+
 	public static OneTimeSale fromJson(final Long clientId, final JsonCommand command, final ItemMaster item) {
 		
 			final String saleType = command.stringValueOfParameterNamed("saleType");

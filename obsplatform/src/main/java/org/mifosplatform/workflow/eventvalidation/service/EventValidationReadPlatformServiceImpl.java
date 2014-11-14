@@ -102,7 +102,7 @@ public class EventValidationReadPlatformServiceImpl implements
 			String errMsg=null;
 			if(out != null){
 				errCode=(Integer)out.get("err_code");
-				errMsg=(String)out.get("err_msg");
+				errMsg=(String)out.get("err_msg"); 
 			}
 				  
 			if(errCode != 0 && errMsg != null){
