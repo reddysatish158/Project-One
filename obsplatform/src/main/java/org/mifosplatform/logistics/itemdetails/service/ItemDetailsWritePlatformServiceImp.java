@@ -227,7 +227,9 @@ public class ItemDetailsWritePlatformServiceImp implements ItemDetailsWritePlatf
 					for(JsonElement j:allocationData){
 			        	
 						ItemDetailsAllocation inventoryItemDetailsAllocation = ItemDetailsAllocation.fromJson(j,fromJsonHelper);
-						AllocationHardwareData allocationHardwareData = inventoryItemDetailsReadPlatformService.retriveInventoryItemDetail(inventoryItemDetailsAllocation.getSerialNumber());
+						OneTimeSale oneTimeSale = this.oneTimeSaleRepository.findOne(inventoryItemDetailsAllocation.getOrderId());
+						AllocationHardwareData allocationHardwareData = inventoryItemDetailsReadPlatformService.retriveInventoryItemDetail(inventoryItemDetailsAllocation.getSerialNumber(),
+								                                       oneTimeSale.getOfficeId());
 			        	checkHardwareCondition(allocationHardwareData);
 			        	ItemDetails inventoryItemDetails = inventoryItemDetailsRepository.findOne(allocationHardwareData.getItemDetailsId());
 						inventoryItemDetails.setItemMasterId(inventoryItemDetailsAllocation.getItemMasterId());
@@ -236,7 +238,7 @@ public class ItemDetailsWritePlatformServiceImp implements ItemDetailsWritePlatf
 						
 						this.inventoryItemDetailsRepository.saveAndFlush(inventoryItemDetails);
 						this.inventoryItemDetailsAllocationRepository.saveAndFlush(inventoryItemDetailsAllocation);
-						OneTimeSale oneTimeSale = this.oneTimeSaleRepository.findOne(inventoryItemDetailsAllocation.getOrderId());
+						
 						oneTimeSale.setHardwareAllocated("ALLOCATED");
 						this.oneTimeSaleRepository.saveAndFlush(oneTimeSale);
 						clientId=oneTimeSale.getClientId();
