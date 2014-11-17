@@ -13,8 +13,8 @@ import javax.persistence.TemporalType;
 
 import org.apache.commons.lang.StringUtils;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
-
-import org.springframework.data.jpa.domain.AbstractPersistable;
+import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
+import org.mifosplatform.useradministration.domain.AppUser;
 
 /**
  * 
@@ -24,7 +24,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @SuppressWarnings("serial")
 @Entity
 @Table(name = "b_paymentgateway")
-public class PaymentGateway extends AbstractPersistable<Long> {
+public class PaymentGateway extends AbstractAuditableCustom<AppUser, Long> {
 	
 	@Column(name = "key_id")
 	private String deviceId;
@@ -176,4 +176,9 @@ public class PaymentGateway extends AbstractPersistable<Long> {
 		return isAuto;
 	}
 
+	public void setPaymentId(String paymentId) {
+		this.paymentId = paymentId;
+	}
+
+	
 }

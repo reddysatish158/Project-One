@@ -7,7 +7,10 @@ import org.mifosplatform.billing.selfcare.service.SelfCareRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
+import org.mifosplatform.organisation.message.domain.BillingMessage;
+import org.mifosplatform.organisation.message.domain.BillingMessageRepository;
 import org.mifosplatform.organisation.message.domain.BillingMessageTemplate;
+import org.mifosplatform.organisation.message.domain.BillingMessageTemplateConstants;
 import org.mifosplatform.organisation.message.domain.BillingMessageTemplateRepository;
 import org.mifosplatform.organisation.message.service.MessagePlatformEmailService;
 import org.mifosplatform.portfolio.client.domain.Client;
@@ -30,6 +33,7 @@ public class EntitlementWritePlatformServiceImpl implements EntitlementWritePlat
 	private final MessagePlatformEmailService messagePlatformEmailService;
 	private final SelfCareRepository selfCareRepository;
 	private final BillingMessageTemplateRepository billingMessageTemplateRepository;
+	private final BillingMessageRepository messageDataRepository;
 	
 
 	@Autowired
@@ -37,7 +41,8 @@ public class EntitlementWritePlatformServiceImpl implements EntitlementWritePlat
 			final ProcessRequestWriteplatformService processRequestWriteplatformService,
 			final ProcessRequestRepository entitlementRepository, final ClientRepository clientRepository,
 			final MessagePlatformEmailService messagePlatformEmailService,final SelfCareRepository selfCareRepository,
-			final BillingMessageTemplateRepository billingMessageTemplateRepository) {
+			final BillingMessageTemplateRepository billingMessageTemplateRepository,
+			final BillingMessageRepository messageDataRepository) {
 
 		this.processRequestWriteplatformService = processRequestWriteplatformService;
 		this.entitlementRepository = entitlementRepository;
@@ -45,6 +50,7 @@ public class EntitlementWritePlatformServiceImpl implements EntitlementWritePlat
 		this.messagePlatformEmailService = messagePlatformEmailService;
 		this.selfCareRepository = selfCareRepository;
 		this.billingMessageTemplateRepository = billingMessageTemplateRepository;
+		this.messageDataRepository = messageDataRepository;
 	}
 
 	/* In This create(JsonCommand command) method, 
@@ -103,24 +109,28 @@ public class EntitlementWritePlatformServiceImpl implements EntitlementWritePlat
 				this.selfCareRepository.save(selfcare);
 				String Name = client.getLastname();
 				
-				List<BillingMessageTemplate> messageDetails=this.billingMessageTemplateRepository.findByTemplateDescription("PROVISION CREDENTIALS");
+				BillingMessageTemplate messageDetails=this.billingMessageTemplateRepository.findByTemplateDescription(BillingMessageTemplateConstants.MESSAGE_TEMPLATE_PROVISION_CREDENTIALS);
 				
-				String subject=messageDetails.get(0).getSubject();
-				String body=messageDetails.get(0).getBody();
-				String header=messageDetails.get(0).getHeader()+","+"\n"+"\n";
+				String subject=messageDetails.getSubject();
+				String body=messageDetails.getBody();
+				String header=messageDetails.getHeader()+","+"\n"+"\n";
+				String footer=messageDetails.getFooter();
 				
 				header = header.replace("<PARAM1>", Name);
 				body = body.replace("<PARAM2>", client.getAccountNumber());
 				body = body.replace("<PARAM3>", authPin);
-				StringBuilder prepareEmail =new StringBuilder();
+				/*StringBuilder prepareEmail =new StringBuilder();
 				prepareEmail.append(header);
 				prepareEmail.append("\t").append(body);
 				prepareEmail.append("\n").append("\n");
-				prepareEmail.append(messageDetails.get(0).getFooter());
+				prepareEmail.append(messageDetails.get(0).getFooter());*/
 				
-				message = messagePlatformEmailService.sendGeneralMessage(client.getEmail(), prepareEmail.toString().trim(), subject);
+				//message = messagePlatformEmailService.sendGeneralMessage(client.getEmail(), prepareEmail.toString().trim(), subject);
 				
+				BillingMessage billingMessage = new BillingMessage(header, body, footer, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_EMAIL_FROM, client.getEmail(),
+						subject, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_STATUS, messageDetails, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_MESSAGE_TYPE, null);
 				
+				this.messageDataRepository.save(billingMessage);
 						
 			}/*else{
 				throw new PlatformDataIntegrityException("error.msg.beenius.process.invalid","Invalid data from Beenius adapter," +

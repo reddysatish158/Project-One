@@ -2521,6 +2521,21 @@ public CommandWrapperBuilder updateUploadFile(Long uploadFileId) {
 	return this;
 }
 
+public CommandWrapperBuilder updatePaymentGatewayConfig(Long configId) {
+	this.actionName = "UPDATE";
+	this.entityName = "PAYMENTGATEWAYCONFIG";
+	this.entityId = configId;
+	this.href = "/paymentgatewayconfigs";
+	return this;
+}
+
+public CommandWrapperBuilder createPaymentGatewayConfig() {
+	this.actionName = "CREATE";
+	this.entityName = "PAYMENTGATEWAYCONFIG";
+	this.href = "/paymentgatewayconfigs";
+	return this;
+}
+
 }
 
 

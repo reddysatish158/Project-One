@@ -13,6 +13,7 @@ import org.mifosplatform.finance.payments.service.PaymentReadPlatformService;
 import org.mifosplatform.finance.paymentsgateway.domain.PaymentGateway;
 import org.mifosplatform.finance.paymentsgateway.domain.PaymentGatewayRepository;
 import org.mifosplatform.finance.paymentsgateway.serialization.PaymentGatewayCommandFromApiJsonDeserializer;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -69,10 +70,11 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 				BigDecimal amountPaid = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("amount", element);
 				String phoneNo = fromApiJsonHelper.extractStringNamed("msisdn",element);
 				String receiptNo = fromApiJsonHelper.extractStringNamed("receipt",element);
-				String source = fromApiJsonHelper.extractStringNamed("service",element);
+				//String source = fromApiJsonHelper.extractStringNamed("service",element);
 				String details = fromApiJsonHelper.extractStringNamed("name",element);
 				DateFormat readFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss Z");
 				Date date;
+				String source = ConfigurationConstants.PAYMENTGATEWAY_MPESA;
 
 				date = readFormat.parse(paymentDate);
 
@@ -106,13 +108,17 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 					result = this.paymentWritePlatformService.createPayment(comm);
 					if (result.resourceId() != null) {
 						paymentGateway.setObsId(result.resourceId());
+						paymentGateway.setPaymentId(result.resourceId().toString());
 						paymentGateway.setStatus("Success");
 						paymentGateway.setAuto(false);
+						this.paymentGatewayRepository.save(paymentGateway);
+					}else{
+						paymentGateway.setStatus("Failure, payment is not Processed.");
 						this.paymentGatewayRepository.save(paymentGateway);
 					}
 					return result.resourceId();
 				} else {
-					paymentGateway.setStatus("Failure");
+					paymentGateway.setStatus("Failure, Hardware with this " + serialNumberId + " not Found.");
 					this.paymentGatewayRepository.save(paymentGateway);
 					return null;
 				}
@@ -133,7 +139,7 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 			String tStatus = fromApiJsonHelper.extractStringNamed("STATUS", element);
 			String details = fromApiJsonHelper.extractStringNamed("COMPANYNAME", element);		 
 			Date date = new Date();		
-			String source="tigo";
+			String source = ConfigurationConstants.PAYMENTGATEWAY_TIGO;
 
 			PaymentGateway paymentGateway = new PaymentGateway(serialNumberId, txnId, amountPaid, phoneNo, type, tStatus, details, date, source);
 
@@ -169,10 +175,13 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 					paymentGateway.setStatus("Success");
 					paymentGateway.setAuto(false);
 					this.paymentGatewayRepository.save(paymentGateway);
+				}else{
+					paymentGateway.setStatus("Failure, payment is not Processed.");
+					this.paymentGatewayRepository.save(paymentGateway);
 				}
 				return result.resourceId();
 			} else {
-				paymentGateway.setStatus("Failure");
+				paymentGateway.setStatus("Failure, Hardware with this " + serialNumberId + " not Found.");
 				this.paymentGatewayRepository.save(paymentGateway);
 				return null;
 			}

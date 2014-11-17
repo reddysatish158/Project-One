@@ -1150,6 +1150,14 @@ public class SynchronousCommandProcessingService implements
 		        	if(wrapper.isLocationAttributeMediaAsset()) {
 						 handler = applicationContext.getBean("createMediaAssetLocationAttributeCommandHandler",NewCommandSourceHandler.class);
 					 }
+            }else if(wrapper.isPaymentGatewayConfigResource()){
+            	if(wrapper.isCreate()) {
+			         handler = applicationContext.getBean("createPaymentGatewayConfigCommandHandler",NewCommandSourceHandler.class);
+			     } else if(wrapper.isUpdate()) {
+					 handler = applicationContext.getBean("updatePaymentGatewayConfigCommandHandler",NewCommandSourceHandler.class);
+				 } else{
+			           throw new UnsupportedCommandException(wrapper.commandName());
+				 }
             }else {
             	throw new UnsupportedCommandException(wrapper.commandName());
 		     }
