@@ -75,12 +75,11 @@ public class PortfolioCommandSourceWritePlatformServiceImpl implements
 					wrapper.getCodeId(), wrapper.getSupportedEntityType(),
 					wrapper.getSupportedEntityId(), wrapper.getTransactionId(),wrapper.getHref());
 
-			result = this.processAndLogCommandService.processAndLogCommand(
-					wrapper, command, isApprovedByChecker);
+			result = this.processAndLogCommandService.processAndLogCommand(wrapper, command, isApprovedByChecker);
+			
 		} catch (RollbackTransactionAsCommandIsNotApprovedByCheckerException e) {
 
-			result = this.processAndLogCommandService.logCommand(e
-					.getCommandSourceResult());
+			result = this.processAndLogCommandService.logCommand(e.getCommandSourceResult());
 		}
 
 		return result;
@@ -93,14 +92,14 @@ public class PortfolioCommandSourceWritePlatformServiceImpl implements
 		CommandSource commandSourceInput = validateMakerCheckerTransaction(makerCheckerId);
 
 		final CommandWrapper wrapper = CommandWrapper.fromExistingCommand(
-				makerCheckerId, commandSourceInput.getActionName(),
-				commandSourceInput.getEntityName(),
-				commandSourceInput.resourceId(),
-				commandSourceInput.subresourceId(),
-				commandSourceInput.getResourceGetUrl());
+			      	makerCheckerId, commandSourceInput.getActionName(),
+				    commandSourceInput.getEntityName(),
+				    commandSourceInput.resourceId(),
+				    commandSourceInput.subresourceId(),
+				    commandSourceInput.getResourceGetUrl());
 
-		final JsonElement parsedCommand = this.fromApiJsonHelper
-				.parse(commandSourceInput.json());
+		final JsonElement parsedCommand = this.fromApiJsonHelper.parse(commandSourceInput.json());
+		
 		final JsonCommand command = JsonCommand.fromExistingCommand(
 				makerCheckerId, commandSourceInput.json(), parsedCommand,
 				this.fromApiJsonHelper, commandSourceInput.getEntityName(),
@@ -123,11 +122,10 @@ public class PortfolioCommandSourceWritePlatformServiceImpl implements
 		return makerCheckerId;
 	}
 
-	private CommandSource validateMakerCheckerTransaction(
-			final Long makerCheckerId) {
+	private CommandSource validateMakerCheckerTransaction(final Long makerCheckerId) {
 
-		final CommandSource commandSourceInput = this.commandSourceRepository
-				.findOne(makerCheckerId);
+		final CommandSource commandSourceInput = this.commandSourceRepository.findOne(makerCheckerId);
+		
 		if (commandSourceInput == null) {
 			throw new CommandNotFoundException(makerCheckerId);
 		}

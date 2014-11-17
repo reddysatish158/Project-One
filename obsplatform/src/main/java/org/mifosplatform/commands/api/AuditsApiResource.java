@@ -111,17 +111,12 @@ public class AuditsApiResource {
 	@Path("{auditId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrieveAuditEntry(@PathParam("auditId") final Long auditId,
-			@Context final UriInfo uriInfo) {
+	public String retrieveAuditEntry(@PathParam("auditId") final Long auditId,@Context final UriInfo uriInfo) {
 
-		context.authenticatedUser().validateHasReadPermission(
-				resourceNameForPermissions);
+		this.context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
 
-		final AuditData auditEntry = this.auditReadPlatformService
-				.retrieveAuditEntry(auditId);
-
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper
-				.process(uriInfo.getQueryParameters());
+		final AuditData auditEntry = this.auditReadPlatformService.retrieveAuditEntry(auditId);
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 		return this.toApiJsonSerializer.serialize(settings, auditEntry,
 				RESPONSE_DATA_PARAMETERS);
 	}
