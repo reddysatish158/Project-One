@@ -72,7 +72,7 @@ public class ConfigurationApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveAllConfigurations(@Context final UriInfo uriInfo) {
 
-        context.authenticatedUser().validateHasReadPermission(RESOURCENAMEFORPERMISSIONS);
+      //  context.authenticatedUser().validateHasReadPermission(RESOURCENAMEFORPERMISSIONS);
 
         final ConfigurationData configurationData = this.readPlatformService.retrieveGlobalConfiguration();
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());

@@ -16,7 +16,7 @@ call addlocation();
 Drop procedure IF EXISTS addlocation;
 
 
-
+SET SQL_SAFE_UPDATES = 0;
 
 delete from m_code_value where code_id=(select id from m_code where m_code.code_name='Item Quality');
 delete from m_code where code_name='Item Quality';
@@ -37,3 +37,4 @@ insert ignore into m_code_value VALUES (null,@a_lid,'In Use',0);
  update b_item_detail set status ='Available' where status='NEW' and quality ='Good';
  update b_item_detail set status ='UnAvailable' where status='NEW' and quality !='Good';
  update b_item_detail set status ='In Use' where status='Used';
+SET SQL_SAFE_UPDATES = 1;

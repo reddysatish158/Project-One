@@ -32,15 +32,12 @@ import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext
 import org.mifosplatform.logistics.grn.service.GrnReadPlatformService;
 import org.mifosplatform.logistics.item.data.ItemData;
 import org.mifosplatform.logistics.itemdetails.data.InventoryGrnData;
-import org.mifosplatform.logistics.itemdetails.data.ItemSerialNumberData;
 import org.mifosplatform.logistics.itemdetails.data.ItemDetailsData;
+import org.mifosplatform.logistics.itemdetails.data.ItemSerialNumberData;
 import org.mifosplatform.logistics.itemdetails.domain.ItemDetailsAllocation;
 import org.mifosplatform.logistics.itemdetails.service.ItemDetailsReadPlatformService;
-import org.mifosplatform.logistics.onetimesale.data.OneTimeSaleData;
 import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
 import org.mifosplatform.organisation.mcodevalues.service.MCodeReadPlatformService;
-import org.mifosplatform.organisation.office.data.OfficeData;
-import org.mifosplatform.organisation.office.service.OfficeReadPlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -71,7 +68,6 @@ public class ItemDetailsApiResource {
 	private final DefaultToApiJsonSerializer<ItemDetailsAllocation> toApiJsonSerializerForItemAllocation;
 	private final MCodeReadPlatformService mCodeReadPlatformService;
 	private final DefaultToApiJsonSerializer<ItemData> toApiJsonSerializerForItemData;
-	private final OfficeReadPlatformService officeReadPlatformService;
 	
     
 	@Autowired
@@ -81,8 +77,7 @@ public class ItemDetailsApiResource {
 			final DefaultToApiJsonSerializer<ItemDetailsAllocation> toApiJsonSerializerForItemAllocation,
 			final DefaultToApiJsonSerializer<ItemSerialNumberData> toApiJsonSerializerForAllocationHardware,
 			final ItemDetailsReadPlatformService itemDetailsReadPlatformService,
-			final DefaultToApiJsonSerializer<ItemData> toApiJsonSerializerForItemData,
-			final OfficeReadPlatformService officeReadPlatformService) {
+			final DefaultToApiJsonSerializer<ItemData> toApiJsonSerializerForItemData) {
 		
 		this.context=context;
 		this.mCodeReadPlatformService=mCodeReadPlatformService;
@@ -94,7 +89,6 @@ public class ItemDetailsApiResource {
 	    this.toApiJsonSerializerForItemAllocation = toApiJsonSerializerForItemAllocation;
 	    this.toApiJsonSerializerForAllocationHardware = toApiJsonSerializerForAllocationHardware;
 	    this.toApiJsonSerializerForItemData = toApiJsonSerializerForItemData;
-	    this.officeReadPlatformService = officeReadPlatformService;
 	}
 
 	/*
@@ -168,14 +162,14 @@ public class ItemDetailsApiResource {
 	@Path("{itemmasterId}/{officeId}")
 	@Consumes({MediaType.APPLICATION_JSON})
 	@Produces({MediaType.APPLICATION_JSON})
-	public String retriveItemSerialNumbers(@PathParam("itemmasterId") final Long itemmasterId,@PathParam("officeId") final Long officeId,@QueryParam("query") final String query, @Context final UriInfo uriInfo){
-		
+	public String retriveItemSerialNumbers(@PathParam("itemmasterId") final Long itemmasterId,@PathParam("officeId") final Long officeId,
+			@QueryParam("query") final String query, @Context final UriInfo uriInfo){
+			
 		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissionsAllocation);
-		
-			List<String> itemSerialNumbers = this.itemDetailsReadPlatformService.retriveSerialNumbersOnKeyStroke(itemmasterId,query,officeId);
-			ItemSerialNumberData InventoryItemSerialNumberData = new ItemSerialNumberData(itemSerialNumbers);
-			final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-			return this.toApiJsonSerializerForAllocationHardware.serialize(settings, InventoryItemSerialNumberData, RESPONSE_DATA_SERIAL_NUMBER_PARAMETERS);
+		List<String> itemSerialNumbers = this.itemDetailsReadPlatformService.retriveSerialNumbersOnKeyStroke(itemmasterId,query,officeId);
+		ItemSerialNumberData InventoryItemSerialNumberData = new ItemSerialNumberData(itemSerialNumbers);
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		return this.toApiJsonSerializerForAllocationHardware.serialize(settings, InventoryItemSerialNumberData, RESPONSE_DATA_SERIAL_NUMBER_PARAMETERS);
 	}
 	
 	

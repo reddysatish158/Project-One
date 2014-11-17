@@ -169,17 +169,18 @@ private final class SerialNumberForValidation implements RowMapper<String>{
 
 
 	
-	
-	public AllocationHardwareData retriveInventoryItemDetail(String serialNumber){
+	@Override
+	public AllocationHardwareData retriveInventoryItemDetail(String serialNumber,Long officeId){
 		
 		try{
 			
 		context.authenticatedUser();
 		ItemDetailMapper rowMapper = new ItemDetailMapper();
-		String sql = "SELECT i.id,i.client_id AS clientId,i.quality as quality,i.serial_no as serialNo FROM b_item_detail i WHERE  i.serial_no = ? and i.status='Available'";
-		  return this.jdbcTemplate.queryForObject(sql,rowMapper,new Object[]{serialNumber});
+		String sql = "SELECT i.id,i.client_id AS clientId,i.quality as quality,i.serial_no as serialNo FROM b_item_detail i WHERE  i.serial_no = ? and i.status='Available'" +
+				" and i.office_id =?";
+		  return this.jdbcTemplate.queryForObject(sql,rowMapper,new Object[]{serialNumber,officeId});
 		 }catch(EmptyResultDataAccessException accessException){
-			 throw new PlatformDataIntegrityException("SerialNumber SerialNumber"+serialNumber+" doest not exist.","SerialNumber SerialNumber"+serialNumber+" doest not exist.","serialNumber"+serialNumber);
+			 throw new PlatformDataIntegrityException("SerialNumber SerialNumber"+serialNumber+" doest not exist.","SerialNumber "+serialNumber+" doest not exist.","serialNumber"+serialNumber);
 		}
 	}
 	
@@ -199,9 +200,15 @@ private final class SerialNumberForValidation implements RowMapper<String>{
 		
 		context.authenticatedUser();
 		SerialNumberMapper rowMapper = new SerialNumberMapper();
-		String sql = "SELECT idt.serial_no AS serialNumber  FROM b_item_detail idt  where idt.item_master_id=? AND idt.office_id=? AND idt.client_id IS NULL" +
-    "  AND idt.serial_no like '%"+query+"%'  AND quality = 'Good' AND idt.is_deleted='N' ORDER BY idt.id  LIMIT 20";
-		return this.jdbcTemplate.query(sql,rowMapper,new Object[]{oneTimeSaleId,officeId});
+		String sql = "SELECT idt.serial_no AS serialNumber  FROM b_item_detail idt  where idt.client_id IS NULL" +
+      " AND idt.serial_no like '%"+query+"%'  AND quality = 'Good' ";
+		StringBuilder builder=new StringBuilder(sql);
+
+		if(!oneTimeSaleId.equals(Long.valueOf(0)) || !officeId.equals(Long.valueOf(0))){
+			builder.append(" AND idt.item_master_id="+oneTimeSaleId+" AND idt.office_id="+officeId);
+		}
+		builder.append(" AND idt.is_deleted='N' ORDER BY idt.id  LIMIT 20");
+		return this.jdbcTemplate.query(builder.toString(),rowMapper,new Object[]{});
 		
 		}catch(EmptyResultDataAccessException accessException){
 			return null; 			
@@ -271,7 +278,9 @@ private final class SerialNumberForValidation implements RowMapper<String>{
 
 	@Override
 	public ItemData retriveItemDetailsDataBySerialNum(final String query) {
-	  
+
+	  try{
+
 		   	context.authenticatedUser();
 			final ItemMastersDataMapper rowMapper = new ItemMastersDataMapper();
 	
@@ -280,6 +289,10 @@ private final class SerialNumberForValidation implements RowMapper<String>{
 								+ " WHERE itd.serial_no = '"+query+"' AND itd.client_id IS NULL and m.id=itd.item_master_id";
 	
 			return this.jdbcTemplate.queryForObject(sql,rowMapper,new Object[]{});
+
+		}catch(EmptyResultDataAccessException e){
+			return null;
+		}
 		
 	}
 	

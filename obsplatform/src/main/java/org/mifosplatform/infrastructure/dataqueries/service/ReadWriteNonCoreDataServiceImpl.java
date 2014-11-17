@@ -154,13 +154,10 @@ public class ReadWriteNonCoreDataServiceImpl implements
 		final List<DatatableData> datatables = new ArrayList<DatatableData>();
 		while (rs.next()) {
 			final String appTableName = rs.getString("application_table_name");
-			final String registeredDatatableName = rs
-					.getString("registered_table_name");
-			final List<ResultsetColumnHeaderData> columnHeaderData = this.genericDataService
-					.fillResultsetColumnHeaders(registeredDatatableName);
+			final String registeredDatatableName = rs.getString("registered_table_name");
+			//final List<ResultsetColumnHeaderData> columnHeaderData = this.genericDataService.fillResultsetColumnHeaders(registeredDatatableName);
 
-			datatables.add(DatatableData.create(appTableName,
-					registeredDatatableName, columnHeaderData));
+			datatables.add(DatatableData.create(appTableName,registeredDatatableName,null));
 		}
 
 		return datatables;
@@ -196,13 +193,10 @@ public class ReadWriteNonCoreDataServiceImpl implements
 		DatatableData datatableData = null;
 		while (rs.next()) {
 			final String appTableName = rs.getString("application_table_name");
-			final String registeredDatatableName = rs
-					.getString("registered_table_name");
-			final List<ResultsetColumnHeaderData> columnHeaderData = this.genericDataService
-					.fillResultsetColumnHeaders(registeredDatatableName);
+			final String registeredDatatableName = rs.getString("registered_table_name");
+			final List<ResultsetColumnHeaderData> columnHeaderData = this.genericDataService.fillResultsetColumnHeaders(registeredDatatableName);
 
-			datatableData = DatatableData.create(appTableName,
-					registeredDatatableName, columnHeaderData);
+			datatableData = DatatableData.create(appTableName,registeredDatatableName, columnHeaderData);
 		}
 
 		return datatableData;

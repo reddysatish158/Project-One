@@ -10,7 +10,6 @@ import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSourc
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.logistics.itemdetails.exception.ActivePlansFoundException;
 import org.mifosplatform.workflow.eventvalidation.data.EventValidationData;
-import org.mifosplatform.workflow.eventvalidation.domain.EventValidation;
 import org.mifosplatform.workflow.eventvalidation.domain.EventValidationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -89,7 +88,7 @@ public class EventValidationReadPlatformServiceImpl implements
 		
 	//	if(eventValidation != null && eventValidation.isDeleted() == 'N'){
 		
-		try{
+	
 
 			jdbcCall.setProcedureName("custom_validation");
 			MapSqlParameterSource parameterSource = new MapSqlParameterSource();
@@ -103,15 +102,13 @@ public class EventValidationReadPlatformServiceImpl implements
 			String errMsg=null;
 			if(out != null){
 				errCode=(Integer)out.get("err_code");
-				errMsg=(String)out.get("err_msg");
+				errMsg=(String)out.get("err_msg"); 
 			}
 				  
 			if(errCode != 0 && errMsg != null){
 			  throw new ActivePlansFoundException(errMsg); 
 		   }
-		}catch(Exception exception){
-			
-		}
+		
 	}
 
 }
