@@ -179,6 +179,11 @@ public class CommandSource extends AbstractPersistable<Long> {
     public void updateClientId(final Long clientId) {
         this.clientId = clientId;
     }
+
+	public void markAsRejected(AppUser maker, DateTime now) {
+	    this.processingResult = CommandProcessingResultType.REJECTED.getValue();
+	    
+	}
     
    /* public String getTransactionId() {
         return this.transactionId;

@@ -37,14 +37,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author hugo
+ *this api class use to perform  different maker actions are approve or delete
+ */
 @Path("/makercheckers")
 @Component
 @Scope("singleton")
 public class MakercheckersApiResource {
 
     private final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(Arrays.asList("id", "actionName", "entityName", "resourceId",
-            "subresourceId", "maker", "madeOnDate", "checker", "checkedOnDate", "processingResult", "commandAsJson", "officeName",
-            "groupLevelName", "groupName", "clientName", "loanAccountNo", "savingsAccountNo"));
+            "subresourceId", "maker", "madeOnDate", "checker", "checkedOnDate", "processingResult", "commandAsJson", "officeName", "groupName", "clientName"));
 
     private final AuditReadPlatformService readPlatformService;
     private final DefaultToApiJsonSerializer<AuditData> toApiJsonSerializerAudit;
@@ -80,7 +83,7 @@ public class MakercheckersApiResource {
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
         final Collection<AuditData> entries = this.readPlatformService.retrieveAllEntriesToBeChecked(extraCriteria,
-                settings.isIncludeJson());
+            settings.isIncludeJson());
 
         return this.toApiJsonSerializerAudit.serialize(settings, entries, RESPONSE_DATA_PARAMETERS);
     }
@@ -95,8 +98,7 @@ public class MakercheckersApiResource {
 
         final AuditSearchData auditSearchData = this.readPlatformService.retrieveSearchTemplate("makerchecker");
 
-        final Set<String> RESPONSE_DATA_PARAMETERS_SEARCH_TEMPLATE = new HashSet<String>(Arrays.asList("appUsers", "actionNames",
-                "entityNames"));
+        final Set<String> RESPONSE_DATA_PARAMETERS_SEARCH_TEMPLATE = new HashSet<String>(Arrays.asList("appUsers", "actionNames", "entityNames"));
 
         return this.toApiJsonSerializerSearchTemplate.serialize(settings, auditSearchData, RESPONSE_DATA_PARAMETERS_SEARCH_TEMPLATE);
     }
@@ -108,16 +110,19 @@ public class MakercheckersApiResource {
     public String approveMakerCheckerEntry(@PathParam("auditId") final Long auditId, @QueryParam("command") final String commandParam) {
 
         CommandProcessingResult result = null;
-        if (is(commandParam, "approve")) {
+        if (checkStatus(commandParam, "approve")) {
             result = this.writePlatformService.approveEntry(auditId);
-        } else {
+        }else if (checkStatus(commandParam, "reject")) {
+            final Long id = this.writePlatformService.rejectEntry(auditId);
+            result = CommandProcessingResult.commandOnlyResult(id);
+        }else {
             throw new UnrecognizedQueryParamException("command", commandParam);
         }
 
         return this.toApiJsonSerializerAudit.serialize(result);
     }
 
-    private boolean is(final String commandParam, final String commandValue) {
+    private boolean checkStatus(final String commandParam, final String commandValue) {
         return StringUtils.isNotBlank(commandParam) && commandParam.trim().equalsIgnoreCase(commandValue);
     }
 

@@ -50,7 +50,8 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
 		this.commandSourceRepository = commandSourceRepository;
 		this.configurationDomainService = configurationDomainService;
 	}
-
+	
+	@Transactional
 	@Override
 	public CommandProcessingResult processAndLogCommand(final CommandWrapper wrapper, final JsonCommand command,
 			final boolean isApprovedByChecker) {
@@ -60,7 +61,7 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
 		final NewCommandSourceHandler handler = findCommandHandler(wrapper);
 		final CommandProcessingResult result = handler.processCommand(command);
 
-		final AppUser maker = context.authenticatedUser();
+		final AppUser maker = context.authenticatedUser(wrapper);
 
 		CommandSource commandSourceResult = null;
 		if (command.commandId() != null) {
@@ -87,25 +88,20 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
 			commandSourceRepository.save(commandSourceResult);
 		}
 
-	/*	if (rollbackTransaction) {
-			throw new RollbackTransactionAsCommandIsNotApprovedByCheckerException(
-					commandSourceResult);
-		}*/
-		 if ((rollbackTransaction || result.isRollbackTransaction()) && !isApprovedByChecker) {
-			 /*
-			 * JournalEntry will generate a new transactionId every time.
+		if ((rollbackTransaction || result.isRollbackTransaction()) && !isApprovedByChecker) {
+			
+		/*	   JournalEntry will generate a new transactionId every time.
 			 * Updating the transactionId with old transactionId, because as
 			 * there are no entries are created with new transactionId, will
 			 * throw an error when checker approves the transaction
-			 */
+			 
 			// commandSourceResult.updateTransaction(command.getTransactionId());
-			 /*
-			 * Update CommandSource json data with JsonCommand json data, line
-			 * 77 and 81 may update the json data
-			 */
-			 commandSourceResult.updateJsonTo(command.json());
-			 throw new RollbackTransactionAsCommandIsNotApprovedByCheckerException(commandSourceResult);
-			 }
+			
+			* Update CommandSource json data with JsonCommand json data, line
+			* 77 and 81 may update the json data*/
+			commandSourceResult.updateJsonTo(command.json());
+			throw new RollbackTransactionAsCommandIsNotApprovedByCheckerException(commandSourceResult);
+		}
 			 result.setRollbackTransaction(null);
 			 
 			// publishEvent(wrapper.entityName(), wrapper.actionName(), result);
@@ -114,10 +110,10 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
 
 	@Transactional
 	@Override
-	public CommandProcessingResult logCommand(final CommandSource commandSourceResult) {
+	public CommandProcessingResult logCommand(CommandSource commandSourceResult) {
 
 		commandSourceResult.markAsAwaitingApproval();
-		commandSourceRepository.save(commandSourceResult);
+		commandSourceResult = this.commandSourceRepository.save(commandSourceResult);
 
 		return new CommandProcessingResultBuilder()
 				.withCommandId(commandSourceResult.getId())

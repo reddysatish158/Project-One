@@ -5,6 +5,7 @@
  */
 package org.mifosplatform.commands.service;
 
+import org.joda.time.DateTime;
 import org.mifosplatform.commands.domain.CommandSource;
 import org.mifosplatform.commands.domain.CommandSourceRepository;
 import org.mifosplatform.commands.domain.CommandWrapper;
@@ -15,6 +16,7 @@ import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
+import org.mifosplatform.useradministration.domain.AppUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,12 +46,10 @@ public class PortfolioCommandSourceWritePlatformServiceImpl implements
 
 	@Override
 	public CommandProcessingResult logCommandSource(final CommandWrapper wrapper) {
-		
 
 		boolean isApprovedByChecker = false;
 		// check if is update of own account details
-		if (wrapper.isUpdateOfOwnUserDetails(context.authenticatedUser()
-				.getId())) {
+		if (wrapper.isUpdateOfOwnUserDetails(context.authenticatedUser(wrapper).getId())) {
 			// then allow this operation to proceed.
 			// maker checker doesnt mean anything here.
 			isApprovedByChecker = true; // set to true in case permissions have
@@ -58,15 +58,13 @@ public class PortfolioCommandSourceWritePlatformServiceImpl implements
 		} else {
 			// if not user changing their own details - check user has
 			// permission to perform specific task.
-			context.authenticatedUser().validateHasPermissionTo(
-					wrapper.getTaskPermissionName());
+			context.authenticatedUser().validateHasPermissionTo(wrapper.getTaskPermissionName());
 		}
 
 		final String json = wrapper.getJson();
 		CommandProcessingResult result = null;
 		try {
-			final JsonElement parsedCommand = this.fromApiJsonHelper
-					.parse(json);
+			final JsonElement parsedCommand = this.fromApiJsonHelper.parse(json);
 			final JsonCommand command = JsonCommand.from(json, parsedCommand,
 					this.fromApiJsonHelper, wrapper.getEntityName(),
 					wrapper.getEntityId(), wrapper.getSubentityId(),
@@ -77,7 +75,7 @@ public class PortfolioCommandSourceWritePlatformServiceImpl implements
 
 			result = this.processAndLogCommandService.processAndLogCommand(wrapper, command, isApprovedByChecker);
 			
-		} catch (RollbackTransactionAsCommandIsNotApprovedByCheckerException e) {
+		} catch (final RollbackTransactionAsCommandIsNotApprovedByCheckerException e) {
 
 			result = this.processAndLogCommandService.logCommand(e.getCommandSourceResult());
 		}
@@ -91,24 +89,18 @@ public class PortfolioCommandSourceWritePlatformServiceImpl implements
 
 		CommandSource commandSourceInput = validateMakerCheckerTransaction(makerCheckerId);
 
-		final CommandWrapper wrapper = CommandWrapper.fromExistingCommand(
-			      	makerCheckerId, commandSourceInput.getActionName(),
-				    commandSourceInput.getEntityName(),
-				    commandSourceInput.resourceId(),
-				    commandSourceInput.subresourceId(),
+		final CommandWrapper wrapper = CommandWrapper.fromExistingCommand(makerCheckerId, commandSourceInput.getActionName(),
+				    commandSourceInput.getEntityName(),commandSourceInput.resourceId(),commandSourceInput.subresourceId(),
 				    commandSourceInput.getResourceGetUrl());
 
 		final JsonElement parsedCommand = this.fromApiJsonHelper.parse(commandSourceInput.json());
 		
-		final JsonCommand command = JsonCommand.fromExistingCommand(
-				makerCheckerId, commandSourceInput.json(), parsedCommand,
-				this.fromApiJsonHelper, commandSourceInput.getEntityName(),
-				commandSourceInput.resourceId(),
+		final JsonCommand command = JsonCommand.fromExistingCommand(makerCheckerId, commandSourceInput.json(), parsedCommand,
+				this.fromApiJsonHelper, commandSourceInput.getEntityName(),commandSourceInput.resourceId(),
 				commandSourceInput.subresourceId());
-
+		
 		final boolean makerCheckerApproval = true;
-		return this.processAndLogCommandService.processAndLogCommand(wrapper,
-				command, makerCheckerApproval);
+		return this.processAndLogCommandService.processAndLogCommand(wrapper,command, makerCheckerApproval);
 	}
 
 	@Transactional
@@ -121,6 +113,17 @@ public class PortfolioCommandSourceWritePlatformServiceImpl implements
 
 		return makerCheckerId;
 	}
+	
+	@Override
+	public Long rejectEntry(final Long makerCheckerId) {
+		
+	    final CommandSource commandSourceInput = validateMakerCheckerTransaction(makerCheckerId);
+	    final AppUser maker = this.context.authenticatedUser();
+	    commandSourceInput.markAsRejected(maker, DateTime.now());
+	    this.commandSourceRepository.save(commandSourceInput);
+	    return makerCheckerId ;
+	    
+	    }
 
 	private CommandSource validateMakerCheckerTransaction(final Long makerCheckerId) {
 
@@ -132,10 +135,8 @@ public class PortfolioCommandSourceWritePlatformServiceImpl implements
 		if (!(commandSourceInput.isMarkedAsAwaitingApproval())) {
 			throw new CommandNotAwaitingApprovalException(makerCheckerId);
 		}
-
-		context.authenticatedUser().validateHasCheckerPermissionTo(
-				commandSourceInput.getPermissionCode());
-
+		context.authenticatedUser().validateHasCheckerPermissionTo(commandSourceInput.getPermissionCode());
+		
 		return commandSourceInput;
 	}
 }
