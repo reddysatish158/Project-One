@@ -161,8 +161,12 @@ public class AuditsApiResource {
 		String extraCriteria = "";
 
 		if (actionName != null) {
+			if("ALL".equalsIgnoreCase(actionName)){
+				
+			}else{
 			extraCriteria += " and aud.action_name = "
 					+ ApiParameterHelper.sqlEncodeString(actionName);
+			}
 		}
 		if (entityName != null) {
 			extraCriteria += " and aud.entity_name like "
