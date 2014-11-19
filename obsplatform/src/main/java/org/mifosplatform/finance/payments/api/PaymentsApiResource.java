@@ -35,7 +35,13 @@ import org.mifosplatform.finance.payments.data.PaymentData;
 import org.mifosplatform.finance.payments.exception.DalpayRequestFailureException;
 import org.mifosplatform.finance.payments.exception.KortaRequestFailureException;
 import org.mifosplatform.finance.payments.service.PaymentReadPlatformService;
+import org.mifosplatform.finance.paymentsgateway.domain.PaymentGateway;
+import org.mifosplatform.finance.paymentsgateway.domain.PaymentGatewayRepository;
 import org.mifosplatform.infrastructure.codes.data.CodeData;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.exception.ConfigurationPropertyNotFoundException;
 import org.mifosplatform.infrastructure.core.api.ApiRequestParameterHelper;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
@@ -66,17 +72,23 @@ public class PaymentsApiResource {
 	private final ApiRequestParameterHelper apiRequestParameterHelper;
 	private final PortfolioCommandSourceWritePlatformService writePlatformService;
 	private final SelfCareTemporaryRepository selfCareTemporaryRepository;
+	private final ConfigurationRepository configurationRepository;
+	private final PaymentGatewayRepository paymentGatewayRepository;
 
 	@Autowired
 	public PaymentsApiResource(final PlatformSecurityContext context,final PaymentReadPlatformService readPlatformService,
 			final DefaultToApiJsonSerializer<PaymentData> toApiJsonSerializer,final ApiRequestParameterHelper apiRequestParameterHelper,
-			final PortfolioCommandSourceWritePlatformService writePlatformService, final SelfCareTemporaryRepository selfCareTemporaryRepository) {
+			final PortfolioCommandSourceWritePlatformService writePlatformService, final SelfCareTemporaryRepository selfCareTemporaryRepository,
+			final ConfigurationRepository globalConfigurationRepository, final PaymentGatewayRepository paymentGatewayRepository) {
+		
 		this.context = context;
 		this.readPlatformService = readPlatformService;
 		this.toApiJsonSerializer = toApiJsonSerializer;
 		this.apiRequestParameterHelper = apiRequestParameterHelper;
 		this.writePlatformService = writePlatformService;
 		this.selfCareTemporaryRepository = selfCareTemporaryRepository;
+		this.configurationRepository = globalConfigurationRepository;
+		this.paymentGatewayRepository = paymentGatewayRepository;
 	}
 
 	/**
@@ -236,7 +248,8 @@ public class PaymentsApiResource {
 		   catch(Exception e){
 		    return e.getMessage();
 		   }
-		 }
+		 
+	 }
 	 
 	@POST
 	@Path("paypalEnquirey/{clientId}")
@@ -306,4 +319,110 @@ public class PaymentsApiResource {
 			return e.getMessage();
 		}
 	}
+	
+	/**
+	 * This method is used for Online Payment 
+	 * Systems like Paypal,Dalpay,Korta etc...
+	 * 
+	 * Storing these payment details in 2 tables.
+	 * 1) b_paymentgateway and 
+	 * 2) b_payment.
+	 */
+	 @POST
+	 @Path("onlinepayment")
+	 @Consumes({ MediaType.APPLICATION_JSON })
+	 @Produces({ MediaType.TEXT_HTML})
+	 public String OnlinePaymentMethod(final String apiRequestBodyAsJson){
+
+		   try {
+			   Long value = null;
+			   String deviceId = " ";
+			   
+			   Configuration configuration=configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_ONLINEPAYMODE);
+				  
+			   if(configuration == null){
+				   throw new ConfigurationPropertyNotFoundException(ConfigurationConstants.CONFIG_PROPERTY_ONLINEPAYMODE);
+			   }
+			   	
+			   value = Long.parseLong(configuration.getValue());
+			   	
+			   final JSONObject json= new JSONObject(apiRequestBodyAsJson); 
+			   final Long clientId = json.getLong("clientId");			   	  
+			   final String emailId = json.getString("emailId");			   	 
+			   final String txnId = json.getString("transactionId");			   	 
+			   final String amount = json.getString("total_amount");
+			   final String source = json.getString("source");
+			   final String data = json.getJSONObject("otherData").toString();
+			   deviceId = json.getString("device");	
+			   final BigDecimal totalAmount = new BigDecimal(amount);
+			   Date date = new Date();
+			   
+			   PaymentGateway paymentGateway = new PaymentGateway(deviceId, " ", date, totalAmount, txnId, source, data);
+			   
+			  
+			   	if (clientId !=null && clientId > 0 && value != null && value > 0) {
+			   		final String formattedDate = new SimpleDateFormat("dd MMMM yyyy").format(new Date());
+					final JsonObject object = new JsonObject();
+					object.addProperty("txn_id", txnId);
+					object.addProperty("dateFormat", "dd MMMM yyyy");
+					object.addProperty("locale", "en");
+					object.addProperty("paymentDate", formattedDate);
+					object.addProperty("amountPaid", totalAmount);
+					object.addProperty("isChequeSelected", "no");
+					object.addProperty("receiptNo", txnId);
+					object.addProperty("remarks", "Updated with Dalpay");
+					object.addProperty("paymentCode", value);
+
+					final CommandWrapper commandRequest = new CommandWrapperBuilder().createPayment(clientId).withJson(object.toString()).build();
+					final CommandProcessingResult result = this.writePlatformService.logCommandSource(commandRequest);
+					
+					if (result.resourceId() != null) {
+						paymentGateway.setObsId(result.resourceId());
+						paymentGateway.setPaymentId(result.resourceId().toString());
+						paymentGateway.setStatus("Success");
+						paymentGateway.setAuto(false);
+						this.paymentGatewayRepository.save(paymentGateway);
+					}
+					
+					return this.toApiJsonSerializer.serialize(result);
+					
+					
+				}else if(clientId !=null && clientId == 0 && value != null && value > 0){
+					
+					final SelfCareTemporary selfCareTemporary = this.selfCareTemporaryRepository.findOneByEmailId(emailId);
+					if(selfCareTemporary != null && selfCareTemporary.getPaymentStatus().equalsIgnoreCase("INACTIVE")){
+						
+						selfCareTemporary.setPaymentData(json.toString());
+						selfCareTemporary.setPaymentStatus("PENDING");
+						this.selfCareTemporaryRepository.save(selfCareTemporary);
+						
+						paymentGateway.setObsId(clientId);
+						paymentGateway.setStatus("Success");
+						paymentGateway.setPaymentId("0");
+						this.paymentGatewayRepository.save(paymentGateway);
+						
+						return "Success";
+					}else if(selfCareTemporary != null){				
+						throw new SelfCareTemporaryAlreadyExistException(emailId);					
+					}else{					
+						throw new SelfCareTemporaryEmailIdNotFoundException(emailId);					
+					}		
+				}else{
+					paymentGateway.setStatus("Failure");
+					this.paymentGatewayRepository.save(paymentGateway);
+					throw new DalpayRequestFailureException(clientId);				
+				}
+				
+				/*return "<!-- success--> <span>Order Accepted Successfully</span>"
+				+ "<br>"
+				+ "<a href='"+ returnUrl +"'>"
+				+ "<strong>CLICK HERE</strong> to return to your account</a>";*/
+			   	  
+			   	
+		  } 
+		   catch(Exception e){
+		    return e.getMessage();
+		   }
+		 
+	 }
 }

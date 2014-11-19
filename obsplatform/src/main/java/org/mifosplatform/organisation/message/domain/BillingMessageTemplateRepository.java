@@ -19,6 +19,6 @@ public interface BillingMessageTemplateRepository extends JpaRepository<BillingM
 	List<BillingMessageTemplate> findOneByTemplate(@Param("templateDescription")String templateDescription);
 	*/
 	@Query("from BillingMessageTemplate billingMessageTemplate where billingMessageTemplate.templateDescription =:messageTemplateName and billingMessageTemplate.isDeleted ='N'")
-	List<BillingMessageTemplate> findByTemplateDescription(@Param("messageTemplateName") String messageTemplateName);
+	BillingMessageTemplate findByTemplateDescription(@Param("messageTemplateName") String messageTemplateName);
 
 }

@@ -40,15 +40,11 @@ import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext
 import org.mifosplatform.organisation.address.service.AddressReadPlatformService;
 import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
 import org.mifosplatform.organisation.mcodevalues.service.MCodeReadPlatformService;
+import org.mifosplatform.useradministration.domain.AppUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-/**
- * 
- * @author Praveen/Rahman
- *
- */
 @Path("/prospects")
 @Component
 @Scope("singleton")
@@ -130,9 +126,10 @@ public class ClientProspectApiResource {
 	public String retriveProspectsForNewClient(@Context final UriInfo uriInfo, @QueryParam("sqlSearch") final String sqlSearch, 
 			@QueryParam("limit") final Integer limit, @QueryParam("offset") final Integer offset) {
 
-		context.authenticatedUser().validateHasReadPermission(RESOURCETYPE);
+		AppUser user = context.authenticatedUser();
+		user.validateHasReadPermission(RESOURCETYPE);
 		final SearchSqlQuery clientProspect = SearchSqlQuery.forSearch(sqlSearch, offset, limit);
-		final Page<ClientProspectData> clientProspectData = this.clientProspectReadPlatformService.retriveClientProspect(clientProspect);
+		final Page<ClientProspectData> clientProspectData = this.clientProspectReadPlatformService.retriveClientProspect(clientProspect,user.getId());
 		return this.apiJsonSerializer.serialize(clientProspectData);
 	}
 	
@@ -194,8 +191,9 @@ public class ClientProspectApiResource {
 	public String getSingleClient(@Context final UriInfo uriInfo,
 			@PathParam("prospectId") final Long prospectId) {
 
-		context.authenticatedUser().validateHasReadPermission(RESOURCETYPE);
-		final ClientProspectData clientData = clientProspectReadPlatformService.retriveSingleClient(prospectId);
+		AppUser user = context.authenticatedUser();
+		user.validateHasReadPermission(RESOURCETYPE);
+		final ClientProspectData clientData = clientProspectReadPlatformService.retriveSingleClient(prospectId, user.getId());
 		final Collection<MCodeData> sourceOfPublicityData = codeReadPlatformService.getCodeValue("Source Type");
 		final Collection<ProspectPlanCodeData> planData = clientProspectReadPlatformService.retrivePlans();
 		clientData.setPlanData(planData);
@@ -289,7 +287,8 @@ public class ClientProspectApiResource {
 	@Consumes({ MediaType.APPLICATION_JSON })
 	public String retriveProspects(@Context final UriInfo uriInfo, @PathParam("prospectId") final Long prospectId) {
 		
-		context.authenticatedUser().validateHasReadPermission(RESOURCETYPE);
+		AppUser user = context.authenticatedUser();
+		user.validateHasReadPermission(RESOURCETYPE);
 		
 		final ProspectDetailData clientProspectData = this.clientProspectReadPlatformService.retriveClientProspect(prospectId);
 		final Collection<MCodeData> mCodeData = codeReadPlatformService.getCodeValue("Call Status");
@@ -357,8 +356,9 @@ public class ClientProspectApiResource {
 	public String history(@Context final UriInfo uriInfo,
 			@PathParam("prospectdetailid") final Long prospectdetailid) {
 		
-		context.authenticatedUser().validateHasReadPermission(RESOURCETYPE);
-		final List<ProspectDetailData> prospectDetailData = this.clientProspectReadPlatformService.retriveProspectDetailHistory(prospectdetailid);
+		AppUser user = context.authenticatedUser();
+		user.validateHasReadPermission(RESOURCETYPE);
+		final List<ProspectDetailData> prospectDetailData = this.clientProspectReadPlatformService.retriveProspectDetailHistory(prospectdetailid, user.getId());
 		final ProspectDetailData data = new ProspectDetailData(prospectDetailData);
 		
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());

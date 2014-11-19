@@ -48,12 +48,13 @@ public class ClientProspectReadPlatformServiceImp implements
 	}
 
 	public Page<ClientProspectData> retriveClientProspect(
-			final SearchSqlQuery searchClientProspect) {
+			final SearchSqlQuery searchClientProspect, final Long userId) {
 
 		final ClientProspectMapperForNewClient rowMapper = new ClientProspectMapperForNewClient();
 		final StringBuilder sqlBuilder = new StringBuilder(200);
 		sqlBuilder.append("select ").append(rowMapper.query())
-				.append(" where p.is_deleted = 'N' | 'Y' ");
+				.append(" where p.is_deleted = 'N' | 'Y' ")
+				.append(" and p.createdby_id = " + userId);
 
 		String sqlSearch = searchClientProspect.getSqlSearch();
 			
@@ -110,12 +111,12 @@ public class ClientProspectReadPlatformServiceImp implements
 
 	@Override
 	public List<ProspectDetailData> retriveProspectDetailHistory(
-			final Long prospectdetailid) {
+			final Long prospectdetailid, final Long userId) {
 		
 		context.authenticatedUser();
 		HistoryMapper mapper = new HistoryMapper();
-		String sql = "select " + mapper.query() + " where d.prospect_id=? order by d.id desc";
-		return jdbcTemplate.query(sql, mapper, new Object[] { prospectdetailid });
+		String sql = "select " + mapper.query() + " where p.id = d.prospect_id and p.createdby_id=? and d.prospect_id=? order by d.id desc";
+		return jdbcTemplate.query(sql, mapper, new Object[] { userId, prospectdetailid });
 	}
 
 	private static final class HistoryMapper implements RowMapper<ProspectDetailData> {
@@ -134,7 +135,7 @@ public class ClientProspectReadPlatformServiceImp implements
 		}
 
 		public String query() {
-			return "d.id as id, d.prospect_id as prospectId, d.next_time as nextTime, d.notes as notes, cv.code_value as callStatus, au.username as assignedTo from b_prospect_detail d left outer join m_code_value cv on d.call_status=cv.id left outer join m_appuser au on au.id=d.assigned_to";
+			return "d.id as id, d.prospect_id as prospectId, d.next_time as nextTime, d.notes as notes, cv.code_value as callStatus, au.username as assignedTo from b_prospect p, b_prospect_detail d left outer join m_code_value cv on d.call_status=cv.id left outer join m_appuser au on au.id=d.assigned_to";
 		}
 	}
 
@@ -290,13 +291,13 @@ public class ClientProspectReadPlatformServiceImp implements
 	}
 
 	@Override
-	public ClientProspectData retriveSingleClient(Long id) {
+	public ClientProspectData retriveSingleClient(Long id, Long userId) {
 
 		context.authenticatedUser();
 		final EditClientProspectMapper rowMapper = new EditClientProspectMapper();
 		final String sql = "select " + rowMapper.query()
-				+ " from b_prospect p where id=?";
-		return jdbcTemplate.queryForObject(sql, rowMapper, new Object[] { id });
+				+ " from b_prospect p where id=? and p.createdby_id=?";
+		return jdbcTemplate.queryForObject(sql, rowMapper, new Object[] { id, userId });
 	}
 
 	public class EditClientProspectMapper implements
