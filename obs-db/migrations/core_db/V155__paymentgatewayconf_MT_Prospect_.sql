@@ -5,6 +5,7 @@ INSERT IGNORE INTO m_permission VALUES (null,'Finance', 'CREATE_PAYMENTGATEWAYCO
 INSERT IGNORE INTO m_permission VALUES (null,'Finance', 'UPDATE_PAYMENTGATEWAYCONFIG', 'PAYMENTGATEWAYCONFIG', 'UPDATE', 1);
 INSERT IGNORE INTO m_permission VALUES (null,'Finance', 'READ_PAYMENTGATEWAYCONFIG', 'PAYMENTGATEWAYCONFIG', 'READ', 2);
 
+
 CREATE TABLE IF NOT EXISTS `c_paymentgateway_conf` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
@@ -14,10 +15,11 @@ CREATE TABLE IF NOT EXISTS `c_paymentgateway_conf` (
   UNIQUE KEY `name_config` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COMMENT='utf8_general_ci';
 
-INSERT IGNORE INTO c_paymentgateway_conf VALUES (null,'korta',0,'{"merchantId":"123...","terminalId":"123..","secretCode":"123.."}');
-INSERT IGNORE INTO c_paymentgateway_conf VALUES (null,'dalpay',0,'http://......');
-INSERT IGNORE INTO c_paymentgateway_conf VALUES (null,'paypal',0,'{"paypalUrl":"https://...","paypalUrl":"xyz@gmail.com"}');
 INSERT IGNORE INTO b_message_template(template_description,subject,header,body,footer,message_type) values ('CREATE USER','OBS User Creation','Dear <PARAM1>','OBS User Account has been successfully created .You can login using the following credentials. \n userName : <PARAM2> , \n password : <PARAM3> .','Thankyou','E');
+
+INSERT IGNORE INTO c_paymentgateway_conf VALUES (null,'korta',0,'');
+INSERT IGNORE INTO c_paymentgateway_conf VALUES (null,'dalpay',0,'');
+INSERT IGNORE INTO c_paymentgateway_conf VALUES (null,'paypal',0,'');
 
 Drop procedure IF EXISTS alterprospectemail; 
 DELIMITER //
@@ -49,6 +51,8 @@ END //
 DELIMITER ;
 call renameTemp();
 Drop procedure IF EXISTS renameTemp;
+
+
 
 
 
