@@ -35,7 +35,9 @@ public class EventOrderData {
 		this.status=status;
 	}
 
-	public EventOrderData(List<EventOrderDeviceData> devices, List<EventMasterData> events, List<EnumOptionData> optType, Collection<MCodeData> codes, List<ClientTypeData> clientType) {
+	public EventOrderData(List<EventOrderDeviceData> devices, List<EventMasterData> events, List<EnumOptionData> optType,
+			Collection<MCodeData> codes, List<ClientTypeData> clientType) {
+		
 		this.devices = devices;
 		this.events = events;
 		this.optType = optType;

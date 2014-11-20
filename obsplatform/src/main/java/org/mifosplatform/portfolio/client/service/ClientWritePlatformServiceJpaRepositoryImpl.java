@@ -63,9 +63,13 @@ import org.mifosplatform.portfolio.order.domain.UserActionStatusTypeEnum;
 import org.mifosplatform.portfolio.order.service.OrderReadPlatformService;
 import org.mifosplatform.portfolio.plan.domain.Plan;
 import org.mifosplatform.portfolio.plan.domain.PlanRepository;
+import org.mifosplatform.provisioning.preparerequest.service.PrepareRequestReadplatformService;
+import org.mifosplatform.provisioning.provisioning.api.ProvisioningApiConstants;
 import org.mifosplatform.provisioning.provisioning.domain.ServiceParameters;
 import org.mifosplatform.provisioning.provisioning.domain.ServiceParametersRepository;
 import org.mifosplatform.provisioning.provisioning.service.ProvisioningWritePlatformService;
+import org.mifosplatform.provisioning.provsionactions.domain.ProvisionActions;
+import org.mifosplatform.provisioning.provsionactions.domain.ProvisioningActionsRepository;
 import org.mifosplatform.useradministration.domain.AppUser;
 import org.mifosplatform.workflow.eventaction.data.ActionDetaislData;
 import org.mifosplatform.workflow.eventaction.service.ActionDetailsReadPlatformService;
@@ -83,7 +87,17 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 
     private final static Logger logger = LoggerFactory.getLogger(ClientWritePlatformServiceJpaRepositoryImpl.class);
 
+    private final ActionDetailsReadPlatformService actionDetailsReadPlatformService;
+    private final ActiondetailsWritePlatformService actiondetailsWritePlatformService;
+    private final PrepareRequestWriteplatformService prepareRequestWriteplatformService;
+    private final PortfolioCommandSourceWritePlatformService  portfolioCommandSourceWritePlatformService;
     private final PlanRepository planRepository;
+    private final OrderReadPlatformService orderReadPlatformService;
+    private final ClientReadPlatformService clientReadPlatformService;
+    private final ConfigurationRepository configurationRepository;
+    private final ServiceParametersRepository serviceParametersRepository;
+    private final AccountNumberGeneratorFactory accountIdentifierGeneratorFactory;
+    private final ProvisioningWritePlatformService ProvisioningWritePlatformService;
     private final OrderRepository orderRepository;
     private final PlatformSecurityContext context;
     private final OfficeRepository officeRepository;
@@ -93,16 +107,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     private final ClientRepositoryWrapper clientRepository;
     private final ClientDataValidator fromApiJsonDeserializer;
     private final GroupsDetailsRepository groupsDetailsRepository;
-    private final OrderReadPlatformService orderReadPlatformService;
-    private final ClientReadPlatformService clientReadPlatformService;
-    private final ConfigurationRepository configurationRepository;
-    private final ServiceParametersRepository serviceParametersRepository;
-    private final AccountNumberGeneratorFactory accountIdentifierGeneratorFactory;
-    private final ProvisioningWritePlatformService ProvisioningWritePlatformService;
-    private final ActionDetailsReadPlatformService actionDetailsReadPlatformService;
-    private final ActiondetailsWritePlatformService actiondetailsWritePlatformService;
-    private final PrepareRequestWriteplatformService prepareRequestWriteplatformService;
-	private final PortfolioCommandSourceWritePlatformService  portfolioCommandSourceWritePlatformService;
+    private final ProvisioningActionsRepository provisioningActionsRepository;
   
     
    
@@ -116,28 +121,30 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             final OrderReadPlatformService orderReadPlatformService,final ProvisioningWritePlatformService  ProvisioningWritePlatformService,
             final GroupsDetailsRepository groupsDetailsRepository,final OrderRepository orderRepository,final PlanRepository planRepository,
             final PrepareRequestWriteplatformService prepareRequestWriteplatformService,final ClientReadPlatformService clientReadPlatformService,
-            final SelfCareRepository selfCareRepository,final PortfolioCommandSourceWritePlatformService  portfolioCommandSourceWritePlatformService) {
+            final SelfCareRepository selfCareRepository,final PortfolioCommandSourceWritePlatformService  portfolioCommandSourceWritePlatformService,
+            final ProvisioningActionsRepository provisioningActionsRepository,final PrepareRequestReadplatformService prepareRequestReadplatformService) {
     	
         this.context = context;
+        this.ProvisioningWritePlatformService=ProvisioningWritePlatformService;
+        this.actiondetailsWritePlatformService=actiondetailsWritePlatformService;
+        this.accountIdentifierGeneratorFactory = accountIdentifierGeneratorFactory;
+        this.prepareRequestWriteplatformService=prepareRequestWriteplatformService;
         this.planRepository=planRepository;
-        this.orderRepository=orderRepository;
-        this.clientRepository = clientRepository;
-        this.addressRepository=addressRepository;
-        this.officeRepository = officeRepository;
-        this.selfCareRepository=selfCareRepository;
-        this.codeValueRepository=codeValueRepository;
-        this.configurationRepository=configurationRepository;
         this.groupsDetailsRepository=groupsDetailsRepository;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.orderReadPlatformService=orderReadPlatformService;
         this.clientReadPlatformService = clientReadPlatformService;
         this.serviceParametersRepository = serviceParametersRepository;
         this.actionDetailsReadPlatformService=actionDetailsReadPlatformService;
-        this.ProvisioningWritePlatformService=ProvisioningWritePlatformService;
-        this.actiondetailsWritePlatformService=actiondetailsWritePlatformService;
-        this.accountIdentifierGeneratorFactory = accountIdentifierGeneratorFactory;
-        this.prepareRequestWriteplatformService=prepareRequestWriteplatformService;
         this.portfolioCommandSourceWritePlatformService=portfolioCommandSourceWritePlatformService;
+        this.orderRepository=orderRepository;
+        this.clientRepository = clientRepository;
+        this.addressRepository=addressRepository;
+        this.officeRepository = officeRepository;
+        this.provisioningActionsRepository=provisioningActionsRepository;
+        this.selfCareRepository=selfCareRepository;
+        this.codeValueRepository=codeValueRepository;
+        this.configurationRepository=configurationRepository;
        
     }
 
@@ -190,7 +197,8 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 			if(actionDetaislDatas.size() != 0){
 			this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,command.entityId(), clientId.toString(),null);
 			}
-
+			
+			
             return new CommandProcessingResultBuilder() //
                     .withCommandId(command.commandId()) //
                     .withClientId(clientId) //
@@ -284,6 +292,13 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             this.actiondetailsWritePlatformService.AddNewActions(actionDetailsDatas,newClient.getId(),newClient.getId().toString(),null);
             }
             
+            ProvisionActions provisionActions=this.provisioningActionsRepository.findOneByProvisionType(ProvisioningApiConstants.PROV_EVENT_CREATE_CLIENT);
+			if(provisionActions != null && provisionActions.isEnable() == 'Y'){
+				this.prepareRequestWriteplatformService.prepareRequestForRegistration(newClient.getId(),provisionActions.getAction(),
+						   provisionActions.getProvisioningSystem());
+			}
+
+            
             
             return new CommandProcessingResultBuilder() 
                     .withCommandId(command.commandId()) 
@@ -341,7 +356,8 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                       if(order.getStatus().equals(StatusTypeEnum.ACTIVE.getValue().longValue())){
                     	  final CommandProcessingResult processingResult=this.prepareRequestWriteplatformService.prepareNewRequest(order, plan, UserActionStatusTypeEnum.CHANGE_GROUP.toString());
                	        this.ProvisioningWritePlatformService.postOrderDetailsForProvisioning(order,plan.getCode(),UserActionStatusTypeEnum.CHANGE_GROUP.toString(),
-               			processingResult.resourceId(),oldGroup,null,order.getId());
+               			processingResult.resourceId(),oldGroup,null,order.getId(),plan.getProvisionSystem(),
+               			this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
                       }
             	   }
             		

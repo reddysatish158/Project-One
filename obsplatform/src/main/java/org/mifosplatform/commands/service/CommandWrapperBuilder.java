@@ -2521,6 +2521,15 @@ public CommandWrapperBuilder updateUploadFile(Long uploadFileId) {
 	return this;
 }
 
+public CommandWrapperBuilder activeProvisionActions(Long provisionActionId) {
+	
+	this.actionName = "ACTIVE";
+	this.entityName = "PROVISIONACTIONS";
+	this.entityId = provisionActionId;
+	this.href = "/provisioningactions/" +provisionActionId;
+	return this;
+}
+
 }
 
 

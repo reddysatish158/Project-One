@@ -96,7 +96,6 @@ public class OneTimeSaleWritePlatformServiceImpl implements OneTimeSaleWritePlat
 			ItemMaster item = this.itemMasterRepository.findOne(itemId);
 
 			// Check for Custome_Validation
-
 			this.eventValidationReadPlatformService.checkForCustomValidations(clientId, "Rental",command.json(),getUserId());
 			final OneTimeSale oneTimeSale = OneTimeSale.fromJson(clientId, command,item);
 
@@ -106,7 +105,7 @@ public class OneTimeSaleWritePlatformServiceImpl implements OneTimeSaleWritePlat
 			final String saleType = command.stringValueOfParameterNamed("saleType");
 			if (saleType.equalsIgnoreCase("NEWSALE")) {
 				for (OneTimeSaleData oneTimeSaleData : oneTimeSaleDatas) {
-					this.invoiceOneTimeSale.invoiceOneTimeSale(clientId,oneTimeSaleData);
+					this.invoiceOneTimeSale.invoiceOneTimeSale(clientId,oneTimeSaleData,false);
 					updateOneTimeSale(oneTimeSaleData);
 				}
 			}

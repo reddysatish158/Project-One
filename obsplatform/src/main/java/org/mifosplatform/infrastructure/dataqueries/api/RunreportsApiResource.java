@@ -89,10 +89,14 @@ public class RunreportsApiResource {
 		if (exportPdf) {
 			Map<String, String> reportParams = getReportParams(queryParams,false);
 			String pdfFileName = this.readExtraDataAndReportingService.retrieveReportPDF(reportName, parameterTypeValue,reportParams);
+			//StreamingOutput result = this.readExtraDataAndReportingService.retrieveReportCSV(reportName, parameterTypeValue, reportParams);
+			
+			/*return Response.ok().entity(result).type("application/pdf").header("Content-Disposition","attachment;filename=" + reportName.replaceAll(" ", "")
+									+ ".pdf").build();*/
 
 			File file = new File(pdfFileName);
 			ResponseBuilder response = Response.ok(file);
-			response.header("Content-Disposition", "attachment; filename=\""+ pdfFileName + "\"");
+			response.header("Content-Disposition", "attachment; filename=\""+ reportName + "\"");
 			response.header("content-Type", "application/pdf");
 			return response.build();
 		}

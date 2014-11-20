@@ -1139,17 +1139,19 @@ public class SynchronousCommandProcessingService implements
 			               throw new UnsupportedCommandException(wrapper.commandName());
 		            }
 		    }else if(wrapper.isIpDetails()){
-		        	
 		    	   if(wrapper.isUpdateOperation()) {
 				         handler = applicationContext.getBean("updateIpDetailsCommandHandler",NewCommandSourceHandler.class);
 				     }else {
 	               throw new UnsupportedCommandException(wrapper.commandName());
 				     }
 		    }else if(wrapper.isMediaAssetLocationResource()){
-                	
 		        	if(wrapper.isLocationAttributeMediaAsset()) {
 						 handler = applicationContext.getBean("createMediaAssetLocationAttributeCommandHandler",NewCommandSourceHandler.class);
 					 }
+            }else if(wrapper.isProvisionActionResource()){
+	        	if(wrapper.isActive()) {
+					 handler = applicationContext.getBean("updateProvisionActionStatusCommandHandler",NewCommandSourceHandler.class);
+				 }
             }else {
             	throw new UnsupportedCommandException(wrapper.commandName());
 		     }

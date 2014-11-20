@@ -1209,4 +1209,12 @@ public class CommandWrapper {
 			  return  this.entityName.equalsIgnoreCase("NEWSALE") || this.entityName.equalsIgnoreCase("SECONDSALE") 
 					   ||this.entityName.equalsIgnoreCase("DEVICERENTAL");
 		}
+
+		public boolean isProvisionActionResource() {
+			return this.entityName.equalsIgnoreCase("PROVISIONACTIONS");
+		}
+
+		public boolean isActive() {
+			return this.entityName.equalsIgnoreCase("PROVISIONACTIONS") && this.actionName.equalsIgnoreCase("ACTIVE");
+		}
 }

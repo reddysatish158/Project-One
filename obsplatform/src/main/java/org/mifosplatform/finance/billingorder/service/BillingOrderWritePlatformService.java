@@ -13,6 +13,6 @@ public interface BillingOrderWritePlatformService {
 	
 	//CommandProcessingResult updateOrderPrice(List<BillingOrderCommand> billingOrderCommands);
 	
-	void updateClientBalance(Invoice invoice,Long clientId);
+	void updateClientBalance(Invoice invoice,Long clientId, boolean isWalletEnable);
 
 }

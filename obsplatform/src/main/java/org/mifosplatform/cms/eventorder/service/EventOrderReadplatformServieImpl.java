@@ -60,8 +60,9 @@ public class EventOrderReadplatformServieImpl implements EventOrderReadplatformS
 
 		public String schema() {
 			return "  e.id AS orderid,e.client_id AS clientId,e.event_id AS eventId,e.eventprice_id AS eventpriceId,0 AS movieLink,e.booked_price AS bookedPrice," +
-					" e.charge_code AS chargeCode,e.is_invoiced AS isInvoiced,c.charge_type as chargeType FROM b_eventorder e, b_charge_codes c " +
-					" where e.charge_code = c.charge_code ";
+					" e.charge_code AS chargeCode,e.is_invoiced AS isInvoiced,c.charge_type as chargeType, c.tax_inclusive as  taxInclusive," +
+					" p.discount_id as discountId FROM b_eventorder e, b_charge_codes c,b_event_pricing p  where e.charge_code = c.charge_code " +
+					" and p.id=e.eventprice_id and e.is_invoiced = 'N' ";
 
 		}
 
@@ -75,7 +76,9 @@ public class EventOrderReadplatformServieImpl implements EventOrderReadplatformS
 			BigDecimal bookedPrice = rs.getBigDecimal("bookedPrice");
 			String isInvoiced = rs.getString("isInvoiced");
 			String chargeType = rs.getString("chargeType");
-			return new OneTimeSaleData(orderid,clientId, null, chargeCode,chargeType, null,null, bookedPrice,isInvoiced,orderid,1l,null);
+			final Long discountId=rs.getLong("discountId");
+			final Integer taxInclusive = rs.getInt("taxInclusive");
+			return new OneTimeSaleData(orderid,clientId, null, chargeCode,chargeType, null,null, bookedPrice,isInvoiced,orderid,discountId,taxInclusive);
 
 		}
 	}

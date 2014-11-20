@@ -20,12 +20,10 @@ public interface ProvisioningWritePlatformService {
 
 	CommandProcessingResult updateProvisioningDetails(Long entityId);
 
-	void updateHardwareDetails(Long clientId, String serialNumber,
-			String oldSerialnumber, String provSerilaNum, String oldHardware);
+	void updateHardwareDetails(Long clientId, String serialNumber,String oldSerialnumber, String provSerilaNum, String oldHardware);
 
-	void postOrderDetailsForProvisioning(Order order, String planName,
-			String reqType, Long prepareId, String groupName, String serialNo,
-			Long orderId);
+	CommandProcessingResult postOrderDetailsForProvisioning(Order order, String planName,String reqType, Long prepareId, String groupName, String serialNo,
+			Long orderId,String provisioningSys, String configdata);
 
 	CommandProcessingResult updateIpDetails(Long entityId, JsonCommand command);
 
@@ -34,5 +32,7 @@ public interface ProvisioningWritePlatformService {
 	String runAdapterCommands(String apiRequestBodyAsJson);
 
 	List<ProvisionAdapter> gettingLogInformation(String apiRequestBodyAsJson);
+
+
 
 }

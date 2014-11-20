@@ -11,7 +11,7 @@ public class ActivePlansFoundException extends AbstractPlatformDomainRuleExcepti
 
 	public ActivePlansFoundException(String errorCode) {
 		
-		 super(errorCode, "plans are activated with this hardWare",errorCode);
+		 super(errorCode, errorCode,errorCode);
 	}
 
 	public ActivePlansFoundException(Long clientId) {

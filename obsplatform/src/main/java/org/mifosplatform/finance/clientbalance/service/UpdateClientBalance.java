@@ -90,7 +90,7 @@ public class UpdateClientBalance {
 			balanceAmount = BigDecimal.ZERO.subtract(amount);
 		}
 
-		clientBalance = new ClientBalance(clientId, balanceAmount);
+		clientBalance = new ClientBalance(clientId, balanceAmount,'N');
 		
 		return clientBalance;
 		
