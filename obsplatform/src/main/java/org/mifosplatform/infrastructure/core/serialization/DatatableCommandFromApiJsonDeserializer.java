@@ -65,14 +65,11 @@ public class DatatableCommandFromApiJsonDeserializer {
 			throw new InvalidJsonException();
 		}
 
-		final Type typeOfMap = new TypeToken<Map<String, Object>>() {
-		}.getType();
-		this.fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json,
-				this.supportedParametersForCreate);
+		final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
+		this.fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json,this.supportedParametersForCreate);
 
 		final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
-		final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(
-				dataValidationErrors).resource("datatable");
+		final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("datatable");
 
 		final JsonElement element = this.fromApiJsonHelper.parse(json);
 
@@ -240,8 +237,7 @@ public class DatatableCommandFromApiJsonDeserializer {
 	 * @param column
 	 * check columns with its types
 	 */
-	private void validateType(final DataValidatorBuilder baseDataValidator,
-			final JsonElement column) {
+	private void validateType(final DataValidatorBuilder baseDataValidator,final JsonElement column) {
 		
 		final String type = this.fromApiJsonHelper.extractStringNamed("type",column);
 		baseDataValidator.reset().parameter("type").value(type).notBlank()
@@ -274,15 +270,14 @@ public class DatatableCommandFromApiJsonDeserializer {
 		}
 
 		// check dropdown with code values
-		final String code = this.fromApiJsonHelper.extractStringNamed("code",
-				column);
+		final String code = this.fromApiJsonHelper.extractStringNamed("code",column);
 		if (type != null && type.equalsIgnoreCase("Dropdown")) {
 			if (code != null) {
 				baseDataValidator.reset().parameter("code").value(code).notBlank()
 						.matchesRegularExpression(DATATABLE_NAME_REGEX_PATTERN);
 			} else {
 				baseDataValidator.reset().parameter("code").value(code)
-						.cantBeBlankWhenParameterProvidedIs("type", type);
+			           .cantBeBlankWhenParameterProvidedIs("type", type);
 			}
 		} else {
 			baseDataValidator.reset().parameter("code").value(code)

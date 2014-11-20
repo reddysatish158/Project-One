@@ -7,9 +7,9 @@ package org.mifosplatform.commands.exception;
 
 import org.mifosplatform.commands.domain.CommandSource;
 
-public class RollbackTransactionAsCommandIsNotApprovedByCheckerException extends
-		RuntimeException {
-
+public class RollbackTransactionAsCommandIsNotApprovedByCheckerException extends RuntimeException {
+	
+	private static final long serialVersionUID = 1L;
 	/**
 	 * When maker-checker is configured globally and also for the current
 	 * transaction.
@@ -23,8 +23,7 @@ public class RollbackTransactionAsCommandIsNotApprovedByCheckerException extends
 	 */
 	private final CommandSource commandSourceResult;
 
-	public RollbackTransactionAsCommandIsNotApprovedByCheckerException(
-			final CommandSource commandSourceResult) {
+	public RollbackTransactionAsCommandIsNotApprovedByCheckerException(final CommandSource commandSourceResult) {
 		this.commandSourceResult = commandSourceResult;
 	}
 

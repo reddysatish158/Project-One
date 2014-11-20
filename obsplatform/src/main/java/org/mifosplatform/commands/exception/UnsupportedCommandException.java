@@ -11,7 +11,9 @@ package org.mifosplatform.commands.exception;
  */
 public class UnsupportedCommandException extends RuntimeException {
 
-    private final String unsupportedCommandName;
+	private static final long serialVersionUID = 1L;
+	
+	private final String unsupportedCommandName;
 
     public UnsupportedCommandException(final String unsupportedCommandName) {
         this.unsupportedCommandName = unsupportedCommandName;

@@ -27,8 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class SynchronousCommandProcessingService implements
-		CommandProcessingService {
+public class SynchronousCommandProcessingService implements CommandProcessingService {
 
 	private PlatformSecurityContext context;
 	private final ApplicationContext applicationContext;
@@ -51,29 +50,25 @@ public class SynchronousCommandProcessingService implements
 		this.commandSourceRepository = commandSourceRepository;
 		this.configurationDomainService = configurationDomainService;
 	}
-
+	
+	@Transactional
 	@Override
-	public CommandProcessingResult processAndLogCommand(
-			final CommandWrapper wrapper, final JsonCommand command,
+	public CommandProcessingResult processAndLogCommand(final CommandWrapper wrapper, final JsonCommand command,
 			final boolean isApprovedByChecker) {
 		
-		final boolean rollbackTransaction = this.configurationDomainService
-				.isMakerCheckerEnabledForTask(wrapper.taskPermissionName())
-				&& !isApprovedByChecker;
+		final boolean rollbackTransaction = this.configurationDomainService.isMakerCheckerEnabledForTask(wrapper.taskPermissionName());
 
 		final NewCommandSourceHandler handler = findCommandHandler(wrapper);
 		final CommandProcessingResult result = handler.processCommand(command);
 
-		final AppUser maker = context.authenticatedUser();
+		final AppUser maker = context.authenticatedUser(wrapper);
 
 		CommandSource commandSourceResult = null;
 		if (command.commandId() != null) {
-			commandSourceResult = this.commandSourceRepository.findOne(command
-					.commandId());
+			commandSourceResult = this.commandSourceRepository.findOne(command.commandId());
 			commandSourceResult.markAsChecked(maker, DateTime.now());
 		} else {
-			commandSourceResult = CommandSource.fullEntryFrom(wrapper, command,
-					maker);
+			commandSourceResult = CommandSource.fullEntryFrom(wrapper, command, maker);
 		}
 		commandSourceResult.updateResourceId(result.resourceId());
 		commandSourceResult.updateClientId(result.getClientId());
@@ -82,11 +77,9 @@ public class SynchronousCommandProcessingService implements
 
 		String changesOnlyJson = null;
 		if (result.hasChanges()) {
-			changesOnlyJson = this.toApiJsonSerializer.serializeResult(result
-					.getChanges());
+			changesOnlyJson = this.toApiJsonSerializer.serializeResult(result.getChanges());
 			commandSourceResult.updateJsonTo(changesOnlyJson);
 		}
-
 		if (!result.hasChanges() && wrapper.isUpdateOperation()) {
 			commandSourceResult.updateJsonTo(null);
 		}
@@ -95,21 +88,32 @@ public class SynchronousCommandProcessingService implements
 			commandSourceRepository.save(commandSourceResult);
 		}
 
-		if (rollbackTransaction) {
-			throw new RollbackTransactionAsCommandIsNotApprovedByCheckerException(
-					commandSourceResult);
+		if ((rollbackTransaction || result.isRollbackTransaction()) && !isApprovedByChecker) {
+			
+		/*	   JournalEntry will generate a new transactionId every time.
+			 * Updating the transactionId with old transactionId, because as
+			 * there are no entries are created with new transactionId, will
+			 * throw an error when checker approves the transaction
+			 
+			// commandSourceResult.updateTransaction(command.getTransactionId());
+			
+			* Update CommandSource json data with JsonCommand json data, line
+			* 77 and 81 may update the json data*/
+			commandSourceResult.updateJsonTo(command.json());
+			throw new RollbackTransactionAsCommandIsNotApprovedByCheckerException(commandSourceResult);
 		}
-
-		return result;
+			 result.setRollbackTransaction(null);
+			 
+			// publishEvent(wrapper.entityName(), wrapper.actionName(), result);
+			 return result;
 	}
 
 	@Transactional
 	@Override
-	public CommandProcessingResult logCommand(
-			final CommandSource commandSourceResult) {
+	public CommandProcessingResult logCommand(CommandSource commandSourceResult) {
 
 		commandSourceResult.markAsAwaitingApproval();
-		commandSourceRepository.save(commandSourceResult);
+		commandSourceResult = this.commandSourceRepository.save(commandSourceResult);
 
 		return new CommandProcessingResultBuilder()
 				.withCommandId(commandSourceResult.getId())
