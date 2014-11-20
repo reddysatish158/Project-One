@@ -184,6 +184,18 @@ public class CommandSource extends AbstractPersistable<Long> {
 	    this.processingResult = CommandProcessingResultType.REJECTED.getValue();
 	    
 	}
+	
+	public Long getOfficeId() {
+		return officeId;
+	}
+	
+	public Long getClientId() {
+		return clientId;
+	}
+
+	
+	
+	
     
    /* public String getTransactionId() {
         return this.transactionId;

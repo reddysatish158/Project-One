@@ -49,7 +49,7 @@ public class AdjustmentWritePlatformServiceImpl implements
 
 	@Transactional
 	@Override
-	public Long createAdjustment(final Long id2, final Long id, final Long clientid, final JsonCommand command) {
+	public Long createAdjustment(final Long id2, final Long id, final Long clientId, final JsonCommand command) {
 		// TODO Auto-generated method stub
 
 		try {
@@ -84,10 +84,8 @@ public class AdjustmentWritePlatformServiceImpl implements
 			context.authenticatedUser();
 
 			this.fromApiJsonDeserializer.validateForCreate(command.json());
-			final List<ClientBalanceData> clientBalancedatas = clientBalanceReadPlatformService
-					.retrieveAllClientBalances(command.entityId());
-			final List<ClientBalanceData> adjustmentBalancesDatas = adjustmentReadPlatformService
-					.retrieveAllAdjustments(command.entityId());
+			final List<ClientBalanceData> clientBalancedatas = clientBalanceReadPlatformService.retrieveAllClientBalances(command.entityId());
+			final List<ClientBalanceData> adjustmentBalancesDatas = adjustmentReadPlatformService.retrieveAllAdjustments(command.entityId());
 			Long id = Long.valueOf(-1);
 			if (clientBalancedatas.size() == 1 && adjustmentBalancesDatas.size() == 1){
 				id = createAdjustment(clientBalancedatas.get(0).getId(),

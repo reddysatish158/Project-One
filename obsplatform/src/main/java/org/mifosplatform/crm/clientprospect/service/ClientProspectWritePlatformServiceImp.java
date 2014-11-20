@@ -71,7 +71,7 @@ public class ClientProspectWritePlatformServiceImp implements
 			final ClientProspect entity = ClientProspect.fromJson(fromApiJsonHelper, command);
 			this.clientProspectJpaRepository.save(entity);
 			
-			return new CommandProcessingResultBuilder().withCommandId(entity.getId()).build();
+			return new CommandProcessingResultBuilder().withEntityId(entity.getId()).withCommandId(command.commandId()).build();
 			
 		} catch (DataIntegrityViolationException dve) {
 			handleDataIntegrityIssues(command, dve);

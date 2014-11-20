@@ -39,7 +39,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * @author hugo
- *this api class use to perform  different maker actions are approve or delete
+ *this api class use to perform  different maker actions are approve or delete or reject
  */
 @Path("/makercheckers")
 @Component
@@ -74,11 +74,10 @@ public class MakercheckersApiResource {
             @QueryParam("entityName") final String entityName, @QueryParam("resourceId") final Long resourceId,
             @QueryParam("makerId") final Long makerId, @QueryParam("makerDateTimeFrom") final String makerDateTimeFrom,
             @QueryParam("makerDateTimeTo") final String makerDateTimeTo, @QueryParam("officeId") final Integer officeId,
-            @QueryParam("groupId") final Integer groupId, @QueryParam("clientId") final Integer clientId,
-            @QueryParam("loanid") final Integer loanId, @QueryParam("savingsAccountId") final Integer savingsAccountId) {
+            @QueryParam("groupId") final Integer groupId, @QueryParam("clientId") final Integer clientId) {
 
         final String extraCriteria = getExtraCriteria(actionName, entityName, resourceId, makerId, makerDateTimeFrom, makerDateTimeTo,
-                officeId, groupId, clientId, loanId, savingsAccountId);
+                officeId, groupId, clientId);
 
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
@@ -139,7 +138,7 @@ public class MakercheckersApiResource {
 
     private String getExtraCriteria(final String actionName, final String entityName, final Long resourceId, final Long makerId,
             final String makerDateTimeFrom, final String makerDateTimeTo, final Integer officeId, final Integer groupId,
-            final Integer clientId, final Integer loanId, final Integer savingsAccountId) {
+            final Integer clientId) {
 
         String extraCriteria = "";
 
@@ -173,14 +172,6 @@ public class MakercheckersApiResource {
 
         if (clientId != null) {
             extraCriteria += " and aud.client_id = " + clientId;
-        }
-
-        if (loanId != null) {
-            extraCriteria += " and aud.loan_id = " + loanId;
-        }
-
-        if (savingsAccountId != null) {
-            extraCriteria += " and aud.savings_account_id = " + savingsAccountId;
         }
 
         if (StringUtils.isNotBlank(extraCriteria)) {

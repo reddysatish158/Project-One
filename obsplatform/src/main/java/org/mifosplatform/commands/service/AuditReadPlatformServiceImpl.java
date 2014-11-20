@@ -178,6 +178,9 @@ public class AuditReadPlatformServiceImpl implements AuditReadPlatformService {
         return this.jdbcTemplate.queryForObject(sql, rm, new Object[] {});
     }
 
+    /* (non-Javadoc)
+     * @see #retrieveSearchTemplate(java.lang.String)
+     */
     @Override
     public AuditSearchData retrieveSearchTemplate(final String useType) {
 

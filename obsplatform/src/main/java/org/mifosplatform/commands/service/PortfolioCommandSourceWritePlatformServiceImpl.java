@@ -91,12 +91,12 @@ public class PortfolioCommandSourceWritePlatformServiceImpl implements
 
 		final CommandWrapper wrapper = CommandWrapper.fromExistingCommand(makerCheckerId, commandSourceInput.getActionName(),
 				    commandSourceInput.getEntityName(),commandSourceInput.resourceId(),commandSourceInput.subresourceId(),
-				    commandSourceInput.getResourceGetUrl());
+				    commandSourceInput.getResourceGetUrl(),commandSourceInput.getClientId());
 
 		final JsonElement parsedCommand = this.fromApiJsonHelper.parse(commandSourceInput.json());
 		
 		final JsonCommand command = JsonCommand.fromExistingCommand(makerCheckerId, commandSourceInput.json(), parsedCommand,
-				this.fromApiJsonHelper, commandSourceInput.getEntityName(),commandSourceInput.resourceId(),
+				this.fromApiJsonHelper, commandSourceInput.getEntityName(),wrapper.getEntityId(),
 				commandSourceInput.subresourceId());
 		
 		final boolean makerCheckerApproval = true;
