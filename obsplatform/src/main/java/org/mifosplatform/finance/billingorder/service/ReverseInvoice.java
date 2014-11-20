@@ -49,7 +49,7 @@ public class ReverseInvoice {
 		
 		//List<ClientBalanceData> clientBalancesDatas = clientBalanceReadPlatformService.retrieveAllClientBalances(clientId);
 		
-		this.billingOrderWritePlatformService.updateClientBalance(invoice,clientId);
+		this.billingOrderWritePlatformService.updateClientBalance(invoice,clientId,false);
 		
 		this.billingOrderWritePlatformService.updateBillingOrder(billingOrderCommands);
 	    //this.billingOrderWritePlatformService.updateOrderPrice(billingOrderCommands);

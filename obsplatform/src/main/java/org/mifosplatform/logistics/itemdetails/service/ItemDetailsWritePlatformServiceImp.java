@@ -309,13 +309,13 @@ public class ItemDetailsWritePlatformServiceImp implements ItemDetailsWritePlatf
 							inventoryItemDetailsAllocation.deAllocate();
 							this.inventoryItemDetailsAllocationRepository.save(inventoryItemDetailsAllocation);
 							ItemDetails inventoryItemDetails=this.inventoryItemDetailsRepository.findOne(allocationDetailsData.getItemDetailId());
-							inventoryItemDetails.delete();
+							inventoryItemDetails.setAvailable();
 							this.inventoryItemDetailsRepository.save(inventoryItemDetails);
 					     
-							InventoryTransactionHistory transactionHistory = InventoryTransactionHistory.logTransaction(new LocalDate().toDate(), 
+						/*	InventoryTransactionHistory transactionHistory = InventoryTransactionHistory.logTransaction(new LocalDate().toDate(), 
 					  			inventoryItemDetailsAllocation.getOrderId(),"De Allocation",inventoryItemDetailsAllocation.getSerialNumber(), inventoryItemDetailsAllocation.getItemMasterId(),
 								inventoryItemDetailsAllocation.getClientId(),inventoryItemDetails.getOfficeId());
-							inventoryTransactionHistoryJpaRepository.save(transactionHistory);
+							inventoryTransactionHistoryJpaRepository.save(transactionHistory);*/
 					   
 						}
 						

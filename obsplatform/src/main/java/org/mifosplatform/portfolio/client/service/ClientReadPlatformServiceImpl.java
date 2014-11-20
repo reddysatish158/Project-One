@@ -300,7 +300,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             final String entryType=rs.getString("entryType");
             return ClientData.instance(accountNo,groupName, status, officeId, officeName, id, firstname, middlename, lastname, fullname, displayName,
                     externalId, activationDate, imageKey,categoryType,email,phone,homePhoneNumber, null, null,null, null,null,null, null,null,currency,taxExemption,
-                    entryType);
+                    entryType,null);
         }
     }
 
@@ -314,12 +314,11 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
 
             builder.append("c.id as id, c.account_no as accountNo,g.group_name as groupName, c.external_id as externalId, c.status_enum as statusEnum, ");
             builder.append("c.office_id as officeId, o.name as officeName, ");
-            builder.append("c.office_id as officeId, o.name as officeName, ");
             builder.append("c.firstname as firstname, c.middlename as middlename, c.lastname as lastname,c.is_indororp as entryType, ");
             builder.append("c.fullname as fullname, c.display_name as displayName,mc.code_value as categoryType, ");
             builder.append("c.email as email,c.phone as phone,c.home_phone_number as homePhoneNumber,c.activation_date as activationDate, c.image_key as imagekey,c.exempt_tax as taxExemption, ");
             builder.append("a.address_no as addrNo,a.street as street,a.city as city,a.state as state,a.country as country, ");
-            builder.append(" a.zip as zipcode,b.balance_amount as balanceAmount,bc.currency as currency,");
+            builder.append(" a.zip as zipcode,b.balance_amount as balanceAmount,b.wallet_amount as walletAmount,bc.currency as currency,");
             
             if(configProp.equalsIgnoreCase(ConfigurationConstants.CONFIR_PROPERTY_SALE)){
             	
@@ -375,6 +374,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             final String zipcode = rs.getString("zipcode");
             final String hwSerial = rs.getString("HW_Serial");
             final BigDecimal clientBalance = rs.getBigDecimal("balanceAmount");
+            final BigDecimal walletAmount = rs.getBigDecimal("walletAmount");
             final String currency=rs.getString("currency");
             final String taxExemption=rs.getString("taxExemption");
             final String entryType=rs.getString("entryType");
@@ -382,7 +382,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
 
             return ClientData.instance(accountNo,groupName, status, officeId, officeName, id, firstname, middlename, lastname, fullname, displayName,
                     externalId, activationDate, imageKey,categoryType,email,phone,homePhoneNumber, addressNo, street, city, state, country, zipcode,
-                    clientBalance,hwSerial,currency,taxExemption,entryType);
+                    clientBalance,hwSerial,currency,taxExemption,entryType,walletAmount);
         }
     }
 

@@ -7,8 +7,6 @@ public interface PaymentWritePlatformService {
 
 	CommandProcessingResult createPayment(JsonCommand command);
 
-	Long createPayments(Long clientBalanceid, Long clientid, JsonCommand command);
-
 	CommandProcessingResult cancelPayment(JsonCommand command,Long entityId);
 
 	CommandProcessingResult paypalEnquirey(JsonCommand command);

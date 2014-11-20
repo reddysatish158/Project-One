@@ -31,9 +31,9 @@ public class ConfigurationConstants {
 	public static final String CONFIG_PROPERTY_CONSTAINT_APPROACH_FOR_DATATABLES= "constraint-approach-for-datatables";
 	public static final String CONFIG_PROPERTY_SELFCATE_REQUIRES_EMAIL= "selfcare-requires-email";
 	public static final String CONFIG_PROPERTY_OSD_PROVISIONING_SYSTEM= "osd-provisioningSystem";
+	public static final String CONFIG_PROPERTY_WALLER_ENABLE= "is-wallet-enable";
 	public static final String CONFIG_PROPERTY_MEDIA_CRASH_EMAIL = "media-crash-email";
 	public static final String CONFIG_PROPERTY_ONLINEPAYMODE = "online-paymode";
-	
 	public static final String CONFIG_PROPERTY_SMTP= "smtp";
 
 	public static final String ENABLED = "enabled";

@@ -1210,6 +1210,13 @@ public class CommandWrapper {
 					   ||this.entityName.equalsIgnoreCase("DEVICERENTAL");
 		}
 
+		public boolean isProvisionActionResource() {
+			return this.entityName.equalsIgnoreCase("PROVISIONACTIONS");
+		}
+
+		public boolean isActive() {
+			return this.entityName.equalsIgnoreCase("PROVISIONACTIONS") && this.actionName.equalsIgnoreCase("ACTIVE");
+		}
 		public boolean isPaymentGatewayConfigResource() {
 			return this.entityName.equalsIgnoreCase("PAYMENTGATEWAYCONFIG");
 		}

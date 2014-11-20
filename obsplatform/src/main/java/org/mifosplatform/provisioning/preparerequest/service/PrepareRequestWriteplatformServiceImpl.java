@@ -14,13 +14,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class PrepareRequestWriteplatformServiceImpl implements PrepareRequestWriteplatformService{
-	private final PlatformSecurityContext context;
 	private final PrepareRequsetRepository prepareRequsetRepository; 
 
 	@Autowired
-	public PrepareRequestWriteplatformServiceImpl(final PlatformSecurityContext context,
-			final PrepareRequsetRepository prepareRequsetRepository	) {
-		this.context = context;
+	public PrepareRequestWriteplatformServiceImpl(final PrepareRequsetRepository prepareRequsetRepository	) {
 		this.prepareRequsetRepository=prepareRequsetRepository;
 
 	}
@@ -29,12 +26,10 @@ public class PrepareRequestWriteplatformServiceImpl implements PrepareRequestWri
 	public CommandProcessingResult prepareNewRequest(final Order order, final Plan plan, final String requestType) {
   
 		try{
-		//	this.context.authenticatedUser();
-			//String requstStatus= SavingStatusEnumaration.interestCompoundingPeriodType(StatusTypeEnum.CONNECT).getValue();
 		
 			PrepareRequest prepareRequest=new PrepareRequest(order.getClientId(), order.getId(), requestType, plan.getProvisionSystem(), 'N', "NONE", plan.getPlanCode());
-			
 			this.prepareRequsetRepository.save(prepareRequest);
+			
 			
 			return CommandProcessingResult.resourceResult(prepareRequest.getId(), order.getId());
           			
@@ -42,6 +37,14 @@ public class PrepareRequestWriteplatformServiceImpl implements PrepareRequestWri
 			return CommandProcessingResult.empty();
 		
 	}
+	}
+
+	@Override
+	public void prepareRequestForRegistration(Long clientId, String action,String provisioningSystem) {
+		
+		PrepareRequest prepareRequest=new PrepareRequest(clientId,Long.valueOf(0),action,provisioningSystem, 'N', "NONE",String.valueOf(0));
+		this.prepareRequsetRepository.save(prepareRequest);
+		
 	}
 
 	
