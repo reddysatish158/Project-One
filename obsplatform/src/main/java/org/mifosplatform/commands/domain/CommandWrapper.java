@@ -1209,4 +1209,8 @@ public class CommandWrapper {
 			  return  this.entityName.equalsIgnoreCase("NEWSALE") || this.entityName.equalsIgnoreCase("SECONDSALE") 
 					   ||this.entityName.equalsIgnoreCase("DEVICERENTAL");
 		}
+
+		public boolean isPaymentGatewayConfigResource() {
+			return this.entityName.equalsIgnoreCase("PAYMENTGATEWAYCONFIG");
+		}
 }

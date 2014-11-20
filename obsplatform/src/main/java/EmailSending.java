@@ -1,8 +1,8 @@
-
+/*
 import java.util.Properties;
+
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
@@ -13,12 +13,12 @@ public class EmailSending {
 	public static void main(String a[]) {
 		Properties properties = new Properties();
 		String outgoingMailServer = "mail.spicenet.co.tz";
-		/*props.put("mail.smtp.host", "smtp.gmail.com");
+		props.put("mail.smtp.host", "smtp.gmail.com");
 		props.put("mail.smtp.socketFactory.port", "465");
 		props.put("mail.smtp.socketFactory.class",
 				"javax.net.ssl.SSLSocketFactory");
 		props.put("mail.smtp.auth", "true");
-		props.put("mail.smtp.port", "465");*/
+		props.put("mail.smtp.port", "465");
 		 properties.put("mail.smtp.host", outgoingMailServer);
          properties.put("mail.smtps.auth", "true");
          properties.put("mail.smtp.starttls.enable", "true");
@@ -29,21 +29,21 @@ public class EmailSending {
 
 		try {
 
-			/*Message message = new MimeMessage(session);
+			Message message = new MimeMessage(session);
 			message.setFrom(new InternetAddress("ashokreddy556@gmail.com"));
 			message.setRecipients(Message.RecipientType.TO,
 					InternetAddress.parse("ashokcse556@gmail.com"));
 			message.setSubject("Testing Subject");
 			message.setText("Dear Mail Crawler,"
-					+ "\n\n No spam to my email, please!");*/
+					+ "\n\n No spam to my email, please!");
 			
 		    MimeMessage message=new MimeMessage(session);  
 		    message.setFrom(new InternetAddress("system@spicenet.co.tz"));  
 		    message.addRecipient(Message.RecipientType.TO,   
 		    new InternetAddress("osbtest@streamingmedia.is"));  
-		    message.setText("Næsta skref í skráningu er að fara á slóðina hér fyrir neðan og fylla út nánari upplýsingar: URL : <PARAM1>");  
+		    message.setText("Nï¿½sta skref ï¿½ skrï¿½ningu er aï¿½ fara ï¿½ slï¿½ï¿½ina hï¿½r fyrir neï¿½an og fylla ï¿½t nï¿½nari upplï¿½singar: URL : <PARAM1>");  
 
-			/*Transport.send(message);*/
+			Transport.send(message);
 			
 			Transport tr = session.getTransport("smtp");
 			// transport.connect(outgoingMailServer, 465, emailUserName, emailPassword)
@@ -62,3 +62,4 @@ public class EmailSending {
 
 	}
 }
+*/

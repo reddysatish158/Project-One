@@ -61,6 +61,7 @@ public class AuditReadPlatformServiceImpl implements AuditReadPlatformService {
                     + " mk.username as maker, aud.made_on_date as madeOnDate, "
                     + "ck.username as checker, aud.checked_on_date as checkedOnDate, ev.enum_message_property as processingResult "
                     + commandAsJsonString + ", "
+
                     + " o.name as officeName, g.display_name as groupName, c.display_name as clientName from m_portfolio_command_source aud "
                     + " left join m_appuser mk on mk.id = aud.maker_id" + " left join m_appuser ck on ck.id = aud.checker_id"
                     + " left join m_office o on o.id = aud.office_id" + " left join m_group g on g.id = aud.group_id"
@@ -103,6 +104,8 @@ public class AuditReadPlatformServiceImpl implements AuditReadPlatformService {
          
             return new AuditData(id, actionName, entityName, resourceId, subresourceId, maker, madeOnDate, checker, checkedOnDate,
                     processingResult, commandAsJson, officeName, groupName, clientName);
+
+           
         }
     }
 
