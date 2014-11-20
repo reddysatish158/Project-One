@@ -20,6 +20,7 @@ import org.mifosplatform.finance.billingorder.api.BillingOrderApiResourse;
 import org.mifosplatform.organisation.message.domain.BillingMessage;
 import org.mifosplatform.organisation.message.domain.BillingMessageRepository;
 import org.mifosplatform.organisation.message.domain.BillingMessageTemplate;
+import org.mifosplatform.organisation.message.domain.BillingMessageTemplateConstants;
 import org.mifosplatform.organisation.message.domain.BillingMessageTemplateRepository;
 import org.mifosplatform.organisation.message.exception.EmailNotFoundException;
 import org.mifosplatform.portfolio.association.data.AssociationData;
@@ -114,7 +115,7 @@ public class EventActionWritePlatformServiceImpl implements ActiondetailsWritePl
 				          TicketMasterData data = this.ticketMasterReadPlatformService.retrieveTicket(clientId,new Long(resourceId));
 				          TicketMaster ticketMaster=this.repository.findOne(new Long(resourceId));
 				          AppUserData user = this.readPlatformService.retrieveUser(new Long(data.getUserId()));
-				          List<BillingMessageTemplate> billingMessageTemplate = this.messageTemplateRepository.findByTemplateDescription("TICKET_TEMPLATE");
+				          BillingMessageTemplate billingMessageTemplate = this.messageTemplateRepository.findByTemplateDescription(BillingMessageTemplateConstants.MESSAGE_TEMPLATE_TICKET_TEMPLATE);
 				          String value=ticketURL+""+resourceId;
 				          String removeUrl="<br/><b>URL : </b>"+"<a href="+value+">View Ticket</a>";
 				         // removeUrl.replaceAll("(PARAMURL)", ticketURL+""+resourceId); 	
@@ -122,7 +123,8 @@ public class EventActionWritePlatformServiceImpl implements ActiondetailsWritePl
 				        	  	if(!user.getEmail().isEmpty()){
 				        	  		BillingMessage billingMessage = new BillingMessage("CREATE TICKET", data.getProblemDescription()+"<br/>"
 				        	  	    +ticketMaster.getDescription()+"\n"+removeUrl, "", user.getEmail(), user.getEmail(),
-									 "Ticket:"+resourceId, "N", billingMessageTemplate.get(0),'E',null);
+									 "Ticket:"+resourceId, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_STATUS, billingMessageTemplate,
+									 BillingMessageTemplateConstants.MESSAGE_TEMPLATE_MESSAGE_TYPE, null);
 				        	  		this.messageDataRepository.save(billingMessage);
 				        	  	}else{
 				        	  	   if(actionProcedureData.getEmailId().isEmpty()){
@@ -131,7 +133,8 @@ public class EventActionWritePlatformServiceImpl implements ActiondetailsWritePl
 				        	  		}else{
 				        	  			BillingMessage billingMessage = new BillingMessage("CREATE TICKET", data.getProblemDescription()+"<br/>"
 				        	  		    +ticketMaster.getDescription()+"\n"+removeUrl, "", actionProcedureData.getEmailId(), actionProcedureData.getEmailId(),
-										"Ticket:"+resourceId, "N", billingMessageTemplate.get(0),'E',null);
+										"Ticket:"+resourceId, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_STATUS, billingMessageTemplate,
+										BillingMessageTemplateConstants.MESSAGE_TEMPLATE_MESSAGE_TYPE, null);
 				        	  			this.messageDataRepository.save(billingMessage);
 				        	  		}
 				        	  	}
@@ -141,7 +144,8 @@ public class EventActionWritePlatformServiceImpl implements ActiondetailsWritePl
 				        	    if(!user.getEmail().isEmpty()){
 				        	  		BillingMessage billingMessage = new BillingMessage("ADD COMMENT", data.getProblemDescription()+"<br/>"
 				        	        +ticketMaster.getDescription()+"<br/>"+"COMMENT: "+data.getLastComment()+"<br/>"+removeUrl, "", user.getEmail(), user.getEmail(),
-									"Ticket:"+resourceId, "N", billingMessageTemplate.get(0),'E',null);
+									"Ticket:"+resourceId, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_STATUS, billingMessageTemplate,
+									BillingMessageTemplateConstants.MESSAGE_TEMPLATE_MESSAGE_TYPE, null);
 				        	  		this.messageDataRepository.save(billingMessage);
 				        	  	}else{
 				        	  		if(actionProcedureData.getEmailId().isEmpty()){
@@ -149,7 +153,8 @@ public class EventActionWritePlatformServiceImpl implements ActiondetailsWritePl
 					        	  	}else{
 					        	  		BillingMessage billingMessage = new BillingMessage("ADD COMMENT", data.getProblemDescription()+"<br/>"
 					        	  	     +ticketMaster.getDescription()+"<br/>"+"COMMENT: \t"+data.getLastComment()+"<br/>"+removeUrl, "", actionProcedureData.getEmailId(),
-					        	  	     actionProcedureData.getEmailId(),"Ticket:"+resourceId, "N", billingMessageTemplate.get(0),'E',null);
+					        	  	     actionProcedureData.getEmailId(),"Ticket:"+resourceId, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_STATUS, billingMessageTemplate,
+					        	  	     BillingMessageTemplateConstants.MESSAGE_TEMPLATE_MESSAGE_TYPE, null);
 						        	  		this.messageDataRepository.save(billingMessage);
 					        	  	}
 				        	  	}
@@ -158,7 +163,8 @@ public class EventActionWritePlatformServiceImpl implements ActiondetailsWritePl
 				        	  	if(!user.getEmail().isEmpty()){
 				        	  			BillingMessage billingMessage = new BillingMessage("CLOSED TICKET", data.getProblemDescription()+"<br/>"
 				        	  			+ticketMaster.getDescription()+"<br/>"+"RESOLUTION: \t"+ticketMaster.getResolutionDescription()+"<br/>"+removeUrl, "", user.getEmail(), user.getEmail(),
-										"Ticket:"+resourceId, "N", billingMessageTemplate.get(0),'E',null);
+										"Ticket:"+resourceId, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_STATUS, billingMessageTemplate,
+										BillingMessageTemplateConstants.MESSAGE_TEMPLATE_MESSAGE_TYPE, null);
 				        	  			this.messageDataRepository.save(billingMessage);
 				        	  	}else{
 				        	  		if(actionProcedureData.getEmailId().isEmpty()){
@@ -166,7 +172,8 @@ public class EventActionWritePlatformServiceImpl implements ActiondetailsWritePl
 					        	  	}else{
 					        	  		     BillingMessage billingMessage = new BillingMessage("CLOSED TICKET", data.getProblemDescription()+"<br/>"
 					        	  		    +ticketMaster.getDescription()+"<br/>"+"RESOLUTION: \t"+ticketMaster.getResolutionDescription()+"<br/>"+removeUrl, "", actionProcedureData.getEmailId(),
-					        	  	         actionProcedureData.getEmailId(),"Ticket:"+resourceId, "N", billingMessageTemplate.get(0),'E',null);
+					        	  	         actionProcedureData.getEmailId(),"Ticket:"+resourceId, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_STATUS, billingMessageTemplate,
+					        	  	       BillingMessageTemplateConstants.MESSAGE_TEMPLATE_MESSAGE_TYPE, null);
 						        	        this.messageDataRepository.save(billingMessage);
 					        	  }
 				        	  	}

@@ -9,9 +9,14 @@ import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
 import org.mifosplatform.useradministration.domain.AppUser;
 
 @Entity
-@Table(name="temp")
+@Table(name="b_client_register")
 public class SelfCareTemporary extends AbstractAuditableCustom<AppUser, Long>{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Column(name="username")
 	private String userName;
 	

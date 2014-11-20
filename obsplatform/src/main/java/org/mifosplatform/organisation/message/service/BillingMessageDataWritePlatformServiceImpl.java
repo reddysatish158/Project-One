@@ -35,7 +35,7 @@ public class BillingMessageDataWritePlatformServiceImpl implements BillingMessag
 		final List<BillingMessageTemplateData> clientData = this.billingMesssageReadPlatformService.retrieveData(id, json, 
 				templateData, messageparam, billingMesssageReadPlatformService);
 
-		return new CommandProcessingResultBuilder().withCommandId(id).withEntityId(id).build();
+		return new CommandProcessingResultBuilder().withEntityId(id).build();
 
 	}
 }

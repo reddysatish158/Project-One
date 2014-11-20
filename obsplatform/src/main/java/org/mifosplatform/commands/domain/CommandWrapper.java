@@ -27,16 +27,16 @@ public class CommandWrapper {
     private final Long supportedEntityId;
     
     public static CommandWrapper wrap(final String actionName, final String entityName, final Long resourceId, final Long subresourceId, final Long loginId) {
-        return new CommandWrapper(null, actionName, entityName, resourceId, subresourceId, null);
+        return new CommandWrapper(null, actionName, entityName, resourceId, subresourceId, null,null);
     }
 
     public static CommandWrapper fromExistingCommand(final Long commandId, final String actionName, final String entityName,
-            final Long resourceId, final Long subresourceId, final String resourceGetUrl) {
-        return new CommandWrapper(commandId, actionName, entityName, resourceId, subresourceId, resourceGetUrl);
+            final Long resourceId, final Long subresourceId, final String resourceGetUrl,final Long clientId) {
+        return new CommandWrapper(commandId, actionName, entityName, resourceId, subresourceId, resourceGetUrl,clientId);
     }
 
     private CommandWrapper(final Long commandId, final String actionName, final String entityName, final Long resourceId,
-            final Long subresourceId, final String resourceGetUrl) {
+            final Long subresourceId, final String resourceGetUrl,final Long clientId) {
         this.commandId = commandId;
         this.officeId = null;
         this.groupId = null;
@@ -46,7 +46,7 @@ public class CommandWrapper {
         this.actionName = actionName;
         this.entityName = entityName;
         this.taskPermissionName = actionName + "_" + entityName;
-        this.entityId = resourceId;
+        this.entityId = (clientId==null) ? resourceId : clientId;
         this.subentityId = subresourceId;
         this.codeId = null;
         this.supportedEntityType = null;
@@ -1216,5 +1216,8 @@ public class CommandWrapper {
 
 		public boolean isActive() {
 			return this.entityName.equalsIgnoreCase("PROVISIONACTIONS") && this.actionName.equalsIgnoreCase("ACTIVE");
+		}
+		public boolean isPaymentGatewayConfigResource() {
+			return this.entityName.equalsIgnoreCase("PAYMENTGATEWAYCONFIG");
 		}
 }

@@ -8,6 +8,7 @@ import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext
 import org.mifosplatform.organisation.message.domain.BillingMessage;
 import org.mifosplatform.organisation.message.domain.BillingMessageRepository;
 import org.mifosplatform.organisation.message.domain.BillingMessageTemplate;
+import org.mifosplatform.organisation.message.domain.BillingMessageTemplateConstants;
 import org.mifosplatform.organisation.message.domain.BillingMessageTemplateRepository;
 import org.mifosplatform.organisation.message.exception.EmailNotFoundException;
 import org.mifosplatform.useradministration.domain.AppUser;
@@ -36,7 +37,7 @@ public class EventActionMappingHelper {
 	public void sendEmailAction(TicketMasterData data, TicketMaster ticketMaster, String resourceId, String ticketURL, String eventName, String mailId) {
 		
 		
-		  List<BillingMessageTemplate> billingMessageTemplate = this.messageTemplateRepository.findByTemplateDescription("TICKET_TEMPLATE");
+		  BillingMessageTemplate billingMessageTemplate = this.messageTemplateRepository.findByTemplateDescription(BillingMessageTemplateConstants.MESSAGE_TEMPLATE_TICKET_TEMPLATE);
 		  String value=ticketURL+""+resourceId;
 		  BillingMessage billingMessage =null;
 		  String removeUrl="<br/><b>URL : </b>"+"<a href="+value+">View Ticket</a>";
@@ -49,19 +50,21 @@ public class EventActionMappingHelper {
 		  
 		  	if(EventActionConstants.EVENT_CREATE_TICKET.equalsIgnoreCase(eventName)){
 		  		billingMessage = new BillingMessage("CREATE TICKET", data.getProblemDescription()+"<br/>"
-		  	             +ticketMaster.getDescription()+"\n"+removeUrl, "", mailId, mailId,"Ticket:"+resourceId, "N", billingMessageTemplate.get(0),'E',null);
-				  
+		  	             +ticketMaster.getDescription()+"\n"+removeUrl, "", mailId, mailId,"Ticket:"+resourceId, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_STATUS, 
+		  	             billingMessageTemplate, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_MESSAGE_TYPE, null);			
 	           
 		  	}else if(EventActionConstants.EVENT_EDIT_TICKET.equalsIgnoreCase(eventName)){
 		  		  billingMessage = new BillingMessage("ADD COMMENT", data.getProblemDescription()+"<br/>"
 		  				+ticketMaster.getDescription()+"<br/>"+"COMMENT: "+data.getLastComment()+"<br/>"+removeUrl, "", mailId,mailId,
-		  				"Ticket:"+resourceId, "N", billingMessageTemplate.get(0),'E',null);
+		  				"Ticket:"+resourceId, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_STATUS, billingMessageTemplate,
+		  				BillingMessageTemplateConstants.MESSAGE_TEMPLATE_MESSAGE_TYPE, null);
 		  	
 		  	}else if(EventActionConstants.EVENT_CLOSE_TICKET.equalsIgnoreCase(eventName)){
         	  	
     	  			 billingMessage = new BillingMessage("CLOSED TICKET", data.getProblemDescription()+"<br/>"
     	  			+ticketMaster.getDescription()+"<br/>"+"RESOLUTION: \t"+ticketMaster.getResolutionDescription()+"<br/>"+removeUrl, "", mailId,mailId,
-					"Ticket:"+resourceId, "N", billingMessageTemplate.get(0),'E',null);
+					"Ticket:"+resourceId, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_STATUS, billingMessageTemplate, 
+					BillingMessageTemplateConstants.MESSAGE_TEMPLATE_MESSAGE_TYPE, null);
     	  }
 		  	this.messageDataRepository.save(billingMessage);
 		}

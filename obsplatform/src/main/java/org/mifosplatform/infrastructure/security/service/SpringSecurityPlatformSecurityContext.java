@@ -5,6 +5,7 @@
  */
 package org.mifosplatform.infrastructure.security.service;
 
+import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.useradministration.domain.AppUser;
 import org.mifosplatform.useradministration.exception.UnAuthenticatedUserException;
 import org.springframework.security.core.Authentication;
@@ -34,4 +35,22 @@ public class SpringSecurityPlatformSecurityContext implements PlatformSecurityCo
 
         return currentUser;
     }
+
+	@Override
+	public AppUser authenticatedUser(CommandWrapper commandWrapper) {
+		
+		AppUser currentUser = null;
+        final SecurityContext context = SecurityContextHolder.getContext();
+        if (context != null) {
+            final Authentication auth = context.getAuthentication();
+            if (auth != null) {
+                currentUser = (AppUser) auth.getPrincipal();
+            }
+        }
+
+        if (currentUser == null) { throw new UnAuthenticatedUserException(); }
+        
+        return currentUser;
+	}
+	
 }

@@ -62,8 +62,8 @@ public class DiscountWritePlatformServiceImpl implements
 			this.apiJsonDeserializer.validateForCreate(command.json());
 			DiscountMaster discountMaster = DiscountMaster.fromJson(command);
 			this.discountMasterRepository.save(discountMaster);
-			return new CommandProcessingResult(discountMaster.getId());
-
+			return new CommandProcessingResultBuilder().withCommandId(command.commandId())
+					        .withEntityId(discountMaster.getId()).build();
 		} catch (DataIntegrityViolationException dve) {
 			handleCodeDataIntegrityIssues(command, dve);
 			return new CommandProcessingResult(Long.valueOf(-1));

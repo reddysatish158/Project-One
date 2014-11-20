@@ -6,6 +6,9 @@ import org.mifosplatform.billing.selfcare.exception.SelfCareIdNotFoundException;
 import org.mifosplatform.billing.selfcare.service.SelfCareRepository;
 import org.mifosplatform.cms.mediadevice.exception.DeviceDetailsInActiveException;
 import org.mifosplatform.cms.mediadevice.exception.DeviceIdNotFoundException;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
@@ -28,19 +31,23 @@ public class MediaDeviceWritePlatformServiceImpl implements MediaDeviceWritePlat
 	private final MediaDeviceReadPlatformService mediaDeviceReadPlatformService;
 	private final SelfCareRepository selfCareRepository;
 	private final MessagePlatformEmailService messagePlatformEmailService;
+	private final ConfigurationRepository configurationRepository;
 	
 	@Autowired
 	public MediaDeviceWritePlatformServiceImpl(final PlatformSecurityContext context,
 			final OwnedHardwareJpaRepository ownedHardwareJpaRepository,
 			final MediaDeviceReadPlatformService mediaDeviceReadPlatformService, 
 			final SelfCareRepository selfCareRepository, 
-			final MessagePlatformEmailService messagePlatformEmailService){
+			final MessagePlatformEmailService messagePlatformEmailService,
+			final ConfigurationRepository configurationRepository){
 		
 		this.context = context;
 		this.ownedHardwareJpaRepository  = ownedHardwareJpaRepository;
 		this.mediaDeviceReadPlatformService = mediaDeviceReadPlatformService;
 		this.selfCareRepository = selfCareRepository;
 		this.messagePlatformEmailService = messagePlatformEmailService;
+		this.configurationRepository = configurationRepository;
+		
 	}
 
 	@Override
@@ -95,15 +102,27 @@ public class MediaDeviceWritePlatformServiceImpl implements MediaDeviceWritePlat
 	@Override
 	public CommandProcessingResult updateMediaDetailsCrashStatus(Long clientId,JsonCommand command) {
 		try{
+			String message = null;
 			this.context.authenticatedUser();
 			String crashReportString = command.stringValueOfParameterNamed("crashReportString");
 			SelfCare selfCare = SelfCareRetrieveByClientId(clientId);
-			selfCare.setStatus("INACTIVE");		
-			String message = this.messagePlatformEmailService.sendGeneralMessage("shiva@openbillingsystem.com",crashReportString,"Crash Api Report");
-			if(message.equalsIgnoreCase("Success")){
-				message = clientId.toString();
+			selfCare.setStatus("INACTIVE");	
+			
+			Configuration configurationData = this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_MEDIA_CRASH_EMAIL);
+			
+			if(configurationData != null && configurationData.isEnabled() && configurationData.getValue() != null){
+				message = this.messagePlatformEmailService.sendGeneralMessage(configurationData.getValue(), crashReportString, "Crash Api Report");
+				if(message.equalsIgnoreCase("Success")){
+					message = clientId.toString();
+				}
 			}
+			
+			if(message == null){
+				message = "Please Enable the configuration Property";
+			}
+			
 			return new CommandProcessingResult(message);
+			
 	  }catch (DataIntegrityViolationException dve) {
 			handleCodeDataIntegrityIssues(command, dve);
 			return  CommandProcessingResult.empty();

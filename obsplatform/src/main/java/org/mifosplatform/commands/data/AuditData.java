@@ -12,50 +12,27 @@ import org.joda.time.DateTime;
  */
 public final class AuditData {
 
-	@SuppressWarnings("unused")
+	
 	private final Long id;
-	@SuppressWarnings("unused")
 	private final String actionName;
-	@SuppressWarnings("unused")
 	private final String entityName;
-	@SuppressWarnings("unused")
 	private final Long resourceId;
-	@SuppressWarnings("unused")
 	private final Long subresourceId;
-	@SuppressWarnings("unused")
 	private final String maker;
-	@SuppressWarnings("unused")
 	private final DateTime madeOnDate;
-	@SuppressWarnings("unused")
 	private final String checker;
-	@SuppressWarnings("unused")
 	private final DateTime checkedOnDate;
-	@SuppressWarnings("unused")
 	private final String processingResult;
-	@SuppressWarnings("unused")
 	private final String commandAsJson;
-	@SuppressWarnings("unused")
 	private final String officeName;
-	@SuppressWarnings("unused")
-	private final String groupLevelName;
-	@SuppressWarnings("unused")
 	private final String groupName;
-	@SuppressWarnings("unused")
 	private final String clientName;
-	@SuppressWarnings("unused")
-	private final String loanAccountNo;
-	@SuppressWarnings("unused")
-	private final String savingsAccountNo;
 
-	public AuditData(final Long id, final String actionName,
-			final String entityName, final Long resourceId,
-			final Long subresourceId, final String maker,
-			final DateTime madeOnDate, final String checker,
-			final DateTime checkedOnDate, final String processingResult,
-			final String commandAsJson, final String officeName,
-			final String groupLevelName, final String groupName,
-			final String clientName, final String loanAccountNo,
-			final String savingsAccountNo) {
+
+	public AuditData(final Long id, final String actionName,final String entityName, final Long resourceId,
+			final Long subresourceId, final String maker,final DateTime madeOnDate, final String checker,
+			final DateTime checkedOnDate, final String processingResult,final String commandAsJson, final String officeName, 
+			final String groupName,final String clientName) {
 
 		this.id = id;
 		this.actionName = actionName;
@@ -69,10 +46,64 @@ public final class AuditData {
 		this.commandAsJson = commandAsJson;
 		this.processingResult = processingResult;
 		this.officeName = officeName;
-		this.groupLevelName = groupLevelName;
 		this.groupName = groupName;
 		this.clientName = clientName;
-		this.loanAccountNo = loanAccountNo;
-		this.savingsAccountNo = savingsAccountNo;
 	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public String getActionName() {
+		return actionName;
+	}
+
+	public String getEntityName() {
+		return entityName;
+	}
+
+	public Long getResourceId() {
+		return resourceId;
+	}
+
+	public Long getSubresourceId() {
+		return subresourceId;
+	}
+
+	public String getMaker() {
+		return maker;
+	}
+
+	public DateTime getMadeOnDate() {
+		return madeOnDate;
+	}
+
+	public String getChecker() {
+		return checker;
+	}
+	
+	public DateTime getCheckedOnDate() {
+		return checkedOnDate;
+	}
+	
+	public String getProcessingResult() {
+		return processingResult;
+	}
+
+	public String getCommandAsJson() {
+		return commandAsJson;
+	}
+
+	public String getOfficeName() {
+		return officeName;
+	}
+
+	public String getGroupName() {
+		return groupName;
+	}
+
+	public String getClientName() {
+		return clientName;
+	}
+	
 }

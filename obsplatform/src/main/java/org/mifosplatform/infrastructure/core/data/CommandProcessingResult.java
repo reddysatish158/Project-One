@@ -25,12 +25,13 @@ public class CommandProcessingResult {
     private final Map<String, Object> changes;
     @SuppressWarnings("unused")
     private final String resourceIdentifier;
+    private Boolean rollbackTransaction;
 
     public static CommandProcessingResult fromDetails(final Long commandId, final Long officeId, final Long groupId, final Long clientId,
             final Long loanId, final Long savingsId, final String resourceIdentifier, final Long entityId, final String transactionId,
-            final Map<String, Object> changes) {
+            final Map<String, Object> changes, final Boolean rollbackTransaction) {
         return new CommandProcessingResult(commandId, officeId, groupId, clientId, loanId, savingsId, resourceIdentifier, entityId,
-                transactionId, changes);
+                transactionId, changes,rollbackTransaction);
     }
 
     public static CommandProcessingResult commandOnlyResult(final Long commandId) {
@@ -100,7 +101,7 @@ public class CommandProcessingResult {
 
     private CommandProcessingResult(final Long commandId, final Long officeId, final Long groupId, final Long clientId, final Long loanId,
             final Long savingsId, final String resourceIdentifier, final Long resourceId, final String transactionId,
-            final Map<String, Object> changesOnly) {
+            final Map<String, Object> changesOnly,final Boolean rollbackTransaction) {
         this.commandId = commandId;
         this.officeId = officeId;
         this.groupId = groupId;
@@ -111,6 +112,7 @@ public class CommandProcessingResult {
         this.resourceId = resourceId;
         this.changes = changesOnly;
         this.transactionId = transactionId;
+        this.rollbackTransaction = rollbackTransaction;
     }
 
     private CommandProcessingResult(final Long resourceId, final Long officeId, final Long commandId, final Map<String, Object> changesOnly) {
@@ -202,4 +204,11 @@ public class CommandProcessingResult {
         final boolean noChanges = this.changes == null || this.changes.isEmpty();
         return !noChanges;
     }
+    
+    public boolean isRollbackTransaction() {
+    	return this.rollbackTransaction != null && this.rollbackTransaction;
+    	}
+    	public void setRollbackTransaction(Boolean rollbackTransaction) {
+    	this.rollbackTransaction = rollbackTransaction;
+    	}
 }

@@ -68,11 +68,10 @@ public class DatatablesApiResource {
 	@GET
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrieveDatatables(@QueryParam("apptable") final String apptable,
-			@Context final UriInfo uriInfo) {
+	public String retrieveDatatables(@QueryParam("apptable") final String apptable,@Context final UriInfo uriInfo) {
 
 		final List<DatatableData> result = this.readWriteNonCoreDataService.retrieveDatatableNames(apptable);
-		final boolean prettyPrint = ApiParameterHelper.prettyPrint(uriInfo	.getQueryParameters());
+		final boolean prettyPrint = ApiParameterHelper.prettyPrint(uriInfo.getQueryParameters());
 		return this.toApiJsonSerializer.serializePretty(prettyPrint, result);
 	}
 
@@ -115,8 +114,7 @@ public class DatatablesApiResource {
 	@Path("{datatableName}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String updateDatatable(@PathParam("datatableName") final String datatableName,
-			final String apiRequestBodyAsJson) {
+	public String updateDatatable(@PathParam("datatableName") final String datatableName,final String apiRequestBodyAsJson) {
 
 		final CommandWrapper commandRequest = new CommandWrapperBuilder().updateDatatable(datatableName, apiRequestBodyAsJson).build();
 		final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
@@ -132,15 +130,10 @@ public class DatatablesApiResource {
 	@Path("{datatableName}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String deleteDatatable(
-			@PathParam("datatableName") final String datatableName,
-			final String apiRequestBodyAsJson) {
+	public String deleteDatatable(@PathParam("datatableName") final String datatableName,final String apiRequestBodyAsJson) {
 
-		final CommandWrapper commandRequest = new CommandWrapperBuilder()
-				.deleteDatatable(datatableName).build();
-
-		final CommandProcessingResult result = this.commandSourceWritePlatformService
-				.logCommandSource(commandRequest);
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteDatatable(datatableName).build();
+		final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 	}
 
