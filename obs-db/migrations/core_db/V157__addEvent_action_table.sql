@@ -10,14 +10,6 @@
   UNIQUE KEY `provisining_key` (`provision_type`)
 );
 
-
-insert ignore into b_provisioning_actions values(null,'Create Client','ACTIVATION','Beenius','Y','N');
-insert ignore into b_provisioning_actions values (null,'Close Client','TERMINATE','Beenius','Y','N');
-insert ignore into b_provisioning_actions values (null,'Event Order','PROVISION IT','Beenius','Y','N');
-insert ignore into m_permission values(null,'billing','ACTIVE_PROVISIONACTIONS','PROVISIONACTIONS','ACTIVE',0);
-
-DELETE FROM b_eventaction_mapping  WHERE  event_name='Event Order';
-
 Drop procedure IF EXISTS makercheker; 
 DELIMITER //
 create procedure makercheker() 
@@ -32,3 +24,9 @@ END //
 DELIMITER ;
 call makercheker();
 Drop procedure IF EXISTS makercheker;
+
+insert ignore into b_provisioning_actions values(null,'Create Client','ACTIVATION','Beenius','Y','N');
+insert ignore into b_provisioning_actions values (null,'Close Client','TERMINATE','Beenius','Y','N');
+insert ignore into b_provisioning_actions values (null,'Event Order','PROVISION IT','Beenius','Y','N');
+DELETE FROM b_eventaction_mapping  WHERE  event_name='Event Order';
+insert ignore into m_permission values(null,'billing','ACTIVE_PROVISIONACTIONS','PROVISIONACTIONS','ACTIVE',0);
