@@ -65,33 +65,22 @@ public class AuditsApiResource {
 	@GET
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrieveAuditEntries(
-			@Context final UriInfo uriInfo,
-			@QueryParam("actionName") final String actionName,
-			@QueryParam("entityName") final String entityName,
-			@QueryParam("resourceId") final Long resourceId,
-			@QueryParam("makerId") final Long makerId,
-			@QueryParam("makerDateTimeFrom") final String makerDateTimeFrom,
-			@QueryParam("makerDateTimeTo") final String makerDateTimeTo,
-			@QueryParam("checkerId") final Long checkerId,
-			@QueryParam("checkerDateTimeFrom") final String checkerDateTimeFrom,
-			@QueryParam("checkerDateTimeTo") final String checkerDateTimeTo,
-			@QueryParam("processingResult") final Integer processingResult,
-			@QueryParam("officeId") final Integer officeId,
-			@QueryParam("groupId") final Integer groupId,
-			@QueryParam("clientId") final Integer clientId) {
+	public String retrieveAuditEntries(@Context final UriInfo uriInfo,@QueryParam("actionName") final String actionName,
+			@QueryParam("entityName") final String entityName,@QueryParam("resourceId") final Long resourceId,
+			@QueryParam("makerId") final Long makerId,@QueryParam("makerDateTimeFrom") final String makerDateTimeFrom,
+			@QueryParam("makerDateTimeTo") final String makerDateTimeTo,@QueryParam("checkerId") final Long checkerId,
+			@QueryParam("checkerDateTimeFrom") final String checkerDateTimeFrom,@QueryParam("checkerDateTimeTo") final String checkerDateTimeTo,
+			@QueryParam("processingResult") final Integer processingResult,@QueryParam("officeId") final Integer officeId,
+			@QueryParam("groupId") final Integer groupId,@QueryParam("clientId") final Integer clientId) {
 
-		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-
-		final String extraCriteria = getExtraCriteria(actionName, entityName,
+			context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+			final String extraCriteria = getExtraCriteria(actionName, entityName,
 				resourceId, makerId, makerDateTimeFrom, makerDateTimeTo,
 				checkerId, checkerDateTimeFrom, checkerDateTimeTo,
 				processingResult, officeId, groupId, clientId);
 
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-
 		final Collection<AuditData> auditEntries = this.auditReadPlatformService.retrieveAuditEntries(extraCriteria, settings.isIncludeJson());
-
 		return this.toApiJsonSerializer.serialize(settings, auditEntries,RESPONSE_DATA_PARAMETERS);
 	}
 
@@ -125,12 +114,9 @@ public class AuditsApiResource {
 		return this.toApiJsonSerializerSearchTemplate.serialize(settings,auditSearchData, RESPONSE_DATA_PARAMETERS_SEARCH_TEMPLATE);
 	}
 
-	private String getExtraCriteria(final String actionName,
-			final String entityName, final Long resourceId, final Long makerId,
-			final String makerDateTimeFrom, final String makerDateTimeTo,
-			final Long checkerId, final String checkerDateTimeFrom,
-			final String checkerDateTimeTo, final Integer processingResult,
-			final Integer officeId, final Integer groupId,final Integer clientId) {
+	private String getExtraCriteria(final String actionName,final String entityName, final Long resourceId, final Long makerId,
+			final String makerDateTimeFrom, final String makerDateTimeTo,final Long checkerId, final String checkerDateTimeFrom,
+			final String checkerDateTimeTo, final Integer processingResult,final Integer officeId, final Integer groupId,final Integer clientId) {
 
 		String extraCriteria = "";
 
