@@ -10,6 +10,20 @@
   UNIQUE KEY `provisining_key` (`provision_type`)
 );
 
+Drop procedure IF EXISTS makercheker; 
+DELIMITER //
+create procedure makercheker() 
+Begin
+IF  EXISTS (
+     SELECT * FROM information_schema.COLUMNS
+     WHERE TABLE_NAME = 'm_portfolio_command_source' and COLUMN_NAME ='command_as_json' and IS_NULLABLE='NO'
+     and TABLE_SCHEMA = DATABASE())THEN
+ALTER TABLE m_portfolio_command_source CHANGE COLUMN `command_as_json` `command_as_json` TEXT DEFAULT NULL;
+END IF;
+END //
+DELIMITER ;
+call makercheker();
+Drop procedure IF EXISTS makercheker;
 
 insert ignore into b_provisioning_actions values(null,'Create Client','ACTIVATION','Beenius','Y','N');
 insert ignore into b_provisioning_actions values (null,'Close Client','TERMINATE','Beenius','Y','N');
