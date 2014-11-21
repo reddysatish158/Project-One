@@ -8,6 +8,8 @@ public interface PrepareRequestWriteplatformService {
 
 	CommandProcessingResult prepareNewRequest(Order order,Plan plan, String requstStatus);
 
+	void prepareRequestForRegistration(Long id, String action,String provisioningSystem);
+
 
 
 }

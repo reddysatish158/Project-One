@@ -387,13 +387,15 @@ try{
 			//for Prepare Request
 		final String requstStatus = UserActionStatusTypeEnum.DISCONNECTION.toString();
 		Long processingResultId = Long.valueOf(0);
-		if(ProvisioningApiConstants.PROV_PACKETSPAN.equalsIgnoreCase(plan.getProvisionSystem())){
-			this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order, plan.getPlanCode(), UserActionStatusTypeEnum.DISCONNECTION.toString(),
-					processingResultId, null, null, order.getId());
-		}else{
-			CommandProcessingResult processingResult = this.prepareRequestWriteplatformService.prepareNewRequest(order, plan, requstStatus);
+		//if(ProvisioningApiConstants.PROV_PACKETSPAN.equalsIgnoreCase(plan.getProvisionSystem())){
+		CommandProcessingResult processingResult=this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order, plan.getPlanCode(), UserActionStatusTypeEnum.DISCONNECTION.toString(),
+					processingResultId, null, null, order.getId(),plan.getProvisionSystem(),
+					this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
+		//}else{
+			//CommandProcessingResult processingResult = this.prepareRequestWriteplatformService.prepareNewRequest(order, plan, requstStatus);
+			//this.prepareRequestReadplatformService.processingClientDetails(requestData, configProp);
 			processingResultId = processingResult.commandId();
-		}
+		//}
 		
 		//For Order History
 		final OrderHistory orderHistory = new OrderHistory(order.getId(), new LocalDate(), new LocalDate(), processingResultId, requstStatus, getUserId(), null);
@@ -470,20 +472,22 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 	  orderDetails.setRenewalDate(newStartdate.toDate());
 	  this.orderRepository.save(orderDetails);
 
-	  Set<PlanDetails> planDetails=plan.getDetails();
-	  ServiceMaster serviceMaster=this.serviceMasterRepository.findOneByServiceCode(planDetails.iterator().next().getServiceCode());
-	  
+	//  Set<PlanDetails> planDetails=plan.getDetails();
+	 // ServiceMaster serviceMaster=this.serviceMasterRepository.findOneByServiceCode(planDetails.iterator().next().getServiceCode());
+	  Long resourceId=Long.valueOf(0);
 	  	if(!plan.getProvisionSystem().equalsIgnoreCase("None")){
-		    	 if(serviceMaster.isAuto() == 'Y' && requestStatusForProv != null){
-		    	 	this.prepareRequestWriteplatformService.prepareNewRequest(orderDetails,plan,requestStatusForProv);
-		    	 }else{
-		    		 this.provisioningWritePlatformService.postOrderDetailsForProvisioning(orderDetails,plan.getPlanCode(),UserActionStatusTypeEnum.ACTIVATION.toString(),
-		    				 Long.valueOf(0),null,null,orderDetails.getId());
-		    	 }
+		    	// if(serviceMaster.isAuto() == 'Y' && requestStatusForProv != null){
+		    	 	//this.prepareRequestWriteplatformService.prepareNewRequest(orderDetails,plan,requestStatusForProv);
+		    	// }else{
+		    		 CommandProcessingResult commandProcessingResult=this.provisioningWritePlatformService.postOrderDetailsForProvisioning(orderDetails,plan.getPlanCode(),requestStatusForProv,
+		    				 Long.valueOf(0),null,null,orderDetails.getId(),plan.getProvisionSystem(),
+		    				 this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
+		    		 resourceId=commandProcessingResult.resourceId();
+		    	// }
 		     }
 
 		     //For Order History
-   			OrderHistory orderHistory=new OrderHistory(orderDetails.getId(),new LocalDate(),newStartdate,null,requstStatus,userId,description);
+   			OrderHistory orderHistory=new OrderHistory(orderDetails.getId(),new LocalDate(),newStartdate,resourceId,requstStatus,userId,description);
    			this.orderHistoryRepository.save(orderHistory);
    			
    			return new CommandProcessingResult(Long.valueOf(orderDetails.getClientId()),orderDetails.getClientId());
@@ -554,11 +558,12 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 		   				
 		   				//for Prepare Request
 		   				String requstStatus = UserActionStatusTypeEnum.RECONNECTION.toString().toString();
-		   				CommandProcessingResult processingResult=this.prepareRequestWriteplatformService.prepareNewRequest(order,plan,requstStatus);
-		   					if(plan.getProvisionSystem().equalsIgnoreCase(ProvisioningApiConstants.PROV_PACKETSPAN)){
-		   						this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order,plan.getPlanCode(), requstStatus,
-		   								processingResult.resourceId(),null,null,order.getId());
-		   					}
+		   				//CommandProcessingResult processingResult=this.prepareRequestWriteplatformService.prepareNewRequest(order,plan,requstStatus);
+		   				//	if(plan.getProvisionSystem().equalsIgnoreCase(ProvisioningApiConstants.PROV_PACKETSPAN)){
+		   				CommandProcessingResult processingResult =this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order,plan.getPlanCode(), requstStatus,
+		   								Long.valueOf(0),null,null,order.getId(),plan.getProvisionSystem(),
+		   								this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
+		   					//}
 			
 		   					//For Order History
 		   			OrderHistory orderHistory=new OrderHistory(order.getId(),new LocalDate(),new LocalDate(),processingResult.commandId(),requstStatus,getUserId(),null);
@@ -695,16 +700,18 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 		Long processResuiltId=new Long(0);
 		
 			if(!plan.getProvisionSystem().equalsIgnoreCase("None")){
-				Set<PlanDetails> planDetails=plan.getDetails();
-				ServiceMaster serviceMaster=this.serviceMasterRepository.findOneByServiceCode(planDetails.iterator().next().getServiceCode());
+				//Set<PlanDetails> planDetails=plan.getDetails();
+				//ServiceMaster serviceMaster=this.serviceMasterRepository.findOneByServiceCode(planDetails.iterator().next().getServiceCode());
 				
-				if(serviceMaster.isAuto() == 'Y'){
-					CommandProcessingResult processingResult=this.prepareRequestWriteplatformService.prepareNewRequest(newOrder,plan,UserActionStatusTypeEnum.CHANGE_PLAN.toString());
-					processResuiltId=processingResult.commandId();
-				}else{
-					this.provisioningWritePlatformService.postOrderDetailsForProvisioning(newOrder, plan.getCode(), UserActionStatusTypeEnum.CHANGE_PLAN.toString(), 
-							new Long(0), null, null,order.getId());
-				}
+				//if(serviceMaster.isAuto() == 'Y'){
+					//CommandProcessingResult processingResult=this.prepareRequestWriteplatformService.prepareNewRequest(newOrder,plan,UserActionStatusTypeEnum.CHANGE_PLAN.toString());
+					//processResuiltId=processingResult.commandId();
+				//}else{
+				CommandProcessingResult processingResult=this.provisioningWritePlatformService.postOrderDetailsForProvisioning(newOrder, plan.getCode(), UserActionStatusTypeEnum.CHANGE_PLAN.toString(), 
+							new Long(0), null, null,order.getId(),plan.getProvisionSystem(),
+							this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
+				processResuiltId=processingResult.commandId();
+				//}
 			}
 				
 		     
@@ -914,16 +921,18 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 							orderStatus = OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.TERMINATED).getId();
 					}else{
 							orderStatus = OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.PENDING).getId();
-							CommandProcessingResult processingResult= this.prepareRequestWriteplatformService.prepareNewRequest(order,plan,UserActionStatusTypeEnum.TERMINATION.toString());
-							resourceId=processingResult.resourceId();
+							//CommandProcessingResult processingResult= this.prepareRequestWriteplatformService.prepareNewRequest(order,plan,UserActionStatusTypeEnum.TERMINATION.toString());
+							//resourceId=processingResult.resourceId();
 					}
 						order.setStatus(orderStatus);
 						order.setuserAction(UserActionStatusTypeEnum.TERMINATION.toString());
 						this.orderRepository.saveAndFlush(order);
-							if(plan.getProvisionSystem().equalsIgnoreCase(ProvisioningApiConstants.PROV_PACKETSPAN)){
-								this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order, plan.getCode(), UserActionStatusTypeEnum.TERMINATION.toString(), 
-										resourceId, null, null,order.getId());
-							}
+							//if(plan.getProvisionSystem().equalsIgnoreCase(ProvisioningApiConstants.PROV_PACKETSPAN)){
+						CommandProcessingResult processingResult =this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order, plan.getCode(), UserActionStatusTypeEnum.TERMINATION.toString(), 
+										resourceId, null, null,order.getId(),plan.getProvisionSystem(),
+										this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
+						resourceId=processingResult.resourceId();
+							//}
 			OrderHistory orderHistory=new OrderHistory(order.getId(),new LocalDate(),new LocalDate(),resourceId,UserActionStatusTypeEnum.TERMINATION.toString(),
 											appUser.getId(),null);
 			this.orderHistoryRepository.save(orderHistory);	
@@ -956,14 +965,16 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 				     if(!plan.getProvisionSystem().equalsIgnoreCase("None")){
 				    	 final Long pendingId=this.enumDomainServiceRepository.findOneByEnumMessageProperty(StatusTypeEnum.PENDING.toString()).getEnumId();	
 				    		order.setStatus(pendingId);
-				    	  ServiceMaster serviceMaster=this.serviceMasterRepository.findOneByServiceCode(plan.getDetails().iterator().next().getServiceCode());
-				    	  if(serviceMaster.isAuto() == 'Y'){
-								final CommandProcessingResult commandProcessingResult=this.prepareRequestWriteplatformService.prepareNewRequest(order,plan,UserActionStatusTypeEnum.SUSPENTATION.toString());
-								resourceId =commandProcessingResult.resourceId();
-				    	  }else{
-				    			this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order, plan.getCode(), UserActionStatusTypeEnum.SUSPENTATION.toString(), 
-										resourceId, null, null,order.getId());
-				    	  }
+				    	 // ServiceMaster serviceMaster=this.serviceMasterRepository.findOneByServiceCode(plan.getDetails().iterator().next().getServiceCode());
+				    	  //if(serviceMaster.isAuto() == 'Y'){
+							//	final CommandProcessingResult commandProcessingResult=this.prepareRequestWriteplatformService.prepareNewRequest(order,plan,UserActionStatusTypeEnum.SUSPENTATION.toString());
+								//resourceId =commandProcessingResult.resourceId();
+				    	  //}else{
+				    			CommandProcessingResult commandProcessingResult=this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order, plan.getCode(), UserActionStatusTypeEnum.SUSPENTATION.toString(), 
+										resourceId, null, null,order.getId(),plan.getProvisionSystem(),
+										this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
+				    			resourceId =commandProcessingResult.resourceId();
+				    	  //}
 				    		  
 					}
 					order.setuserAction(UserActionStatusTypeEnum.SUSPENTATION.toString());
@@ -1002,8 +1013,8 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 
 		    if(!"None".equalsIgnoreCase(plan.getProvisionSystem()) && !ProvisioningApiConstants.PROV_PACKETSPAN.equalsIgnoreCase(plan.getProvisionSystem())){
 		    		
-				final CommandProcessingResult processingResult = this.prepareRequestWriteplatformService.prepareNewRequest(order, plan, UserActionStatusTypeEnum.REACTIVATION.toString());
-				resourceId = processingResult.resourceId();
+			//	final CommandProcessingResult processingResult = this.prepareRequestWriteplatformService.prepareNewRequest(order, plan, UserActionStatusTypeEnum.REACTIVATION.toString());
+				//resourceId = processingResult.resourceId();
 			}else{
 				EnumDomainService enumDomainService = this.enumDomainServiceRepository.findOneByEnumMessageProperty(StatusTypeEnum.ACTIVE.toString());
 						order.setStatus(enumDomainService.getEnumId());
@@ -1017,11 +1028,13 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 				this.paymentFollowupRepository.save(paymentFollowup);
 			}
 					
-			if(plan.getProvisionSystem().equalsIgnoreCase(ProvisioningApiConstants.PROV_PACKETSPAN)){
+		//	if(plan.getProvisionSystem().equalsIgnoreCase(ProvisioningApiConstants.PROV_PACKETSPAN)){
 				order.setStatus(pendingId);
-				this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order, plan.getCode(), UserActionStatusTypeEnum.REACTIVATION.toString(), 
-									resourceId, null, null, order.getId());
-			}
+				CommandProcessingResult commandProcessingResult=this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order, plan.getCode(), UserActionStatusTypeEnum.REACTIVATION.toString(), 
+									resourceId, null, null, order.getId(),plan.getProvisionSystem(),
+									this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
+				resourceId=commandProcessingResult.resourceId();
+			//}
 			
 			this.orderRepository.save(order);
 			final OrderHistory orderHistory = new OrderHistory(order.getId(),new LocalDate(),new LocalDate(),resourceId,UserActionStatusTypeEnum.REACTIVATION.toString(),

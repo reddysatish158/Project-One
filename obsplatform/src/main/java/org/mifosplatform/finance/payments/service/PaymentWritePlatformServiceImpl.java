@@ -15,12 +15,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.mifosplatform.finance.billingorder.domain.Invoice;
 import org.mifosplatform.finance.billingorder.domain.InvoiceRepository;
-import org.mifosplatform.finance.clientbalance.data.ClientBalanceData;
 import org.mifosplatform.finance.clientbalance.domain.ClientBalance;
 import org.mifosplatform.finance.clientbalance.domain.ClientBalanceRepository;
 import org.mifosplatform.finance.clientbalance.service.ClientBalanceReadPlatformService;
 import org.mifosplatform.finance.clientbalance.service.UpdateClientBalance;
-import org.mifosplatform.finance.payments.data.McodeData;
 import org.mifosplatform.finance.payments.domain.ChequePayment;
 import org.mifosplatform.finance.payments.domain.ChequePaymentRepository;
 import org.mifosplatform.finance.payments.domain.Payment;
@@ -72,19 +70,16 @@ public class PaymentWritePlatformServiceImpl implements PaymentWritePlatformServ
 	private final ClientBalanceRepository clientBalanceRepository;
 	private final ChequePaymentRepository chequePaymentRepository;
 	private final PaypalEnquireyRepository paypalEnquireyRepository;
-	private final PaymentReadPlatformService paymodeReadPlatformService ;
 	private final ConfigurationRepository globalConfigurationRepository;
 	private final PaymentCommandFromApiJsonDeserializer fromApiJsonDeserializer;
 	private final ActionDetailsReadPlatformService actionDetailsReadPlatformService; 
-	private final ClientBalanceReadPlatformService clientBalanceReadPlatformService;
 	private final ActiondetailsWritePlatformService actiondetailsWritePlatformService;
 
 	@Autowired
 	public PaymentWritePlatformServiceImpl(final PlatformSecurityContext context,final PaymentRepository paymentRepository,
-			final PaymentCommandFromApiJsonDeserializer fromApiJsonDeserializer,final ClientBalanceReadPlatformService clientBalanceReadPlatformService,
-			final ClientBalanceRepository clientBalanceRepository,final ChequePaymentRepository chequePaymentRepository,
-			final ActionDetailsReadPlatformService actionDetailsReadPlatformService,
-			final UpdateClientBalance updateClientBalance,final ActiondetailsWritePlatformService actiondetailsWritePlatformService,final PaymentReadPlatformService paymodeReadPlatformService,
+			final PaymentCommandFromApiJsonDeserializer fromApiJsonDeserializer,final ClientBalanceRepository clientBalanceRepository,
+			final ChequePaymentRepository chequePaymentRepository,final ActionDetailsReadPlatformService actionDetailsReadPlatformService,
+			final UpdateClientBalance updateClientBalance,final ActiondetailsWritePlatformService actiondetailsWritePlatformService,
 			final InvoiceRepository invoiceRepository,final ConfigurationRepository globalConfigurationRepository,
 			final PaypalEnquireyRepository paypalEnquireyRepository,final FromJsonHelper fromApiJsonHelper) {
 		
@@ -97,10 +92,8 @@ public class PaymentWritePlatformServiceImpl implements PaymentWritePlatformServ
 		this.chequePaymentRepository=chequePaymentRepository;
 		this.fromApiJsonDeserializer = fromApiJsonDeserializer;
 		this.paypalEnquireyRepository=paypalEnquireyRepository;
-		this.paymodeReadPlatformService=paymodeReadPlatformService;
 		this.globalConfigurationRepository=globalConfigurationRepository;
 		this.actionDetailsReadPlatformService=actionDetailsReadPlatformService;
-		this.clientBalanceReadPlatformService=clientBalanceReadPlatformService;
 		this.actiondetailsWritePlatformService=actiondetailsWritePlatformService; 
 		
 	}
@@ -110,62 +103,28 @@ public class PaymentWritePlatformServiceImpl implements PaymentWritePlatformServ
 	public CommandProcessingResult createPayment(final JsonCommand command) {
 		
 		try {
-			context.authenticatedUser();
-			this.fromApiJsonDeserializer.validateForCreate(command.json());
-			final List<ClientBalanceData> clientBalancedatas = clientBalanceReadPlatformService.retrieveAllClientBalances(command.entityId());
-			Long id=Long.valueOf(-1);
 			
-				if(clientBalancedatas.size() == 1)
-					id= createPayments(clientBalancedatas.get(0).getId(),command.entityId(),command);											
-				else
-					id=	createPayments(command.entityId(),command.entityId(),command);
-					if(command.stringValueOfParameterNamed("isChequeSelected").equalsIgnoreCase("yes")){
-						final ChequePayment chequePayment = ChequePayment.fromJson(command);
-						chequePayment.setPaymentId(id);
-						chequePaymentRepository.save(chequePayment);
-					}
-			
-					//Add New Action 
-					final List<ActionDetaislData> actionDetaislDatas=this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_CREATE_PAYMENT);
-						if(actionDetaislDatas.size() != 0){
-							this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,command.entityId(), id.toString(),null);
-						}
-						return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(id).withClientId(command.entityId()).build();
-		
-		} catch (DataIntegrityViolationException dve) {
-			return CommandProcessingResult.empty();
-			}
-		}
-	
-	@Transactional
-	@Override
-	public Long createPayments(final Long clientBalanceid, final Long clientid,final JsonCommand command) {
-                                                                              
-		try {
 			this.context.authenticatedUser();
-			Payment payment = null;
-			payment  = Payment.fromJson(command,clientid);
+			this.fromApiJsonDeserializer.validateForCreate(command.json());
+			Payment payment  = Payment.fromJson(command,command.entityId());
 			this.paymentRepository.saveAndFlush(payment);
-
-			final Long getPayMode = Long.parseLong(String.valueOf(payment.getPaymodeCode()));
 			
-			final McodeData payModeData=paymodeReadPlatformService.retrieveSinglePaymode(getPayMode);
-		
-			/* Manoj code for updating client balance */
-              
-			ClientBalance clientBalance = null;
-			if(clientBalanceid!=null)
-			clientBalance = clientBalanceRepository.findOne(clientBalanceid);
-
-			if(clientBalance != null){
-				clientBalance = updateClientBalance.doUpdatePaymentClientBalance(clientid,command,clientBalance);
-
-			}else if(clientBalance == null){
-
-				clientBalance = updateClientBalance.createPaymentClientBalance(clientid,command, clientBalance);
+			if(command.stringValueOfParameterNamed("isChequeSelected").equalsIgnoreCase("yes")){
+				final ChequePayment chequePayment = ChequePayment.fromJson(command);
+				chequePayment.setPaymentId(payment.getId());
+				chequePaymentRepository.save(chequePayment);
 			}
-
-			updateClientBalance.saveClientBalanceEntity(clientBalance);
+			
+			ClientBalance clientBalance=this.clientBalanceRepository.findByClientId(payment.getClientId());
+			
+			if(clientBalance != null){
+				clientBalance.updateBalance("CREDIT",payment.getAmountPaid(),payment.isWalletPayment());
+			
+			}else if(clientBalance == null){
+                    BigDecimal balance=BigDecimal.ZERO.subtract(payment.getAmountPaid());
+				clientBalance =ClientBalance.create(payment.getClientId(),balance,payment.isWalletPayment());
+			}
+			this.clientBalanceRepository.saveAndFlush(clientBalance);
 			
 			//Update Invoice Amount
 			if(payment.getInvoiceId() != null){
@@ -175,15 +134,20 @@ public class PaymentWritePlatformServiceImpl implements PaymentWritePlatformServ
 				this.invoiceRepository.save(invoice);
 				
 			}
-		
-			return payment.getId();
+			//Add New Action 
+			final List<ActionDetaislData> actionDetaislDatas=this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_CREATE_PAYMENT);
+				if(actionDetaislDatas.size() != 0){
+					this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,command.entityId(),payment.getId().toString(),null);
+				}
+				return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(payment.getId()).withClientId(command.entityId()).build();
 
+			
+			
 		} catch (DataIntegrityViolationException dve) {
-			handleDataIntegrityIssues(command, dve);
-			return Long.valueOf(-1);
+			return CommandProcessingResult.empty();
+			}
 		}
-	}
-
+	
 	@Override
 	public CommandProcessingResult cancelPayment(final JsonCommand command,final Long paymentId) {
 		
@@ -197,13 +161,14 @@ public class PaymentWritePlatformServiceImpl implements PaymentWritePlatformServ
 			payment.cancelPayment(command);
 			this.paymentRepository.save(payment);
 			final ClientBalance clientBalance = clientBalanceRepository.findByClientId(payment.getClientId());
-			clientBalance.setBalanceAmount(clientBalance.getBalanceAmount().add(payment.getAmountPaid()));
+			clientBalance.setBalanceAmount(payment.getAmountPaid(),payment.isWalletPayment());
 			this.clientBalanceRepository.save(clientBalance);
 			
 			return new CommandProcessingResult(paymentId,payment.getClientId());
 			
 			
 		}catch(DataIntegrityViolationException exception){
+			handleDataIntegrityIssues(command, exception);
 			return CommandProcessingResult.empty();
 		}
 		

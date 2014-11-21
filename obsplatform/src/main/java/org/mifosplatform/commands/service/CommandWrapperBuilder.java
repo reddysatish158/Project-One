@@ -2521,6 +2521,14 @@ public CommandWrapperBuilder updateUploadFile(Long uploadFileId) {
 	return this;
 }
 
+public CommandWrapperBuilder activeProvisionActions(Long provisionActionId) {
+	
+	this.actionName = "ACTIVE";
+	this.entityName = "PROVISIONACTIONS";
+	this.entityId = provisionActionId;
+	this.href = "/provisioningactions/" +provisionActionId;
+	return this;
+}
 public CommandWrapperBuilder updatePaymentGatewayConfig(Long configId) {
 	this.actionName = "UPDATE";
 	this.entityName = "PAYMENTGATEWAYCONFIG";

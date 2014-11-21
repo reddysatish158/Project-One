@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.service.DataSourcePerTenantService;
 import org.mifosplatform.logistics.onetimesale.data.AllocationDetailsData;
 import org.mifosplatform.portfolio.allocation.service.AllocationReadPlatformService;
@@ -137,16 +138,18 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 			}
 
  @Override
- public void processingClientDetails(PrepareRequestData requestData,String configProp) {
+ public CommandProcessingResult processingClientDetails(PrepareRequestData requestData,String configProp) {
    try{
 		String requestType=null;
 		String sentMessage=null;			        
-		
+		ProcessRequest processRequest=null;
+		Long processResultId=Long.valueOf(0);
 		Order order=this.orderRepository.findOne(requestData.getOrderId());
 		AllocationDetailsData detailsData=this.allocationReadPlatformService.getTheHardwareItemDetails(requestData.getOrderId(),configProp);
 		requestType=requestData.getRequestType();
 		
 		PrepareRequest prepareRequest=this.prepareRequsetRepository.findOne(requestData.getRequestId());
+		
 		if(requestData.getIshardwareReq().equalsIgnoreCase("Y") && detailsData == null){
 			String status=OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.PENDING).getValue().toString();
 			prepareRequest.setStatus(status);
@@ -155,12 +158,14 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 			//Update Order Status
 			order.setStatus(OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.PENDING).getId());
 			this.orderRepository.saveAndFlush(order);
+		
 		}else {
+			
 			String HardWareId=null;
 			if(detailsData!=null){
 				HardWareId=detailsData.getSerialNo();
 			}
-			ProcessRequest processRequest=new ProcessRequest(requestData.getRequestId(),order.getClientId(), order.getId(),
+			 processRequest=new ProcessRequest(requestData.getRequestId(),order.getClientId(), order.getId(),
 					requestData.getProvisioningSystem(),requestType,'N','N');
 			List<OrderLine> orderLineData=order.getServices();
 			
@@ -204,6 +209,7 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 					processRequest.add(processRequestDetails);
 					
 			}else{
+				
 				for(OrderLine orderLine:orderLineData){
 					List<ProvisionServiceDetails> provisionServiceDetails=this.provisionServiceDetailsRepository.findOneByServiceId(orderLine.getServiceId());
 					ServiceMaster service=this.serviceMasterRepository.findOne(orderLine.getServiceId());
@@ -226,17 +232,24 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 			}
 			this.processRequestRepository.save(processRequest);				
 			//PrepareRequest prepareRequest=this.prepareRequsetRepository.findOne(requestData.getRequestId());
-			prepareRequest.setIsProvisioning('Y');
 			String status=OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.ACTIVE).getValue().toString();
-			prepareRequest.setStatus(status);
-			this.prepareRequsetRepository.save(prepareRequest);
+			processResultId=processRequest.getId();
+			
+			if(prepareRequest != null){
+				prepareRequest.setIsProvisioning('Y');
+				prepareRequest.setStatus(status);
+				this.prepareRequsetRepository.save(prepareRequest);
+			}
 		}
 		if(requestData.getProvisioningSystem().equalsIgnoreCase("None")){
 			order.setStatus(new Long(1));
 			this.orderRepository.save(order);
 		}
+		
+		return new CommandProcessingResult(processResultId);
    }catch(Exception exception){
 	   exception.printStackTrace();
+	   return new CommandProcessingResult(Long.valueOf(-1));
    }
  }
 

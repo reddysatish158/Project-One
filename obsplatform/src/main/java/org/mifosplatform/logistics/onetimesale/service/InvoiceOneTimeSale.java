@@ -16,6 +16,7 @@ import org.mifosplatform.finance.billingorder.domain.Invoice;
 import org.mifosplatform.finance.billingorder.service.BillingOrderWritePlatformService;
 import org.mifosplatform.finance.billingorder.service.GenerateBill;
 import org.mifosplatform.finance.billingorder.service.GenerateBillingOrderService;
+import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.logistics.onetimesale.data.OneTimeSaleData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,8 +45,9 @@ public class InvoiceOneTimeSale {
 /**
  * @param clientId
  * @param oneTimeSaleData
+ * @param b 
  */
-public void invoiceOneTimeSale(final Long clientId, final OneTimeSaleData oneTimeSaleData) {
+public CommandProcessingResult invoiceOneTimeSale(final Long clientId, final OneTimeSaleData oneTimeSaleData, boolean isWalletEnable) {
 	
 		 List<BillingOrderCommand> billingOrderCommands = new ArrayList<BillingOrderCommand>();
 
@@ -70,7 +72,9 @@ public void invoiceOneTimeSale(final Long clientId, final OneTimeSaleData oneTim
 				Invoice invoice = this.generateBillingOrderService.generateInvoice(billingOrderCommands);
 
 				// To fetch record from client_balance table
-				this.billingOrderWritePlatformService.updateClientBalance(invoice,clientId);
+				this.billingOrderWritePlatformService.updateClientBalance(invoice,clientId,isWalletEnable);
+				
+				return new CommandProcessingResult(invoice.getId());
 
 		
 
