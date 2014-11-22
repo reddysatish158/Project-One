@@ -23,6 +23,10 @@ public class UniteTypeData {
 		case HOURS:
 			optionData = new EnumOptionData(UnitEnumType.HOURS.getValue().longValue(), codePrefix + UnitEnumType.HOURS.getCode(), "HOURS");
 			break;
+		
+		case DAYS:
+			optionData = new EnumOptionData(UnitEnumType.DAYS.getValue().longValue(), codePrefix + UnitEnumType.DAYS.getCode(), "DAYS");
+			break;
 				
 		default:
 			optionData = new EnumOptionData(UnitEnumType.INVALID.getValue().longValue(), UnitEnumType.INVALID.getCode(), "INVALID");

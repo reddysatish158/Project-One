@@ -16,6 +16,7 @@ import org.mifosplatform.infrastructure.core.data.DataValidatorBuilder;
 import org.mifosplatform.infrastructure.core.exception.InvalidJsonException;
 import org.mifosplatform.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
+import org.mifosplatform.logistics.item.domain.UnitEnumType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -67,7 +68,7 @@ public final class OneTimesaleCommandFromApiJsonDeserializer {
         baseDataValidator.reset().parameter("itemId").value(itemId).notNull();
         
         final String quantity = fromApiJsonHelper.extractStringNamed("quantity", element);
-        baseDataValidator.reset().parameter("quantity").value(quantity).notBlank().integerGreaterThanZero().notExceedingLengthOf(50); 
+        baseDataValidator.reset().parameter("quantity").value(quantity).notBlank().notExceedingLengthOf(50); 
         
         final Long discountId = fromApiJsonHelper.extractLongNamed("discountId", element);
         baseDataValidator.reset().parameter("discountId").value(discountId).notNull();
@@ -107,10 +108,14 @@ public final class OneTimesaleCommandFromApiJsonDeserializer {
         final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("onetimesale");
         
-        final Integer totalPrice=fromApiJsonHelper.extractIntegerWithLocaleNamed("quantity", jsonElement);
-        baseDataValidator.reset().parameter("quantity").value(totalPrice).notNull().integerGreaterThanZero();
+        if(UnitEnumType.NUMBERS.toString().equalsIgnoreCase(fromApiJsonHelper.extractStringNamed("units", jsonElement))){
+        	final Integer totalPrice=fromApiJsonHelper.extractIntegerWithLocaleNamed("quantity", jsonElement);
+            baseDataValidator.reset().parameter("quantity").value(totalPrice).notNull().integerGreaterThanZero();
+        }else{
+        	final String quntity=fromApiJsonHelper.extractStringNamed("quantity", jsonElement);
+            baseDataValidator.reset().parameter("quantity").value(quntity).notNull();
+        }
         
-
         throwExceptionIfValidationWarningsExist(dataValidationErrors);
     }
    
