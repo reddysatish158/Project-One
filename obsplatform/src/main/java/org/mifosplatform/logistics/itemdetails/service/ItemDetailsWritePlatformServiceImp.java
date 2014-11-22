@@ -384,7 +384,7 @@ public class ItemDetailsWritePlatformServiceImp implements ItemDetailsWritePlatf
 	        	InventoryGrn grn=this.inventoryGrnRepository.findOne(inventoryItemDetails.getGrnId());
 	        	inventoryItemDetails.itemDelete();
 	        	this.inventoryItemDetailsRepository.saveAndFlush(inventoryItemDetails);
-	        	Long ReceivedItems=grn.getReceivedQuantity()-new Long(1);
+	        	Long ReceivedItems=grn.getReceivedQuantity()-Long.valueOf(1);
 	        	grn.setReceivedQuantity(ReceivedItems);
 	        	this.inventoryGrnRepository.save(grn);
 	        	return new CommandProcessingResult(id);

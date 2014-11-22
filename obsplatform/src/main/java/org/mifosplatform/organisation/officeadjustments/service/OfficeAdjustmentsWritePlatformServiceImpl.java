@@ -2,6 +2,7 @@ package org.mifosplatform.organisation.officeadjustments.service;
 
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
+import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.organisation.officeadjustments.domain.OfficeAdjustments;
 import org.mifosplatform.organisation.officeadjustments.domain.OfficeAdjustmentsRepository;
@@ -44,7 +45,8 @@ public class OfficeAdjustmentsWritePlatformServiceImpl implements
 			this.fromApiJsonDeserializer.validateForCreate(command.json());
 			final OfficeAdjustments officeAdjustment = OfficeAdjustments.fromJson(command);
 			this.officeAdjustmentsRepository.save(officeAdjustment);
-			return new CommandProcessingResult(Long.valueOf(officeAdjustment.getId()));
+			return new CommandProcessingResultBuilder().withCommandId(command.commandId())
+					        .withEntityId(officeAdjustment.getId()).withOfficeId(command.entityId()).build();
 		}catch(DataIntegrityViolationException dve) {
 			return new CommandProcessingResult(Long.valueOf(-1L));
 		}
