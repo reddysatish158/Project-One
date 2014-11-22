@@ -68,7 +68,7 @@ public final class OneTimesaleCommandFromApiJsonDeserializer {
         baseDataValidator.reset().parameter("itemId").value(itemId).notNull();
         
         final String quantity = fromApiJsonHelper.extractStringNamed("quantity", element);
-        baseDataValidator.reset().parameter("quantity").value(quantity).notBlank().notExceedingLengthOf(50); 
+        baseDataValidator.reset().parameter("quantity").value(quantity).notBlank().notExceedingLengthOf(50).positiveAmount(); 
         
         final Long discountId = fromApiJsonHelper.extractLongNamed("discountId", element);
         baseDataValidator.reset().parameter("discountId").value(discountId).notNull();
