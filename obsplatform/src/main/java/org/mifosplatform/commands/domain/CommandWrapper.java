@@ -40,7 +40,7 @@ public class CommandWrapper {
         this.commandId = commandId;
         this.officeId = null;
         this.groupId = null;
-        this.clientId = null;
+        this.clientId = clientId;
         this.loanId = null;
         this.savingsId = null;
         this.actionName = actionName;
