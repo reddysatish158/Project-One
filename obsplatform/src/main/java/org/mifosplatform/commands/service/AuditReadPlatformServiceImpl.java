@@ -123,11 +123,12 @@ public class AuditReadPlatformServiceImpl implements AuditReadPlatformService {
     public Collection<AuditData> retrieveAllEntriesToBeChecked(final String extraCriteria, final boolean includeJson) {
 
         String updatedExtraCriteria = "";
-        if (StringUtils.isNotBlank(extraCriteria))
+        if (StringUtils.isNotBlank(extraCriteria)){
             updatedExtraCriteria = " where (" + extraCriteria + ")" + " and aud.processing_result_enum = 2";
-        else
+        }
+        else{
             updatedExtraCriteria = " where aud.processing_result_enum = 2";
-
+        }
         updatedExtraCriteria += " order by aud.id";
 
         return retrieveEntries("makerchecker", updatedExtraCriteria, includeJson);
