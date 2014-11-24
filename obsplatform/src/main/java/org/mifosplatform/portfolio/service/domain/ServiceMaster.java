@@ -40,6 +40,9 @@ public class ServiceMaster extends AbstractPersistable<Long> {
 
 	@Column(name = "is_deleted")
 	private String isDeleted="n";
+	
+	@Column(name = "sort_by")
+	private Integer sortBy;
 
 
 public ServiceMaster()
@@ -168,6 +171,16 @@ public static ServiceMaster fromJson(final JsonCommand command) {
 
 	public ServiceData todata() {
 		return new ServiceData(getId(),null,null,null,this.serviceCode,this.serviceDescription,null,null,null,null);
+	}
+
+
+	public Integer getSortBy() {
+		return sortBy;
+	}
+
+
+	public void setSortBy(Integer sortBy) {
+		this.sortBy = sortBy;
 	}
 
 
