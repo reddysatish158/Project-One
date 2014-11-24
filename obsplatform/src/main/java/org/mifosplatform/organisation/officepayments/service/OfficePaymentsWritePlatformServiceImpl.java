@@ -2,6 +2,7 @@ package org.mifosplatform.organisation.officepayments.service;
 
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
+import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.organisation.officepayments.domain.OfficePayments;
@@ -48,7 +49,8 @@ public class OfficePaymentsWritePlatformServiceImpl implements OfficePaymentsWri
 			this.fromApiJsonDeserializer.validateForCreate(command.json());
 			final OfficePayments officePayments = OfficePayments.fromJson(command);
 			this.officePaymentsRepository.save(officePayments);
-			return new CommandProcessingResult(Long.valueOf(officePayments.getId()));
+			return new CommandProcessingResultBuilder().withCommandId(command.commandId())
+					     .withEntityId(officePayments.getId()).withOfficeId(command.entityId()).build();
 		}catch(DataIntegrityViolationException dve) {
 			handleCodeDataIntegrityIssues(command, dve);
 			return null;

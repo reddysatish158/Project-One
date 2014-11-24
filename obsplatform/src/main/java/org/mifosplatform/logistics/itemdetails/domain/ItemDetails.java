@@ -266,6 +266,7 @@ public class ItemDetails extends AbstractAuditableCustom<AppUser, Long>{
 	public void itemDelete() {
 	
 		this.isDeleted='Y';
+		this.serialNumber=this.serialNumber+"_"+this.getId();
 		
 	}
 
