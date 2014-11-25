@@ -66,7 +66,7 @@ public class ServiceMasterReadPlatformServiceImpl implements  ServiceMasterReadP
 		this.context.authenticatedUser();
 
 		final ServiceMapper mapper = new ServiceMapper();
-		final String sql = "select " + mapper.schema()+" where d.is_deleted='n' order by sort_by ";
+		final String sql = "select " + mapper.schema()+" where d.is_deleted='n' order by ISNULL(sort_by), sort_by ASC ";
 
 		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
 
@@ -85,7 +85,7 @@ public class ServiceMasterReadPlatformServiceImpl implements  ServiceMasterReadP
 			final String status=rs.getString("status");
 			final String isOptional=rs.getString("isOptional");
 			final String isAutoProvision=rs.getString("isAuto");
-			final Integer sortBy = rs.getInt("sortBy");
+			final String sortBy = rs.getString("sortBy");
 
 			return new ServiceMasterOptionsData(id,serviceCode,serviceDescription,serviceType,serviceUnitType,status,isOptional,isAutoProvision,sortBy);
 
