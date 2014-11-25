@@ -2,6 +2,9 @@ package org.mifosplatform.organisation.smartsearch.service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
 
 import org.joda.time.LocalDate;
 import org.mifosplatform.infrastructure.core.domain.JdbcSupport;
@@ -43,16 +46,17 @@ public AdvanceSearchReadPlafformServiceImpl(final PlatformSecurityContext securi
 		  this.context.authenticatedUser();
 		  final AdvanceSearchMapper advanceSearchMapper=new AdvanceSearchMapper();
 		  StringBuilder stringBuilder=new StringBuilder(advanceSearchMapper.schema());
-		  
+		  final Object[] objectArray = new Object[3];
+	        int arrayPos = 0;
 		  if(searchParameters.getSqlSearch() != null){
-			  stringBuilder.append(" AND (t.description LIKE '"+searchParameters.getSqlSearch()+"' OR c.display_name LIKE '"+searchParameters.getSqlSearch()+"')");
+			  stringBuilder.append(" AND (t.description LIKE '%"+searchParameters.getSqlSearch()+"%' OR c.display_name LIKE '%"+searchParameters.getSqlSearch()+"%')");
 		  }
 		  
 		  if(searchParameters.getCategory() != null){
 			  stringBuilder.append(" AND v.id="+searchParameters.getCategory());
 		  }
 		  if(searchParameters.getStatus() != null){
-			  stringBuilder.append(" AND t.status="+searchParameters.getStatus());
+			  stringBuilder.append(" AND t.status='"+searchParameters.getStatus()+"'");
 		  }
 		  if(searchParameters.getAssignedTo() != null){
 			  stringBuilder.append(" AND t.assigned_to ="+searchParameters.getAssignedTo());
@@ -60,10 +64,46 @@ public AdvanceSearchReadPlafformServiceImpl(final PlatformSecurityContext securi
 		  if(searchParameters.getClosedBy() != null){
 			  stringBuilder.append(" AND t.lastmodifiedby_id="+searchParameters.getClosedBy());
 		  }
-		  
+		  if(searchParameters.getClosedBy() != null){
+			  stringBuilder.append(" AND t.lastmodifiedby_id="+searchParameters.getClosedBy());
+		  }
+		  if (searchParameters.getFromDataParam() != null || searchParameters.getToDateParam() != null) {
+	        	
+	            final DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+	            String fromDateString = null;
+	            String toDateString = null;
+	            
+	            if (searchParameters.getFromDataParam() != null && searchParameters.getToDateParam() != null) {
+	                //sql += "  AND p.payment_date BETWEEN ? AND ?";
+	            	stringBuilder.append("  AND Date_format(t.ticket_date,'%Y-%m-%d') between ? AND ?");
+	                fromDateString = df.format(searchParameters.getFromDataParam());
+	                toDateString = df.format(searchParameters.getToDateParam());
+	                objectArray[arrayPos] = fromDateString;
+	                arrayPos = arrayPos + 1;
+	                objectArray[arrayPos] = toDateString;
+	                arrayPos = arrayPos + 1;
+	                
+	            } else if (searchParameters.getFromDataParam() != null) {
+	                //sql += " AND p.payment_date >= ? ";
+	            	stringBuilder.append(" AND  Date_format(t.ticket_date,'%Y-%m-%d') >= ? ");
+	                fromDateString = df.format(searchParameters.getFromDataParam());
+	                objectArray[arrayPos] = fromDateString;
+	                arrayPos = arrayPos + 1;
+	                
+	            } else if (searchParameters.getToDateParam() != null) {
+	                //sql += "  AND p.payment_date <= ? ";
+	            	stringBuilder.append("  AND  Date_format(t.ticket_date,'%Y-%m-%d') <= ? ");
+	                toDateString = df.format(searchParameters.getToDateParam());
+	                objectArray[arrayPos] = toDateString;
+	                arrayPos = arrayPos + 1;
+	            }
+	        }
+
+	        //sql += "  order by p.payment_date limit "+limit+" offset "+offset;
+	        final Object[] finalObjectArray = Arrays.copyOf(objectArray, arrayPos);
 		   stringBuilder.append(" order by t.id limit "+searchParameters.getLimit()+" offset "+searchParameters.getOffset());
 		   return this.paginationHelper.fetchPage(this.jdbcTemplate, "SELECT FOUND_ROWS()",stringBuilder.toString(),
-	                new Object[] {}, advanceSearchMapper);
+				   finalObjectArray, advanceSearchMapper);
 		  
 	  }catch(EmptyResultDataAccessException accessException){
 		  return null;  
