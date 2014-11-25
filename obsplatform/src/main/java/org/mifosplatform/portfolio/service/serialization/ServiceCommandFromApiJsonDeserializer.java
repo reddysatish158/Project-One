@@ -30,7 +30,7 @@ public final class ServiceCommandFromApiJsonDeserializer {
      * The parameters supported for this command.
      */
     private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("serviceCode","serviceDescription",
-    		"serviceUnitType","serviceType","status","isOptional","isAutoProvision"));
+    		"serviceUnitType","serviceType","status","isOptional","isAutoProvision","sortBy","locale"));
     private final FromJsonHelper fromApiJsonHelper;
 
     @Autowired
@@ -38,7 +38,7 @@ public final class ServiceCommandFromApiJsonDeserializer {
         this.fromApiJsonHelper = fromApiJsonHelper;
     }
 
-    public void validateForCreate(final String json) {
+    public void validateForCreate(final String json, Boolean isSortValue) {
         if (StringUtils.isBlank(json)) { throw new InvalidJsonException(); }
 
         final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
@@ -48,19 +48,23 @@ public final class ServiceCommandFromApiJsonDeserializer {
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("service");
 
         final JsonElement element = fromApiJsonHelper.parse(json);
-
-        final String serviceCode = fromApiJsonHelper.extractStringNamed("serviceCode", element);
-        baseDataValidator.reset().parameter("serviceCode").value(serviceCode).notBlank().notExceedingLengthOf(10);
-        final String serviceDescription = fromApiJsonHelper.extractStringNamed("serviceDescription", element);
-        baseDataValidator.reset().parameter("serviceDescription").value(serviceDescription).notBlank();
-        final String  serviceType = fromApiJsonHelper.extractStringNamed("serviceType", element);
-        baseDataValidator.reset().parameter("serviceType").value(serviceType).notBlank().notExceedingLengthOf(100);
-        /*final String  serviceUnitType = fromApiJsonHelper.extractStringNamed("serviceUnitType", element);
-        baseDataValidator.reset().parameter("serviceUnitType").value(serviceUnitType).notBlank();*/
-        final String  status = fromApiJsonHelper.extractStringNamed("status", element);
-        baseDataValidator.reset().parameter("status").value(status).notBlank();
+        
+        if(isSortValue){
+        	final Integer sortBy = fromApiJsonHelper.extractIntegerWithLocaleNamed("sortBy", element);
+        	baseDataValidator.reset().parameter("sortBy").value(sortBy).notExceedingLengthOf(5);
+        }else{
+        	final String serviceCode = fromApiJsonHelper.extractStringNamed("serviceCode", element);
+        	baseDataValidator.reset().parameter("serviceCode").value(serviceCode).notBlank().notExceedingLengthOf(10);
+        	final String serviceDescription = fromApiJsonHelper.extractStringNamed("serviceDescription", element);
+        	baseDataValidator.reset().parameter("serviceDescription").value(serviceDescription).notBlank();
+        	final String  serviceType = fromApiJsonHelper.extractStringNamed("serviceType", element);
+        	baseDataValidator.reset().parameter("serviceType").value(serviceType).notBlank().notExceedingLengthOf(100);
+        	/*final String  serviceUnitType = fromApiJsonHelper.extractStringNamed("serviceUnitType", element);
+        	baseDataValidator.reset().parameter("serviceUnitType").value(serviceUnitType).notBlank();*/
+        	final String  status = fromApiJsonHelper.extractStringNamed("status", element);
+        	baseDataValidator.reset().parameter("status").value(status).notBlank();
        
-
+        }
         
         throwExceptionIfValidationWarningsExist(dataValidationErrors);
     }
