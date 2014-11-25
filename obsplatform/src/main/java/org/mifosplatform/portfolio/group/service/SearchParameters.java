@@ -71,8 +71,8 @@ public final class SearchParameters {
         this.sortOrder = sortOrder;
         this.groupName=groupName;
         this.status=status;
-        this.fromDataParam=fromDateParam.getDate();
-        this.toDateParam=toDateParam.getDate();
+        this.fromDataParam=fromDateParam != null?fromDateParam.getDate():null;
+        this.toDateParam=toDateParam != null?toDateParam.getDate():null;
         this.assignedTo=assignedTo;
         this.closedBy=closedBy;
         this.category=category;
