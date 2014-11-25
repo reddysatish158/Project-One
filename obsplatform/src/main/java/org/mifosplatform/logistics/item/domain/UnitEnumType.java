@@ -4,6 +4,7 @@ public enum UnitEnumType {
 		METERS(1, "CategoryType.meters"), //
 		NUMBERS(2, "CategoryType.numbers"),
         HOURS(3, "CategoryType.hours"),
+        DAYS(4, "CategoryType.days"),
 		INVALID(4, "CategoryType.invalid");
 
 
@@ -37,7 +38,12 @@ public enum UnitEnumType {
 			case 3:
 				enumType = UnitEnumType.HOURS;
 				break;
-				default:
+				
+			case 4:
+				enumType = UnitEnumType.DAYS;
+				break;
+				
+			default:
 				enumType = UnitEnumType.INVALID;
 				break;
 			}
