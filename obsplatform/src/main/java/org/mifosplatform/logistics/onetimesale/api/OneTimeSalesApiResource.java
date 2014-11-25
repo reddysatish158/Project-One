@@ -60,7 +60,7 @@ public class OneTimeSalesApiResource {
 	private final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(Arrays.asList("itemId", "chargedatas", "itemDatas", "units",
 					"unitPrice", "saleDate", "totalprice", "quantity", "flag","allocationData", "discountMasterDatas", "id", "eventName",
 					"bookedDate", "eventPrice", "chargeCode", "status","contractPeriods"));
-
+	
 	private final String resourceNameForPermissions = "ONETIMESALE";
 	private final PlatformSecurityContext context;
 	private final DefaultToApiJsonSerializer<OneTimeSaleData> toApiJsonSerializer;
