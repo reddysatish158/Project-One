@@ -20,8 +20,8 @@ public final class SearchParameters {
     private final String sortOrder;
     private final String groupName;
     private final String status;
-    private final Date fromDataParam;
-    private final Date toDateParam;
+    private Date fromDataParam;
+    private Date toDateParam;
     private final String category;
     private final Long assignedTo;
     private final Long closedBy;

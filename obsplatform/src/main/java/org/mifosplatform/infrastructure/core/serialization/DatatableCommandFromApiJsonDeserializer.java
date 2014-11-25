@@ -101,8 +101,7 @@ public class DatatableCommandFromApiJsonDeserializer {
 				validateType(baseDataValidator, column);
 
 				final Boolean mandatory = this.fromApiJsonHelper.extractBooleanNamed("mandatory", column);
-				baseDataValidator.reset().parameter("mandatory").value(mandatory).ignoreIfNull().notBlank()
-						.isOneOfTheseValues(true, false);
+				baseDataValidator.reset().parameter("mandatory").value(mandatory).ignoreIfNull().notBlank().isOneOfTheseValues(true, false);
 			}
 		}
 
@@ -127,14 +126,11 @@ public class DatatableCommandFromApiJsonDeserializer {
 					"Provided JSON request body does not have any parameters.");
 		}
 
-		final Type typeOfMap = new TypeToken<Map<String, Object>>() {
-		}.getType();
-		this.fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json,
-				this.supportedParametersForUpdate);
+		final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
+		this.fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json,this.supportedParametersForUpdate);
 
 		final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
-		final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(
-				dataValidationErrors).resource("datatable");
+		final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("datatable");
 
 		final JsonElement element = this.fromApiJsonHelper.parse(json);
 		
