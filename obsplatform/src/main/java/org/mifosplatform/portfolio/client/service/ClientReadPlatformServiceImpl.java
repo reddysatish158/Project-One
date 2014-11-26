@@ -320,9 +320,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             builder.append(" c.email as email,c.phone as phone,c.home_phone_number as homePhoneNumber,c.activation_date as activationDate, c.image_key as imagekey,c.exempt_tax as taxExemption, ");
             builder.append(" a.address_no as addrNo,a.street as street,a.city as city,a.state as state,a.country as country, ");
             builder.append(" a.zip as zipcode,b.balance_amount as balanceAmount,b.wallet_amount as walletAmount,bc.currency as currency,");
-            builder.append(" IFNULL((  Select serial_no from b_allocation b  where c.id = b.client_id  AND b.is_deleted = 'N' limit 1");
-            builder.append(" union ");
-            builder.append(" Select serial_number from b_owned_hardware ba where c.id=ba.client_id  AND ba.is_deleted = 'N' limit 1),'No Hardware') HW_Serial");   
+            builder.append(" coalesce(ba.serial_no, oh.serial_number ,'No Device') HW_Serial ");
             builder.append(" from m_client c ");
             builder.append(" join m_office o on o.id = c.office_id ");
             builder.append(" left outer join b_client_balance b on  b.client_id = c.id ");
@@ -330,6 +328,8 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             builder.append(" left outer join  m_code_value mc on  mc.id =c.category_type  ");
             builder.append(" left outer join b_client_address a on  a.client_id = c.id ");
             builder.append(" left outer join b_country_currency bc on  bc.country = a.country ");
+            builder.append(" left outer join b_allocation ba on (c.id = ba.client_id AND ba.is_deleted = 'N')");
+            builder.append(" left outer join b_owned_hardware oh on (c.id=oh.client_id  AND oh.is_deleted = 'N')");
             this.schema = builder.toString();
         }
 
