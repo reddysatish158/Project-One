@@ -1220,4 +1220,8 @@ public class CommandWrapper {
 		public boolean isPaymentGatewayConfigResource() {
 			return this.entityName.equalsIgnoreCase("PAYMENTGATEWAYCONFIG");
 		}
+
+		public boolean isOnlinePaymentGateway() {
+			return this.actionName.equalsIgnoreCase("ONLINE") && this.entityName.equalsIgnoreCase("PAYMENTGATEWAY");
+		}
 }
