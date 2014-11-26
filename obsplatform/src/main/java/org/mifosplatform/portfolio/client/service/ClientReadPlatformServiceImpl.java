@@ -117,6 +117,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
         // DONT order by default - just use database natural ordering so doesnt
         // have to scan entire database table.
         // sql += " order by c.display_name ASC, c.account_no ASC";
+        sqlBuilder.append(" group by c.id ");
         if (searchParameters.isOrderByRequested()) {
             sqlBuilder.append(" order by ").append(searchParameters.getOrderBy()).append(' ').append(searchParameters.getSortOrder());
         }
@@ -205,7 +206,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
         	final String hierarchySearchString = hierarchy + "%";
             final Configuration configurationRepository=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);
             final ClientMapper clientMapper = new ClientMapper(configurationRepository.getValue());
-            final String sql = "select " + clientMapper.schema() + " where o.hierarchy like ? and c.id = ? and a.address_key='PRIMARY'";
+            final String sql = "select " + clientMapper.schema() + " where o.hierarchy like ? and c.id = ? and a.address_key='PRIMARY' group by c.id";
             final ClientData clientData = this.jdbcTemplate.queryForObject(sql,clientMapper,new Object[] { hierarchySearchString, clientId });
             final String clientGroupsSql = "select " + this.clientGroupsMapper.parentGroupsSchema();
 
@@ -312,28 +313,23 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
         	
         	final StringBuilder builder = new StringBuilder(400);
 
-            builder.append("c.id as id, c.account_no as accountNo,g.group_name as groupName, c.external_id as externalId, c.status_enum as statusEnum, ");
-            builder.append("c.office_id as officeId, o.name as officeName, ");
-            builder.append("c.firstname as firstname, c.middlename as middlename, c.lastname as lastname,c.is_indororp as entryType, ");
-            builder.append("c.fullname as fullname, c.display_name as displayName,mc.code_value as categoryType, ");
-            builder.append("c.email as email,c.phone as phone,c.home_phone_number as homePhoneNumber,c.activation_date as activationDate, c.image_key as imagekey,c.exempt_tax as taxExemption, ");
-            builder.append("a.address_no as addrNo,a.street as street,a.city as city,a.state as state,a.country as country, ");
+            builder.append(" c.id as id, c.account_no as accountNo,g.group_name as groupName, c.external_id as externalId, c.status_enum as statusEnum, ");
+            builder.append(" c.office_id as officeId, o.name as officeName, ");
+            builder.append(" c.firstname as firstname, c.middlename as middlename, c.lastname as lastname,c.is_indororp as entryType, ");
+            builder.append(" c.fullname as fullname, c.display_name as displayName,mc.code_value as categoryType, ");
+            builder.append(" c.email as email,c.phone as phone,c.home_phone_number as homePhoneNumber,c.activation_date as activationDate, c.image_key as imagekey,c.exempt_tax as taxExemption, ");
+            builder.append(" a.address_no as addrNo,a.street as street,a.city as city,a.state as state,a.country as country, ");
             builder.append(" a.zip as zipcode,b.balance_amount as balanceAmount,b.wallet_amount as walletAmount,bc.currency as currency,");
-            
-            if(configProp.equalsIgnoreCase(ConfigurationConstants.CONFIR_PROPERTY_SALE)){
-            	
-                builder.append("IFNULL(( Select min(serial_no) from b_allocation ba where c.id=ba.client_id  AND ba.is_deleted = 'N'),'No Hardware') HW_Serial ");
-            }else {
-            	
-            	builder.append("IFNULL(( Select min(serial_number) from b_owned_hardware ba where c.id=ba.client_id  AND ba.is_deleted = 'N'),'No Hardware') HW_Serial ");
-            }
-            builder.append("from m_client c ");
-            builder.append("join m_office o on o.id = c.office_id ");
-            builder.append("left outer join b_client_balance b on  b.client_id = c.id ");
-            builder.append("left outer join b_group g on  g.id = c.group_id ");
-            builder.append("left outer join  m_code_value mc on  mc.id =c.category_type  ");
-            builder.append("left outer join b_client_address a on  a.client_id = c.id ");
-            builder.append("left outer join b_country_currency bc on  bc.country = a.country ");
+            builder.append(" IFNULL((  Select serial_no from b_allocation b  where c.id = b.client_id  AND b.is_deleted = 'N' limit 1");
+            builder.append(" union ");
+            builder.append(" Select serial_number from b_owned_hardware ba where c.id=ba.client_id  AND ba.is_deleted = 'N' limit 1),'No Hardware') HW_Serial");   
+            builder.append(" from m_client c ");
+            builder.append(" join m_office o on o.id = c.office_id ");
+            builder.append(" left outer join b_client_balance b on  b.client_id = c.id ");
+            builder.append(" left outer join b_group g on  g.id = c.group_id ");
+            builder.append(" left outer join  m_code_value mc on  mc.id =c.category_type  ");
+            builder.append(" left outer join b_client_address a on  a.client_id = c.id ");
+            builder.append(" left outer join b_country_currency bc on  bc.country = a.country ");
             this.schema = builder.toString();
         }
 

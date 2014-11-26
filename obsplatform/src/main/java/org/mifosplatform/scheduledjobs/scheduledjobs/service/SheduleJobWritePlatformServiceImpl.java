@@ -241,6 +241,7 @@ public void processRequest() {
 	           			fw.append("Prepare Request id="+requestData.getRequestId()+" ,clientId="+requestData.getClientId()+" ,orderId="
 	           					+requestData.getOrderId()+" ,HardwareId="+requestData.getHardwareId()+" ,planName="+requestData.getPlanName()+
 	           					" ,Provisiong system="+requestData.getProvisioningSystem()+"\r\n");
+	           			
 	           			this.prepareRequestReadplatformService.processingClientDetails(requestData,globalConfiguration.getValue());
 	           		}
 	           		

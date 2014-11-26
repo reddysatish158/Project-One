@@ -16,7 +16,7 @@ public interface ItemDetailsReadPlatformService {
 
 	public ItemSerialNumberData retriveAllocationData(List<String> itemSerialNumbers,QuantityData quantityData, ItemMasterIdData itemMasterIdData);
 	
-	public AllocationHardwareData retriveInventoryItemDetail(String serialNumber, Long officeId);
+	public AllocationHardwareData retriveInventoryItemDetail(String serialNumber);
 
 	List<String> retriveSerialNumbers();
 

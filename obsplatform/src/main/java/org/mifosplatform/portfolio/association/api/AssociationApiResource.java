@@ -82,7 +82,7 @@ public class AssociationApiResource {
 		AssociationData associationData = this.associationReadplatformService.retrieveSingleDetails(id);
 		List<AssociationData> HardwareDatas = this.associationReadplatformService.retrieveHardwareData(clientId);
 		List<AssociationData> planDatas= this.associationReadplatformService.retrieveplanData(clientId);
-		HardwareDatas.add(new AssociationData(associationData.getSerialNum(),associationData.getProvisionNumber()));
+		HardwareDatas.add(new AssociationData(associationData.getSerialNum(),associationData.getProvisionNumber(),associationData.getAllocationType()));
 		AssociationData data=new AssociationData(associationData.getPlanId(),associationData.getPlanCode(),associationData.getOrderId());
 	    planDatas.add(data);
 		

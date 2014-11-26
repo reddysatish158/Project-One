@@ -9,14 +9,17 @@ public class AllocationDetailsData {
 	private final String serialNo;
 	private final LocalDate allocationDate;
 	private final Long itemDetailId;
+	private final String allocationType;
+	
 
 	public AllocationDetailsData(final Long id, final String itemDescription,
-			final String serialNo, final LocalDate allocationDate, final Long itemDetailId) {
+			final String serialNo, final LocalDate allocationDate, final Long itemDetailId, String allocationType) {
 		this.id = id;
 		this.itemDescription = itemDescription;
 		this.serialNo = serialNo;
 		this.allocationDate = allocationDate;
 		this.itemDetailId = itemDetailId;
+		this.allocationType=allocationType;
 	}
 
 	public AllocationDetailsData(final Long id, final Long orderId, final String serialNum,
@@ -27,6 +30,7 @@ public class AllocationDetailsData {
 		this.itemDescription = null;
 		this.allocationDate = null;
 		this.itemDetailId = null;
+		this.allocationType=null;
 
 	}
 
@@ -40,6 +44,12 @@ public class AllocationDetailsData {
 
 	public String getSerialNo() {
 		return serialNo;
+	}
+	
+	
+
+	public String getAllocationType() {
+		return allocationType;
 	}
 
 	public LocalDate getAllocationDate() {
