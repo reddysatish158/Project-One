@@ -110,8 +110,8 @@ public class OneTimeSaleWritePlatformServiceImpl implements OneTimeSaleWritePlat
 					updateOneTimeSale(oneTimeSaleData);
 				}
 			}
-			/**	Call if Item units is NUMBERS */
-			if(UnitEnumType.NUMBERS.toString().equalsIgnoreCase(item.getUnits())){
+			/**	Call if Item units is PIECES */
+			if(UnitEnumType.PIECES.toString().equalsIgnoreCase(item.getUnits())){
 				JsonArray serialData = fromJsonHelper.extractJsonArrayNamed("serialNumber", element);
 				for (JsonElement je : serialData) {
 					JsonObject serialNumber = je.getAsJsonObject();
@@ -193,7 +193,7 @@ public class OneTimeSaleWritePlatformServiceImpl implements OneTimeSaleWritePlat
 			ItemData itemData = this.itemReadPlatformService.retrieveSingleItemDetails(itemId);
 			List<ChargesData> chargesDatas = this.itemReadPlatformService.retrieveChargeCode();
 
-		    if(UnitEnumType.NUMBERS.toString().equalsIgnoreCase(units)){
+		    if(UnitEnumType.PIECES.toString().equalsIgnoreCase(units)){
 		    	final Integer quantity = fromJsonHelper.extractIntegerWithLocaleNamed("quantity",query.parsedJson());
 		    	totalPrice = itemprice.multiply(new BigDecimal(quantity));
 		    	return new ItemData(itemCodeData, itemData, totalPrice, quantity.toString(), discountdata, chargesDatas);
