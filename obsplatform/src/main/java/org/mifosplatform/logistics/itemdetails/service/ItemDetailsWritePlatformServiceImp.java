@@ -228,8 +228,7 @@ public class ItemDetailsWritePlatformServiceImp implements ItemDetailsWritePlatf
 			        	
 						ItemDetailsAllocation inventoryItemDetailsAllocation = ItemDetailsAllocation.fromJson(j,fromJsonHelper);
 						OneTimeSale oneTimeSale = this.oneTimeSaleRepository.findOne(inventoryItemDetailsAllocation.getOrderId());
-						AllocationHardwareData allocationHardwareData = inventoryItemDetailsReadPlatformService.retriveInventoryItemDetail(inventoryItemDetailsAllocation.getSerialNumber(),
-								                                       oneTimeSale.getOfficeId());
+						AllocationHardwareData allocationHardwareData = inventoryItemDetailsReadPlatformService.retriveInventoryItemDetail(inventoryItemDetailsAllocation.getSerialNumber());
 			        	checkHardwareCondition(allocationHardwareData);
 			        	ItemDetails inventoryItemDetails = inventoryItemDetailsRepository.findOne(allocationHardwareData.getItemDetailsId());
 						inventoryItemDetails.setItemMasterId(inventoryItemDetailsAllocation.getItemMasterId());
@@ -258,16 +257,16 @@ public class ItemDetailsWritePlatformServiceImp implements ItemDetailsWritePlatf
 						if(configurationProperty.isEnabled()){
 							configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);
 							
-							if(configurationProperty.getValue().equalsIgnoreCase(ConfigurationConstants.CONFIR_PROPERTY_SALE)){
+							//if(configurationProperty.getValue().equalsIgnoreCase(ConfigurationConstants.CONFIR_PROPERTY_SALE)){
 								ItemMaster itemMaster=this.itemRepository.findOne(inventoryItemDetails.getItemMasterId());
 								List<HardwareAssociationData> allocationDetailsDatas=this.associationReadplatformService.retrieveClientAllocatedPlan(oneTimeSale.getClientId(),itemMaster.getItemCode());						    		   
 								if(!allocationDetailsDatas.isEmpty()){
 									
 									this.associationWriteplatformService.createNewHardwareAssociation(oneTimeSale.getClientId(),
 											allocationDetailsDatas.get(0).getPlanId(),inventoryItemDetails.getSerialNumber(),
-											allocationDetailsDatas.get(0).getorderId());
+											allocationDetailsDatas.get(0).getorderId(),"ALLOT");
 						    		   }	
-									}	
+								//	}	
 						    	}	
 					}
 					return new CommandProcessingResult(entityId,clientId);

@@ -35,7 +35,6 @@ import org.mifosplatform.portfolio.order.domain.StatusTypeEnum;
 import org.mifosplatform.portfolio.order.domain.UserActionStatusTypeEnum;
 import org.mifosplatform.portfolio.plan.domain.Plan;
 import org.mifosplatform.portfolio.plan.domain.PlanRepository;
-import org.mifosplatform.provisioning.provisioning.api.ProvisioningApiConstants;
 import org.mifosplatform.provisioning.provisioning.service.ProvisioningWritePlatformService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +55,6 @@ public class HardwareSwappingWriteplatformServiceImpl implements HardwareSwappin
 	private final PlatformSecurityContext context;
 	private final HardwareAssociationWriteplatformService associationWriteplatformService;
 	private final ItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService;
-	private final PrepareRequestWriteplatformService prepareRequestWriteplatformService;
 	private final OrderRepository orderRepository;
 	private final PlanRepository  planRepository;
 	private final HardwareSwappingCommandFromApiJsonDeserializer fromApiJsonDeserializer;
@@ -70,16 +68,15 @@ public class HardwareSwappingWriteplatformServiceImpl implements HardwareSwappin
 	  
 	@Autowired
 	public HardwareSwappingWriteplatformServiceImpl(final PlatformSecurityContext context,final HardwareAssociationWriteplatformService associationWriteplatformService,
-			final ItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService,final PrepareRequestWriteplatformService prepareRequestWriteplatformService,
-			final OrderRepository orderRepository,final PlanRepository planRepository,final ProvisioningWritePlatformService provisioningWritePlatformService,
-			final HardwareSwappingCommandFromApiJsonDeserializer apiJsonDeserializer,final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService,
-			final OrderHistoryRepository orderHistoryRepository,final ConfigurationRepository configurationRepository,final OwnedHardwareJpaRepository hardwareJpaRepository,
+			final ItemDetailsWritePlatformService inventoryItemDetailsWritePlatformService,final OrderRepository orderRepository,final PlanRepository planRepository,
+			final ProvisioningWritePlatformService provisioningWritePlatformService,final HardwareSwappingCommandFromApiJsonDeserializer apiJsonDeserializer,
+			final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService,final OrderHistoryRepository orderHistoryRepository,
+			final ConfigurationRepository configurationRepository,final OwnedHardwareJpaRepository hardwareJpaRepository,
 			final HardwareAssociationReadplatformService associationReadplatformService,final ItemRepository itemRepository) {
  
 		this.context=context;
 		this.associationWriteplatformService=associationWriteplatformService;
 		this.inventoryItemDetailsWritePlatformService=inventoryItemDetailsWritePlatformService;
-		this.prepareRequestWriteplatformService=prepareRequestWriteplatformService;
 		this.orderRepository=orderRepository;
 		this.planRepository=planRepository;
 		this.fromApiJsonDeserializer=apiJsonDeserializer;
@@ -135,7 +132,8 @@ public CommandProcessingResult doHardWareSwapping(final Long entityId,final Json
 	        List<HardwareAssociationData> allocationDetailsDatas=this.associationReadplatformService.retrieveClientAllocatedPlan(ownedHardware.getClientId(),itemMaster.getItemCode());
 	    
 	        if(!allocationDetailsDatas.isEmpty()){
-	    				this.associationWriteplatformService.createNewHardwareAssociation(ownedHardware.getClientId(),allocationDetailsDatas.get(0).getPlanId(),ownedHardware.getSerialNumber(),allocationDetailsDatas.get(0).getorderId());
+	    				this.associationWriteplatformService.createNewHardwareAssociation(ownedHardware.getClientId(),allocationDetailsDatas.get(0).getPlanId(),
+	    						ownedHardware.getSerialNumber(),allocationDetailsDatas.get(0).getorderId(),"ALLOT");
 	    		   }
 	   }else{
 		
