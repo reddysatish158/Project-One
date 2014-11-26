@@ -53,8 +53,8 @@ public class BillMasterReadPlatformServiceImplementation implements
 			RowMapper<FinancialTransactionsData> {
 
 		@Override
-		public FinancialTransactionsData mapRow(final ResultSet resultSet, final int rowNum)
-									throws SQLException {
+		public FinancialTransactionsData mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {
+			
 			final Long transactionId = resultSet.getLong("transId");
 			final String transactionType = resultSet.getString("transType");
 			final BigDecimal amount = resultSet.getBigDecimal("amount");

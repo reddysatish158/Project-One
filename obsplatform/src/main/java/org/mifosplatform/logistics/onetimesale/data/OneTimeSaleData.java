@@ -54,7 +54,7 @@ public class OneTimeSaleData {
 	/*hardware allocated and flag is added by rahman */
 
 	public OneTimeSaleData(Long id, LocalDate saleDate, String itemCode,
-			String chargeCode, String quantity, BigDecimal totalPrice,String hardwareAllocated,String itemClass, String serialNo) {
+			String chargeCode, String quantity, BigDecimal totalPrice,String hardwareAllocated,String itemClass, String serialNo,String units) {
 		this.id=id;
 		this.saleDate=saleDate;
 		this.itemCode=itemCode;
@@ -65,6 +65,7 @@ public class OneTimeSaleData {
 		this.flag = hardwareAllocated.equalsIgnoreCase("ALLOCATED")?true:false;
 		this.itemClass = itemClass;
 		this.serialNo=serialNo;
+		this.units = units;
 		
 	}
 
