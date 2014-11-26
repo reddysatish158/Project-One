@@ -201,7 +201,7 @@ public class OneTimeSaleReadPlatformServiceImpl implements	OneTimeSaleReadPlatfo
             final String serialNo = rs.getString("serialNo");
 		    final LocalDate allocationDate=JdbcSupport.getLocalDate(rs,"allocationDate");
 		    
-			return new AllocationDetailsData(id,itemDescription,serialNo,allocationDate,itemDetailId);
+			return new AllocationDetailsData(id,itemDescription,serialNo,allocationDate,itemDetailId,null);
 
 		}
 	}

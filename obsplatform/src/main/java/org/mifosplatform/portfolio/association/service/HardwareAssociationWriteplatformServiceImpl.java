@@ -46,12 +46,12 @@ public class HardwareAssociationWriteplatformServiceImpl implements HardwareAsso
 	}
 	
 	@Override
-	public void createNewHardwareAssociation(Long clientId, Long planId,String serialNo,Long orderId) 
+	public void createNewHardwareAssociation(Long clientId, Long planId,String serialNo,Long orderId,String allocationType) 
 	{
 	        try{
 	        	
 	        //	this.context.authenticatedUser();
-	        	HardwareAssociation hardwareAssociation=new HardwareAssociation(clientId,planId,serialNo,orderId);
+	        	HardwareAssociation hardwareAssociation=new HardwareAssociation(clientId,planId,serialNo,orderId,allocationType);
 	        	this.associationRepository.saveAndFlush(hardwareAssociation);
 	        	
 	        }catch(DataIntegrityViolationException exception){
@@ -69,7 +69,8 @@ public class HardwareAssociationWriteplatformServiceImpl implements HardwareAsso
 			Long orderId = command.longValueOfParameterNamed("orderId");
 			Order order=this.orderRepository.findOne(orderId);
 			String provisionNum = command.stringValueOfParameterNamed("provisionNum");
-			HardwareAssociation hardwareAssociation = new HardwareAssociation(command.entityId(), order.getPlanId(), provisionNum, orderId);
+			String allocationType = command.stringValueOfParameterNamed("allocationType");
+			HardwareAssociation hardwareAssociation = new HardwareAssociation(command.entityId(), order.getPlanId(), provisionNum, orderId,allocationType);
 			//Check for Custome_Validation
 			this.eventValidationReadPlatformService.checkForCustomValidations(hardwareAssociation.getClientId(),"Pairing", command.json(),userId);
 			this.associationRepository.saveAndFlush(hardwareAssociation);
