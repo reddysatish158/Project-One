@@ -52,10 +52,10 @@ public class ItemReadPlatformServiceImpl implements ItemReadPlatformService{
 	@Override
 	public List<EnumOptionData> retrieveUnitTypes() {
 		final EnumOptionData meters = UniteTypeData.UnitClassType(UnitEnumType.METERS);
-		final EnumOptionData numbers = UniteTypeData.UnitClassType(UnitEnumType.NUMBERS);
+		final EnumOptionData pieces = UniteTypeData.UnitClassType(UnitEnumType.PIECES);
 		final EnumOptionData hours = UniteTypeData.UnitClassType(UnitEnumType.HOURS);
 		final EnumOptionData days = UniteTypeData.UnitClassType(UnitEnumType.DAYS);
-		final List<EnumOptionData> categotyType = Arrays.asList(meters, numbers, hours, days);
+		final List<EnumOptionData> categotyType = Arrays.asList(meters, pieces, hours, days);
 		return categotyType;
 	}
 
@@ -74,7 +74,7 @@ public class ItemReadPlatformServiceImpl implements ItemReadPlatformService{
  private static final class ChargeMapper implements RowMapper<ChargesData> {
 
         @Override
-        public ChargesData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
+        public ChargesData mapRow(final ResultSet rs,final int rowNum) throws SQLException {
 
             final Long id = rs.getLong("id");
             final String chargeCode = rs.getString("charge_code");
@@ -197,7 +197,7 @@ public List<ItemData> retrieveAuditDetails(final Long itemId) {
 private static final class AuditMapper implements RowMapper<ItemData> {
 
     @Override
-    public ItemData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
+    public ItemData mapRow(final ResultSet rs,final int rowNum) throws SQLException {
     	
     	final Long id = rs.getLong("id");
     	final Long itemMasterId = rs.getLong("itemMasterId");
