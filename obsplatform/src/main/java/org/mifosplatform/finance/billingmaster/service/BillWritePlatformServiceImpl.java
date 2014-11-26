@@ -521,12 +521,14 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 			parameters.put("SUBREPORT_DIR",jpath+""+File.separator);
 			final Connection connection = this.dataSource.getConnection();
 			try{
+				//System.out.println("Filling report...");
 				final JasperPrint jasperPrint = JasperFillManager.fillReport(jfilepath, parameters, connection);
 				JasperExportManager.exportReportToPdfFile(jasperPrint, printInvoicedetailsLocation);
 			}finally{
 	            try {
 	            	connection.close();
-	            } catch (final SQLException e) {
+	            }
+	            catch (final SQLException e) {
 	                e.printStackTrace();
 	            }
 			}

@@ -34,5 +34,9 @@ public class ProvisioningApiConstants {
 	public static final String PROV_DATA_OLD_SERIALNO="OLD_SERIALNO";
 	public static final String PROV_DATA_NEW_SERIALNO="NEW_SERIALNO";
 	public static final String PROV_DATA_OLD_ORDERID="ORDER_ID";
+	
+	//Provisioning Actions
+	public static final String PROV_EVENT_CREATE_CLIENT="Create Client";
+	public static final String PROV_EVENT_CLOSE_CLIENT="Close Client";
 
 }

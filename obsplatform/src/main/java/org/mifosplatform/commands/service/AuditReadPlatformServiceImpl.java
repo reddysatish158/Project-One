@@ -29,6 +29,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
+/**
+ * @author hugo
+ *
+ */
 @Service
 public class AuditReadPlatformServiceImpl implements AuditReadPlatformService {
 
@@ -57,11 +61,11 @@ public class AuditReadPlatformServiceImpl implements AuditReadPlatformService {
                     + " mk.username as maker, aud.made_on_date as madeOnDate, "
                     + "ck.username as checker, aud.checked_on_date as checkedOnDate, ev.enum_message_property as processingResult "
                     + commandAsJsonString + ", "
-                    + " o.name as officeName, g.display_name as groupName, c.display_name as clientName "
-                    + " from m_portfolio_command_source aud "
+
+                    + " o.name as officeName, g.display_name as groupName, c.display_name as clientName from m_portfolio_command_source aud "
                     + " left join m_appuser mk on mk.id = aud.maker_id" + " left join m_appuser ck on ck.id = aud.checker_id"
                     + " left join m_office o on o.id = aud.office_id" + " left join m_group g on g.id = aud.group_id"
-                    + " left join m_client c on c.id = aud.client_id "
+                    + " left join m_client c on c.id = aud.client_id"
                     + " left join r_enum_value ev on ev.enum_name = 'processing_result_enum' and ev.enum_id = aud.processing_result_enum";
 
             // data scoping: head office (hierarchy = ".") can see all audit
@@ -74,7 +78,7 @@ public class AuditReadPlatformServiceImpl implements AuditReadPlatformService {
         }
 
         @Override
-        public AuditData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
+        public AuditData mapRow(final ResultSet rs, final int rowNum) throws SQLException {
 
             final Long id = rs.getLong("id");
             final String actionName = rs.getString("actionName");
@@ -95,14 +99,13 @@ public class AuditReadPlatformServiceImpl implements AuditReadPlatformService {
             }
 
             String officeName = rs.getString("officeName");
-            //String groupLevelName = rs.getString("groupLevelName");
             String groupName = rs.getString("groupName");
             String clientName = rs.getString("clientName");
-            //String loanAccountNo = rs.getString("loanAccountNo");
-            //String savingsAccountNo = rs.getString("savingsAccountNo");
-
+         
             return new AuditData(id, actionName, entityName, resourceId, subresourceId, maker, madeOnDate, checker, checkedOnDate,
-                    processingResult, commandAsJson, officeName, null, groupName, clientName, null, null);
+                    processingResult, commandAsJson, officeName, groupName, clientName);
+
+           
         }
     }
 
@@ -120,11 +123,12 @@ public class AuditReadPlatformServiceImpl implements AuditReadPlatformService {
     public Collection<AuditData> retrieveAllEntriesToBeChecked(final String extraCriteria, final boolean includeJson) {
 
         String updatedExtraCriteria = "";
-        if (StringUtils.isNotBlank(extraCriteria))
+        if (StringUtils.isNotBlank(extraCriteria)){
             updatedExtraCriteria = " where (" + extraCriteria + ")" + " and aud.processing_result_enum = 2";
-        else
+        }
+        else{
             updatedExtraCriteria = " where aud.processing_result_enum = 2";
-
+        }
         updatedExtraCriteria += " order by aud.id";
 
         return retrieveEntries("makerchecker", updatedExtraCriteria, includeJson);
@@ -161,6 +165,9 @@ public class AuditReadPlatformServiceImpl implements AuditReadPlatformService {
         return this.jdbcTemplate.query(sql, rm, new Object[] {});
     }
 
+    /* (non-Javadoc)
+     * @see #retrieveAuditEntry(java.lang.Long)
+     */
     @Override
     public AuditData retrieveAuditEntry(final Long auditId) {
 
@@ -175,6 +182,9 @@ public class AuditReadPlatformServiceImpl implements AuditReadPlatformService {
         return this.jdbcTemplate.queryForObject(sql, rm, new Object[] {});
     }
 
+    /* (non-Javadoc)
+     * @see #retrieveSearchTemplate(java.lang.String)
+     */
     @Override
     public AuditSearchData retrieveSearchTemplate(final String useType) {
 
@@ -230,7 +240,7 @@ public class AuditReadPlatformServiceImpl implements AuditReadPlatformService {
     private static final class ActionNamesMapper implements RowMapper<String> {
 
         @Override
-        public String mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
+        public String mapRow(final ResultSet rs,  final int rowNum) throws SQLException {
 
             return rs.getString("actionName");
         }
@@ -240,7 +250,7 @@ public class AuditReadPlatformServiceImpl implements AuditReadPlatformService {
     private static final class EntityNamesMapper implements RowMapper<String> {
 
         @Override
-        public String mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
+        public String mapRow(final ResultSet rs,  final int rowNum) throws SQLException {
             return rs.getString("entityName");
         }
 
@@ -249,7 +259,7 @@ public class AuditReadPlatformServiceImpl implements AuditReadPlatformService {
     private static final class ProcessingResultsMapper implements RowMapper<ProcessingResultLookup> {
 
         @Override
-        public ProcessingResultLookup mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
+        public ProcessingResultLookup mapRow(final ResultSet rs, final int rowNum) throws SQLException {
             Long id = JdbcSupport.getLong(rs, "id");
             String processingResult = rs.getString("processingResult");
 

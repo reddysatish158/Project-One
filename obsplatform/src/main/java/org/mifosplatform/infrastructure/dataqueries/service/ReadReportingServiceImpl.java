@@ -378,9 +378,7 @@ public class ReadReportingServiceImpl implements ReadReportingService {
             table.setWidthPercentage(100);
 
             for (int i = 0; i < chSize; i++) {
-
                 table.addCell(columnHeaders.get(i).getColumnName());
-
             }
             table.completeRow();
 
@@ -402,6 +400,8 @@ public class ReadReportingServiceImpl implements ReadReportingService {
                         } else {
                             table.addCell(currVal.toString());
                         }
+                    }else{
+                        table.addCell(currVal);
                     }
                 }
             }

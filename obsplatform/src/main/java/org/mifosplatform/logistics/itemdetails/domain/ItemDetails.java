@@ -256,16 +256,17 @@ public class ItemDetails extends AbstractAuditableCustom<AppUser, Long>{
 	}
 
 
-	public void delete() {
+	public void setAvailable() {
 		
 		this.clientId=null;
-		this.status="NEW";
+		this.status="Available";
 		
 	}
 	
 	public void itemDelete() {
 	
 		this.isDeleted='Y';
+		this.serialNumber=this.serialNumber+"_"+this.getId();
 		
 	}
 

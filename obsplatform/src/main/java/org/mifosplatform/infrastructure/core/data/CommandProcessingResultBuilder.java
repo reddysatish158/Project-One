@@ -23,10 +23,11 @@ public class CommandProcessingResultBuilder {
     private Long entityId;
     private String transactionId;
     private Map<String, Object> changes;
+    private boolean rollbackTransaction = false;
 
     public CommandProcessingResult build() {
         return CommandProcessingResult.fromDetails(commandId, officeId, groupId, clientId, loanId, savingsId, resourceIdentifier, entityId,
-                transactionId, changes);
+                transactionId, changes,rollbackTransaction);
     }
 
     public CommandProcessingResultBuilder withCommandId(final Long withCommandId) {
@@ -78,5 +79,10 @@ public class CommandProcessingResultBuilder {
         this.transactionId = withTransactionId;
         return this;
     }
+    
+    public CommandProcessingResultBuilder setRollbackTransaction(final boolean rollbackTransaction) {
+    	this.rollbackTransaction = this.rollbackTransaction || rollbackTransaction;
+    	return this;
+   }
     
 }

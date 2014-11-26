@@ -38,12 +38,8 @@ import org.springframework.stereotype.Component;
 @Scope("singleton")
 public class AuditsApiResource {
 
-	private final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(
-			Arrays.asList("id", "actionName", "entityName", "resourceId",
-					"subresourceId", "maker", "madeOnDate", "checker",
-					"checkedOnDate", "processingResult", "commandAsJson",
-					"officeName", "groupLevelName", "groupName", "clientName",
-					"loanAccountNo", "savingsAccountNo"));
+	private final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(Arrays.asList("id", "actionName", "entityName", "resourceId","subresourceId", 
+			                  "maker", "madeOnDate", "checker","checkedOnDate", "processingResult", "commandAsJson","officeName","groupName", "clientName"));
 
 	private final String resourceNameForPermissions = "AUDIT";
 
@@ -54,8 +50,7 @@ public class AuditsApiResource {
 	private final DefaultToApiJsonSerializer<AuditSearchData> toApiJsonSerializerSearchTemplate;
 
 	@Autowired
-	public AuditsApiResource(
-			final PlatformSecurityContext context,
+	public AuditsApiResource(final PlatformSecurityContext context,
 			final AuditReadPlatformService auditReadPlatformService,
 			final ApiRequestParameterHelper apiRequestParameterHelper,
 			final DefaultToApiJsonSerializer<AuditData> toApiJsonSerializer,
@@ -70,60 +65,36 @@ public class AuditsApiResource {
 	@GET
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrieveAuditEntries(
-			@Context final UriInfo uriInfo,
-			@QueryParam("actionName") final String actionName,
-			@QueryParam("entityName") final String entityName,
-			@QueryParam("resourceId") final Long resourceId,
-			@QueryParam("makerId") final Long makerId,
-			@QueryParam("makerDateTimeFrom") final String makerDateTimeFrom,
-			@QueryParam("makerDateTimeTo") final String makerDateTimeTo,
-			@QueryParam("checkerId") final Long checkerId,
-			@QueryParam("checkerDateTimeFrom") final String checkerDateTimeFrom,
-			@QueryParam("checkerDateTimeTo") final String checkerDateTimeTo,
-			@QueryParam("processingResult") final Integer processingResult,
-			@QueryParam("officeId") final Integer officeId,
-			@QueryParam("groupId") final Integer groupId,
-			@QueryParam("clientId") final Integer clientId,
-			@QueryParam("loanid") final Integer loanId,
-			@QueryParam("savingsAccountId") final Integer savingsAccountId) {
+	public String retrieveAuditEntries(@Context final UriInfo uriInfo,@QueryParam("actionName") final String actionName,
+			@QueryParam("entityName") final String entityName,@QueryParam("resourceId") final Long resourceId,
+			@QueryParam("makerId") final Long makerId,@QueryParam("makerDateTimeFrom") final String makerDateTimeFrom,
+			@QueryParam("makerDateTimeTo") final String makerDateTimeTo,@QueryParam("checkerId") final Long checkerId,
+			@QueryParam("checkerDateTimeFrom") final String checkerDateTimeFrom,@QueryParam("checkerDateTimeTo") final String checkerDateTimeTo,
+			@QueryParam("processingResult") final Integer processingResult,@QueryParam("officeId") final Integer officeId,
+			@QueryParam("groupId") final Integer groupId,@QueryParam("clientId") final Integer clientId) {
 
-		context.authenticatedUser().validateHasReadPermission(
-				resourceNameForPermissions);
-
-		final String extraCriteria = getExtraCriteria(actionName, entityName,
+			context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+			final String extraCriteria = getExtraCriteria(actionName, entityName,
 				resourceId, makerId, makerDateTimeFrom, makerDateTimeTo,
 				checkerId, checkerDateTimeFrom, checkerDateTimeTo,
-				processingResult, officeId, groupId, clientId, loanId,
-				savingsAccountId);
+				processingResult, officeId, groupId, clientId);
 
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper
-				.process(uriInfo.getQueryParameters());
-
-		final Collection<AuditData> auditEntries = this.auditReadPlatformService
-				.retrieveAuditEntries(extraCriteria, settings.isIncludeJson());
-
-		return this.toApiJsonSerializer.serialize(settings, auditEntries,
-				RESPONSE_DATA_PARAMETERS);
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		final Collection<AuditData> auditEntries = this.auditReadPlatformService.retrieveAuditEntries(extraCriteria, settings.isIncludeJson());
+		return this.toApiJsonSerializer.serialize(settings, auditEntries,RESPONSE_DATA_PARAMETERS);
 	}
 
 	@GET
 	@Path("{auditId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrieveAuditEntry(@PathParam("auditId") final Long auditId,
-			@Context final UriInfo uriInfo) {
+	public String retrieveAuditEntry(@PathParam("auditId") final Long auditId,@Context final UriInfo uriInfo) {
 
-		context.authenticatedUser().validateHasReadPermission(
-				resourceNameForPermissions);
+		this.context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
 
-		final AuditData auditEntry = this.auditReadPlatformService
-				.retrieveAuditEntry(auditId);
-
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper
-				.process(uriInfo.getQueryParameters());
-		return this.toApiJsonSerializer.serialize(settings, auditEntry,
-				RESPONSE_DATA_PARAMETERS);
+		final AuditData auditEntry = this.auditReadPlatformService.retrieveAuditEntry(auditId);
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		return this.toApiJsonSerializer.serialize(settings, auditEntry,RESPONSE_DATA_PARAMETERS);
 	}
 
 	@GET
@@ -132,31 +103,20 @@ public class AuditsApiResource {
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String retrieveAuditSearchTemplate(@Context final UriInfo uriInfo) {
 
-		context.authenticatedUser().validateHasReadPermission(
-				resourceNameForPermissions);
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
 
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper
-				.process(uriInfo.getQueryParameters());
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
-		final AuditSearchData auditSearchData = this.auditReadPlatformService
-				.retrieveSearchTemplate("audit");
+		final AuditSearchData auditSearchData = this.auditReadPlatformService.retrieveSearchTemplate("audit");
 
-		final Set<String> RESPONSE_DATA_PARAMETERS_SEARCH_TEMPLATE = new HashSet<String>(
-				Arrays.asList("appUsers", "actionNames", "entityNames",
-						"processingResults"));
+		final Set<String> RESPONSE_DATA_PARAMETERS_SEARCH_TEMPLATE = new HashSet<String>(Arrays.asList("appUsers", "actionNames", "entityNames","processingResults"));
 
-		return this.toApiJsonSerializerSearchTemplate.serialize(settings,
-				auditSearchData, RESPONSE_DATA_PARAMETERS_SEARCH_TEMPLATE);
+		return this.toApiJsonSerializerSearchTemplate.serialize(settings,auditSearchData, RESPONSE_DATA_PARAMETERS_SEARCH_TEMPLATE);
 	}
 
-	private String getExtraCriteria(final String actionName,
-			final String entityName, final Long resourceId, final Long makerId,
-			final String makerDateTimeFrom, final String makerDateTimeTo,
-			final Long checkerId, final String checkerDateTimeFrom,
-			final String checkerDateTimeTo, final Integer processingResult,
-			final Integer officeId, final Integer groupId,
-			final Integer clientId, final Integer loanId,
-			final Integer savingsAccountId) {
+	private String getExtraCriteria(final String actionName,final String entityName, final Long resourceId, final Long makerId,
+			final String makerDateTimeFrom, final String makerDateTimeTo,final Long checkerId, final String checkerDateTimeFrom,
+			final String checkerDateTimeTo, final Integer processingResult,final Integer officeId, final Integer groupId,final Integer clientId) {
 
 		String extraCriteria = "";
 
@@ -214,14 +174,6 @@ public class AuditsApiResource {
 
 		if (clientId != null) {
 			extraCriteria += " and aud.client_id = " + clientId;
-		}
-
-		if (loanId != null) {
-			extraCriteria += " and aud.loan_id = " + loanId;
-		}
-
-		if (savingsAccountId != null) {
-			extraCriteria += " and aud.savings_account_id = " + savingsAccountId;
 		}
 
 		if (StringUtils.isNotBlank(extraCriteria)) {

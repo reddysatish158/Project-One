@@ -14,8 +14,7 @@ public class PrepareRequestData {
 	
 
 	
-	public PrepareRequestData(Long id, Long clientId, Long orderId,
-			String requestType, String hardWareId, String userName,
+	public PrepareRequestData(Long id, Long clientId, Long orderId,String requestType, String hardWareId, String userName,
 			String provisioningSys, String planName, String ishwReq) {
 		      this.requestId=id;
 		      this.clientId=clientId;

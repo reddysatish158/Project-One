@@ -338,8 +338,7 @@ public class ReadWriteNonCoreDataServiceImpl implements
 	 */
 	@Transactional
 	@Override
-	public void updateDatatable(final String datatableName,
-			final JsonCommand command) {
+	public void updateDatatable(final String datatableName,final JsonCommand command) {
 
 		try {
 			this.context.authenticatedUser();
@@ -1188,13 +1187,10 @@ public class ReadWriteNonCoreDataServiceImpl implements
 			final List<ResultsetColumnHeaderData> columnHeaders = this.genericDataService
 					.fillResultsetColumnHeaders(dataTableName);
 
-			final Type typeOfMap = new TypeToken<Map<String, String>>() {
-			}.getType();
-			final Map<String, String> dataParams = this.fromJsonHelper
-					.extractDataMap(typeOfMap, command.json());
+			final Type typeOfMap = new TypeToken<Map<String, String>>() {}.getType();
+			final Map<String, String> dataParams = this.fromJsonHelper.extractDataMap(typeOfMap, command.json());
 
-			final String sql = getAddSqlWithScore(columnHeaders, dataTableName,
-					getFKField(appTable), appTableId, dataParams);
+			final String sql = getAddSqlWithScore(columnHeaders, dataTableName,getFKField(appTable), appTableId, dataParams);
 
 			this.jdbcTemplate.update(sql);
 
@@ -1265,7 +1261,7 @@ public class ReadWriteNonCoreDataServiceImpl implements
 	private String datatableColumnNameToCodeValueName(final String columnName,
 			final String code) {
 
-		return (columnName+"_cd_"+code);
+		return (code+"_cd_"+columnName);
 	}
 
 	private void throwExceptionIfValidationWarningsExist(

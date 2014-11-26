@@ -170,22 +170,25 @@ public CommandProcessingResult doHardWareSwapping(final Long entityId,final Json
 		}
 			//for Reassociation With New SerialNumber
 			//this.associationWriteplatformService.createAssociation(command);
+		Long resouceId=Long.valueOf(0);
 		
 			if(!plan.getProvisionSystem().equalsIgnoreCase("None")){
 			requstStatus =UserActionStatusTypeEnum.DEVICE_SWAP.toString();
-			final CommandProcessingResult processingResult=this.prepareRequestWriteplatformService.prepareNewRequest(order,plan,requstStatus);
+			//final CommandProcessingResult processingResult=this.prepareRequestWriteplatformService.prepareNewRequest(order,plan,requstStatus);
 			order.setStatus( OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.PENDING).getId());
 			
-	            if(plan.getProvisionSystem().equalsIgnoreCase(ProvisioningApiConstants.PROV_PACKETSPAN)){
+	         //   if(plan.getProvisionSystem().equalsIgnoreCase(ProvisioningApiConstants.PROV_PACKETSPAN)){
 					
-					this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order,plan.getPlanCode(),UserActionStatusTypeEnum.DEVICE_SWAP.toString(),
-							processingResult.resourceId(),null,serialNo,order.getId());
-				}
+				CommandProcessingResult commandProcessingResult=	this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order,plan.getPlanCode(),UserActionStatusTypeEnum.DEVICE_SWAP.toString(),
+							Long.valueOf(0),null,serialNo,order.getId(),plan.getProvisionSystem(),
+							this.globalConfigurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
+				resouceId=commandProcessingResult.resourceId();
+			//	}
 			}
 					
  			this.orderRepository.save(order);
 				//For Order History
-				OrderHistory orderHistory=new OrderHistory(order.getId(),new LocalDate(),new LocalDate(),null,"DEVICE SWAP",userId,null);
+				OrderHistory orderHistory=new OrderHistory(order.getId(),new LocalDate(),new LocalDate(),resouceId,"DEVICE SWAP",userId,null);
 		
 				this.orderHistoryRepository.save(orderHistory);
 		return new CommandProcessingResult(entityId,order.getClientId());		

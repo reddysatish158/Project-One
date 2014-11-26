@@ -2,6 +2,7 @@ package org.mifosplatform.provisioning.preparerequest.service;
 
 import java.util.List;
 
+import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.provisioning.preparerequest.data.PrepareRequestData;
 public interface PrepareRequestReadplatformService {
 
@@ -9,7 +10,7 @@ public interface PrepareRequestReadplatformService {
 	
 	List<Long> retrieveRequestClientOrderDetails(Long clientId);
 	
-	void processingClientDetails(PrepareRequestData requestData, String configProp);
+	CommandProcessingResult processingClientDetails(PrepareRequestData requestData, String configProp);
 	
 	List<Long> getPrepareRequestDetails(Long id);
 	

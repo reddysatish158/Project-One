@@ -55,7 +55,6 @@ public class ProcessEventActionServiceImpl implements ProcessEventActionService 
 	}
 	
 	@Override
-	@Transactional
 	public void processEventActions(EventActionData eventActionData) {
 		
 		EventAction eventAction=this.eventActionRepository.findOne(eventActionData.getId());
@@ -66,6 +65,7 @@ public class ProcessEventActionServiceImpl implements ProcessEventActionService 
 			switch (eventAction.getActionName()) {
 			
 			case EventActionConstants.ACTION_RENEWAL:
+				
 				 parsedCommand = this.fromApiJsonHelper.parse(jsonObject);
 	            command = JsonCommand.from(jsonObject,parsedCommand,this.fromApiJsonHelper,"RenewalOrder",
 						eventActionData.getClientId(), null,null,eventActionData.getClientId(), null, null, null,null, null, null,null);

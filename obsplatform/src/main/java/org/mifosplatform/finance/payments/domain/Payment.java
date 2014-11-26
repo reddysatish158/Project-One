@@ -52,12 +52,16 @@ public class Payment extends AbstractAuditableCustom<AppUser, Long> {
 	
 	@Column(name = "invoice_id", nullable = false)
 	private Long invoiceId;
+	
+	@Column(name = "is_wallet_payment", nullable = false)
+	private char isWalletPayment;
 
 	public Payment() {
 	}
 
 	public Payment(final Long clientId, final Long paymentId,final Long externalId, final BigDecimal amountPaid,final Long statmentId,
-			final LocalDate paymentDate,final String remark, final Long paymodeCode, final String transId,final String receiptNo, final Long invoiceId) {
+			final LocalDate paymentDate,final String remark, final Long paymodeCode, final String transId,final String receiptNo, 
+			final Long invoiceId, boolean isWalletPayment) {
 
 
 		this.clientId = clientId;
@@ -69,6 +73,7 @@ public class Payment extends AbstractAuditableCustom<AppUser, Long> {
 		this.transactionId=transId;
 		this.receiptNo=receiptNo;
 		this.invoiceId=invoiceId;
+		this.isWalletPayment=isWalletPayment?'Y':'N';
 
 	}
 
@@ -82,8 +87,8 @@ public class Payment extends AbstractAuditableCustom<AppUser, Long> {
 		final String txtid=command.stringValueOfParameterNamed("txn_id");
 		final String receiptNo=command.stringValueOfParameterNamed("receiptNo");
 		final Long invoiceId=command.longValueOfParameterNamed("invoiceId");
-
-		return new Payment(clientid, null, null, amountPaid, null, paymentDate,remarks, paymentCode,txtid,receiptNo,invoiceId);
+		final boolean isWalletPayment = command.booleanPrimitiveValueOfParameterNamed("isWalletPayment");
+		return new Payment(clientid, null, null, amountPaid, null, paymentDate,remarks, paymentCode,txtid,receiptNo,invoiceId,isWalletPayment);
 
 
 	}
@@ -151,6 +156,12 @@ public class Payment extends AbstractAuditableCustom<AppUser, Long> {
 			return cancelRemark;
 		}
 		
+		
+		
+	public char isWalletPayment() {
+			return isWalletPayment;
+		}
+
 	public void setInvoiceId(final Long invoiceId){
 		this.invoiceId=invoiceId;
 	}

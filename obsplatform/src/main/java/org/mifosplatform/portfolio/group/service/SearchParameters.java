@@ -1,6 +1,9 @@
 package org.mifosplatform.portfolio.group.service;
 
+import java.util.Date;
+
 import org.apache.commons.lang.StringUtils;
+import org.mifosplatform.accounting.journalentry.api.DateParam;
 
 public final class SearchParameters {
 
@@ -17,11 +20,25 @@ public final class SearchParameters {
     private final String sortOrder;
     private final String groupName;
     private final String status;
+    private Date fromDataParam;
+    private Date toDateParam;
+    private final String category;
+    private final Long assignedTo;
+    private final Long closedBy;
 
     public static SearchParameters from(final String sqlSearch, final Long officeId, final String externalId, final String name,
             final String hierarchy) {
-        return new SearchParameters(sqlSearch, officeId, externalId, name, hierarchy, null, null, null, null, null, null,null,null);
+        return new SearchParameters(sqlSearch, officeId, externalId, name, hierarchy, null, null, null, null, null, null,null,null,
+        		null,null,null,null,null);
     }
+    
+
+	public static SearchParameters forTickets(String searchText,DateParam fromDateParam, DateParam toDateParam, Long assignedTo,
+			 Long closedBy, String category,String status, Integer limit, Integer offset) {
+		
+		return new SearchParameters(searchText,null,null,null,null,null,null, offset, limit, null, null,null, status,fromDateParam,toDateParam,
+				assignedTo,closedBy,category);
+	}
 
     public static SearchParameters forClients(final String sqlSearch, final Long officeId, final String externalId,
             final String displayName, final String firstname, final String lastname, final String hierarchy, final Integer offset,
@@ -33,12 +50,14 @@ public final class SearchParameters {
         }
 
         return new SearchParameters(sqlSearch, officeId, externalId, displayName, hierarchy, firstname, lastname, offset, maxLimitAllowed,
-                orderBy, sortOrder,groupName,status);
+                orderBy, sortOrder,groupName,status,null,null,null,null,null);
     }
 
     private SearchParameters(final String sqlSearch, final Long officeId, final String externalId, final String name,
             final String hierarchy, final String firstname, final String lastname, final Integer offset, final Integer limit,
-            final String orderBy, final String sortOrder,final String groupName,final String status) {
+            final String orderBy, final String sortOrder,final String groupName,final String status, DateParam fromDateParam,
+            DateParam toDateParam, Long assignedTo, Long closedBy, String category) {
+    	
         this.sqlSearch = sqlSearch;
         this.officeId = officeId;
         this.externalId = externalId;
@@ -52,6 +71,12 @@ public final class SearchParameters {
         this.sortOrder = sortOrder;
         this.groupName=groupName;
         this.status=status;
+        this.fromDataParam=fromDateParam != null?fromDateParam.getDate():null;
+        this.toDateParam=toDateParam != null?toDateParam.getDate():null;
+        this.assignedTo=assignedTo;
+        this.closedBy=closedBy;
+        this.category=category;
+        
     }
 
     public String getGroupName() {
@@ -112,13 +137,38 @@ public final class SearchParameters {
     public boolean isOffset() {
         return this.offset != null;
     }
+    
+	 public Date getFromDataParam() {
+		return fromDataParam;
+	}
 
-	 public static SearchParameters forPagination(final Integer offset, final Integer limit, final String orderBy,
+
+	public Date getToDateParam() {
+		return toDateParam;
+	}
+
+
+	public String getCategory() {
+		return category;
+	}
+
+
+	public Long getAssignedTo() {
+		return assignedTo;
+	}
+
+
+	public Long getClosedBy() {
+		return closedBy;
+	}
+
+
+	public static SearchParameters forPagination(final Integer offset, final Integer limit, final String orderBy,
             final String sortOrder) {
 
         Integer maxLimitAllowed = getCheckedLimit(limit);
 
-        return new SearchParameters(null, null, null, null, null, null, null, offset, maxLimitAllowed, orderBy, sortOrder,null,null);
+        return new SearchParameters(null, null, null, null, null, null, null, offset, maxLimitAllowed, orderBy, sortOrder,null,null,null,null,null,null,null);
     }
 
 	public static Integer getCheckedLimit(final Integer limit) {
@@ -147,5 +197,6 @@ public final class SearchParameters {
 	public String getStatus() {
 		return status;
 	}
+
 	
 }

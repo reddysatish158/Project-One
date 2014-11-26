@@ -412,7 +412,7 @@ public class DataValidatorBuilder {
     }
     
     public DataValidatorBuilder cantBeBlankWhenParameterProvidedIs(final String parameterName, final Object parameterValue) {
-        if (StringUtils.isNotBlank(value.toString())) { return this; }
+        if (value != null && StringUtils.isNotBlank(value.toString())) { return this; }
 
         StringBuilder validationErrorCode = new StringBuilder("validation.msg.").append(resource).append(".").append(parameter)
                 .append(".must.be.provided.when.").append(parameterName).append(".is.").append(parameterValue);

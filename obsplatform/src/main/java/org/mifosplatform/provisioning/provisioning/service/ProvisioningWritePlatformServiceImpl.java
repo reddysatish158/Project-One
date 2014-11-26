@@ -37,8 +37,12 @@ import org.mifosplatform.portfolio.order.domain.OrderLine;
 import org.mifosplatform.portfolio.order.domain.OrderRepository;
 import org.mifosplatform.portfolio.order.domain.UserActionStatusTypeEnum;
 import org.mifosplatform.portfolio.order.service.OrderReadPlatformService;
+import org.mifosplatform.portfolio.plan.domain.Plan;
+import org.mifosplatform.portfolio.plan.domain.PlanRepository;
 import org.mifosplatform.portfolio.service.domain.ServiceMaster;
 import org.mifosplatform.portfolio.service.domain.ServiceMasterRepository;
+import org.mifosplatform.provisioning.preparerequest.data.PrepareRequestData;
+import org.mifosplatform.provisioning.preparerequest.service.PrepareRequestReadplatformService;
 import org.mifosplatform.provisioning.processrequest.domain.ProcessRequest;
 import org.mifosplatform.provisioning.processrequest.domain.ProcessRequestDetails;
 import org.mifosplatform.provisioning.processrequest.domain.ProcessRequestRepository;
@@ -77,6 +81,8 @@ public class ProvisioningWritePlatformServiceImpl implements
 	private final ProvisioningCommandRepository provisioningCommandRepository;
 	private final IpPoolManagementJpaRepository ipPoolManagementJpaRepository;
 	private final ProvisionHelper provisionHelper;
+	private final PlanRepository planRepository;
+	private final PrepareRequestReadplatformService prepareRequestReadplatformService;
 	private final ItemDetailsRepository inventoryItemDetailsRepository;
 	private final ProvisioningCommandFromApiJsonDeserializer fromApiJsonDeserializer;
 	private final ProcessRequestReadplatformService processRequestReadplatformService;
@@ -90,18 +96,21 @@ public class ProvisioningWritePlatformServiceImpl implements
 			final OrderRepository orderRepository,final FromJsonHelper fromJsonHelper,final HardwareAssociationRepository associationRepository,
 			final ServiceMasterRepository serviceMasterRepository,final ProvisionHelper provisionHelper,
 			final ProcessRequestReadplatformService processRequestReadplatformService,final IpPoolManagementJpaRepository ipPoolManagementJpaRepository,
-			final ProcessRequestWriteplatformService processRequestWriteplatformService) {
+			final ProcessRequestWriteplatformService processRequestWriteplatformService,final PlanRepository planRepository,
+			final PrepareRequestReadplatformService prepareRequestReadplatformService) {
 
 		this.context = context;
 		this.fromJsonHelper = fromJsonHelper;
 		this.orderRepository = orderRepository;
 		this.fromApiJsonHelper = fromApiJsonHelper;
 		this.associationRepository = associationRepository;
+		this.planRepository=planRepository;
 		this.provisionHelper=provisionHelper;
 		this.fromApiJsonDeserializer = fromApiJsonDeserializer;
 		this.serviceMasterRepository = serviceMasterRepository;
 		this.serviceParametersRepository = parametersRepository;
 		this.processRequestRepository = processRequestRepository;
+		this.prepareRequestReadplatformService=prepareRequestReadplatformService;
 		this.orderReadPlatformService = orderReadPlatformService;
 		this.provisioningCommandRepository = provisioningCommandRepository;
 		this.ipPoolManagementJpaRepository = ipPoolManagementJpaRepository;
@@ -314,29 +323,29 @@ public class ProvisioningWritePlatformServiceImpl implements
 	@Transactional
 	@Override
 
-	public void postOrderDetailsForProvisioning(final Order order,final String planName,final String requestType, 
-			final Long prepareId,final String groupname,final String serialNo,final Long orderId) {
+	public CommandProcessingResult postOrderDetailsForProvisioning(final Order order,final String planName,final String requestType, 
+			final Long prepareId,final String groupname,final String serialNo,final Long orderId,final String provisioningSys,
+			final String configpropertyData) {
 
-		
 		try {
-			this.context.authenticatedUser();
-			List<ServiceParameters> parameters = this.serviceParametersRepository.findDataByOrderId(orderId);
+			
+			Long commandProcessId=null;
+			HardwareAssociation hardwareAssociation = this.associationRepository.findOneByOrderId(order.getId());
+			if (hardwareAssociation == null) {
+				throw new PairingNotExistException(order.getId());
+			}
 
+			ItemDetails inventoryItemDetails = this.inventoryItemDetailsRepository.getInventoryItemDetailBySerialNum(hardwareAssociation.getSerialNo());
+			if (inventoryItemDetails == null) {
+				throw new PairingNotExistException(order.getId());
+			}
+			List<ServiceParameters> parameters = this.serviceParametersRepository.findDataByOrderId(orderId);
+			
 			if (!parameters.isEmpty()) {
+				
 				ProcessRequest processRequest = new ProcessRequest(prepareId, order.getClientId(), order.getId(),
 						ProvisioningApiConstants.PROV_PACKETSPAN, requestType, 'N', 'N');
 				List<OrderLine> orderLines = order.getServices();
-				HardwareAssociation hardwareAssociation = this.associationRepository.findOneByOrderId(order.getId());
-
-				if (hardwareAssociation == null) {
-					throw new PairingNotExistException(order.getId());
-				}
-
-				ItemDetails inventoryItemDetails = this.inventoryItemDetailsRepository.getInventoryItemDetailBySerialNum(hardwareAssociation.getSerialNo());
-				if (inventoryItemDetails == null) {
-					throw new PairingNotExistException(order.getId());
-				}
-				
 				JSONObject jsonData=this.provisionHelper.buildJsonForOrderProvision(order.getClientId(),planName,requestType,
 						             groupname,serialNo,orderId, inventoryItemDetails.getSerialNumber(),order.getId(),parameters);
 
@@ -350,9 +359,23 @@ public class ProvisioningWritePlatformServiceImpl implements
 						processRequest.add(processRequestDetails);
 				}
 				this.processRequestRepository.save(processRequest);
+				commandProcessId=processRequest.getId();
+				
+			
+			}else{
+				
+				Plan plan=this.planRepository.findOne(order.getPlanId());
+				PrepareRequestData prepareRequestData=new  PrepareRequestData(Long.valueOf(0),order.getClientId(), orderId, requestType, hardwareAssociation.getSerialNo(),
+						 null, provisioningSys, planName, String.valueOf(plan.isHardwareReq()));
+			CommandProcessingResult commandProcessingResult =this.prepareRequestReadplatformService.processingClientDetails(prepareRequestData, configpropertyData);
+			commandProcessId=commandProcessingResult.resourceId();
 			}
+			
+			return new CommandProcessingResult(commandProcessId);
+			
 		} catch (DataIntegrityViolationException dve) {
 			handleCodeDataIntegrityIssues(null, dve);
+			return new CommandProcessingResult(Long.valueOf(-1));
 		} 
 
 	}
