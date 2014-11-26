@@ -108,7 +108,7 @@ public final class OneTimesaleCommandFromApiJsonDeserializer {
         final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("onetimesale");
         
-        if(UnitEnumType.NUMBERS.toString().equalsIgnoreCase(fromApiJsonHelper.extractStringNamed("units", jsonElement))){
+        if(UnitEnumType.PIECES.toString().equalsIgnoreCase(fromApiJsonHelper.extractStringNamed("units", jsonElement))){
         	final Integer totalPrice=fromApiJsonHelper.extractIntegerWithLocaleNamed("quantity", jsonElement);
             baseDataValidator.reset().parameter("quantity").value(totalPrice).notNull().integerGreaterThanZero();
         }else{
