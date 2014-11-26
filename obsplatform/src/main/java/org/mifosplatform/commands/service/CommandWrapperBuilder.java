@@ -2536,6 +2536,13 @@ public CommandWrapperBuilder createPaymentGatewayConfig() {
 	return this;
 }
 
+public CommandWrapperBuilder OnlinePaymentGateway() {
+	this.actionName = "ONLINE";
+	this.entityName = "PAYMENTGATEWAY";
+	this.href = "/paymentgateways/onlinepayment";
+	return this;
+}
+
 }
 
 

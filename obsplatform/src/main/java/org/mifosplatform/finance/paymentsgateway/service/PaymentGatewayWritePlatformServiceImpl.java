@@ -1,25 +1,44 @@
 package org.mifosplatform.finance.paymentsgateway.service;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.XML;
+import org.mifosplatform.commands.domain.CommandWrapper;
+import org.mifosplatform.commands.service.CommandWrapperBuilder;
+import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.mifosplatform.finance.payments.exception.ReceiptNoDuplicateException;
-import org.mifosplatform.finance.payments.service.PaymentWritePlatformService;
 import org.mifosplatform.finance.payments.service.PaymentReadPlatformService;
+import org.mifosplatform.finance.payments.service.PaymentWritePlatformService;
 import org.mifosplatform.finance.paymentsgateway.domain.PaymentGateway;
+import org.mifosplatform.finance.paymentsgateway.domain.PaymentGatewayConfiguration;
+import org.mifosplatform.finance.paymentsgateway.domain.PaymentGatewayConfigurationRepository;
 import org.mifosplatform.finance.paymentsgateway.domain.PaymentGatewayRepository;
 import org.mifosplatform.finance.paymentsgateway.serialization.PaymentGatewayCommandFromApiJsonDeserializer;
+import org.mifosplatform.infrastructure.configuration.domain.Configuration;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.exception.ConfigurationPropertyNotFoundException;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
+import org.mifosplatform.portfolio.client.exception.ClientNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -41,6 +60,9 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 	    private final PaymentWritePlatformService paymentWritePlatformService;
 	    private final PaymentReadPlatformService paymodeReadPlatformService;
 	    private final PaymentGatewayReadPlatformService paymentGatewayReadPlatformService;
+	    private final ConfigurationRepository configurationRepository;
+	    private final PortfolioCommandSourceWritePlatformService writePlatformService;
+	    private final PaymentGatewayConfigurationRepository paymentGatewayConfigurationRepository;
 	   
 	    @Autowired
 	    public PaymentGatewayWritePlatformServiceImpl(final PlatformSecurityContext context,
@@ -49,7 +71,10 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 	    		final PaymentGatewayReadPlatformService readPlatformService,
 	    		final PaymentWritePlatformService paymentWritePlatformService,
 	    		final PaymentReadPlatformService paymodeReadPlatformService,
-	    		final PaymentGatewayReadPlatformService paymentGatewayReadPlatformService)
+	    		final PaymentGatewayReadPlatformService paymentGatewayReadPlatformService,
+	    		final ConfigurationRepository configurationRepository,
+	    		final PortfolioCommandSourceWritePlatformService writePlatformService,
+	    		final PaymentGatewayConfigurationRepository paymentGatewayConfigurationRepository)
 	    {
 	    	this.context=context;
 	    	this.paymentGatewayRepository=paymentGatewayRepository;
@@ -59,6 +84,9 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 	    	this.paymentWritePlatformService=paymentWritePlatformService;
 	    	this.paymodeReadPlatformService=paymodeReadPlatformService;
 	    	this.paymentGatewayReadPlatformService=paymentGatewayReadPlatformService;
+	    	this.configurationRepository = configurationRepository;
+	    	this.writePlatformService = writePlatformService;
+	    	this.paymentGatewayConfigurationRepository = paymentGatewayConfigurationRepository;
 	    }
 	    
 	    private Long mPesaTransaction(JsonElement element) {
@@ -268,5 +296,207 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 			
 			return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(gateway.getId()).with(changes).build();
 		}
+
+		@Override
+		public CommandProcessingResult onlinePaymentGateway(JsonCommand command) {
+			try{
+				String commandJson = null;
+				final String source = command.stringValueOfParameterNamed("source");
+				final String transactionId = command.stringValueOfParameterNamed("transactionId");
+				
+				
+				if(source.equalsIgnoreCase(ConfigurationConstants.GLOBALPAY_PAYMENTGATEWAY)){
+					
+					PaymentGatewayConfiguration pgConfig = this.paymentGatewayConfigurationRepository.findOneByName(ConfigurationConstants.GLOBALPAY_PAYMENTGATEWAY);
+					
+					if(pgConfig != null && pgConfig.getValue() != null){
+						
+						commandJson = globalPayProcessing(transactionId, pgConfig.getValue());
+						
+						if(commandJson == null){
+							return null;
+						}
+					}
+					
+				}else{
+					commandJson = command.json();
+				}
+				return processOnlinePayment(commandJson);
+				
+			} catch (JSONException e) {
+				try {
+					throw new JSONException(e.getCause());
+				} catch (JSONException e1) {
+					return null;
+				}
+			} catch (IOException e) {
+				try {
+					throw new Exception("IOException occured...", e.getCause());
+				} catch (Exception e1) {
+					return null;
+				}
+			}
+			
+		}
+			
+	private String globalPayProcessing(String MerchantTxnRef, String pgConfig) throws JSONException, IOException {
+
+		JSONObject pgConfigJsonObj = new JSONObject(pgConfig);
+		String merchantId = pgConfigJsonObj.getString("merchantId");
+		String userName = pgConfigJsonObj.getString("userName");
+		String password = pgConfigJsonObj.getString("password");
+
+		String data = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+				+ "<soap12:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+				+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap12=\"http://www.w3.org/2003/05/soap-envelope\">"
+				+ "<soap12:Body>"
+				+ "<getTransactions xmlns=\"https://www.eazypaynigeria.com/globalpay_demo/\">"
+				+ "<merch_txnref>" + MerchantTxnRef + "</merch_txnref>"
+				+ "<channel></channel>" + "<merchantID>" + merchantId
+				+ "</merchantID>" + "<start_date></start_date>"
+				+ "<end_date></end_date>" + "<uid>" + userName + "</uid>"
+				+ "<pwd>" + password + "</pwd>"
+				+ "<payment_status></payment_status>" + "</getTransactions>"
+				+ "</soap12:Body>" + "</soap12:Envelope>";
+
+		URL oURL = new URL("https://demo.globalpay.com.ng/GlobalpayWebService_demo/service.asmx");
+		HttpURLConnection soapConnection = (HttpURLConnection) oURL.openConnection();
+
+		System.out.println("connect to server...");
+		
+		// Send SOAP Message to SOAP Server
+		soapConnection.setRequestMethod("POST");
+		soapConnection.setRequestProperty("Host", "demo.globalpay.com.ng");
+		soapConnection.setRequestProperty("Content-Length", String.valueOf(data.toString().length()));
+		soapConnection.setRequestProperty("Content-Type", "application/soap+xml; charset=utf-8");
+		soapConnection.setRequestProperty("SoapAction", "");
+		soapConnection.setDoOutput(true);
+
+		OutputStream reqStream = soapConnection.getOutputStream();
+		reqStream.write(data.toString().getBytes());
+		StringBuilder responseSB = new StringBuilder();
+		BufferedReader br = new BufferedReader(new InputStreamReader(soapConnection.getInputStream()));
+		String line;
+		while ((line = br.readLine()) != null) {
+			responseSB.append(line);
+		}
+
+		responseSB.append(line);
+		String responseSB1 = responseSB.toString().replaceAll("&lt;", "<");
+		responseSB1 = responseSB1.replaceAll("&gt;", ">");
+
+		JSONObject xmlJSONObj = XML.toJSONObject(responseSB1);
+
+		JSONObject resultset = xmlJSONObj.getJSONObject("soap:Envelope")
+				.getJSONObject("soap:Body")
+				.getJSONObject("getTransactionsResponse")
+				.getJSONObject("getTransactionsResult")
+				.getJSONObject("resultset").getJSONObject("record");
+
+		String paymentDesc = resultset.getString("payment_status_description");
+		System.out.println("paymentDesc From Globalpay: "+ paymentDesc);
+		Double amount = resultset.getDouble("amount");
+
+		String paymentDate = resultset.getString("payment_date");
+		Long txnref = resultset.getLong("txnref");
+		String channel = resultset.getString("channel");
+		String paymentStatus = resultset.getString("payment_status");
+
+		JSONArray fieldArray = resultset.getJSONObject("field_values").getJSONObject("field_values").getJSONArray("field");
+		String currency = fieldArray.getJSONObject(2).getString("currency");
+		String emailAddress = fieldArray.getJSONObject(3).getString("email_address");
+		String globalpayMerchanttxnref = fieldArray.getJSONObject(5).getString("merchant_txnref");
+
+		JSONObject otherDataObject = new JSONObject();
+		otherDataObject.put("currency", currency);
+		otherDataObject.put("paymentStatus", paymentStatus);
+		otherDataObject.put("channel", channel);
+		otherDataObject.put("paymentDate", paymentDate);
+		otherDataObject.put("paymentDesc", paymentDesc);
+		otherDataObject.put("globalpayMerchanttxnref", globalpayMerchanttxnref);
+
+		String[] clientIdString = globalpayMerchanttxnref.split("-");
+		String status = "SUCCESSFUL";
+
+		if (!globalpayMerchanttxnref.equals(MerchantTxnRef)) {
+			status = "FAILURE";
+		}
+
+		pgConfigJsonObj.put("clientId", clientIdString[0]);
+		pgConfigJsonObj.put("emailId", emailAddress);
+		pgConfigJsonObj.put("transactionId", txnref);
+		pgConfigJsonObj.put("total_amount", String.valueOf(amount));
+		pgConfigJsonObj.put("source", ConfigurationConstants.GLOBALPAY_PAYMENTGATEWAY);
+		pgConfigJsonObj.put("transactionId", txnref);
+		pgConfigJsonObj.put("otherData", otherDataObject);
+		pgConfigJsonObj.put("device", "");
+		pgConfigJsonObj.put("status", status);
+
+		return pgConfigJsonObj.toString();
+	}
+
+	private CommandProcessingResult processOnlinePayment(String jsonData) throws JSONException {
+
+		Long value = null;
+		String deviceId = "";
+
+		Configuration configuration = configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_ONLINEPAYMODE);
+
+		if (configuration == null || configuration.getValue() == null || configuration.getValue() == "") {
+			throw new ConfigurationPropertyNotFoundException(ConfigurationConstants.CONFIG_PROPERTY_ONLINEPAYMODE);
+		}
+
+		value = Long.parseLong(configuration.getValue());
+
+		final JSONObject json = new JSONObject(jsonData);
+
+		final Long clientId = json.getLong("clientId");
+		final String txnId = json.getString("transactionId");
+		final String amount = json.getString("total_amount");
+		final String source = json.getString("source");
+		final String data = json.getJSONObject("otherData").toString();
+		deviceId = json.getString("device");
+		final BigDecimal totalAmount = new BigDecimal(amount);
+		Date date = new Date();
+
+		PaymentGateway paymentGateway = new PaymentGateway(deviceId, " ", date, totalAmount, txnId, source, data);
+
+		if (clientId != null && clientId > 0) {
+
+			final String formattedDate = new SimpleDateFormat("dd MMMM yyyy").format(new Date());
+			final JsonObject object = new JsonObject();
+			object.addProperty("txn_id", txnId);
+			object.addProperty("dateFormat", "dd MMMM yyyy");
+			object.addProperty("locale", "en");
+			object.addProperty("paymentDate", formattedDate);
+			object.addProperty("amountPaid", totalAmount);
+			object.addProperty("isChequeSelected", "no");
+			object.addProperty("receiptNo", txnId);
+			object.addProperty("remarks", "Payment Done");
+			object.addProperty("paymentCode", value);
+
+			final CommandWrapper commandRequest = new CommandWrapperBuilder().createPayment(clientId).withJson(object.toString()).build();
+			final CommandProcessingResult result = this.writePlatformService.logCommandSource(commandRequest);
+
+			if (result.resourceId() != null) {
+				paymentGateway.setObsId(result.getClientId());
+				paymentGateway.setPaymentId(result.resourceId().toString());
+				paymentGateway.setStatus("Success");
+				paymentGateway.setAuto(false);
+			} else {
+				paymentGateway.setStatus("Failure: Payment is Not Processed..");
+			}
+
+			this.paymentGatewayRepository.save(paymentGateway);
+
+			return result;
+
+		} else {
+			paymentGateway.setStatus("Failure");
+			this.paymentGatewayRepository.save(paymentGateway);
+			throw new ClientNotFoundException(clientId);
+		}
+
+	}
 	
 }
