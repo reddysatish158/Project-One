@@ -145,7 +145,7 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 		ProcessRequest processRequest=null;
 		Long processResultId=Long.valueOf(0);
 		Order order=this.orderRepository.findOne(requestData.getOrderId());
-		AllocationDetailsData detailsData=this.allocationReadPlatformService.getTheHardwareItemDetails(requestData.getOrderId(),configProp);
+		AllocationDetailsData detailsData=this.allocationReadPlatformService.getTheHardwareItemDetails(requestData.getOrderId());
 		requestType=requestData.getRequestType();
 		
 		PrepareRequest prepareRequest=this.prepareRequsetRepository.findOne(requestData.getRequestId());

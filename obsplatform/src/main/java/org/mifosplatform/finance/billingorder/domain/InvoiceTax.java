@@ -4,20 +4,17 @@ import java.math.BigDecimal;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.springframework.data.jpa.domain.AbstractPersistable;
+
 @Entity
 @Table(name = "b_charge_tax")
-public class InvoiceTax {
+public class InvoiceTax extends AbstractPersistable<Long>{
 
-	@Id
-	@GeneratedValue
-	@Column(name = "id")
-	private Long id;
+	private static final long serialVersionUID = 1L;
 
 	@ManyToOne
 	@JoinColumn(name = "charge_id", insertable = true, updatable = true, nullable = true, unique = true)
@@ -42,6 +39,9 @@ public class InvoiceTax {
 	@Column(name = "bill_id")
 	private Long billId;
 	
+   public InvoiceTax() {
+		
+	  }
 
 	public InvoiceTax(final Invoice invoice, final BillingOrder charge,
 			final String taxCode, final BigDecimal taxValue,
@@ -54,16 +54,6 @@ public class InvoiceTax {
 		this.taxPercentage = taxPercentage;
 		this.taxAmount = taxAmount;
 	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-
 
 	public BillingOrder getCharge() {
 		return charge;
@@ -111,7 +101,6 @@ public class InvoiceTax {
 
 	public void updateBillId(Long billId) {
 		this.billId=billId;
-		
 	}
 	
 	public void update(BillingOrder charge) {

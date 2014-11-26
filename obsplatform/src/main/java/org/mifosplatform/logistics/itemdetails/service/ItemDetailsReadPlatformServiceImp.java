@@ -170,15 +170,15 @@ private final class SerialNumberForValidation implements RowMapper<String>{
 
 	
 	@Override
-	public AllocationHardwareData retriveInventoryItemDetail(String serialNumber,Long officeId){
+	public AllocationHardwareData retriveInventoryItemDetail(String serialNumber){
 		
 		try{
 			
 		context.authenticatedUser();
 		ItemDetailMapper rowMapper = new ItemDetailMapper();
-		String sql = "SELECT i.id,i.client_id AS clientId,i.quality as quality,i.serial_no as serialNo FROM b_item_detail i WHERE  i.serial_no = ? and i.status='Available'" +
-				" and i.office_id =?";
-		  return this.jdbcTemplate.queryForObject(sql,rowMapper,new Object[]{serialNumber,officeId});
+		String sql = "SELECT i.id,i.client_id AS clientId,i.quality as quality,i.serial_no as serialNo FROM b_item_detail i WHERE  i.serial_no = ? and i.status='Available'";
+		  return this.jdbcTemplate.queryForObject(sql,rowMapper,new Object[]{serialNumber});
+		  
 		 }catch(EmptyResultDataAccessException accessException){
 			 throw new PlatformDataIntegrityException("SerialNumber SerialNumber"+serialNumber+" doest not exist.","SerialNumber "+serialNumber+" doest not exist.","serialNumber"+serialNumber);
 		}
