@@ -351,6 +351,17 @@ public class PaymentGatewayApiResource {
 		 return this.toApiJsonSerializer.serialize(result);
 
 	}
+	
+	@PUT
+	@Path("onlinepayment")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.TEXT_HTML})
+	public String OnlinePaymentMethod(final String apiRequestBodyAsJson){
+		 
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().OnlinePaymentGateway().withJson(apiRequestBodyAsJson).build();
+		final CommandProcessingResult result = this.writePlatformService.logCommandSource(commandRequest);
+		return this.toApiJsonSerializer.serialize(result);
+	}
 
 }
 
