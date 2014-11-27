@@ -49,8 +49,15 @@ public class ConfigurationConstants {
 	public static final Set<String> UPDATE_CONFIGURATION_DATA_PARAMETERS = new HashSet<String>(Arrays.asList(ENABLED, VALUE));
 	public static final Set<String> CREATE_CONFIGURATION_DATA_PARAMETERS = new HashSet<String>(Arrays.asList(NAME, MAIL,PASSWORD,HOSTNAME,PORT,STARTTLS));
 	
+	//Paymentgateway configurations
 	public static final String PAYMENTGATEWAY_MPESA = "MPESA";
 	public static final String PAYMENTGATEWAY_TIGO = "TIGO";
+	public static final String PAYMENTGATEWAY_ONLINEPAYMENT = "ONLINE_PAYMENT";
+		
+	public static final String KORTA_PAYMENTGATEWAY = "korta";
+	public static final String DALPAY_PAYMENTGATEWAY = "dalpay";
+	public static final String GLOBALPAY_PAYMENTGATEWAY = "globalpay";
+	public static final String PAYPAL_PAYMENTGATEWAY = "paypal";
 
 	//Constants
 	public static final char CONST_IS_Y = 'Y';

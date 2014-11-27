@@ -351,6 +351,25 @@ public class PaymentGatewayApiResource {
 		 return this.toApiJsonSerializer.serialize(result);
 
 	}
+	
+	/**
+	 * This method is used for Online Payment 
+	 * Systems like Paypal,Dalpay,Korta etc...
+	 * 
+	 * Storing these payment details in 2 tables.
+	 * 1) b_paymentgateway and 
+	 * 2) b_payment.
+	 */
+	@PUT
+	@Path("onlinepayment")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.TEXT_HTML})
+	public String OnlinePaymentMethod(final String apiRequestBodyAsJson){
+		 
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().OnlinePaymentGateway().withJson(apiRequestBodyAsJson).build();
+		final CommandProcessingResult result = this.writePlatformService.logCommandSource(commandRequest);
+		return this.toApiJsonSerializer.serialize(result);
+	}
 
 }
 
