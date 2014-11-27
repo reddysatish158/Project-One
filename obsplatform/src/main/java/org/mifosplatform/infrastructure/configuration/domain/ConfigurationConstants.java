@@ -53,13 +53,11 @@ public class ConfigurationConstants {
 	public static final String PAYMENTGATEWAY_MPESA = "MPESA";
 	public static final String PAYMENTGATEWAY_TIGO = "TIGO";
 	public static final String PAYMENTGATEWAY_ONLINEPAYMENT = "ONLINE_PAYMENT";
-	
+
 	public static final String KORTA_PAYMENTGATEWAY = "korta";
 	public static final String DALPAY_PAYMENTGATEWAY = "dalpay";
 	public static final String GLOBALPAY_PAYMENTGATEWAY = "globalpay";
 	public static final String PAYPAL_PAYMENTGATEWAY = "paypal";
-	
-	
 
 	//Constants
 	public static final char CONST_IS_Y = 'Y';
