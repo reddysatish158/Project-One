@@ -10,6 +10,6 @@ public class DalpayRequestFailureException extends AbstractPlatformDomainRuleExc
 	private static final long serialVersionUID = 1L;
 
 	public DalpayRequestFailureException(final Long user){
-		 super("error.msg.finance.payment.dalpay.user1.not.found", "Dalpay Response 'user1' value invalid, user1= " + user);
+		 super("error.msg.finance.payment.not.found", "Dalpay Response 'user1' value invalid, user1= " + user);
 	}
 }
