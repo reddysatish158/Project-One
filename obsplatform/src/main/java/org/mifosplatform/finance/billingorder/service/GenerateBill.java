@@ -378,39 +378,21 @@ public class GenerateBill {
 		if (durationType.equalsIgnoreCase("month(s)")) {
 
 			if (chargeDuration == 12) {
-				pricePerDay = amount.divide(new BigDecimal(maximumDaysInYear),
-						2, RoundingMode.HALF_UP);
+				pricePerDay = amount.divide(new BigDecimal(maximumDaysInYear),2, RoundingMode.HALF_UP);
 
-			} else if (chargeDuration == 6) {
-				pricePerDay = amount.divide(new BigDecimal(divisibleDays), 2,
-						RoundingMode.HALF_UP);
-
-			} else if (chargeDuration == 3) {
-				pricePerDay = amount.divide(new BigDecimal(divisibleDays), 2,
-						RoundingMode.HALF_UP);
-
-			} else if (chargeDuration == 2) {
-				pricePerDay = amount.divide(new BigDecimal(divisibleDays), 2,
-						RoundingMode.HALF_UP);
+			} else if(chargeDuration != 1){
+				pricePerDay = amount.divide(new BigDecimal(divisibleDays), 2,RoundingMode.HALF_UP);
 
 			} else {
-				pricePerDay = amount.divide(new BigDecimal(maxDaysOfMonth), 2,
-						RoundingMode.HALF_UP);
+				pricePerDay = amount.divide(new BigDecimal(maxDaysOfMonth), 2,RoundingMode.HALF_UP);
 			}
 		} else if (durationType.equalsIgnoreCase("week(s)")) {
 
 			Integer billingDays = 7 * chargeDuration;
 
-			if (chargeDuration == 2) {
-
-				pricePerDay = amount.divide(new BigDecimal(billingDays), 2,
-						RoundingMode.HALF_UP);
-
-			} else {
-				pricePerDay = amount.divide(new BigDecimal(billingDays), 2,
-						RoundingMode.HALF_UP);
-			}
-		}
+			pricePerDay = amount.divide(new BigDecimal(billingDays), 2,RoundingMode.HALF_UP);
+	}
+		
 
 		return pricePerDay.multiply(new BigDecimal(totalDays));
 

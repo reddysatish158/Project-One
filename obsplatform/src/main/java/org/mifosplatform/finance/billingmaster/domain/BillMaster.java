@@ -8,22 +8,18 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
+import org.springframework.data.jpa.domain.AbstractPersistable;
 
 @Entity
 @Table(name = "b_bill_master")
-public class BillMaster {
+public class BillMaster extends AbstractPersistable<Long>{
 
-	@Id
-	@GeneratedValue
-	@Column(name = "id")
-	private Long id;
+	private static final long serialVersionUID = 1L;
 
 	@Column(name = "bill_no")
 	private Long billNumber;
@@ -106,14 +102,6 @@ public class BillMaster {
 		this.parentId = parentId;
 		this.isDeleted = 'N';
 
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(final Long id) {
-		this.id = id;
 	}
 
 	public Long getBillNumber() {

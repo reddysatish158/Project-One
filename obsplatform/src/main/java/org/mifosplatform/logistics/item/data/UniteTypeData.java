@@ -16,8 +16,9 @@ public class UniteTypeData {
 		case METERS:
 			optionData = new EnumOptionData(UnitEnumType.METERS.getValue().longValue(), codePrefix + UnitEnumType.METERS.getCode(), "METERS");
 			break;
-		case NUMBERS:
-			optionData = new EnumOptionData(UnitEnumType.NUMBERS.getValue().longValue(), codePrefix + UnitEnumType.NUMBERS.getCode(), "NUMBERS");
+			
+		case PIECES:
+			optionData = new EnumOptionData(UnitEnumType.PIECES.getValue().longValue(), codePrefix + UnitEnumType.PIECES.getCode(), "PIECES");
 			break;
 
 		case HOURS:
