@@ -320,9 +320,7 @@ public class ProvisioningWritePlatformServiceImpl implements
 		}
 	}
 
-	@Transactional
 	@Override
-
 	public CommandProcessingResult postOrderDetailsForProvisioning(final Order order,final String planName,final String requestType, 
 			final Long prepareId,final String groupname,final String serialNo,final Long orderId,final String provisioningSys,
 			final String configpropertyData) {

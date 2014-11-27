@@ -351,7 +351,7 @@ public class PaymentGatewayApiResource {
 		 return this.toApiJsonSerializer.serialize(result);
 
 	}
-	
+
 	/**
 	 * This method is used for Online Payment 
 	 * Systems like Paypal,Dalpay,Korta etc...
@@ -360,6 +360,7 @@ public class PaymentGatewayApiResource {
 	 * 1) b_paymentgateway and 
 	 * 2) b_payment.
 	 */
+
 	@PUT
 	@Path("onlinepayment")
 	@Consumes({ MediaType.APPLICATION_JSON })

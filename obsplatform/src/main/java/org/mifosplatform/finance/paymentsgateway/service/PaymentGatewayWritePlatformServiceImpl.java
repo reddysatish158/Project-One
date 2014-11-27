@@ -296,7 +296,7 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 			
 			return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(gateway.getId()).with(changes).build();
 		}
-		
+
 		@Override
 		public CommandProcessingResult onlinePaymentGateway(JsonCommand command) {
 			try{

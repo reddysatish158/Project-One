@@ -308,5 +308,5 @@ public class PaymentsApiResource {
 			return e.getMessage();
 		}
 	}
-	
+
 }
