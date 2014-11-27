@@ -960,7 +960,8 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
 	        	             handler = this.applicationContext.getBean("updatePaymentGatewayCommandhandler", NewCommandSourceHandler.class);
 					     }else if (wrapper.isOnlinePaymentGateway()) {
 	        	             handler = this.applicationContext.getBean("onlinePaymentGatewayCommandhandler", NewCommandSourceHandler.class);
-					     }              
+
+					     }             
 				}else if(wrapper.isHardwareSwapping()){
 					     if(wrapper.isDoSwapping()) {
 					         handler = applicationContext.getBean("hardwareSwappingCommandHandler",NewCommandSourceHandler.class);
