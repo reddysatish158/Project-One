@@ -53,7 +53,7 @@ public class HardwareAssociationWriteplatformServiceImpl implements HardwareAsso
 	        //	this.context.authenticatedUser();
 	        	HardwareAssociation hardwareAssociation=new HardwareAssociation(clientId,planId,serialNo,orderId,allocationType);
 	        	this.associationRepository.saveAndFlush(hardwareAssociation);
-	        	
+
 	        }catch(DataIntegrityViolationException exception){
 	        	exception.printStackTrace();
 	        }

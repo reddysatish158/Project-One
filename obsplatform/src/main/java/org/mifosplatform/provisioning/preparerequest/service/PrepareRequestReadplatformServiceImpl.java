@@ -139,118 +139,113 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 
  @Override
  public CommandProcessingResult processingClientDetails(PrepareRequestData requestData,String configProp) {
-   try{
-		String requestType=null;
-		String sentMessage=null;			        
-		ProcessRequest processRequest=null;
-		Long processResultId=Long.valueOf(0);
-		Order order=this.orderRepository.findOne(requestData.getOrderId());
-		AllocationDetailsData detailsData=this.allocationReadPlatformService.getTheHardwareItemDetails(requestData.getOrderId());
-		requestType=requestData.getRequestType();
+	
+	 PrepareRequest prepareRequest=this.prepareRequsetRepository.findOne(requestData.getRequestId());
+	 try{
+	 String requestType=null;
+	 ProcessRequest processRequest=null;
+	 Long processResultId=Long.valueOf(0);
+	 Order order=this.orderRepository.findOne(requestData.getOrderId());
+	 AllocationDetailsData detailsData=this.allocationReadPlatformService.getTheHardwareItemDetails(requestData.getOrderId());
+	 requestType=requestData.getRequestType();
+	
+	
+	 if(requestData.getIshardwareReq().equalsIgnoreCase("Y") && detailsData == null){
+		 String status=OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.PENDING).getValue().toString();
+		 
+		 if(prepareRequest != null){
+		 		prepareRequest.setStatus(status);
+		 		this.prepareRequsetRepository.save(prepareRequest);
+		 }
+		 
+		 //Update Order Status
+		 order.setStatus(OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.PENDING).getId());
+		 this.orderRepository.saveAndFlush(order);
 		
-		PrepareRequest prepareRequest=this.prepareRequsetRepository.findOne(requestData.getRequestId());
+	 }else {
+		 String HardWareId=null;
+		 if(detailsData!=null){
+			 HardWareId=detailsData.getSerialNo();
+		 }	
+		 processRequest=new ProcessRequest(requestData.getRequestId(),order.getClientId(), order.getId(),
+				 requestData.getProvisioningSystem(),requestType,'N','N');
+		 List<OrderLine> orderLineData=order.getServices();
+		 JSONObject jsonObject = new JSONObject();
+		 
+		 PlanMapping planMapping= this.planMappingRepository.findOneByPlanId(order.getPlanId());
+		 
+		 if(planMapping != null){
+			 jsonObject.put("planIdentification", planMapping.getPlanIdentification());
+		 }
+		 
+		 JSONArray serviceArray = new JSONArray();
+		 
+		 if(requestData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.CHANGE_PLAN.toString())){
+			 Order oldOrder=this.orderRepository.findOldOrderByOrderNO(order.getOrderNo());
+			 List<OrderLine> orderdetails=oldOrder.getServices();
+			 
+			 for(OrderLine orderLine:orderdetails){
+				 JSONObject oldsubjson = new JSONObject();
+				 List<ProvisionServiceDetails> provisionServiceDetails=this.provisionServiceDetailsRepository.findOneByServiceId(orderLine.getServiceId());
+				 ServiceMaster service=this.serviceMasterRepository.findOne(orderLine.getServiceId()); 
+				 oldsubjson.put("oldServiceIdentification", provisionServiceDetails.get(0).getServiceIdentification());
+				 oldsubjson.put("oldServiceType", service.getServiceType());
+				 serviceArray.put(oldsubjson.toString());
+			 }
+			 jsonObject.put("oldServices", serviceArray);
+		 }
+
+		 JSONArray newServiceArray = new JSONArray();
+		 for(OrderLine orderLine:orderLineData){
+			 
+			 List<ProvisionServiceDetails> provisionServiceDetails=this.provisionServiceDetailsRepository.findOneByServiceId(orderLine.getServiceId());
+			 	ServiceMaster service=this.serviceMasterRepository.findOne(orderLine.getServiceId());
 		
-		if(requestData.getIshardwareReq().equalsIgnoreCase("Y") && detailsData == null){
-			String status=OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.PENDING).getValue().toString();
-			prepareRequest.setStatus(status);
-			this.prepareRequsetRepository.save(prepareRequest);
-			
-			//Update Order Status
-			order.setStatus(OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.PENDING).getId());
-			this.orderRepository.saveAndFlush(order);
-		
-		}else {
-			
-			String HardWareId=null;
-			if(detailsData!=null){
-				HardWareId=detailsData.getSerialNo();
-			}
-			 processRequest=new ProcessRequest(requestData.getRequestId(),order.getClientId(), order.getId(),
-					requestData.getProvisioningSystem(),requestType,'N','N');
-			List<OrderLine> orderLineData=order.getServices();
-			
-			JSONObject jobject = new JSONObject();
-			PlanMapping planMapping= this.planMappingRepository.findOneByPlanId(order.getPlanId());
-			
-			if(planMapping != null){
-				jobject.put("planIdentification", planMapping.getPlanIdentification());
-			}
-			
-			
-			if(requestData.getProvisioningSystem().equalsIgnoreCase(ProvisioningApiConstants.PROV_BEENIUS)){
-				JSONObject subjson = new JSONObject();
-				JSONArray serviceArray = new JSONArray();
-					if(requestData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.CHANGE_PLAN.toString())){
-						Order oldOrder=this.orderRepository.findOldOrderByOrderNO(order.getOrderNo());
-						List<OrderLine> orderdetails=oldOrder.getServices();
-							for(OrderLine orderLine:orderdetails){
-									JSONObject oldsubjson = new JSONObject();
-									 List<ProvisionServiceDetails> provisionServiceDetails=this.provisionServiceDetailsRepository.findOneByServiceId(orderLine.getServiceId());
-									 ServiceMaster service=this.serviceMasterRepository.findOne(orderLine.getServiceId()); 
-									 oldsubjson.put("oldServiceIdentification", provisionServiceDetails.get(0).getServiceIdentification());
-									 oldsubjson.put("oldServiceType", service.getServiceType());
-									serviceArray.put(oldsubjson.toString());
-								 }
-								 jobject.put("oldServices", serviceArray);
-					}
-							 
-					JSONArray newServiceArray = new JSONArray();
-					for(OrderLine orderLine:orderLineData){
-						List<ProvisionServiceDetails> provisionServiceDetails=this.provisionServiceDetailsRepository.findOneByServiceId(orderLine.getServiceId());
-						ServiceMaster service=this.serviceMasterRepository.findOne(orderLine.getServiceId()); 
-						subjson.put("serviceIdentification", provisionServiceDetails.get(0).getServiceIdentification());
-						subjson.put("serviceType", service.getServiceType());
-						newServiceArray.put(subjson.toString());	 
-					}
-					jobject.put("services", newServiceArray);
-					ProcessRequestDetails processRequestDetails=new ProcessRequestDetails(orderLineData.get(0).getId(),
-							orderLineData.get(0).getServiceId(),jobject.toString(),"Recieved",
-							HardWareId,order.getStartDate(),order.getEndDate(),null,null,'N',requestType,null);
-					processRequest.add(processRequestDetails);
-					
-			}else{
-				
-				for(OrderLine orderLine:orderLineData){
-					List<ProvisionServiceDetails> provisionServiceDetails=this.provisionServiceDetailsRepository.findOneByServiceId(orderLine.getServiceId());
-					ServiceMaster service=this.serviceMasterRepository.findOne(orderLine.getServiceId());
-					if(!provisionServiceDetails.isEmpty()){
-						sentMessage = provisionServiceDetails.get(0).getServiceIdentification();
-							if(requestData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.DEVICE_SWAP.toString())){
-								AllocationDetailsData allocationDetailsData=this.allocationReadPlatformService.getDisconnectedHardwareItemDetails(requestData.getOrderId(),requestData.getClientId(),configProp);
-								JSONObject object = new JSONObject();
-								object.put("clientId", order.getClientId());
-								object.put("service", provisionServiceDetails.get(0).getServiceIdentification());
-								object.put("OldHWId", allocationDetailsData.getSerialNo());
-								object.put("NewHWId", HardWareId);
-								sentMessage = object.toString();
-							}
-						ProcessRequestDetails processRequestDetails=new ProcessRequestDetails(orderLine.getId(),orderLine.getServiceId(),sentMessage,"Recieved",
-								HardWareId,order.getStartDate(),order.getEndDate(),null,null,'N',requestType,service.getServiceType());
-						processRequest.add(processRequestDetails);
-					}
-				}
-			}
-			this.processRequestRepository.save(processRequest);				
-			//PrepareRequest prepareRequest=this.prepareRequsetRepository.findOne(requestData.getRequestId());
-			String status=OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.ACTIVE).getValue().toString();
-			processResultId=processRequest.getId();
-			
-			if(prepareRequest != null){
-				prepareRequest.setIsProvisioning('Y');
-				prepareRequest.setStatus(status);
-				this.prepareRequsetRepository.save(prepareRequest);
-			}
-		}
-		if(requestData.getProvisioningSystem().equalsIgnoreCase("None")){
-			order.setStatus(new Long(1));
-			this.orderRepository.save(order);
-		}
-		
-		return new CommandProcessingResult(processResultId);
-   }catch(Exception exception){
-	   exception.printStackTrace();
-	   return new CommandProcessingResult(Long.valueOf(-1));
-   }
+			 	if(requestData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.DEVICE_SWAP.toString())){
+				 AllocationDetailsData allocationDetailsData=this.allocationReadPlatformService.getDisconnectedHardwareItemDetails(requestData.getOrderId(),requestData.getClientId(),configProp);
+				 jsonObject.put("clientId", order.getClientId());
+				 jsonObject.put("OldHWId", allocationDetailsData.getSerialNo());
+				 jsonObject.put("NewHWId", HardWareId);
+			 
+			 	}else{
+				 JSONObject subjson = new JSONObject();
+				 subjson.put("serviceName", service.getServiceCode());
+				 subjson.put("serviceIdentification", provisionServiceDetails.get(0).getServiceIdentification());
+				 subjson.put("serviceType", service.getServiceType());
+				 newServiceArray.put(subjson.toString());	 
+			 }
+		 }
+
+		 jsonObject.put("services", newServiceArray);
+		 ProcessRequestDetails processRequestDetails=new ProcessRequestDetails(orderLineData.get(0).getId(),
+				 orderLineData.get(0).getServiceId(),jsonObject.toString(),"",
+				 HardWareId,order.getStartDate(),order.getEndDate(),null,null,'N',requestType,null);
+		 processRequest.add(processRequestDetails);
+		 
+		 this.processRequestRepository.save(processRequest);				
+		 String status=OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.ACTIVE).getValue().toString();
+		 processResultId=processRequest.getId();
+		 
+		 if(prepareRequest != null){
+			 prepareRequest.setIsProvisioning('Y');
+			 prepareRequest.setStatus(status);
+			 this.prepareRequsetRepository.save(prepareRequest);
+		 }
+	 }
+	/* if(requestData.getProvisioningSystem().equalsIgnoreCase("None")){
+		 order.setStatus(new Long(1));
+		 this.orderRepository.save(order);
+	 }*/
+	 return new CommandProcessingResult(processResultId);	
+ }catch(Exception exception){
+	 if(prepareRequest != null){
+		 prepareRequest.setIsProvisioning('F');
+		 prepareRequest.setStatus("Failed");
+		 this.prepareRequsetRepository.save(prepareRequest);
+	 }
+	 exception.printStackTrace();
+	 return new CommandProcessingResult(Long.valueOf(-1));
+ }
  }
 
  @Override
