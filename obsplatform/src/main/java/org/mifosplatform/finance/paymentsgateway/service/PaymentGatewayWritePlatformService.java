@@ -8,6 +8,8 @@ public interface PaymentGatewayWritePlatformService {
 	CommandProcessingResult createPaymentGateway(JsonCommand command);
 
 	CommandProcessingResult updatePaymentGateway(JsonCommand command);
+
+	CommandProcessingResult onlinePaymentGateway(JsonCommand command);
 	
 	
 

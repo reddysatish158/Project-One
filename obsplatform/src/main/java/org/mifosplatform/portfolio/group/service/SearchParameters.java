@@ -20,8 +20,8 @@ public final class SearchParameters {
     private final String sortOrder;
     private final String groupName;
     private final String status;
-    private final Date fromDataParam;
-    private final Date toDateParam;
+    private Date fromDataParam;
+    private Date toDateParam;
     private final String category;
     private final Long assignedTo;
     private final Long closedBy;
@@ -71,8 +71,8 @@ public final class SearchParameters {
         this.sortOrder = sortOrder;
         this.groupName=groupName;
         this.status=status;
-        this.fromDataParam=fromDateParam.getDate();
-        this.toDateParam=toDateParam.getDate();
+        this.fromDataParam=fromDateParam != null?fromDateParam.getDate():null;
+        this.toDateParam=toDateParam != null?toDateParam.getDate():null;
         this.assignedTo=assignedTo;
         this.closedBy=closedBy;
         this.category=category;

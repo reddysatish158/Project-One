@@ -15,6 +15,7 @@ import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext
 import org.mifosplatform.logistics.item.data.ItemData;
 import org.mifosplatform.logistics.item.domain.ItemMaster;
 import org.mifosplatform.logistics.item.domain.ItemRepository;
+import org.mifosplatform.logistics.item.domain.UnitEnumType;
 import org.mifosplatform.logistics.item.service.ItemReadPlatformService;
 import org.mifosplatform.logistics.itemdetails.service.ItemDetailsWritePlatformService;
 import org.mifosplatform.logistics.onetimesale.data.OneTimeSaleData;
@@ -109,19 +110,22 @@ public class OneTimeSaleWritePlatformServiceImpl implements OneTimeSaleWritePlat
 					updateOneTimeSale(oneTimeSaleData);
 				}
 			}
-			
-			JsonArray serialData = fromJsonHelper.extractJsonArrayNamed("serialNumber", element);
-			for (JsonElement je : serialData) {
-				JsonObject serialNumber = je.getAsJsonObject();
-				serialNumber.addProperty("clientId", oneTimeSale.getClientId());
-				serialNumber.addProperty("orderId", oneTimeSale.getId());
+			/**	Call if Item units is PIECES */
+			if(UnitEnumType.PIECES.toString().equalsIgnoreCase(item.getUnits())){
+				JsonArray serialData = fromJsonHelper.extractJsonArrayNamed("serialNumber", element);
+				for (JsonElement je : serialData) {
+					JsonObject serialNumber = je.getAsJsonObject();
+					serialNumber.addProperty("clientId", oneTimeSale.getClientId());
+					serialNumber.addProperty("orderId", oneTimeSale.getId());
+				}
+				jsonObject.addProperty("itemMasterId", oneTimeSale.getItemId());
+				jsonObject.addProperty("quantity", oneTimeSale.getQuantity());
+				jsonObject.add("serialNumber", serialData);
+				JsonCommand jsonCommand = new JsonCommand(null,jsonObject.toString(), element, fromJsonHelper, null, null,
+						null, null, null, null, null, null, null, null, null, null);
+				this.inventoryItemDetailsWritePlatformService.allocateHardware(jsonCommand);
 			}
-			jsonObject.addProperty("itemMasterId", oneTimeSale.getItemId());
-			jsonObject.addProperty("quantity", oneTimeSale.getQuantity());
-			jsonObject.add("serialNumber", serialData);
-			JsonCommand jsonCommand = new JsonCommand(null,jsonObject.toString(), element, fromJsonHelper, null, null,
-					null, null, null, null, null, null, null, null, null, null);
-			this.inventoryItemDetailsWritePlatformService.allocateHardware(jsonCommand);
+			
 			return new CommandProcessingResult(Long.valueOf(oneTimeSale.getId()), clientId);
 		} catch (final DataIntegrityViolationException dve) {
 			handleCodeDataIntegrityIssues(command, dve);
@@ -173,22 +177,33 @@ public class OneTimeSaleWritePlatformServiceImpl implements OneTimeSaleWritePlat
 			
 			this.context.authenticatedUser();
 			this.apiJsonDeserializer.validateForPrice(query.parsedJson());
-			final Integer quantity = fromJsonHelper.extractIntegerWithLocaleNamed("quantity",query.parsedJson());
 			final BigDecimal unitprice = fromJsonHelper.extractBigDecimalWithLocaleNamed("unitPrice",query.parsedJson());
+			final String units = fromJsonHelper.extractStringNamed("units", query.parsedJson());
 			BigDecimal itemprice = null;
+			BigDecimal totalPrice = null;
 			ItemMaster itemMaster = this.itemMasterRepository.findOne(itemId);
+		
 		    if (unitprice != null) {
 				itemprice = unitprice;
 			} else {
 				itemprice = itemMaster.getUnitPrice();
 			}
-			BigDecimal totalPrice = itemprice.multiply(new BigDecimal(quantity));
-			List<ItemData> itemCodeData = this.oneTimeSaleReadPlatformService.retrieveItemData();
+		    List<ItemData> itemCodeData = this.oneTimeSaleReadPlatformService.retrieveItemData();
 			List<DiscountMasterData> discountdata = this.discountReadPlatformService.retrieveAllDiscounts();
 			ItemData itemData = this.itemReadPlatformService.retrieveSingleItemDetails(itemId);
 			List<ChargesData> chargesDatas = this.itemReadPlatformService.retrieveChargeCode();
 
-			return new ItemData(itemCodeData, itemData, totalPrice, quantity,discountdata, chargesDatas);
+		    if(UnitEnumType.PIECES.toString().equalsIgnoreCase(units)){
+		    	final Integer quantity = fromJsonHelper.extractIntegerWithLocaleNamed("quantity",query.parsedJson());
+		    	totalPrice = itemprice.multiply(new BigDecimal(quantity));
+		    	return new ItemData(itemCodeData, itemData, totalPrice, quantity.toString(), discountdata, chargesDatas);
+		    }else{
+		    	final String quantityValue = fromJsonHelper.extractStringNamed("quantity",query.parsedJson());
+		    	totalPrice = itemprice.multiply(new BigDecimal(quantityValue));
+		    	return new ItemData(itemCodeData, itemData, totalPrice, quantityValue, discountdata, chargesDatas);
+		    }
+			
+			
 		} catch (final DataIntegrityViolationException dve) {
 			handleCodeDataIntegrityIssues(null, dve);
 			return null;
