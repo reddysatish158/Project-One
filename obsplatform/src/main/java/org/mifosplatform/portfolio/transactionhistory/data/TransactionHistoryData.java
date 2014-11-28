@@ -1,6 +1,6 @@
 package org.mifosplatform.portfolio.transactionhistory.data;
 
-import org.joda.time.LocalDate;
+import org.joda.time.DateTime;
 
 public class TransactionHistoryData {
 	
@@ -16,7 +16,7 @@ public class TransactionHistoryData {
 
 		private Long clientId;
 		private String transactionType;
-		private LocalDate transactionDate;
+		private DateTime transactionDate;
 		private String history;
 		private String user;
 		private String resourceId;
@@ -25,14 +25,14 @@ public class TransactionHistoryData {
 			
 		}
 		
-		public TransactionHistoryData(final Long clientId, final String transactionType, final LocalDate transactionDate, final String history){
+		public TransactionHistoryData(final Long clientId, final String transactionType, final DateTime transactionDate, final String history){
 			this.clientId = clientId;
 			this.transactionType = transactionType;
 			this.transactionDate = transactionDate;
 			this.history = history;
 		}
 		
-		public TransactionHistoryData(final Long id, final Long clientId, final String transactionType, final LocalDate transactionDate, final String resourceId, final String history, String user){
+		public TransactionHistoryData(final Long id, final Long clientId, final String transactionType, final DateTime transactionDate, final String resourceId, final String history, String user){
 			this.id = id;
 			this.clientId = clientId;
 			this.transactionType = transactionType;
@@ -78,7 +78,7 @@ public class TransactionHistoryData {
 		/**
 		 * @return the transactionDate
 		 */
-		public LocalDate getTransactionDate() {
+		public DateTime getTransactionDate() {
 			return transactionDate;
 		}
 
@@ -86,7 +86,7 @@ public class TransactionHistoryData {
 		/**
 		 * @param transactionDate the transactionDate to set
 		 */
-		public void setTransactionDate(LocalDate transactionDate) {
+		public void setTransactionDate(DateTime transactionDate) {
 			this.transactionDate = transactionDate;
 		}
 
