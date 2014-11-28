@@ -79,6 +79,7 @@ DELIMITER ;
 call clientUser();
 Drop procedure IF EXISTS clientUser;
 
+SET SQL_SAFE_UPDATES = 0;
 update b_item_master set units='PIECES' where units='NUMBERS';
 update b_onetime_sale set units='PIECES' where units='NUMBERS';
 
@@ -99,7 +100,4 @@ END //
 DELIMITER ;
 call addsubfieldInPayment();
 Drop procedure IF EXISTS addsubfieldInPayment;
-
-
-
 
