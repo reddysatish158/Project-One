@@ -16,12 +16,17 @@ public class UniteTypeData {
 		case METERS:
 			optionData = new EnumOptionData(UnitEnumType.METERS.getValue().longValue(), codePrefix + UnitEnumType.METERS.getCode(), "METERS");
 			break;
-		case NUMBERS:
-			optionData = new EnumOptionData(UnitEnumType.NUMBERS.getValue().longValue(), codePrefix + UnitEnumType.NUMBERS.getCode(), "NUMBERS");
+			
+		case PIECES:
+			optionData = new EnumOptionData(UnitEnumType.PIECES.getValue().longValue(), codePrefix + UnitEnumType.PIECES.getCode(), "PIECES");
 			break;
 
 		case HOURS:
 			optionData = new EnumOptionData(UnitEnumType.HOURS.getValue().longValue(), codePrefix + UnitEnumType.HOURS.getCode(), "HOURS");
+			break;
+		
+		case DAYS:
+			optionData = new EnumOptionData(UnitEnumType.DAYS.getValue().longValue(), codePrefix + UnitEnumType.DAYS.getCode(), "DAYS");
 			break;
 				
 		default:

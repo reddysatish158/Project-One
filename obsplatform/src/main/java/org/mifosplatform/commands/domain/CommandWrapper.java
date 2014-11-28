@@ -40,7 +40,7 @@ public class CommandWrapper {
         this.commandId = commandId;
         this.officeId = null;
         this.groupId = null;
-        this.clientId = null;
+        this.clientId = clientId;
         this.loanId = null;
         this.savingsId = null;
         this.actionName = actionName;
@@ -1219,5 +1219,9 @@ public class CommandWrapper {
 		}
 		public boolean isPaymentGatewayConfigResource() {
 			return this.entityName.equalsIgnoreCase("PAYMENTGATEWAYCONFIG");
+		}
+
+		public boolean isOnlinePaymentGateway() {
+			return this.actionName.equalsIgnoreCase("ONLINE") && this.entityName.equalsIgnoreCase("PAYMENTGATEWAY");
 		}
 }

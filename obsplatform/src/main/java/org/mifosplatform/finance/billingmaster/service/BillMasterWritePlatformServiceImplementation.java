@@ -23,6 +23,7 @@ import org.mifosplatform.finance.payments.domain.Payment;
 import org.mifosplatform.finance.payments.domain.PaymentRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
+import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.organisation.message.domain.BillingMessage;
@@ -136,7 +137,8 @@ public class BillMasterWritePlatformServiceImplementation implements
 		billWritePlatformService.updateBillMaster(listOfBillingDetail, billMaster, previousBal);
 		billWritePlatformService.updateBillId(financialTransactionsDatas, billMaster.getId());
 		
-        return new CommandProcessingResult(billMaster.getId(), clientId);
+        return new CommandProcessingResultBuilder().withCommandId(command.commandId())
+        		     .withClientId(clientId).withEntityId(billMaster.getId()).build();
 	}   catch (DataIntegrityViolationException dve) {
 		LOGGER.error(dve.getLocalizedMessage());
 		 handleCodeDataIntegrityIssues(command, dve);

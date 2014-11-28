@@ -397,6 +397,7 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 	public CommandProcessingResult selfcareChangePassword(JsonCommand command) {
 		
 		try{
+			
 			context.authenticatedUser();
 			selfCareCommandFromApiJsonDeserializer.validateForCreate(command);
 			String uniqueReference = command.stringValueOfParameterNamed("uniqueReference");
@@ -406,11 +407,13 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 			if(selfCare == null){				
 				throw new SelfcareEmailIdNotFoundException(uniqueReference);			
 			}else{		
-				
+				if(command.parameterExists("userName")){
+					String userName = command.stringValueOfParameterNamed("userName");
+					selfCare.setUserName(userName);
+				}
 				selfCare.setPassword(password);
 				this.selfCareRepository.save(selfCare);
-				
-				
+			
 			}
 			
 			return new CommandProcessingResultBuilder().withEntityId(selfCare.getId()).withClientId(selfCare.getClientId()).build();

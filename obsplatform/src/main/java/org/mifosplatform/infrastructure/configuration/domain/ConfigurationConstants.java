@@ -31,7 +31,7 @@ public class ConfigurationConstants {
 	public static final String CONFIG_PROPERTY_CONSTAINT_APPROACH_FOR_DATATABLES= "constraint-approach-for-datatables";
 	public static final String CONFIG_PROPERTY_SELFCATE_REQUIRES_EMAIL= "selfcare-requires-email";
 	public static final String CONFIG_PROPERTY_OSD_PROVISIONING_SYSTEM= "osd-provisioningSystem";
-	public static final String CONFIG_PROPERTY_WALLER_ENABLE= "is-wallet-enable";
+	public static final String CONFIG_PROPERTY_WALLET_ENABLE= "is-wallet-enable";
 	public static final String CONFIG_PROPERTY_MEDIA_CRASH_EMAIL = "media-crash-email";
 	public static final String CONFIG_PROPERTY_ONLINEPAYMODE = "online-paymode";
 	public static final String CONFIG_PROPERTY_SMTP= "smtp";
@@ -49,8 +49,15 @@ public class ConfigurationConstants {
 	public static final Set<String> UPDATE_CONFIGURATION_DATA_PARAMETERS = new HashSet<String>(Arrays.asList(ENABLED, VALUE));
 	public static final Set<String> CREATE_CONFIGURATION_DATA_PARAMETERS = new HashSet<String>(Arrays.asList(NAME, MAIL,PASSWORD,HOSTNAME,PORT,STARTTLS));
 	
+	//Paymentgateway configurations
 	public static final String PAYMENTGATEWAY_MPESA = "MPESA";
 	public static final String PAYMENTGATEWAY_TIGO = "TIGO";
+	public static final String PAYMENTGATEWAY_ONLINEPAYMENT = "ONLINE_PAYMENT";
+
+	public static final String KORTA_PAYMENTGATEWAY = "korta";
+	public static final String DALPAY_PAYMENTGATEWAY = "dalpay";
+	public static final String GLOBALPAY_PAYMENTGATEWAY = "globalpay";
+	public static final String PAYPAL_PAYMENTGATEWAY = "paypal";
 
 	//Constants
 	public static final char CONST_IS_Y = 'Y';

@@ -250,7 +250,7 @@ public class ProvisioningReadPlatformServiceImpl implements ProvisioningReadPlat
 
 	}
 
-	@Override
+/*	@Override
 	public Long getHardwareDetails(String oldHardWare, Long clientId,
 			String name) {
 		try {
@@ -269,7 +269,7 @@ public class ProvisioningReadPlatformServiceImpl implements ProvisioningReadPlat
 		} catch (EmptyResultDataAccessException e) {
 			return null;
 		}
-	}
+	}*/
 
 	@Override
 	public List<ProcessRequestData> getProcessRequestData(String orderNo) {

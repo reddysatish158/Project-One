@@ -22,7 +22,7 @@ public class ItemData {
 	private BigDecimal totalPrice;
 	private List<ItemData> itemDatas;
 	private ItemData itemData;
-	private Integer quantity;
+	private String quantity;
 	private List<EnumOptionData> itemClassData;
 	private List<EnumOptionData> unitData;
 	private List<ChargesData> chargesData;
@@ -54,7 +54,7 @@ public class ItemData {
 		
 	}
 
-	public ItemData(List<ItemData> itemCodeData, ItemData itemData, BigDecimal totalPrice,Integer quantity, List<DiscountMasterData> discountdata,
+	public ItemData(List<ItemData> itemCodeData, ItemData itemData, BigDecimal totalPrice,String quantity, List<DiscountMasterData> discountdata,
 			           List<ChargesData> chargesDatas) {
 
 		this.itemDatas=itemCodeData;
@@ -132,7 +132,7 @@ public class ItemData {
 		return itemData;
 	}
 
-	public Integer getQuantity() {
+	public String getQuantity() {
 		return quantity;
 	}
 

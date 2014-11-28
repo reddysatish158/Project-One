@@ -32,9 +32,6 @@ import org.mifosplatform.finance.payments.domain.PaymentRepository;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.service.FileUtils;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
-import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
-import org.mifosplatform.portfolio.client.domain.Client;
-import org.mifosplatform.portfolio.client.domain.ClientRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,10 +51,13 @@ import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 
+/**
+ * @author hugo
+ *
+ */
 @Service
 public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 	private final static Logger LOGGER = LoggerFactory.getLogger(BillWritePlatformServiceImpl.class);
-	private final PlatformSecurityContext context;
 	private final BillMasterRepository billMasterRepository;
 	private final PaymentRepository paymentRepository;
 	private final AdjustmentRepository adjustmentRepository;
@@ -65,19 +65,17 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 	private final InvoiceTaxRepository invoiceTaxRepository;
 	private final InvoiceRepository invoiceRepository;
 	private final TenantAwareRoutingDataSource dataSource;
-	private final ClientRepository clientRepository;
+
 	
 	@Autowired
-	public BillWritePlatformServiceImpl(final PlatformSecurityContext context, final BillMasterRepository billMasterRepository,
+	public BillWritePlatformServiceImpl(final BillMasterRepository billMasterRepository,
 			final PaymentRepository paymentRepository, final AdjustmentRepository adjustmentRepository,
-			final BillingOrderRepository billingOrderRepository, final InvoiceTaxRepository invoiceTaxRepository, final InvoiceRepository invoiceRepository,
-			final TenantAwareRoutingDataSource dataSource, final ClientRepository clientRepository) {
+			final BillingOrderRepository billingOrderRepository, final InvoiceTaxRepository invoiceTaxRepository, 
+			final InvoiceRepository invoiceRepository,final TenantAwareRoutingDataSource dataSource) {
 
-		this.context = context;
 		this.dataSource = dataSource;
 		this.invoiceRepository = invoiceRepository;
 		this.paymentRepository = paymentRepository;
-		this.clientRepository = clientRepository;
 		this.billMasterRepository = billMasterRepository;
 		this.adjustmentRepository = adjustmentRepository;
 		this.invoiceTaxRepository = invoiceTaxRepository;
@@ -521,12 +519,14 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 			parameters.put("SUBREPORT_DIR",jpath+""+File.separator);
 			final Connection connection = this.dataSource.getConnection();
 			try{
+				//System.out.println("Filling report...");
 				final JasperPrint jasperPrint = JasperFillManager.fillReport(jfilepath, parameters, connection);
 				JasperExportManager.exportReportToPdfFile(jasperPrint, printInvoicedetailsLocation);
 			}finally{
 	            try {
 	            	connection.close();
-	            } catch (final SQLException e) {
+	            }
+	            catch (final SQLException e) {
 	                e.printStackTrace();
 	            }
 			}

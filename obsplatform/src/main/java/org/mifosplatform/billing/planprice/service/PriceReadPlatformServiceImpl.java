@@ -155,8 +155,7 @@ public class PriceReadPlatformServiceImpl implements PriceReadPlatformService {
 	@Override
 	public List<EnumOptionData> retrieveChargeVariantData() {
 
-		EnumOptionData base = SavingChargeVaraint
-				.interestCompoundingPeriodType(ChargeVariant.BASE);
+		EnumOptionData base = SavingChargeVaraint.interestCompoundingPeriodType(ChargeVariant.BASE);
 		return Arrays.asList(base);
 
 	}

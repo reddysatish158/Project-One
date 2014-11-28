@@ -12,7 +12,7 @@ public class AssociationData {
          private List<AssociationData> hardwareData;
          private List<AssociationData> planData;
 		private Long clientId;
-		
+		private String allocationType;
 		private String provisionNumber;
 		private Long saleId;
 		private Long itemId;
@@ -37,10 +37,11 @@ public class AssociationData {
 	}
 
 	public AssociationData(Long orderId, String planCode, String provisionNumber,Long id, Long planId, Long clientId, 
-			String serialNum, String itemCode, Long saleId, Long itemId) {
+			String serialNum, String itemCode, Long saleId, Long itemId,String allocationType) {
 		this.orderId=orderId;
 		this.planCode=planCode;
 		this.serialNum=serialNum;
+		this.allocationType=allocationType;
 		this.id=id;
 		this.planId=planId;
 		this.clientId=clientId;
@@ -57,10 +58,10 @@ public class AssociationData {
 		this.orderId=id;
 	}
 
-	public AssociationData(String serialNum, String provisionNumber) {
-
+	public AssociationData(String serialNum, String provisionNumber,String allocationType) {
 	    this.serialNum=serialNum;
 	    this.provisionNumber=provisionNumber;
+	    this.allocationType=allocationType;
 	}
 
 	public void addHardwareDatas(List<AssociationData> hardwareDatas){
@@ -109,6 +110,18 @@ public class AssociationData {
 
 	public Long getClientId() {
 		return clientId;
+	}
+
+	public String getAllocationType() {
+		return allocationType;
+	}
+
+	public Long getSaleId() {
+		return saleId;
+	}
+
+	public Long getItemId() {
+		return itemId;
 	}
 	
 	
