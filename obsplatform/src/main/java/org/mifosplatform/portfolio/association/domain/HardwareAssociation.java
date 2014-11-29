@@ -23,10 +23,11 @@ public class HardwareAssociation extends AbstractAuditableCustom<AppUser, Long> 
 	@Column(name = "plan_id")
 	private Long planId;
 	
-
-
 	@Column(name = "hw_serial_no")
 	private String serialNo;
+	
+	@Column(name = "allocation_type")
+	private String allocationType;
 	
 	@Column(name = "order_id")
 	private Long orderId;
@@ -41,11 +42,13 @@ public class HardwareAssociation extends AbstractAuditableCustom<AppUser, Long> 
 	}
 
 
-	public HardwareAssociation(Long clientId, Long planId, String serialNo,Long orderId) {
+	public HardwareAssociation(Long clientId, Long planId, String serialNo,Long orderId, String allocationType) {
+		
             this.clientId=clientId;
             this.planId=planId;
             this.serialNo=serialNo;
             this.orderId=orderId;
+            this.allocationType=allocationType;
 	
 	}
 	
@@ -91,6 +94,11 @@ public class HardwareAssociation extends AbstractAuditableCustom<AppUser, Long> 
 
 	public Long getPlanId() {
 		return planId;
+	}
+
+
+	public String getAllocationType() {
+		return allocationType;
 	}
 
 

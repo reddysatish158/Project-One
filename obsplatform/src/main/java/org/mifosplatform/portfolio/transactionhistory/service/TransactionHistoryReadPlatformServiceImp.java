@@ -3,7 +3,7 @@ package org.mifosplatform.portfolio.transactionhistory.service;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.joda.time.LocalDate;
+import org.joda.time.DateTime;
 import org.mifosplatform.crm.clientprospect.service.SearchSqlQuery;
 import org.mifosplatform.infrastructure.core.domain.JdbcSupport;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
@@ -91,11 +91,11 @@ public class TransactionHistoryReadPlatformServiceImp implements TransactionHist
 			Long id = rs.getLong("id");
 			Long clientId = rs.getLong("clientId");
 			String transactionType = rs.getString("actionName")+" "+ rs.getString("entityName");
-			LocalDate transactionDate=JdbcSupport.getLocalDate(rs,"transactionDate");
+			DateTime transactionDate=JdbcSupport.getDateTime(rs,"transactionDate");
 			String resourceId=rs.getString("resourceId");
 			String history = rs.getString("history");
 			String user=rs.getString("userName");
-			return new TransactionHistoryData(id,clientId, transactionType, transactionDate, resourceId, history,user);
+			return new TransactionHistoryData(id,clientId, transactionType, transactionDate,null, history,user);
 		}
 
 	}
@@ -109,7 +109,7 @@ private class ClientOldTransactionHistoryMapper implements RowMapper<Transaction
 			Long id = rs.getLong("id");
 			Long clientId = rs.getLong("clientId");
 			String transactionType = rs.getString("transactionType");
-			LocalDate transactionDate=JdbcSupport.getLocalDate(rs,"transactionDate");
+			DateTime transactionDate=JdbcSupport.getDateTime(rs,"transactionDate");
 			String history = rs.getString("history");
 			String user=rs.getString("userName");
 			return new TransactionHistoryData(id,clientId, transactionType, transactionDate, null, history,user);

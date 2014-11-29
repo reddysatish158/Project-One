@@ -154,10 +154,10 @@ public class MakercheckersApiResource {
             extraCriteria += " and aud.maker_id = " + makerId;
         }
         if (makerDateTimeFrom != null) {
-            extraCriteria += " and aud.made_on_date >= " + ApiParameterHelper.sqlEncodeString(makerDateTimeFrom);
+            extraCriteria += " and DATE_FORMAT(aud.made_on_date,'%y-%m-%d') >= DATE_FORMAT("+ApiParameterHelper.sqlEncodeString(makerDateTimeFrom)+",'%y-%m-%d')";
         }
         if (makerDateTimeTo != null) {
-            extraCriteria += " and aud.made_on_date <= " + ApiParameterHelper.sqlEncodeString(makerDateTimeTo);
+            extraCriteria += " and DATE_FORMAT(aud.made_on_date,'%y-%m-%d') <= DATE_FORMAT("+ApiParameterHelper.sqlEncodeString(makerDateTimeTo)+",'%y-%m-%d')";
         }
 
         if (officeId != null) {

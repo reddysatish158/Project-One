@@ -405,7 +405,7 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 		JSONArray fieldArray = resultset.getJSONObject("field_values").getJSONObject("field_values").getJSONArray("field");
 		String currency = fieldArray.getJSONObject(2).getString("currency");
 		String emailAddress = fieldArray.getJSONObject(3).getString("email_address");
-		String globalpayMerchanttxnref = fieldArray.getJSONObject(5).getString("merchant_txnref");
+		String globalpayMerchanttxnref = fieldArray.getJSONObject(5).getString("merch_txnref");
 
 		JSONObject otherDataObject = new JSONObject();
 		otherDataObject.put("currency", currency);

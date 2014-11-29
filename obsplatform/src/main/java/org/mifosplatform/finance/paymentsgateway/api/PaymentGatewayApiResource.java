@@ -351,7 +351,16 @@ public class PaymentGatewayApiResource {
 		 return this.toApiJsonSerializer.serialize(result);
 
 	}
-	
+
+	/**
+	 * This method is used for Online Payment 
+	 * Systems like Paypal,Dalpay,Korta etc...
+	 * 
+	 * Storing these payment details in 2 tables.
+	 * 1) b_paymentgateway and 
+	 * 2) b_payment.
+	 */
+
 	@PUT
 	@Path("onlinepayment")
 	@Consumes({ MediaType.APPLICATION_JSON })

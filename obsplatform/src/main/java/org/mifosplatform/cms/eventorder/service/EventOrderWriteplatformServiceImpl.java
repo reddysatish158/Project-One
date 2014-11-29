@@ -121,7 +121,7 @@ public class EventOrderWriteplatformServiceImpl implements EventOrderWriteplatfo
 			//Check Client Custome Validation
 			this.eventValidationReadPlatformService.checkForCustomValidations(clientId,EventActionConstants.EVENT_EVENT_ORDER, command.json(),getUserId());
 			EventOrder eventOrder=assembleEventOrderDetails(command,clientId);
-			Configuration walletConfiguration=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_WALLER_ENABLE);
+			Configuration walletConfiguration=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_WALLET_ENABLE);
 			this.checkClientBalance(eventOrder.getBookedPrice(), clientId,walletConfiguration.isEnabled());
 			this.eventOrderRepository.save(eventOrder);
 			
