@@ -235,9 +235,9 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 				throw new SelfCareTemporaryEmailIdNotFoundException(email);
 			}
 
-			if(temporary.getPaymentStatus().equalsIgnoreCase("ACTIVE")){
+			/*if(temporary.getPaymentStatus().equalsIgnoreCase("ACTIVE")){
 				throw new PaymentStatusAlreadyActivatedException(email);
-			}
+			}*/
 			
 			if (temporary.getStatus().equalsIgnoreCase("ACTIVE")) {
 				
@@ -413,7 +413,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 					}		
 				}
 				
-				// payment Processing
+				/*// payment Processing
 				if(temporary.getPaymentStatus().equalsIgnoreCase("PENDING")){
 					  temporary.setPaymentStatus("ACTIVE");
 					  JSONObject json= new JSONObject(temporary.getPaymentData());
@@ -439,7 +439,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 							throw new PlatformDataIntegrityException("error.msg.client.payment.creation","Payment Failed for ClientId:"
 											+ resultClient.getClientId(),"Payment Failed");
 					  }
-				}
+				}*/
 				
 				SelfCare selfcare =  this.selfCareRepository.findOneByClientId(resultClient.getClientId());
 				
