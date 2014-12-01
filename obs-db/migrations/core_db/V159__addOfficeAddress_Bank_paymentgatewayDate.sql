@@ -82,4 +82,22 @@ Drop procedure IF EXISTS clientUser;
 SET SQL_SAFE_UPDATES = 0;
 update b_item_master set units='PIECES' where units='NUMBERS';
 update b_onetime_sale set units='PIECES' where units='NUMBERS';
-SET SQL_SAFE_UPDATES = 1;
+
+Drop procedure IF EXISTS addsubfieldInPayment; 
+DELIMITER //
+create procedure addsubfieldInPayment() 
+Begin
+IF NOT EXISTS (
+     SELECT * FROM information_schema.COLUMNS
+     WHERE COLUMN_NAME ='is_sub_payment'  
+      and TABLE_NAME = 'b_payments'
+     and TABLE_SCHEMA = DATABASE())THEN
+alter table b_payments add column is_sub_payment char(45) DEFAULT 'N';
+
+
+END IF;
+END //
+DELIMITER ;
+call addsubfieldInPayment();
+Drop procedure IF EXISTS addsubfieldInPayment;
+

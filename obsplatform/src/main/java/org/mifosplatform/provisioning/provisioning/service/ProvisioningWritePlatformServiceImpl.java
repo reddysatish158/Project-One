@@ -333,14 +333,20 @@ public class ProvisioningWritePlatformServiceImpl implements
 				throw new PairingNotExistException(order.getId());
 			}
 
-			ItemDetails inventoryItemDetails = this.inventoryItemDetailsRepository.getInventoryItemDetailBySerialNum(hardwareAssociation.getSerialNo());
-			if (inventoryItemDetails == null) {
-				throw new PairingNotExistException(order.getId());
-			}
+		
 			List<ServiceParameters> parameters = this.serviceParametersRepository.findDataByOrderId(orderId);
 			
 			if (!parameters.isEmpty()) {
 				
+				ItemDetails inventoryItemDetails =null;
+				
+				if("ALLOT".equalsIgnoreCase(hardwareAssociation.getAllocationType())){
+					
+					 inventoryItemDetails = this.inventoryItemDetailsRepository.getInventoryItemDetailBySerialNum(hardwareAssociation.getSerialNo());
+					if (inventoryItemDetails == null) {
+						throw new PairingNotExistException(order.getId());
+					}
+					}
 				ProcessRequest processRequest = new ProcessRequest(prepareId, order.getClientId(), order.getId(),
 						ProvisioningApiConstants.PROV_PACKETSPAN, requestType, 'N', 'N');
 				List<OrderLine> orderLines = order.getServices();
