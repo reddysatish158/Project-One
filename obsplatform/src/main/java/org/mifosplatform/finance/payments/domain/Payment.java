@@ -55,13 +55,16 @@ public class Payment extends AbstractAuditableCustom<AppUser, Long> {
 	
 	@Column(name = "is_wallet_payment", nullable = false)
 	private char isWalletPayment;
+	
+	@Column(name = "is_sub_payment", nullable=false)
+	private char isSubscriptionPayment;
 
 	public Payment() {
 	}
 
 	public Payment(final Long clientId, final Long paymentId,final Long externalId, final BigDecimal amountPaid,final Long statmentId,
 			final LocalDate paymentDate,final String remark, final Long paymodeCode, final String transId,final String receiptNo, 
-			final Long invoiceId, boolean isWalletPayment) {
+			final Long invoiceId, boolean isWalletPayment, boolean isSubscriptionPayment) {
 
 
 		this.clientId = clientId;
@@ -74,6 +77,7 @@ public class Payment extends AbstractAuditableCustom<AppUser, Long> {
 		this.receiptNo=receiptNo;
 		this.invoiceId=invoiceId;
 		this.isWalletPayment=isWalletPayment?'Y':'N';
+		this.isSubscriptionPayment=isSubscriptionPayment?'Y':'N';
 
 	}
 
@@ -88,7 +92,8 @@ public class Payment extends AbstractAuditableCustom<AppUser, Long> {
 		final String receiptNo=command.stringValueOfParameterNamed("receiptNo");
 		final Long invoiceId=command.longValueOfParameterNamed("invoiceId");
 		final boolean isWalletPayment = command.booleanPrimitiveValueOfParameterNamed("isWalletPayment");
-		return new Payment(clientid, null, null, amountPaid, null, paymentDate,remarks, paymentCode,txtid,receiptNo,invoiceId,isWalletPayment);
+		final boolean isSubscriptionPayment =command.booleanPrimitiveValueOfParameterNamed("isSubscriptionPayment");
+		return new Payment(clientid, null, null, amountPaid, null, paymentDate,remarks, paymentCode,txtid,receiptNo,invoiceId,isWalletPayment,isSubscriptionPayment);
 
 
 	}

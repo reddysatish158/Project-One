@@ -5,6 +5,7 @@
  */
 package org.mifosplatform.infrastructure.documentmanagement.service;
 
+import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -76,14 +77,14 @@ public class DocumentReadPlatformServiceImpl implements DocumentReadPlatformServ
     final DocumentMapper mapper = new DocumentMapper(false,false);
     final DocumentData documentData = fetchDocumentDetails(entityType, entityId, documentId, mapper);
     //final ContentRepository contentRepository = this.contentRepositoryFactory.getRepository(documentData.storageType());
-    //return contentRepository.fetchFile(documentData);
-    return null;
+    return this.fetchFile(documentData);
+   
     } catch (final EmptyResultDataAccessException e) {
     throw new DocumentNotFoundException(entityType, entityId, documentId);
     }
     }
-    
-    private DocumentData fetchDocumentDetails(final String entityType, final Long entityId, final Long documentId,
+
+	private DocumentData fetchDocumentDetails(final String entityType, final Long entityId, final Long documentId,
     		final DocumentMapper mapper) {
     		final String sql = "select " + mapper.schema() + " and d.id=? ";
     		return this.jdbcTemplate.queryForObject(sql, mapper, new Object[] { entityType, entityId, documentId });
@@ -129,4 +130,11 @@ public class DocumentReadPlatformServiceImpl implements DocumentReadPlatformServ
             return new DocumentData(id, parentEntityType, parentEntityId, name, fileName, fileSize, fileType, description, location,storageType);
         }
     }
+    
+	public FileData fetchFile(DocumentData documentData) {
+		
+		 final File file = new File(documentData.fileLocation());
+		 return new FileData(file, documentData.fileName(), documentData.contentType());
+	}
+    
 }
