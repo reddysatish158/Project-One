@@ -166,6 +166,7 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 		 this.orderRepository.saveAndFlush(order);
 		
 	 }else {
+		 
 		 String HardWareId=null;
 		 if(detailsData!=null){
 			 HardWareId=detailsData.getSerialNo();

@@ -329,7 +329,9 @@ public class ProvisioningWritePlatformServiceImpl implements
 			
 			Long commandProcessId=null;
 			HardwareAssociation hardwareAssociation = this.associationRepository.findOneByOrderId(order.getId());
-			if (hardwareAssociation == null) {
+			Plan plan=this.planRepository.findOne(order.getPlanId());
+			
+			if (hardwareAssociation == null && plan.isHardwareReq() == 'Y') {
 				throw new PairingNotExistException(order.getId());
 			}
 
@@ -368,7 +370,7 @@ public class ProvisioningWritePlatformServiceImpl implements
 			
 			}else{
 				
-				Plan plan=this.planRepository.findOne(order.getPlanId());
+				//Plan plan=this.planRepository.findOne(order.getPlanId());
 				PrepareRequestData prepareRequestData=new  PrepareRequestData(Long.valueOf(0),order.getClientId(), orderId, requestType, hardwareAssociation.getSerialNo(),
 						 null, provisioningSys, planName, String.valueOf(plan.isHardwareReq()));
 			CommandProcessingResult commandProcessingResult =this.prepareRequestReadplatformService.processingClientDetails(prepareRequestData, configpropertyData);

@@ -251,7 +251,7 @@ public class OrderPrice extends AbstractAuditableCustom<AppUser, Long> {
 		}else{
 		   this.billEndDate=null;
 		}
-		if(renewalEndDate!=null){
+		if(newStartdate!=null){
 		this.billStartDate=newStartdate.toDate();
 		}
 		this.nextBillableDay=null;
