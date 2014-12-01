@@ -92,7 +92,7 @@ public class MRNDetailsReadPlatformServiceImp implements MRNDetailsReadPlatformS
 	@Override
 	public Page<MRNDetailsData> retriveMRNDetails(SearchSqlQuery searchMRNDetails) {
 		this.context.authenticatedUser();
-		final String sql = "Select Concat("+"'MRN '"+",mrn.id) as mrnId, mrn.requested_date as requestedDate," +
+		final String sql = "Select Concat("+"'MRN ('"+",mrn.id,')') as mrnId, mrn.requested_date as requestedDate," +
 				"(select item_description from b_item_master where id=mrn.item_master_id) as item," +
 				" (select name from m_office where id=mrn.from_office) as fromOffice, (select name from m_office where id = mrn.to_office) as toOffice," +
 				"mrn.orderd_quantity as orderdQuantity, mrn.received_quantity as receivedQuantity, mrn.status as status from b_mrn mrn ";
@@ -112,7 +112,7 @@ public class MRNDetailsReadPlatformServiceImp implements MRNDetailsReadPlatformS
 	    }
             sqlBuilder.append(extraCriteria);
             
-            final String itemSql = "Union all Select Concat ("+"'Item Sale ' "+",its.id) as id,its.purchase_date as requestedDate," +
+            final String itemSql = "Union all Select Concat ("+"'Item Sale ' "+",its.id,')') as id,its.purchase_date as requestedDate," +
             		"(select item_description from b_item_master where id=its.item_id) as item,(select name from m_office where id=1) as " +
             		" fromOffice,(select name from m_office where id = its.purchase_by) as toOffice, its.order_quantity as orderdQuantity," +
             		"its.received_quantity as receivedQuantity, its.status as status  from b_itemsale its ";
