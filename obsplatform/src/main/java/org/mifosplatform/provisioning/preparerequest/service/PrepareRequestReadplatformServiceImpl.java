@@ -4,8 +4,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.service.DataSourcePerTenantService;
 import org.mifosplatform.logistics.onetimesale.data.AllocationDetailsData;
@@ -28,12 +30,13 @@ import org.mifosplatform.provisioning.preparerequest.domain.PrepareRequsetReposi
 import org.mifosplatform.provisioning.processrequest.domain.ProcessRequest;
 import org.mifosplatform.provisioning.processrequest.domain.ProcessRequestDetails;
 import org.mifosplatform.provisioning.processrequest.domain.ProcessRequestRepository;
-import org.mifosplatform.provisioning.provisioning.api.ProvisioningApiConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
+
+import com.google.gson.Gson;
 
 @Service
 public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestReadplatformService{
@@ -163,6 +166,7 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 		 this.orderRepository.saveAndFlush(order);
 		
 	 }else {
+		 
 		 String HardWareId=null;
 		 if(detailsData!=null){
 			 HardWareId=detailsData.getSerialNo();
@@ -185,14 +189,15 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 			 List<OrderLine> orderdetails=oldOrder.getServices();
 			 
 			 for(OrderLine orderLine:orderdetails){
+				 
 				 JSONObject oldsubjson = new JSONObject();
 				 List<ProvisionServiceDetails> provisionServiceDetails=this.provisionServiceDetailsRepository.findOneByServiceId(orderLine.getServiceId());
 				 ServiceMaster service=this.serviceMasterRepository.findOne(orderLine.getServiceId()); 
 				 oldsubjson.put("oldServiceIdentification", provisionServiceDetails.get(0).getServiceIdentification());
 				 oldsubjson.put("oldServiceType", service.getServiceType());
-				 serviceArray.put(oldsubjson.toString());
+				 serviceArray.add(oldsubjson);
 			 }
-			 jsonObject.put("oldServices", serviceArray);
+			 jsonObject.put("oldServices", new Gson().toJson(serviceArray));
 		 }
 
 		 JSONArray newServiceArray = new JSONArray();
@@ -212,13 +217,13 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 				 subjson.put("serviceName", service.getServiceCode());
 				 subjson.put("serviceIdentification", provisionServiceDetails.get(0).getServiceIdentification());
 				 subjson.put("serviceType", service.getServiceType());
-				 newServiceArray.put(subjson.toString());	 
+				 newServiceArray.add(subjson.toString());	 
 			 }
 		 }
 
-		 jsonObject.put("services", newServiceArray);
+		 jsonObject.put("services", new Gson().toJson(newServiceArray));
 		 ProcessRequestDetails processRequestDetails=new ProcessRequestDetails(orderLineData.get(0).getId(),
-				 orderLineData.get(0).getServiceId(),jsonObject.toString(),"",
+				 orderLineData.get(0).getServiceId(),jsonObject.toString(),"Recieved",
 				 HardWareId,order.getStartDate(),order.getEndDate(),null,null,'N',requestType,null);
 		 processRequest.add(processRequestDetails);
 		 
