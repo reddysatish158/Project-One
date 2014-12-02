@@ -93,11 +93,10 @@ public void ProcessAutoExipiryDetails(OrderData orderData, FileWriter fw, LocalD
   
 	try{
 
-      if(!(orderData.getStatus().equalsIgnoreCase(StatusTypeEnum.DISCONNECTED.toString()) || orderData.getStatus().equalsIgnoreCase(StatusTypeEnum.PENDING.toString())))
-          {
+      if(!(orderData.getStatus().equalsIgnoreCase(StatusTypeEnum.DISCONNECTED.toString()) || orderData.getStatus().equalsIgnoreCase(StatusTypeEnum.PENDING.toString()))){
 
-           if (orderData.getEndDate().equals(exipirydate) || exipirydate.isAfter(orderData.getEndDate()))
-              {
+           if (orderData.getEndDate().equals(exipirydate) || exipirydate.isAfter(orderData.getEndDate())){
+        	   
                  JSONObject jsonobject = new JSONObject();
                      if(data.getIsAutoRenewal().equalsIgnoreCase("Y")){
                     	 
@@ -106,6 +105,7 @@ public void ProcessAutoExipiryDetails(OrderData orderData, FileWriter fw, LocalD
                          boolean isSufficientAmountForRenewal=this.checkClientBalanceForOrderrenewal(orderData,clientId,orderPrice);
 
                           if(isSufficientAmountForRenewal){
+                        	  
 	                            List<SubscriptionData> subscriptionDatas=this.contractPeriodReadPlatformService.retrieveSubscriptionDatabyContractType("Month(s)",1);
 	                            jsonobject.put("renewalPeriod",subscriptionDatas.get(0).getId());	
 	                            jsonobject.put("description","Order Renewal By Scheduler");

@@ -244,23 +244,17 @@ public class OrderPrice extends AbstractAuditableCustom<AppUser, Long> {
 		this.durationType=durationType;
 	}
 
-	public void setDatesOnOrderStatus(LocalDate newStartdate,LocalDate renewalEndDate, Long orderstatus) {
+	public void setDatesOnOrderStatus(LocalDate newStartdate,LocalDate renewalEndDate, String orderstatus) {
 		
 		if(renewalEndDate!=null){
 			this.billEndDate=renewalEndDate.toDate();
 		}else{
 		   this.billEndDate=null;
 		}
-		if(orderstatus.equals(StatusTypeEnum.DISCONNECTED.getValue().longValue())){
-			this.billStartDate=newStartdate.toDate();
-			this.nextBillableDay=null;
-			this.invoiceTillDate=null;
-			
+		if(newStartdate!=null){
+		this.billStartDate=newStartdate.toDate();
 		}
-		
+		this.nextBillableDay=null;
+		this.invoiceTillDate=null;
 	}
-
-
-
-
 }

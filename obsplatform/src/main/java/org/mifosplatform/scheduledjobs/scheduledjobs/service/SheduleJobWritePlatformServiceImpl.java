@@ -294,6 +294,7 @@ public void processSimulator() {
 			} 
 		}
 		if(data.getcreateTicket().equalsIgnoreCase("Y")){
+			
 			for (ProcessingDetailsData detailsData : processingDetails) {
 				ProcessRequest processRequest = this.processRequestRepository.findOne(detailsData.getId());
 				Order order=this.orderRepository.findOne(processRequest.getOrderId());
