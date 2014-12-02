@@ -10,6 +10,7 @@ public class BillingMessageTemplateConstants {
 	public static final String MESSAGE_TEMPLATE_PROVISION_CREDENTIALS="PROVISION CREDENTIALS";
 	public static final String MESSAGE_TEMPLATE_TICKET_TEMPLATE="TICKET_TEMPLATE";
 	public static final String MESSAGE_TEMPLATE_CREATE_USER="CREATE USER";
+	public static final String MESSAGE_TEMPLATE_PAYMENT_RECEIPT = "PAYMENT_RECEIPT";
 	
 	
 	

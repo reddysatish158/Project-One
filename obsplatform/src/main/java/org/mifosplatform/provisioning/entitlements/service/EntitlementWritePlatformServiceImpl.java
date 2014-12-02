@@ -12,7 +12,6 @@ import org.mifosplatform.organisation.message.domain.BillingMessageRepository;
 import org.mifosplatform.organisation.message.domain.BillingMessageTemplate;
 import org.mifosplatform.organisation.message.domain.BillingMessageTemplateConstants;
 import org.mifosplatform.organisation.message.domain.BillingMessageTemplateRepository;
-import org.mifosplatform.organisation.message.service.MessagePlatformEmailService;
 import org.mifosplatform.portfolio.client.domain.Client;
 import org.mifosplatform.portfolio.client.domain.ClientRepository;
 import org.mifosplatform.portfolio.client.exception.ClientNotFoundException;
@@ -30,7 +29,6 @@ public class EntitlementWritePlatformServiceImpl implements EntitlementWritePlat
 	private final ProcessRequestRepository entitlementRepository;
 	private final ProcessRequestWriteplatformService processRequestWriteplatformService;
 	private final ClientRepository clientRepository;
-	private final MessagePlatformEmailService messagePlatformEmailService;
 	private final SelfCareRepository selfCareRepository;
 	private final BillingMessageTemplateRepository billingMessageTemplateRepository;
 	private final BillingMessageRepository messageDataRepository;
@@ -39,15 +37,15 @@ public class EntitlementWritePlatformServiceImpl implements EntitlementWritePlat
 	@Autowired
 	public EntitlementWritePlatformServiceImpl(
 			final ProcessRequestWriteplatformService processRequestWriteplatformService,
-			final ProcessRequestRepository entitlementRepository, final ClientRepository clientRepository,
-			final MessagePlatformEmailService messagePlatformEmailService,final SelfCareRepository selfCareRepository,
+			final ProcessRequestRepository entitlementRepository, 
+			final ClientRepository clientRepository,
+			final SelfCareRepository selfCareRepository,
 			final BillingMessageTemplateRepository billingMessageTemplateRepository,
 			final BillingMessageRepository messageDataRepository) {
 
 		this.processRequestWriteplatformService = processRequestWriteplatformService;
 		this.entitlementRepository = entitlementRepository;
 		this.clientRepository = clientRepository;
-		this.messagePlatformEmailService = messagePlatformEmailService;
 		this.selfCareRepository = selfCareRepository;
 		this.billingMessageTemplateRepository = billingMessageTemplateRepository;
 		this.messageDataRepository = messageDataRepository;
@@ -84,27 +82,6 @@ public class EntitlementWritePlatformServiceImpl implements EntitlementWritePlat
 					throw new PlatformDataIntegrityException("client does not exist", "client not registered","clientId", "client is null ");
 				}
 				
-				/*StringBuilder builder = new StringBuilder();
-				builder.append("Dear " + client.getFirstname() + " " + client.getLastname()+ "\n");
-				builder.append("\n");
-				builder.append("Your Beenius Subscriber Account has been successfully created.");
-				builder.append("Following are the Beenius Account Details. ");
-				builder.append("\n");
-				builder.append("subscriberUid : " + client.getAccountNumber());
-				builder.append("\n");
-				builder.append("Authpin : " + authPin + ".");
-				builder.append("\n");
-				builder.append("PIN : 1234");
-				builder.append("\n");
-				builder.append("\n");
-				builder.append("Thankyou");
-				
-				selfcare.setAuthPin(authPin);
-				this.selfCareRepository.save(selfcare);
-				
-				message = this.messagePlatformEmailService.sendGeneralMessage(client.getEmail(), builder.toString(), 
-						"Beenius StreamingMedia");	*/
-				
 				selfcare.setAuthPin(authPin);
 				this.selfCareRepository.save(selfcare);
 				String Name = client.getLastname();
@@ -119,24 +96,12 @@ public class EntitlementWritePlatformServiceImpl implements EntitlementWritePlat
 				header = header.replace("<PARAM1>", Name);
 				body = body.replace("<PARAM2>", client.getAccountNumber());
 				body = body.replace("<PARAM3>", authPin);
-				/*StringBuilder prepareEmail =new StringBuilder();
-				prepareEmail.append(header);
-				prepareEmail.append("\t").append(body);
-				prepareEmail.append("\n").append("\n");
-				prepareEmail.append(messageDetails.get(0).getFooter());*/
-				
-				//message = messagePlatformEmailService.sendGeneralMessage(client.getEmail(), prepareEmail.toString().trim(), subject);
 				
 				BillingMessage billingMessage = new BillingMessage(header, body, footer, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_EMAIL_FROM, client.getEmail(),
 						subject, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_STATUS, messageDetails, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_MESSAGE_TYPE, null);
 				
-				this.messageDataRepository.save(billingMessage);
-						
-			}/*else{
-				throw new PlatformDataIntegrityException("error.msg.beenius.process.invalid","Invalid data from Beenius adapter," +
-						" clientId: " + clientId + ",authpin: " + authPin, "clientId="+clientId+ ",authpin="+authPin);
-			}*/
-			
+				this.messageDataRepository.save(billingMessage);		
+			}
 		}
 		
 		if(provSystem != null && requestType !=null && provSystem.equalsIgnoreCase("ZebraOTT") 
