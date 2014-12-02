@@ -5,7 +5,6 @@
  */
 package org.mifosplatform.portfolio.activationprocess.service;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -16,7 +15,6 @@ import org.json.JSONObject;
 import org.mifosplatform.billing.selfcare.domain.SelfCare;
 import org.mifosplatform.billing.selfcare.domain.SelfCareTemporary;
 import org.mifosplatform.billing.selfcare.domain.SelfCareTemporaryRepository;
-import org.mifosplatform.billing.selfcare.exception.PaymentStatusAlreadyActivatedException;
 import org.mifosplatform.billing.selfcare.exception.SelfCareNotVerifiedException;
 import org.mifosplatform.billing.selfcare.exception.SelfCareTemporaryEmailIdNotFoundException;
 import org.mifosplatform.billing.selfcare.service.SelfCareRepository;
@@ -60,7 +58,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 @Service
 public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements ActivationProcessWritePlatformService {
 
@@ -136,7 +133,8 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
                 "Unknown data integrity issue with resource.");
     }
 
-    @Transactional
+    @SuppressWarnings({ "static-access" })
+	@Transactional
     @Override
     public CommandProcessingResult activationProcess(final JsonCommand command) {
 
@@ -200,6 +198,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
     }
 
 	//@SuppressWarnings("unused")
+	@SuppressWarnings({ "static-access" })
 	@Override
 	public CommandProcessingResult selfRegistrationProcess(JsonCommand command) {
 
@@ -216,8 +215,6 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 			String device = null;
 			String dateFormat = "dd MMMM yyyy";
 			String activationDate = new SimpleDateFormat(dateFormat).format(new Date());
-
-			
 
 			String fullname = command.stringValueOfParameterNamed("fullname");
 			String firstName = command.stringValueOfParameterNamed("firstname");
@@ -236,9 +233,9 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 				throw new SelfCareTemporaryEmailIdNotFoundException(email);
 			}
 
-			if(temporary.getPaymentStatus().equalsIgnoreCase("ACTIVE")){
+			/*if(temporary.getPaymentStatus().equalsIgnoreCase("ACTIVE")){
 				throw new PaymentStatusAlreadyActivatedException(email);
-			}
+			}*/
 			
 			if (temporary.getStatus().equalsIgnoreCase("ACTIVE")) {
 				
@@ -415,7 +412,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 				}
 				
 				// payment Processing
-				if(temporary.getPaymentStatus().equalsIgnoreCase("PENDING")){
+				/*if(temporary.getPaymentStatus().equalsIgnoreCase("PENDING")){
 					  temporary.setPaymentStatus("ACTIVE");
 					  JSONObject json= new JSONObject(temporary.getPaymentData());
 					  
@@ -440,7 +437,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 							throw new PlatformDataIntegrityException("error.msg.client.payment.creation","Payment Failed for ClientId:"
 											+ resultClient.getClientId(),"Payment Failed");
 					  }
-				}
+				}*/
 				
 				SelfCare selfcare =  this.selfCareRepository.findOneByClientId(resultClient.getClientId());
 				

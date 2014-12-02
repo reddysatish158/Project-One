@@ -62,7 +62,6 @@ public class EntitlementReadPlatformServiceImpl implements
 		public EntitlementsData mapRow(final ResultSet rs, final int rowNum)
 				throws SQLException {
 			Long id = rs.getLong("id");
-			Long serviceId = rs.getLong("serviceId");
 			String product = rs.getString("sentMessage");
 			Long prdetailsId = rs.getLong("prdetailsId");
 			String requestType = rs.getString("requestType");
@@ -75,19 +74,22 @@ public class EntitlementReadPlatformServiceImpl implements
 			Long orderId=rs.getLong("orderId");
 			LocalDate startDate=JdbcSupport.getLocalDate(rs, "startDate");
 		    LocalDate endDate=JdbcSupport.getLocalDate(rs, "endDate");
+		    String displayName = rs.getString("displayName");
+		    String login = rs.getString("login");
+		    String password = rs.getString("password"); 
 
-			return new EntitlementsData(id, prdetailsId, requestType,hardwareId, provisioingSystem, product, serviceId, clientId,planId,
-					orderNo,orderId,startDate,endDate,servicetype);
-
-
+			return new EntitlementsData(id, prdetailsId, requestType,hardwareId, provisioingSystem, product, clientId, planId,
+					orderNo, orderId, startDate, endDate, servicetype, displayName, login, password);
 		}
 
 		public String schema() {
 
-			return "  p.id AS id,p.client_id AS clientId,p.provisioing_system AS provisioingSystem,pr.service_id AS serviceId,pr.id AS prdetailsId,pr.service_type as servicetype," +
-					"pr.sent_message AS sentMessage,pr.hardware_id AS hardwareId,pr.request_type AS requestType,o.plan_id AS planId,o.order_no AS orderNo," +
-					"o.id as orderId,o.start_date as startDate,o.end_date as endDate FROM b_process_request_detail pr, b_process_request p LEFT JOIN b_orders o" +
-					" ON o.id = p.order_id WHERE p.id = pr.processrequest_id AND p.is_processed = 'N'";
+			return " p.id AS id,p.client_id AS clientId,p.provisioing_system AS provisioingSystem,pr.id AS prdetailsId,pr.service_type as servicetype," +
+					" pr.sent_message AS sentMessage,pr.hardware_id AS hardwareId,pr.request_type AS requestType,o.plan_id AS planId,o.order_no AS orderNo," +
+					" o.id as orderId,o.start_date as startDate,o.end_date as endDate, c.account_no as accountNo," +
+					" c.display_name as displayName, ifnull(c.login,c.id) as login, ifnull(c.password,'0000') as password" +
+					" FROM b_process_request_detail pr, b_process_request p LEFT JOIN b_orders o" +
+					" ON o.id = p.order_id LEFT JOIN m_client c ON c.id = p.client_id WHERE p.id = pr.processrequest_id AND p.is_processed = 'N'";
 
 		}
 
@@ -145,7 +147,7 @@ public class EntitlementReadPlatformServiceImpl implements
 			public StakerData mapRow(final ResultSet rs, final int rowNum) throws SQLException {
 				
 			     String mac=rs.getString("mac");
-			     Long Ls1=rs.getLong("Ls");
+			     //Long Ls1=rs.getLong("Ls");
 			     String status=rs.getString("status");
 			     String fname=rs.getString("fname");
 			     String phone=rs.getString("phone");

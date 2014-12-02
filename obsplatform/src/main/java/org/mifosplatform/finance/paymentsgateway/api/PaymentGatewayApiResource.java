@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.Consumes;
@@ -37,6 +38,7 @@ import org.mifosplatform.finance.payments.exception.ReceiptNoDuplicateException;
 import org.mifosplatform.finance.paymentsgateway.data.PaymentGatewayData;
 import org.mifosplatform.finance.paymentsgateway.data.PaymentGatewayDownloadData;
 import org.mifosplatform.finance.paymentsgateway.service.PaymentGatewayReadPlatformService;
+import org.mifosplatform.finance.paymentsgateway.service.PaymentGatewayWritePlatformService;
 import org.mifosplatform.infrastructure.codes.data.CodeData;
 import org.mifosplatform.infrastructure.core.api.ApiRequestParameterHelper;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
@@ -85,12 +87,14 @@ public class PaymentGatewayApiResource {
 	private CommandProcessingResult result;
 	private JSONObject jsonData;
 	private Long errorCode;
+	private final PaymentGatewayWritePlatformService paymentGatewayWritePlatformService;
 
 	@Autowired
 	public PaymentGatewayApiResource(final PlatformSecurityContext context,final PaymentGatewayReadPlatformService readPlatformService,
 			final DefaultToApiJsonSerializer<PaymentGatewayData> toApiJsonSerializer,final ApiRequestParameterHelper apiRequestParameterHelper,
 			final PortfolioCommandSourceWritePlatformService writePlatformService,
-			final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
+			final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
+    		final PaymentGatewayWritePlatformService paymentGatewayWritePlatformService) {
 
 		this.toApiJsonSerializer = toApiJsonSerializer;
 		this.writePlatformService = writePlatformService;
@@ -98,6 +102,7 @@ public class PaymentGatewayApiResource {
 		this.readPlatformService=readPlatformService;
 		this.apiRequestParameterHelper=apiRequestParameterHelper;
 		this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+    	this.paymentGatewayWritePlatformService = paymentGatewayWritePlatformService;
 	}
 
 	/**
@@ -351,7 +356,7 @@ public class PaymentGatewayApiResource {
 		 return this.toApiJsonSerializer.serialize(result);
 
 	}
-	
+
 	/**
 	 * This method is used for Online Payment 
 	 * Systems like Paypal,Dalpay,Korta etc...
@@ -360,16 +365,39 @@ public class PaymentGatewayApiResource {
 	 * 1) b_paymentgateway and 
 	 * 2) b_payment.
 	 */
+
 	@PUT
 	@Path("onlinepayment")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.TEXT_HTML})
 	public String OnlinePaymentMethod(final String apiRequestBodyAsJson){
-		 
-		final CommandWrapper commandRequest = new CommandWrapperBuilder().OnlinePaymentGateway().withJson(apiRequestBodyAsJson).build();
-		final CommandProcessingResult result = this.writePlatformService.logCommandSource(commandRequest);
-		return this.toApiJsonSerializer.serialize(result);
+		
+		try{
+			
+			final CommandWrapper commandRequest = new CommandWrapperBuilder().OnlinePaymentGateway().withJson(apiRequestBodyAsJson).build();
+			final CommandProcessingResult result = this.writePlatformService.logCommandSource(commandRequest);
+			
+			Map<String, Object> output = result.getChanges();
+			
+			String client = String.valueOf(output.get("clientId"));
+			String txnId = String.valueOf(output.get("txnId"));
+			Long pgId = Long.valueOf(String.valueOf(output.get("pgId")));
+			String amount = String.valueOf(output.get("amount"));
+			
+			Long clientId = Long.valueOf(client);
+			
+			String OutputData = this.paymentGatewayWritePlatformService.payment(clientId, pgId, txnId, amount);
+			
+			JSONObject object = new JSONObject(OutputData);
+			
+			this.paymentGatewayWritePlatformService.emailSending(clientId, object.getString("Result"), object.getString("Description"), txnId, object.getString("paymentId"), amount);
+			
+			return object.toString();
+				
+		}catch(JSONException e){
+			
+			return null;
+		}		
 	}
-
 }
 
