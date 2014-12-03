@@ -8,7 +8,7 @@ public class ServiceData {
 	private final String serviceCode;
 	private final String planDescription;
 	private final String planCode;
-	private final String discountCode;
+	private final Long discountId;
 	private final BigDecimal price;
 	private final String chargeCode;
 	private final String chargeVariant;
@@ -23,7 +23,8 @@ public class ServiceData {
 	private final String chargeDescription;
 
 	public ServiceData(final Long id, final String planCode,final  String serviceCode,final String planDescription,final  String chargeCode,
-			final String chargingVariant,final BigDecimal price,final String priceregion,final Long contractId,final String duration,final String billingFrequency) {
+			final String chargingVariant,final BigDecimal price,final String priceregion,final Long contractId,final String duration,
+			final String billingFrequency, final Long discountId, String isPrepaid) {
 
 		this.id = id;
 		this.serviceCode = serviceCode;
@@ -37,10 +38,10 @@ public class ServiceData {
 		this.duration=duration;
 		this.billingFrequency=billingFrequency;
 		this.planId=null;
-		this.discountCode = null;
+		this.discountId = discountId;
 		this.serviceDescription=null;
 		this.serviceType=null;
-		this.isPrepaid=null;
+		this.isPrepaid=isPrepaid;
 		this.chargeDescription=null;
 		
 		
@@ -52,7 +53,7 @@ public class ServiceData {
 		
 		this.id = id;
 		this.planId = planId;
-		this.discountCode = null;
+		this.discountId = null;
 		this.serviceCode = serviceCode;
 		this.planDescription = null;
 		this.planCode = planCode;
@@ -82,8 +83,8 @@ public class ServiceData {
 		return planDescription;
 	}
 
-	public String getDiscountCode() {
-		return discountCode;
+	public Long getDiscountId() {
+		return discountId;
 	}
 
 	public String getPlanCode() {
