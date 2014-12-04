@@ -68,10 +68,10 @@ import org.mifosplatform.portfolio.order.serialization.OrderCommandFromApiJsonDe
 import org.mifosplatform.portfolio.plan.domain.Plan;
 import org.mifosplatform.portfolio.plan.domain.PlanDetails;
 import org.mifosplatform.portfolio.plan.domain.PlanRepository;
-import org.mifosplatform.portfolio.service.domain.ProvisionServiceDetails;
-import org.mifosplatform.portfolio.service.domain.ProvisionServiceDetailsRepository;
 import org.mifosplatform.portfolio.service.domain.ServiceMaster;
 import org.mifosplatform.portfolio.service.domain.ServiceMasterRepository;
+import org.mifosplatform.portfolio.servicemapping.domain.ServiceMapping;
+import org.mifosplatform.portfolio.servicemapping.domain.ServiceMappingRepository;
 import org.mifosplatform.provisioning.preparerequest.domain.PrepareRequest;
 import org.mifosplatform.provisioning.preparerequest.domain.PrepareRequsetRepository;
 import org.mifosplatform.provisioning.preparerequest.exception.PrepareRequestActivationException;
@@ -111,7 +111,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 	private final OrderAssembler  orderAssembler;
 	private final ClientRepository clientRepository;
 	private final EventValidationReadPlatformService eventValidationReadPlatformService;
-	private final ProvisionServiceDetailsRepository provisionServiceDetailsRepository;
+	private final ServiceMappingRepository provisionServiceDetailsRepository;
 	private final PrepareRequestReadplatformService prepareRequestReadplatformService;
 	private final ActiondetailsWritePlatformService actiondetailsWritePlatformService;
 	private final ContractPeriodReadPlatformService contractPeriodReadPlatformService;
@@ -149,7 +149,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 			final PrepareRequestWriteplatformService prepareRequestWriteplatformService,final OrderHistoryRepository orderHistoryRepository,
 			final  ConfigurationRepository configurationRepository,final AllocationReadPlatformService allocationReadPlatformService,
 			final HardwareAssociationWriteplatformService associationWriteplatformService,final PrepareRequestReadplatformService prepareRequestReadplatformService,
-			final ProvisionServiceDetailsRepository provisionServiceDetailsRepository,final OrderReadPlatformService orderReadPlatformService,
+			final ServiceMappingRepository provisionServiceDetailsRepository,final OrderReadPlatformService orderReadPlatformService,
 		    final ProcessRequestRepository processRequestRepository,final HardwareAssociationReadplatformService hardwareAssociationReadplatformService,
 		    final PrepareRequsetRepository prepareRequsetRepository,final PromotionCodeRepository promotionCodeRepository,
 		    final OrderDiscountRepository orderDiscountRepository, final OrderAssembler orderAssembler,
@@ -613,7 +613,7 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 				  			if (detailsData != null) {
 				  				hardWareId = detailsData.getSerialNo();
 				  			}
-				  			final List<ProvisionServiceDetails> provisionServiceDetails = this.provisionServiceDetailsRepository.findOneByServiceId(orderLine.getServiceId());
+				  			final List<ServiceMapping> provisionServiceDetails = this.provisionServiceDetailsRepository.findOneByServiceId(orderLine.getServiceId());
 				  			final ServiceMaster service = this.serviceMasterRepository.findOne(orderLine.getServiceId());
 				  			if (!provisionServiceDetails.isEmpty()) {
 				  				if (message == null) {

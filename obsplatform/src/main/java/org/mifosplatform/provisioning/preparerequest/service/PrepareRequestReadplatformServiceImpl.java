@@ -4,7 +4,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -20,10 +19,10 @@ import org.mifosplatform.portfolio.order.domain.StatusTypeEnum;
 import org.mifosplatform.portfolio.order.domain.UserActionStatusTypeEnum;
 import org.mifosplatform.portfolio.planmapping.domain.PlanMapping;
 import org.mifosplatform.portfolio.planmapping.domain.PlanMappingRepository;
-import org.mifosplatform.portfolio.service.domain.ProvisionServiceDetails;
-import org.mifosplatform.portfolio.service.domain.ProvisionServiceDetailsRepository;
 import org.mifosplatform.portfolio.service.domain.ServiceMaster;
 import org.mifosplatform.portfolio.service.domain.ServiceMasterRepository;
+import org.mifosplatform.portfolio.servicemapping.domain.ServiceMapping;
+import org.mifosplatform.portfolio.servicemapping.domain.ServiceMappingRepository;
 import org.mifosplatform.provisioning.preparerequest.data.PrepareRequestData;
 import org.mifosplatform.provisioning.preparerequest.domain.PrepareRequest;
 import org.mifosplatform.provisioning.preparerequest.domain.PrepareRequsetRepository;
@@ -47,7 +46,7 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 	  private final ProcessRequestRepository processRequestRepository;
 	  private final PrepareRequsetRepository prepareRequsetRepository;
 	  private final AllocationReadPlatformService allocationReadPlatformService;
-	  private final ProvisionServiceDetailsRepository provisionServiceDetailsRepository;
+	  private final ServiceMappingRepository provisionServiceDetailsRepository;
 	  private final ServiceMasterRepository serviceMasterRepository;
 	  public final static String PROVISIONGSYS_COMVENIENT="Comvenient";
 	  private final PlanMappingRepository planMappingRepository;
@@ -57,7 +56,7 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 	    public PrepareRequestReadplatformServiceImpl(final DataSourcePerTenantService dataSourcePerTenantService,final OrderRepository orderRepository,
 	    		final ServiceMasterRepository serviceMasterRepository,final ProcessRequestRepository processRequestRepository,
 	    		final AllocationReadPlatformService allocationReadPlatformService,final PrepareRequsetRepository prepareRequsetRepository,
-	    		final ProvisionServiceDetailsRepository provisionServiceDetailsRepository,final PlanMappingRepository planMappingRepository) {
+	    		final ServiceMappingRepository provisionServiceDetailsRepository,final PlanMappingRepository planMappingRepository) {
 	            
 	    	    
 	    	    this.orderRepository=orderRepository;
@@ -190,7 +189,7 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 			 for(OrderLine orderLine:orderdetails){
 				 
 				 JSONObject oldsubjson = new JSONObject();
-				 List<ProvisionServiceDetails> provisionServiceDetails=this.provisionServiceDetailsRepository.findOneByServiceId(orderLine.getServiceId());
+				 List<ServiceMapping> provisionServiceDetails=this.provisionServiceDetailsRepository.findOneByServiceId(orderLine.getServiceId());
 				 ServiceMaster service=this.serviceMasterRepository.findOne(orderLine.getServiceId()); 
 				 oldsubjson.put("oldServiceIdentification", provisionServiceDetails.get(0).getServiceIdentification());
 				 oldsubjson.put("oldServiceType", service.getServiceType());
@@ -202,7 +201,7 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 		 JSONArray newServiceArray = new JSONArray();
 		 for(OrderLine orderLine:orderLineData){
 			 
-			 List<ProvisionServiceDetails> provisionServiceDetails=this.provisionServiceDetailsRepository.findOneByServiceId(orderLine.getServiceId());
+			 List<ServiceMapping> provisionServiceDetails=this.provisionServiceDetailsRepository.findOneByServiceId(orderLine.getServiceId());
 			 	ServiceMaster service=this.serviceMasterRepository.findOne(orderLine.getServiceId());
 		
 			 	if(requestData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.DEVICE_SWAP.toString())){
