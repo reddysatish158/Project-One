@@ -100,16 +100,16 @@ public class PriceReadPlatformServiceImpl implements PriceReadPlatformService {
 			final String region) {
 
 		context.authenticatedUser();
-		String sql = "SELECT p.plan_code AS plan_code, cp.id as contractId,pm.id AS id,pm.service_code AS serviceCode,"
-				+ "se.service_description AS serviceDescription, pm.duration as contract,c.charge_description AS chargeDescription,"
+		String sql = "SELECT p.plan_code AS plan_code,p.is_prepaid as isPrepaid,cp.id as contractId,pm.id AS id,pm.service_code AS serviceCode,"
+				+ "se.service_description AS serviceDescription, pm.duration as contract,c.charge_description AS chargeDescription,pm.discount_id AS discountId,"
 				+ "pm.charge_code AS charge_code,pm.charging_variant AS chargingVariant,pm.price AS price,c.billfrequency_code as billingFrequency,"
 				+ "pr.priceregion_name AS priceregion FROM b_plan_master p,b_service se,b_charge_codes c,b_plan_pricing pm  left join b_priceregion_master "
 				+ "pr on  pm.price_region_id=pr.id  LEFT JOIN b_contract_period cp ON cp.contract_period = pm.duration WHERE p.id = pm.plan_id  AND pm.charge_code=c.charge_code and "
 				+ " (pm.service_code = se.service_code or pm.service_code ='None') and pm.is_deleted='n' and se.is_deleted='n' and  pm.plan_id =? group by pm.id";
 
 		if (region != null) {
-			sql = " SELECT p.plan_code AS plan_code,cp.id AS contractId,pm.id AS id,pm.service_code AS serviceCode,se.service_description AS serviceDescription,"
-					+ " pm.duration AS contract,c.charge_description AS chargeDescription,pm.charge_code AS charge_code,pm.charging_variant AS chargingVariant,"
+			sql = " SELECT p.plan_code AS plan_code,p.is_prepaid as isPrepaid,cp.id AS contractId,pm.id AS id,pm.service_code AS serviceCode,se.service_description AS serviceDescription,"
+					+ " pm.duration AS contract,c.charge_description AS chargeDescription,pm.charge_code AS charge_code,pm.charging_variant AS chargingVariant,pm.discount_id AS discountId,"
 					+ " pm.price AS price,c.billfrequency_code AS billingFrequency,pr.priceregion_name AS priceregion FROM b_plan_master p,b_service se, b_charge_codes c,"
 					+ " b_priceregion_detail pd, b_state s,b_plan_pricing pm LEFT JOIN b_priceregion_master pr ON pm.price_region_id = pr.id LEFT JOIN "
 					+ " b_contract_period cp ON cp.contract_period = pm.duration WHERE p.id = pm.plan_id AND pm.charge_code = c.charge_code AND "
@@ -127,9 +127,7 @@ public class PriceReadPlatformServiceImpl implements PriceReadPlatformService {
 	private static final class PriceMapper implements RowMapper<ServiceData> {
 
 		@Override
-		public ServiceData mapRow(final ResultSet rs,
-				@SuppressWarnings("unused") final int rowNum)
-				throws SQLException {
+		public ServiceData mapRow(final ResultSet rs, final int rowNum)	throws SQLException {
 
 			final Long id = rs.getLong("id");
 			final Long contractId = rs.getLong("contractId");
@@ -142,13 +140,14 @@ public class PriceReadPlatformServiceImpl implements PriceReadPlatformService {
 			final String chargingVariant = rs.getString("chargingVariant");
 			final String priceregion = rs.getString("priceregion");
 			final BigDecimal price = rs.getBigDecimal("price");
+			final Long discountId  = rs.getLong("discountId");
+			final String isPrepaid = rs.getString("isPrepaid");
 			final int chargingVariant1 = Integer.valueOf(chargingVariant);
 			EnumOptionData chargingvariant = SavingChargeVaraint
 					.interestCompoundingPeriodType(chargingVariant1);
 			final String chargeValue = chargingvariant.getValue();
-			return new ServiceData(id, planCode, serviceCode, planDescription,
-					chargeCode, chargeValue, price, priceregion, contractId,
-					duration, billingFrequency);
+			return new ServiceData(id, planCode, serviceCode, planDescription,chargeCode, chargeValue, price, priceregion,
+					contractId,duration, billingFrequency,discountId,isPrepaid);
 		}
 	}
 
