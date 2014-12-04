@@ -600,9 +600,15 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 				if (plan == null) {
 					throw new NoOrdersFoundException(command.entityId());
 				}
+				Long resourceId = Long.valueOf(0);
 				if (requstStatus != null && plan!=null) {
 					
-					final AllocationDetailsData detailsData = this.allocationReadPlatformService.getTheHardwareItemDetails(command.entityId());
+					 CommandProcessingResult commandProcessingResult=this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order,plan.getPlanCode(),requstStatus,
+		    				 Long.valueOf(0),null,null,order.getId(),plan.getProvisionSystem(),
+		    				 this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
+		    		 resourceId=commandProcessingResult.resourceId();
+					
+					/*final AllocationDetailsData detailsData = this.allocationReadPlatformService.getTheHardwareItemDetails(command.entityId());
 					final ProcessRequest processRequest=new ProcessRequest(Long.valueOf(0),order.getClientId(),order.getId(),plan.getProvisionSystem(),requstStatus
 							,'N','N');
 				  processRequest.setNotify();
@@ -624,12 +630,10 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 				  				processRequest.add(processRequestDetails);
 				  			}
 				  	}
-				this.processRequestRepository.save(processRequest);
+				this.processRequestRepository.save(processRequest);*/
 				this.orderRepository.save(order);
-				final AppUser appUser = this.context.authenticatedUser();
-				final Long userId = appUser.getId();
-				final OrderHistory orderHistory = new OrderHistory(order.getId(),new LocalDate(), new LocalDate(), command.entityId(),
-						requstStatus, userId,null);
+				final OrderHistory orderHistory = new OrderHistory(order.getId(),new LocalDate(), new LocalDate(), resourceId,
+						requstStatus, getUserId(),null);
 				this.orderHistoryRepository.save(orderHistory);
 				
 			}
