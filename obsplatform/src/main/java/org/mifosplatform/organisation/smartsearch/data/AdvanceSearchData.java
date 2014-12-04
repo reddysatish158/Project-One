@@ -13,17 +13,17 @@ public class AdvanceSearchData {
 	private final String userName;
 	
 
-	public AdvanceSearchData(Long id, Long clientId, String accountNo,String clientName, LocalDate transactionDate,
-			String category,String status, String userName) {
+	public AdvanceSearchData(final Long id, final Long clientId, final String accountNo, final String clientName, 
+			final LocalDate transactionDate, final String category, final String status, final String userName) {
              
-		this.id=id;
-		this.clientId=clientId;
-		this.accountNo=accountNo;
-		this.clientName=clientName;
-		this.category=category;
-		this.transactionDate=transactionDate;
-		this.status=status;
-		this.userName=userName;
+		this.id = id;
+		this.clientId = clientId;
+		this.accountNo = accountNo;
+		this.clientName = clientName;
+		this.category = category;
+		this.transactionDate = transactionDate;
+		this.status = status;
+		this.userName = userName;
 		
 	
 	}
