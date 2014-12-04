@@ -201,24 +201,23 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 		 }
 
 		 JSONArray newServiceArray = new JSONArray();
+		 if(requestData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.DEVICE_SWAP.toString())){
+			 AllocationDetailsData allocationDetailsData=this.allocationReadPlatformService.getDisconnectedHardwareItemDetails(requestData.getOrderId(),requestData.getClientId(),configProp);
+			 jsonObject.put("clientId", order.getClientId());
+			 jsonObject.put("OldHWId", allocationDetailsData.getSerialNo());
+			 jsonObject.put("NewHWId", HardWareId);
+		 
+		 	}
 		 for(OrderLine orderLine:orderLineData){
 			 
 			 List<ProvisionServiceDetails> provisionServiceDetails=this.provisionServiceDetailsRepository.findOneByServiceId(orderLine.getServiceId());
 			 	ServiceMaster service=this.serviceMasterRepository.findOne(orderLine.getServiceId());
-		
-			 	if(requestData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.DEVICE_SWAP.toString())){
-				 AllocationDetailsData allocationDetailsData=this.allocationReadPlatformService.getDisconnectedHardwareItemDetails(requestData.getOrderId(),requestData.getClientId(),configProp);
-				 jsonObject.put("clientId", order.getClientId());
-				 jsonObject.put("OldHWId", allocationDetailsData.getSerialNo());
-				 jsonObject.put("NewHWId", HardWareId);
-			 
-			 	}else{
 				 JSONObject subjson = new JSONObject();
 				 subjson.put("serviceName", service.getServiceCode());
 				 subjson.put("serviceIdentification", provisionServiceDetails.get(0).getServiceIdentification());
 				 subjson.put("serviceType", service.getServiceType());
 				 newServiceArray.add(subjson.toString());	 
-			 }
+			
 		 }
 
 		 jsonObject.put("services", new Gson().toJson(newServiceArray));

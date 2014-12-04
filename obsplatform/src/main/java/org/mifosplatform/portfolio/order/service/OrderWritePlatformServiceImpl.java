@@ -68,7 +68,6 @@ import org.mifosplatform.portfolio.order.serialization.OrderCommandFromApiJsonDe
 import org.mifosplatform.portfolio.plan.domain.Plan;
 import org.mifosplatform.portfolio.plan.domain.PlanDetails;
 import org.mifosplatform.portfolio.plan.domain.PlanRepository;
-import org.mifosplatform.portfolio.service.domain.ProvisionServiceDetails;
 import org.mifosplatform.portfolio.service.domain.ProvisionServiceDetailsRepository;
 import org.mifosplatform.portfolio.service.domain.ServiceMaster;
 import org.mifosplatform.portfolio.service.domain.ServiceMasterRepository;
@@ -76,8 +75,6 @@ import org.mifosplatform.provisioning.preparerequest.domain.PrepareRequest;
 import org.mifosplatform.provisioning.preparerequest.domain.PrepareRequsetRepository;
 import org.mifosplatform.provisioning.preparerequest.exception.PrepareRequestActivationException;
 import org.mifosplatform.provisioning.preparerequest.service.PrepareRequestReadplatformService;
-import org.mifosplatform.provisioning.processrequest.domain.ProcessRequest;
-import org.mifosplatform.provisioning.processrequest.domain.ProcessRequestDetails;
 import org.mifosplatform.provisioning.processrequest.domain.ProcessRequestRepository;
 import org.mifosplatform.provisioning.provisioning.service.ProvisioningWritePlatformService;
 import org.mifosplatform.useradministration.domain.AppUser;
@@ -472,7 +469,7 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 	//  Set<PlanDetails> planDetails=plan.getDetails();
 	 // ServiceMaster serviceMaster=this.serviceMasterRepository.findOneByServiceCode(planDetails.iterator().next().getServiceCode());
 	  Long resourceId=Long.valueOf(0);
-	  	if(!plan.getProvisionSystem().equalsIgnoreCase("None")){
+	  	if(!plan.getProvisionSystem().equalsIgnoreCase("None") && requestStatusForProv != null){
 		    	// if(serviceMaster.isAuto() == 'Y' && requestStatusForProv != null){
 		    	 	//this.prepareRequestWriteplatformService.prepareNewRequest(orderDetails,plan,requestStatusForProv);
 		    	// }else{
@@ -600,9 +597,15 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 				if (plan == null) {
 					throw new NoOrdersFoundException(command.entityId());
 				}
+				Long resourceId = Long.valueOf(0);
 				if (requstStatus != null && plan!=null) {
 					
-					final AllocationDetailsData detailsData = this.allocationReadPlatformService.getTheHardwareItemDetails(command.entityId());
+					 CommandProcessingResult commandProcessingResult=this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order,plan.getPlanCode(),requstStatus,
+		    				 Long.valueOf(0),null,null,order.getId(),plan.getProvisionSystem(),
+		    				 this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
+		    		 resourceId=commandProcessingResult.resourceId();
+					
+					/*final AllocationDetailsData detailsData = this.allocationReadPlatformService.getTheHardwareItemDetails(command.entityId());
 					final ProcessRequest processRequest=new ProcessRequest(Long.valueOf(0),order.getClientId(),order.getId(),plan.getProvisionSystem(),requstStatus
 							,'N','N');
 				  processRequest.setNotify();
@@ -624,12 +627,10 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 				  				processRequest.add(processRequestDetails);
 				  			}
 				  	}
-				this.processRequestRepository.save(processRequest);
+				this.processRequestRepository.save(processRequest);*/
 				this.orderRepository.save(order);
-				final AppUser appUser = this.context.authenticatedUser();
-				final Long userId = appUser.getId();
-				final OrderHistory orderHistory = new OrderHistory(order.getId(),new LocalDate(), new LocalDate(), command.entityId(),
-						requstStatus, userId,null);
+				final OrderHistory orderHistory = new OrderHistory(order.getId(),new LocalDate(), new LocalDate(), resourceId,
+						requstStatus, getUserId(),null);
 				this.orderHistoryRepository.save(orderHistory);
 				
 			}
