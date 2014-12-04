@@ -158,7 +158,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 	        for(JsonElement j:clientData){
            
 	        	JsonCommand comm=new JsonCommand(null, j.toString(),j, fromJsonHelper, null, null, null, null, null, null, null, null, null, null, null,null);
-	        	resultClient=this.clientWritePlatformService.createClient(comm,true);
+	        	resultClient=this.clientWritePlatformService.createClient(comm);
 	        }
 
 	      //  Configuration configuration=configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);
@@ -276,7 +276,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 				JsonCommand clientCommand = new JsonCommand(null,clientcreation.toString(), element, fromJsonHelper,
 						null, null, null, null, null, null, null, null, null, null, 
 						null, null);
-				resultClient = this.clientWritePlatformService.createClient(clientCommand,false);
+				resultClient = this.clientWritePlatformService.createClient(clientCommand);
 
 				if (resultClient == null) {
 					throw new PlatformDataIntegrityException("error.msg.client.creation.failed", "Client Creation Failed","Client Creation Failed");
