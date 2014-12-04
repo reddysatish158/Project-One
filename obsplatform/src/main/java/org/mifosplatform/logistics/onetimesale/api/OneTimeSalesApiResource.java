@@ -71,7 +71,6 @@ public class OneTimeSalesApiResource {
 	private final OneTimeSaleReadPlatformService oneTimeSaleReadPlatformService;
 	private final ItemReadPlatformService itemMasterReadPlatformService;
 	private final DiscountReadPlatformService discountReadPlatformService;
-	private final EventOrderReadplatformServie eventOrderReadplatformServie;
 	private final FromJsonHelper fromJsonHelper;
 	private final OfficeReadPlatformService officeReadPlatformService;
 	private final ContractPeriodReadPlatformService contractPeriodReadPlatformService;
@@ -85,7 +84,7 @@ public class OneTimeSalesApiResource {
 			final OneTimeSaleReadPlatformService oneTimeSaleReadPlatformService,
 			final ItemReadPlatformService itemReadPlatformService,
 			final DiscountReadPlatformService discountReadPlatformService,
-			final EventOrderReadplatformServie eventOrderReadplatformServie,
+			
 			final OfficeReadPlatformService officeReadPlatformService,
 			final DefaultToApiJsonSerializer<ItemData> defaultToApiJsonSerializer,
 			final FromJsonHelper fromJsonHelper,
@@ -99,7 +98,6 @@ public class OneTimeSalesApiResource {
 		this.itemMasterReadPlatformService = itemReadPlatformService;
 		this.apiRequestParameterHelper = apiRequestParameterHelper;
 		this.discountReadPlatformService = discountReadPlatformService;
-		this.eventOrderReadplatformServie = eventOrderReadplatformServie;
 		this.oneTimeSaleReadPlatformService = oneTimeSaleReadPlatformService;
 		this.oneTimeSaleWritePlatformService = oneTimeSaleWritePlatformService;
 		this.commandSourceWritePlatformService = commandSourceWritePlatformService;
@@ -148,8 +146,8 @@ public class OneTimeSalesApiResource {
 		
 		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
 		final List<OneTimeSaleData> salesData = this.oneTimeSaleReadPlatformService.retrieveClientOneTimeSalesData(clientId);
-		final List<EventOrderData> eventOrderDatas = this.eventOrderReadplatformServie.getTheClientEventOrders(clientId);
-		final OneTimeSaleData data = new OneTimeSaleData(salesData, eventOrderDatas);
+		//final List<EventOrderData> eventOrderDatas = this.eventOrderReadplatformServie.getTheClientEventOrders(clientId);
+		final OneTimeSaleData data = new OneTimeSaleData(salesData, null);
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 		return this.toApiJsonSerializer.serialize(settings, data,RESPONSE_DATA_PARAMETERS);
 	}
