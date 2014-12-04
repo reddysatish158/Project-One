@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
+import org.mifosplatform.portfolio.plan.data.ServiceData;
 import org.mifosplatform.portfolio.servicemapping.data.ServiceCodeData;
 import org.mifosplatform.portfolio.servicemapping.data.ServiceMappingData;
 import org.mifosplatform.provisioning.provisioning.data.ServiceParameterData;
@@ -142,6 +143,27 @@ public class ServiceMappingReadPlatformServiceImpl implements
 			String sql = "select " + mapper.schema() + " and o.id = " + orderId;
 			if (serviceId != null) {
 				sql = sql + " and sd.service_id=" + serviceId;
+			}
+
+			return this.jdbcTemplate.query(sql, mapper, new Object[] {});
+
+		} catch (EmptyResultDataAccessException accessException) {
+			return null;
+		}
+
+	}
+
+	@Override
+	public List<ServiceMappingData> retrieveOptionalServices(String serviceType) {
+
+		try {
+			ServiceMappingDataByIdRowMapper mapper = new ServiceMappingDataByIdRowMapper();
+			String sql = "SELECT s.id as id,s.service_code as serviceCode,ifnull(sp.category,'all') as category,sp.sub_category as subcategory," +
+					" sp.image as image,sp.service_identification as serviceIdentification,s.status as status FROM b_service s " +
+					" left join b_prov_service_details sp on s.id = sp.service_id where s.is_deleted = 'N' "; 
+			
+			if (serviceType != null) {
+				sql = sql + " and s.is_optional=" + serviceType;
 			}
 
 			return this.jdbcTemplate.query(sql, mapper, new Object[] {});

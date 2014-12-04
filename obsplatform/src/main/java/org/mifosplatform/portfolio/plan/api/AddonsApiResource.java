@@ -32,6 +32,8 @@ import org.mifosplatform.portfolio.order.service.OrderReadPlatformService;
 import org.mifosplatform.portfolio.plan.data.PlanCodeData;
 import org.mifosplatform.portfolio.plan.data.ServiceData;
 import org.mifosplatform.portfolio.service.service.ServiceMasterReadPlatformService;
+import org.mifosplatform.portfolio.servicemapping.data.ServiceMappingData;
+import org.mifosplatform.portfolio.servicemapping.service.ServiceMappingReadPlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -50,21 +52,24 @@ public class AddonsApiResource {
 	 private final ApiRequestParameterHelper apiRequestParameterHelper;
 	 private final OrderReadPlatformService orderReadPlatformService;
 	 private final ChargeCodeReadPlatformService chargeCodeReadPlatformService;
+	 private final ServiceMappingReadPlatformService serviceMappingReadPlatformService;
 	 private final ServiceMasterReadPlatformService serviceMasterReadPlatformService;
 	 private final RegionalPriceReadplatformService regionalPriceReadplatformService;
 	 private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 	  
-@Autowired
-public AddonsApiResource(final DefaultToApiJsonSerializer<AddonsData> apiJsonSerializer,final PlatformSecurityContext context,
+ @Autowired
+ public AddonsApiResource(final DefaultToApiJsonSerializer<AddonsData> apiJsonSerializer,final PlatformSecurityContext context,
 			  final ApiRequestParameterHelper apiRequestParameterHelper,final OrderReadPlatformService orderReadPlatformService,
 			  final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService,final RegionalPriceReadplatformService regionalPriceReadplatformService,
-			  final ChargeCodeReadPlatformService chargeCodeReadPlatformService,final ServiceMasterReadPlatformService serviceMasterReadPlatformService){
+			  final ChargeCodeReadPlatformService chargeCodeReadPlatformService,final ServiceMasterReadPlatformService serviceMasterReadPlatformService,
+			  final ServiceMappingReadPlatformService serviceMappingReadPlatformService){
 		  
 		  this.toApiJsonSerializer=apiJsonSerializer;
 		  this.context=context;
 		  this.chargeCodeReadPlatformService=chargeCodeReadPlatformService;
 		  this.regionalPriceReadplatformService=regionalPriceReadplatformService;
 		  this.orderReadPlatformService=orderReadPlatformService;
+		  this.serviceMappingReadPlatformService=serviceMappingReadPlatformService;
 		  this.apiRequestParameterHelper=apiRequestParameterHelper;
 		  this.serviceMasterReadPlatformService=serviceMasterReadPlatformService;
 		  this.commandsSourceWritePlatformService=commandSourceWritePlatformService;
@@ -100,7 +105,7 @@ public AddonsApiResource(final DefaultToApiJsonSerializer<AddonsData> apiJsonSer
 		List<PlanCodeData> planDatas = this.orderReadPlatformService.retrieveAllPlatformData(Long.valueOf(0));
 		List<ChargeCodeData> chargeCodeDatas = this.chargeCodeReadPlatformService.retrieveAllChargeCodes();
 		List<PriceRegionData> priceRegionData = this.regionalPriceReadplatformService.getPriceRegionsDetails();
-		 final List<ServiceData> servicedatas = this.serviceMasterReadPlatformService.retrieveAllServices("Y");
+		 final List<ServiceMappingData> servicedatas = this.serviceMappingReadPlatformService.retrieveOptionalServices("Y");
 		return new AddonsData(planDatas,chargeCodeDatas,priceRegionData,servicedatas);
 	}
 

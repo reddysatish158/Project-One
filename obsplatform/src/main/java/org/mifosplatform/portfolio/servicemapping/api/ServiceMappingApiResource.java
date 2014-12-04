@@ -149,4 +149,6 @@ public class ServiceMappingApiResource {
 		final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 	}
+	
+	
 }
