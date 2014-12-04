@@ -57,7 +57,7 @@ IF NOT EXISTS (
        and TABLE_NAME = 'b_paymentgateway'
      and TABLE_SCHEMA = DATABASE())THEN
 ALTER TABLE b_paymentgateway ADD COLUMN `lastmodified_date` datetime DEFAULT NULL after `created_date`;
-ALTER TABLE b_paymentgateway ADD COLUMN `lastmodified_id` datetime DEFAULT NULL after `created_date`;
+ALTER TABLE b_paymentgateway ADD COLUMN `lastmodifiedby_id` datetime DEFAULT NULL after `created_date`;
 END IF;
 END //
 DELIMITER ;
