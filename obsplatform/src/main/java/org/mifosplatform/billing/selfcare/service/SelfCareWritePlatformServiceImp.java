@@ -397,6 +397,7 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 	public CommandProcessingResult selfcareChangePassword(JsonCommand command) {
 		
 		try{
+			
 			context.authenticatedUser();
 			selfCareCommandFromApiJsonDeserializer.validateForCreate(command);
 			String uniqueReference = command.stringValueOfParameterNamed("uniqueReference");

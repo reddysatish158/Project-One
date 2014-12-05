@@ -127,13 +127,13 @@ public class PaymentGatewayApiResource {
 			errorDesc = "";
 			errorCode = Long.valueOf(0);	
 			contentData = "OBSTRANSACTIONID=" + result.resourceId();	
-			return this.returnToStalker();	
+			return this.returnToServer();	
 		}catch(ReceiptNoDuplicateException e){
 				success="DUPLICATE_TXN";
 				errorDesc="DUPLICATE";
 				errorCode=Long.valueOf(1);
 				contentData="TXNID ALREADY EXIST";
-				return this.returnToStalker();
+				return this.returnToServer();
 		} catch (JSONException e) {
 			    return e.getCause().toString();	 
 		} catch (PlatformDataIntegrityException e) {
@@ -141,7 +141,7 @@ public class PaymentGatewayApiResource {
 	    }   
 	}
 
-	private String returnToStalker() {
+	private String returnToServer() {
 		
 		try {
 			final String obsPaymentType = jsonData.getString("OBSPAYMENTTYPE");
@@ -383,6 +383,13 @@ public class PaymentGatewayApiResource {
 			String txnId = String.valueOf(output.get("txnId"));
 			Long pgId = Long.valueOf(String.valueOf(output.get("pgId")));
 			String amount = String.valueOf(output.get("amount"));
+			String currency = String.valueOf(output.get("currency"));
+			
+			if(currency.equalsIgnoreCase("ISK")){
+				amount = amount.replace('.', ',');
+			}
+			
+			String totalAmount =  amount + " " + currency;
 			
 			Long clientId = Long.valueOf(client);
 			
@@ -390,7 +397,7 @@ public class PaymentGatewayApiResource {
 			
 			JSONObject object = new JSONObject(OutputData);
 			
-			this.paymentGatewayWritePlatformService.emailSending(clientId, object.getString("Result"), object.getString("Description"), txnId, object.getString("paymentId"), amount);
+			this.paymentGatewayWritePlatformService.emailSending(clientId, object.getString("Result"), object.getString("Description"), txnId, totalAmount);
 			
 			return object.toString();
 				

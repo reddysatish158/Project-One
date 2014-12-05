@@ -19,4 +19,7 @@ public class BillingMessageTemplateConstants {
 	public static final String MESSAGE_TEMPLATE_EMAIL_FROM = "";
 	public static final char MESSAGE_TEMPLATE_MESSAGE_TYPE = 'E';
 
+	public static final String MESSAGE_TEMPLATE_PAYMENT_RECEIPT = null;
+	
+
 }

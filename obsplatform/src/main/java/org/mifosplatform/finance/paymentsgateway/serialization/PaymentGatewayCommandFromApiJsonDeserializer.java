@@ -36,6 +36,9 @@ public class PaymentGatewayCommandFromApiJsonDeserializer {
 				"service", "receipt", "reference","transaction","dateFormat","locale","remarks","status","CUSTOMERREFERENCEID",
 				"TXNID","COMPANYNAME","STATUS","AMOUNT","MSISDN","TYPE","OBSPAYMENTTYPE"));
 	
+	private final Set<String> onlinePaymentSupportedParameters = new HashSet<String>(Arrays.asList("total_amount", 
+			"clientId", "emailId", "transactionId", "source", "otherData", "device", "currency","dateFormat","locale"));
+	
     private final FromJsonHelper fromApiJsonHelper;
     
     @Autowired
@@ -77,6 +80,48 @@ public class PaymentGatewayCommandFromApiJsonDeserializer {
 			baseDataValidator.reset().parameter("AMOUNT").value(amount).notBlank();
 			final String transactionId = fromApiJsonHelper.extractStringNamed("TXNID", element);
 			baseDataValidator.reset().parameter("TXNID").value(transactionId).notBlank();
+			
+		}
+		
+		
+		throwExceptionIfValidationWarningsExist(dataValidationErrors);
+	}
+    
+    public void validateForOnlinePayment(final String json) {
+
+		if (StringUtils.isBlank(json)) {
+			throw new InvalidJsonException();
+		}
+
+		final Type typeOfMap = new TypeToken<Map<String, Object>>() {
+		}.getType();
+		fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, onlinePaymentSupportedParameters);
+
+		final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
+		final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("paymentgateway");
+
+		final JsonElement element = fromApiJsonHelper.parse(json);
+	
+		final String source = fromApiJsonHelper.extractStringNamed("source", element);
+		
+		if(source.equalsIgnoreCase("globalpay")){
+			
+			final String transactionId = fromApiJsonHelper.extractStringNamed("transactionId", element);
+			baseDataValidator.reset().parameter("transactionId").value(transactionId).notBlank().notExceedingLengthOf(30);
+			
+		}else {
+			
+			final String transactionId = fromApiJsonHelper.extractStringNamed("transactionId", element);
+			baseDataValidator.reset().parameter("transactionId").value(transactionId).notBlank().notExceedingLengthOf(30);
+			
+			final String currency = fromApiJsonHelper.extractStringNamed("currency", element);
+			baseDataValidator.reset().parameter("currency").value(currency).notBlank().notExceedingLengthOf(30);
+			
+			final BigDecimal amount = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("total_amount", element);
+			baseDataValidator.reset().parameter("total_amount").value(amount).notBlank();
+			
+			final Long clientId = fromApiJsonHelper.extractLongNamed("clientId", element);
+			baseDataValidator.reset().parameter("clientId").value(clientId).notBlank();
 			
 		}
 		

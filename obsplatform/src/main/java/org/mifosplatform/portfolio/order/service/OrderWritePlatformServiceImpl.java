@@ -79,7 +79,6 @@ import org.mifosplatform.provisioning.preparerequest.service.PrepareRequestReadp
 import org.mifosplatform.provisioning.processrequest.domain.ProcessRequest;
 import org.mifosplatform.provisioning.processrequest.domain.ProcessRequestDetails;
 import org.mifosplatform.provisioning.processrequest.domain.ProcessRequestRepository;
-import org.mifosplatform.provisioning.provisioning.api.ProvisioningApiConstants;
 import org.mifosplatform.provisioning.provisioning.service.ProvisioningWritePlatformService;
 import org.mifosplatform.useradministration.domain.AppUser;
 import org.mifosplatform.workflow.eventaction.data.ActionDetaislData;
@@ -343,7 +342,6 @@ try{
 	return new CommandProcessingResult(order.getId(),order.getClientId());
 }
 	
-    @Transactional
 	@Override
 	public CommandProcessingResult disconnectOrder(final JsonCommand command, final Long orderId ) {
 		
@@ -375,6 +373,8 @@ try{
 			order.setuserAction(UserActionStatusTypeEnum.DISCONNECTION.toString());
 			this.orderRepository.saveAndFlush(order);
 			
+			final String requstStatus = UserActionStatusTypeEnum.DISCONNECTION.toString();
+			Long processingResultId = Long.valueOf(0);
 			
 			//Update Client Status
 			if("None".equalsIgnoreCase(plan.getProvisionSystem())){
@@ -384,22 +384,16 @@ try{
 					client.setStatus(ClientStatus.DEACTIVE.getValue());
 					this.clientRepository.saveAndFlush(client);
 				}
+			}else{
+				
+				CommandProcessingResult processingResult=this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order, plan.getPlanCode(), UserActionStatusTypeEnum.DISCONNECTION.toString(),
+						processingResultId, null, null, order.getId(),plan.getProvisionSystem(),
+						this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
+				processingResultId = processingResult.commandId();
+				
 			}
 				
-			
-			//for Prepare Request
-		final String requstStatus = UserActionStatusTypeEnum.DISCONNECTION.toString();
-		Long processingResultId = Long.valueOf(0);
-		//if(ProvisioningApiConstants.PROV_PACKETSPAN.equalsIgnoreCase(plan.getProvisionSystem())){
-		CommandProcessingResult processingResult=this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order, plan.getPlanCode(), UserActionStatusTypeEnum.DISCONNECTION.toString(),
-					processingResultId, null, null, order.getId(),plan.getProvisionSystem(),
-					this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
-		//}else{
-			//CommandProcessingResult processingResult = this.prepareRequestWriteplatformService.prepareNewRequest(order, plan, requstStatus);
-			//this.prepareRequestReadplatformService.processingClientDetails(requestData, configProp);
-			processingResultId = processingResult.commandId();
-		//}
-		
+	
 		//For Order History
 		final OrderHistory orderHistory = new OrderHistory(order.getId(), new LocalDate(), new LocalDate(), processingResultId, requstStatus, getUserId(), null);
 		this.orderHistoryRepository.save(orderHistory);
@@ -466,7 +460,7 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 					orderprice.setPrice(price.getPrice());
 				}
 		  	}
-		  orderprice.setDatesOnOrderStatus(newStartdate,renewalEndDate,orderDetails.getStatus());//setBillEndDate(renewalEndDate);
+		  orderprice.setDatesOnOrderStatus(newStartdate,renewalEndDate,orderDetails.getUserAction());//setBillEndDate(renewalEndDate);
 		  this.OrderPriceRepository.save(orderprice);
 		  orderDetails.setNextBillableDay(null);
 	  }
@@ -522,60 +516,61 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 	@Transactional
     @Override
 	public CommandProcessingResult reconnectOrder(final Long orderId) {
-	  try{
-		 
-		  	Order order=this.orderRepository.findOne(orderId);
-		  		if(order == null){
-		  			throw new NoOrdersFoundException(orderId);
-		  		}
-		  		final LocalDate startDate=new LocalDate();
-		  		List<SubscriptionData> subscriptionDatas=this.contractPeriodReadPlatformService.retrieveSubscriptionDatabyOrder(orderId);
-		  		Contract contractPeriod=this.subscriptionRepository.findOne(subscriptionDatas.get(0).getId());
-		  		LocalDate EndDate=this.orderAssembler.calculateEndDate(startDate,contractPeriod.getSubscriptionType(),contractPeriod.getUnits());
-		  		order.setStartDate(startDate);
-		  		order.setEndDate(EndDate);
-		  		order.setNextBillableDay(null);
-		  		final List<OrderPrice> orderPrices=order.getPrice();
-		   			for(OrderPrice price:orderPrices){
-		   				price.setBillStartDate(startDate);
-		   				price.setBillEndDate(EndDate);
-		   				price.setNextBillableDay(null);
-		   				price.setInvoiceTillDate(null);
-		   			}
-		   		Plan plan=this.planRepository.findOne(order.getPlanId());
-		   				if(plan.getProvisionSystem().equalsIgnoreCase("None")){
-		   					order.setStatus(OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.ACTIVE).getId());
-		   					Client client=this.clientRepository.findOne(order.getClientId());
-		   					client.setStatus(ClientStatus.ACTIVE.getValue());
-		   					this.clientRepository.save(client);
-		   				}else{
-		   					//	Check For HardwareAssociation
-		   					AssociationData associationData=this.hardwareAssociationReadplatformService.retrieveSingleDetails(orderId);
-		   					if(associationData ==null && plan.isHardwareReq() == 'Y'){
-		   						throw new HardwareDetailsNotFoundException(orderId.toString());
-		   					}
-		   					order.setStatus(OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.PENDING).getId());
-		   				}
-		   				order.setuserAction(UserActionStatusTypeEnum.RECONNECTION.toString());
-		   				this.orderRepository.save(order);
-		   				
-		   				//for Prepare Request
-		   				String requstStatus = UserActionStatusTypeEnum.RECONNECTION.toString().toString();
-		   				//CommandProcessingResult processingResult=this.prepareRequestWriteplatformService.prepareNewRequest(order,plan,requstStatus);
-		   				//	if(plan.getProvisionSystem().equalsIgnoreCase(ProvisioningApiConstants.PROV_PACKETSPAN)){
-		   				CommandProcessingResult processingResult =this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order,plan.getPlanCode(), requstStatus,
-		   								Long.valueOf(0),null,null,order.getId(),plan.getProvisionSystem(),
-		   								this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
-		   					//}
+	  
+	try{
+		Order order=this.orderRepository.findOne(orderId);
+		if(order == null){
+			throw new NoOrdersFoundException(orderId);
+		}
+		final LocalDate startDate=new LocalDate();
+		List<SubscriptionData> subscriptionDatas=this.contractPeriodReadPlatformService.retrieveSubscriptionDatabyOrder(orderId);
+		Contract contractPeriod=this.subscriptionRepository.findOne(subscriptionDatas.get(0).getId());
+		LocalDate EndDate=this.orderAssembler.calculateEndDate(startDate,contractPeriod.getSubscriptionType(),contractPeriod.getUnits());
+		
+		order.setStartDate(startDate);
+		order.setEndDate(EndDate);
+		order.setNextBillableDay(null);
+		final List<OrderPrice> orderPrices=order.getPrice();
+		
+		for(OrderPrice price:orderPrices){
 			
-		   					//For Order History
-		   			OrderHistory orderHistory=new OrderHistory(order.getId(),new LocalDate(),new LocalDate(),processingResult.commandId(),requstStatus,getUserId(),null);
-		   			this.orderHistoryRepository.save(orderHistory);
-		   		  return new CommandProcessingResult(order.getId(),order.getClientId());
-	  	}catch(final DataIntegrityViolationException dve){
-	  		handleCodeDataIntegrityIssues(null, dve);
-	  		return new CommandProcessingResult(Long.valueOf(-1));
-	  	}
+			price.setBillStartDate(startDate);
+			price.setBillEndDate(EndDate);
+			price.setNextBillableDay(null);
+			price.setInvoiceTillDate(null);
+		}
+		
+		Plan plan=this.planRepository.findOne(order.getPlanId());
+		String requstStatus = UserActionStatusTypeEnum.RECONNECTION.toString().toString();
+		Long processingResultId=Long.valueOf(0);
+		
+		if(plan.getProvisionSystem().equalsIgnoreCase("None")){
+			order.setStatus(OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.ACTIVE).getId());
+			Client client=this.clientRepository.findOne(order.getClientId());
+			client.setStatus(ClientStatus.ACTIVE.getValue());
+			this.clientRepository.save(client);
+			
+		}else{
+			
+			order.setStatus(OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.PENDING).getId());
+			CommandProcessingResult processingResult =this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order,plan.getPlanCode(), requstStatus,
+					Long.valueOf(0),null,null,order.getId(),plan.getProvisionSystem(),
+					this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
+			processingResultId=processingResult.commandId();
+		
+		}
+		order.setuserAction(UserActionStatusTypeEnum.RECONNECTION.toString());
+		this.orderRepository.save(order);
+		
+		//For Order History
+		OrderHistory orderHistory=new OrderHistory(order.getId(),new LocalDate(),new LocalDate(),processingResultId,requstStatus,getUserId(),null);
+		this.orderHistoryRepository.save(orderHistory);
+		return new CommandProcessingResult(order.getId(),order.getClientId());
+	
+	}catch(final DataIntegrityViolationException dve){
+		handleCodeDataIntegrityIssues(null, dve);
+		return new CommandProcessingResult(Long.valueOf(-1));
+	  }
 	}
 
 	@Override
@@ -605,9 +600,15 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 				if (plan == null) {
 					throw new NoOrdersFoundException(command.entityId());
 				}
+				Long resourceId = Long.valueOf(0);
 				if (requstStatus != null && plan!=null) {
 					
-					final AllocationDetailsData detailsData = this.allocationReadPlatformService.getTheHardwareItemDetails(command.entityId());
+					 CommandProcessingResult commandProcessingResult=this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order,plan.getPlanCode(),requstStatus,
+		    				 Long.valueOf(0),null,null,order.getId(),plan.getProvisionSystem(),
+		    				 this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
+		    		 resourceId=commandProcessingResult.resourceId();
+					
+					/*final AllocationDetailsData detailsData = this.allocationReadPlatformService.getTheHardwareItemDetails(command.entityId());
 					final ProcessRequest processRequest=new ProcessRequest(Long.valueOf(0),order.getClientId(),order.getId(),plan.getProvisionSystem(),requstStatus
 							,'N','N');
 				  processRequest.setNotify();
@@ -629,12 +630,10 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 				  				processRequest.add(processRequestDetails);
 				  			}
 				  	}
-				this.processRequestRepository.save(processRequest);
+				this.processRequestRepository.save(processRequest);*/
 				this.orderRepository.save(order);
-				final AppUser appUser = this.context.authenticatedUser();
-				final Long userId = appUser.getId();
-				final OrderHistory orderHistory = new OrderHistory(order.getId(),new LocalDate(), new LocalDate(), command.entityId(),
-						requstStatus, userId,null);
+				final OrderHistory orderHistory = new OrderHistory(order.getId(),new LocalDate(), new LocalDate(), resourceId,
+						requstStatus, getUserId(),null);
 				this.orderHistoryRepository.save(orderHistory);
 				
 			}
@@ -647,130 +646,118 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 		}
 	}
 	
-@Transactional
+
 @Override
 public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 		
-	try{
-			Long userId=this.context.authenticatedUser().getId();
-			Order order=this.orderRepository.findOne(entityId);
+ try{
+	 Long userId=this.context.authenticatedUser().getId();
+	 Order order=this.orderRepository.findOne(entityId);
+	 order.updateDisconnectionstate();
+	 Date billEndDate=order.getPrice().get(0).getBillEndDate();
 			
-			order.updateDisconnectionstate();
-			Date billEndDate=order.getPrice().get(0).getBillEndDate();
-			
-			Date invoicetillDate=order.getPrice().get(0).getInvoiceTillDate();
-			this.orderRepository.save(order);
-			
-			Configuration property = this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_CHANGE_PLAN_ALIGN_DATES);
-			
-			if(!property.isEnabled()){
-			Configuration dcConfiguration= this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_DISCONNECT);
-				if(dcConfiguration.isEnabled()){
-						this.reverseInvoice.reverseInvoiceServices(order.getId(), order.getClientId(),new LocalDate());
-			
-				}
-		}
-			
-			CommandProcessingResult result=this.createOrder(order.getClientId(), command);
-			Order newOrder=this.orderRepository.findOne(result.resourceId());
-			
-			newOrder.updateOrderNum(order.getOrderNo());
-			newOrder.updateActivationDate(order.getActiveDate());
-			if(property.isEnabled()){
-					List<OrderPrice> orderPrices=newOrder.getPrice();
-				for(OrderPrice orderPrice:orderPrices){
-					if(billEndDate == null){
-							orderPrice.setBillEndDate(null);	
-					}else{
-						orderPrice.setBillEndDate(new LocalDate(billEndDate));
+	 Date invoicetillDate=order.getPrice().get(0).getInvoiceTillDate();
+	 this.orderRepository.save(order);
+	 
+	 Configuration property = this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_CHANGE_PLAN_ALIGN_DATES);
+	 if(!property.isEnabled()){
+		 Configuration dcConfiguration= this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_DISCONNECT);
+		 if(dcConfiguration.isEnabled()){
+			 this.reverseInvoice.reverseInvoiceServices(order.getId(), order.getClientId(),new LocalDate());
+		 }
+	 }	
+	 
+	 CommandProcessingResult result=this.createOrder(order.getClientId(), command);
+	 Order newOrder=this.orderRepository.findOne(result.resourceId());
+	 
+	 newOrder.updateOrderNum(order.getOrderNo());
+	 newOrder.updateActivationDate(order.getActiveDate());
+	
+	 if(property.isEnabled()){
+		 List<OrderPrice> orderPrices=newOrder.getPrice();
+		 for(OrderPrice orderPrice:orderPrices){
+			 if(billEndDate == null){
+				 orderPrice.setBillEndDate(null);	
+			 }else{
+				 orderPrice.setBillEndDate(new LocalDate(billEndDate));
+			 }
+			 orderPrice.setInvoiceTillDate(invoicetillDate);
+			 	orderPrice.setNextBillableDay(order.getPrice().get(0).getNextBillableDay());
 					}
-					orderPrice.setInvoiceTillDate(invoicetillDate);
-					orderPrice.setNextBillableDay(order.getPrice().get(0).getNextBillableDay());
-				}
 			}
 				
-			newOrder.setuserAction(UserActionStatusTypeEnum.CHANGE_PLAN.toString());
-			this.orderRepository.save(newOrder);
-			
-		Plan plan=this.planRepository.findOne(newOrder.getPlanId());
-		HardwareAssociation association=this.associationRepository.findOneByOrderAndClient(order.getId(),order.getClientId());
+	 newOrder.setuserAction(UserActionStatusTypeEnum.CHANGE_PLAN.toString());
+	 this.orderRepository.save(newOrder);
+	 
+	Plan plan=this.planRepository.findOne(newOrder.getPlanId());
+	HardwareAssociation association=this.associationRepository.findOneByOrderAndClient(order.getId(),order.getClientId());
 		
 		if(association != null){
 			association.delete();
 			this.associationRepository.save(association);
 		}
-		
 		Long processResuiltId=new Long(0);
 		
 			if(!plan.getProvisionSystem().equalsIgnoreCase("None")){
-				//Set<PlanDetails> planDetails=plan.getDetails();
-				//ServiceMaster serviceMaster=this.serviceMasterRepository.findOneByServiceCode(planDetails.iterator().next().getServiceCode());
-				
-				//if(serviceMaster.isAuto() == 'Y'){
-					//CommandProcessingResult processingResult=this.prepareRequestWriteplatformService.prepareNewRequest(newOrder,plan,UserActionStatusTypeEnum.CHANGE_PLAN.toString());
-					//processResuiltId=processingResult.commandId();
-				//}else{
-				CommandProcessingResult processingResult=this.provisioningWritePlatformService.postOrderDetailsForProvisioning(newOrder, plan.getCode(), UserActionStatusTypeEnum.CHANGE_PLAN.toString(), 
-							new Long(0), null, null,order.getId(),plan.getProvisionSystem(),
+				CommandProcessingResult processingResult=this.provisioningWritePlatformService.postOrderDetailsForProvisioning(newOrder, plan.getCode(),
+						UserActionStatusTypeEnum.CHANGE_PLAN.toString(),new Long(0), null, null,newOrder.getId(),plan.getProvisionSystem(),
 							this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
 				processResuiltId=processingResult.commandId();
-				//}
 			}
-				
 		     
-		   //For Order History
+    	// For Order History
 			OrderHistory orderHistory=new OrderHistory(order.getId(),new LocalDate(),new LocalDate(),processResuiltId,
 					UserActionStatusTypeEnum.CHANGE_PLAN.toString(),userId,null);
 			this.orderHistoryRepository.save(orderHistory);
+			
 			return new CommandProcessingResult(result.resourceId(),order.getClientId());
-		}catch(DataIntegrityViolationException exception){
-			handleCodeDataIntegrityIssues(command, exception);
-			return new CommandProcessingResult(new Long(-1));
-		}
 		
-	}
+ 	}catch(DataIntegrityViolationException exception){
+	 handleCodeDataIntegrityIssues(command, exception);
+	 return new CommandProcessingResult(new Long(-1));
+ 	}
+ 
+}
     
 	
 	@Override
-	public CommandProcessingResult applyPromo(JsonCommand command) {
+ public CommandProcessingResult applyPromo(JsonCommand command) {
+	try{
+		this.context.authenticatedUser().getUsername();
+		this.fromApiJsonDeserializer.validateForPromo(command.json());			
+		final Long promoId=command.longValueOfParameterNamed("promoId");
+		final LocalDate startDate=command.localDateValueOfParameterNamed("startDate");
+		PromotionCodeMaster promotion=this.promotionCodeRepository.findOne(promoId);
 		
-		try{
-			String username=this.context.authenticatedUser().getUsername();
-			this.fromApiJsonDeserializer.validateForPromo(command.json());			
-			final Long promoId=command.longValueOfParameterNamed("promoId");
-			final LocalDate startDate=command.localDateValueOfParameterNamed("startDate");
-			PromotionCodeMaster promotion=this.promotionCodeRepository.findOne(promoId);
-				if(promotion == null){
-					throw new PromotionCodeNotFoundException(promoId.toString());
-				}
-				Order order=this.orderRepository.findOne(command.entityId());
-				List<OrderDiscount> orderDiscounts=order.getOrderDiscount();
-				LocalDate enddate=this.orderAssembler.calculateEndDate(startDate,promotion.getDurationType(),promotion.getDuration());
-					for(OrderDiscount orderDiscount:orderDiscounts){
-						orderDiscount.updateDates(promotion.getDiscountRate(),promotion.getDiscountType(),enddate);
-						this.orderDiscountRepository.save(orderDiscount);
-					}
-					
-					this.orderRepository.save(order);
-			return new CommandProcessingResult(command.entityId(),order.getClientId());
-		
-		}catch(DataIntegrityViolationException dve){
-			handleCodeDataIntegrityIssues(command, dve);
-			return null;
+		if(promotion == null){
+			throw new PromotionCodeNotFoundException(promoId.toString());
 		}
+		Order order=this.orderRepository.findOne(command.entityId());
+		List<OrderDiscount> orderDiscounts=order.getOrderDiscount();
+		LocalDate enddate=this.orderAssembler.calculateEndDate(startDate,promotion.getDurationType(),promotion.getDuration());
 		
-	
+		for(OrderDiscount orderDiscount:orderDiscounts){
+			orderDiscount.updateDates(promotion.getDiscountRate(),promotion.getDiscountType(),enddate);
+			this.orderDiscountRepository.save(orderDiscount);
+		}
+		this.orderRepository.save(order);
+		return new CommandProcessingResult(command.entityId(),order.getClientId());
+		
+		
+	}catch(DataIntegrityViolationException dve){
+		handleCodeDataIntegrityIssues(command, dve);
+		return null;
+	}
 	}
 
-     @Transactional
+	@Transactional
 	@Override
-	public CommandProcessingResult scheduleOrderCreation(Long clientId,JsonCommand command) {
-		
-		try{
-		
-		this.fromApiJsonDeserializer.validateForCreate(command.json());
-		LocalDate startDate=command.localDateValueOfParameterNamed("start_date");
-		//final String eventType=command.stringValueOfParameterNamed("eventType");
+public CommandProcessingResult scheduleOrderCreation(Long clientId,JsonCommand command) {
+
+  try{
+	  this.fromApiJsonDeserializer.validateForCreate(command.json());
+	 LocalDate startDate=command.localDateValueOfParameterNamed("start_date");
+	
 		EventAction  eventAction=null;
 		JSONObject jsonObject=new JSONObject();
 		Long userId=getUserId();
@@ -801,7 +788,8 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
         	    
         	  this.eventActionRepository.save(eventAction);
         	  return  new CommandProcessingResult(command.entityId(),clientId);
-	}catch(DataIntegrityViolationException dve){
+	
+  }catch(DataIntegrityViolationException dve){
 		handleCodeDataIntegrityIssues(command, null);
 		return new CommandProcessingResult(Long.valueOf(-1));
 	}catch(JSONException dve){
@@ -911,33 +899,34 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 	public CommandProcessingResult orderTermination(JsonCommand command,Long orderId) {
 		
 		try{
-				AppUser appUser=this.context.authenticatedUser();
-				Order order=this.orderRepository.findOne(orderId);
-				Long resourceId=Long.valueOf(0);
-					if(order == null){
-						throw new OrderNotFoundException(orderId);
-					}
-					Long orderStatus=null;
-					Plan plan=this.planRepository.findOne(order.getPlanId());
-					
-					if(plan.getProvisionSystem().equalsIgnoreCase("None") && !plan.getProvisionSystem().equalsIgnoreCase(ProvisioningApiConstants.PROV_PACKETSPAN)){
-							orderStatus = OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.TERMINATED).getId();
-					}else{
-							orderStatus = OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.PENDING).getId();
-							//CommandProcessingResult processingResult= this.prepareRequestWriteplatformService.prepareNewRequest(order,plan,UserActionStatusTypeEnum.TERMINATION.toString());
-							//resourceId=processingResult.resourceId();
-					}
-						order.setStatus(orderStatus);
-						order.setuserAction(UserActionStatusTypeEnum.TERMINATION.toString());
-						this.orderRepository.saveAndFlush(order);
-							//if(plan.getProvisionSystem().equalsIgnoreCase(ProvisioningApiConstants.PROV_PACKETSPAN)){
-						CommandProcessingResult processingResult =this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order, plan.getCode(), UserActionStatusTypeEnum.TERMINATION.toString(), 
-										resourceId, null, null,order.getId(),plan.getProvisionSystem(),
-										this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
-						resourceId=processingResult.resourceId();
-							//}
-			OrderHistory orderHistory=new OrderHistory(order.getId(),new LocalDate(),new LocalDate(),resourceId,UserActionStatusTypeEnum.TERMINATION.toString(),
-											appUser.getId(),null);
+			AppUser appUser=this.context.authenticatedUser();
+			Order order=this.orderRepository.findOne(orderId);
+			Long resourceId=Long.valueOf(0);
+			
+			if(order == null){
+				throw new OrderNotFoundException(orderId);
+			}
+			
+			Long orderStatus=null;
+			Plan plan=this.planRepository.findOne(order.getPlanId());
+
+			if(plan.getProvisionSystem().equalsIgnoreCase("None")){
+				orderStatus = OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.TERMINATED).getId();
+			
+			}else{
+				orderStatus = OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.PENDING).getId();
+				CommandProcessingResult processingResult =this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order, plan.getCode(), 
+						UserActionStatusTypeEnum.TERMINATION.toString(),resourceId, null, null,order.getId(),plan.getProvisionSystem(),
+						this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
+				resourceId=processingResult.resourceId();
+			}
+			order.setStatus(orderStatus);
+			order.setuserAction(UserActionStatusTypeEnum.TERMINATION.toString());
+			this.orderRepository.saveAndFlush(order);
+			
+			OrderHistory orderHistory=new OrderHistory(order.getId(),new LocalDate(),new LocalDate(),resourceId,
+					UserActionStatusTypeEnum.TERMINATION.toString(),appUser.getId(),null);
+			
 			this.orderHistoryRepository.save(orderHistory);	
 		    return new CommandProcessingResult(orderId,order.getClientId());
 		
@@ -968,11 +957,7 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 				     if(!plan.getProvisionSystem().equalsIgnoreCase("None")){
 				    	 final Long pendingId=this.enumDomainServiceRepository.findOneByEnumMessageProperty(StatusTypeEnum.PENDING.toString()).getEnumId();	
 				    		order.setStatus(pendingId);
-				    	 // ServiceMaster serviceMaster=this.serviceMasterRepository.findOneByServiceCode(plan.getDetails().iterator().next().getServiceCode());
-				    	  //if(serviceMaster.isAuto() == 'Y'){
-							//	final CommandProcessingResult commandProcessingResult=this.prepareRequestWriteplatformService.prepareNewRequest(order,plan,UserActionStatusTypeEnum.SUSPENTATION.toString());
-								//resourceId =commandProcessingResult.resourceId();
-				    	  //}else{
+				    	
 				    			CommandProcessingResult commandProcessingResult=this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order, plan.getCode(), UserActionStatusTypeEnum.SUSPENTATION.toString(), 
 										resourceId, null, null,order.getId(),plan.getProvisionSystem(),
 										this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
@@ -1000,48 +985,44 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 		
 	}
 
-	@Override
-	public CommandProcessingResult reactiveOrder(final JsonCommand command, final Long entityId) {
+  @Override
+ public CommandProcessingResult reactiveOrder(final JsonCommand command, final Long entityId) {
 
-		try{
-			final AppUser appUser = this.context.authenticatedUser();
-			Order order = this.orderRepository.findOne(entityId);
-			Long resourceId = Long.valueOf(0);
-			if(order == null){
-				throw new OrderNotFoundException(entityId);
-			}
-			
-			final Long pendingId = this.enumDomainServiceRepository.findOneByEnumMessageProperty(StatusTypeEnum.PENDING.toString()).getEnumId();	
-		    final Plan plan = this.planRepository.findOne(order.getPlanId());
+	 try{
+		 final AppUser appUser = this.context.authenticatedUser();
+		 Order order = this.orderRepository.findOne(entityId);
+		 Long resourceId = Long.valueOf(0);
+		 
+		 if(order == null){
+			 throw new OrderNotFoundException(entityId);
+		 }
+		 
+		 final Long pendingId = this.enumDomainServiceRepository.findOneByEnumMessageProperty(StatusTypeEnum.PENDING.toString()).getEnumId();	
+		 final Plan plan = this.planRepository.findOne(order.getPlanId());
 
-		    if(!"None".equalsIgnoreCase(plan.getProvisionSystem()) && !ProvisioningApiConstants.PROV_PACKETSPAN.equalsIgnoreCase(plan.getProvisionSystem())){
-		    		
-			//	final CommandProcessingResult processingResult = this.prepareRequestWriteplatformService.prepareNewRequest(order, plan, UserActionStatusTypeEnum.REACTIVATION.toString());
-				//resourceId = processingResult.resourceId();
-			}else{
-				EnumDomainService enumDomainService = this.enumDomainServiceRepository.findOneByEnumMessageProperty(StatusTypeEnum.ACTIVE.toString());
-						order.setStatus(enumDomainService.getEnumId());
-			}
-			order.setuserAction(UserActionStatusTypeEnum.REACTIVATION.toString());
-			
-			PaymentFollowup paymentFollowup = this.paymentFollowupRepository.findOneByorderId(order.getId());
-			
-			if(paymentFollowup != null){
-				paymentFollowup.setReactiveDate(new Date());
-				this.paymentFollowupRepository.save(paymentFollowup);
-			}
-					
-		//	if(plan.getProvisionSystem().equalsIgnoreCase(ProvisioningApiConstants.PROV_PACKETSPAN)){
-				order.setStatus(pendingId);
+		 if(!"None".equalsIgnoreCase(plan.getProvisionSystem())){
+		    	order.setStatus(pendingId);
 				CommandProcessingResult commandProcessingResult=this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order, plan.getCode(), UserActionStatusTypeEnum.REACTIVATION.toString(), 
 									resourceId, null, null, order.getId(),plan.getProvisionSystem(),
 									this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
 				resourceId=commandProcessingResult.resourceId();
-			//}
+		 
+		 }else{
+			 EnumDomainService enumDomainService = this.enumDomainServiceRepository.findOneByEnumMessageProperty(StatusTypeEnum.ACTIVE.toString());
+			 order.setStatus(enumDomainService.getEnumId());
+		}
+		
+		 order.setuserAction(UserActionStatusTypeEnum.REACTIVATION.toString());
+		 PaymentFollowup paymentFollowup = this.paymentFollowupRepository.findOneByorderId(order.getId());
+		
+		 if(paymentFollowup != null){
+			 paymentFollowup.setReactiveDate(new Date());
+			 this.paymentFollowupRepository.save(paymentFollowup);
+		 }	
 			
-			this.orderRepository.save(order);
-			final OrderHistory orderHistory = new OrderHistory(order.getId(),new LocalDate(),new LocalDate(),resourceId,UserActionStatusTypeEnum.REACTIVATION.toString(),
-					appUser.getId(),null);
+		 this.orderRepository.save(order);
+		 final OrderHistory orderHistory = new OrderHistory(order.getId(),new LocalDate(),new LocalDate(),resourceId,UserActionStatusTypeEnum.REACTIVATION.toString(),
+				 appUser.getId(),null);
             this.orderHistoryRepository.save(orderHistory);	
 		    
 		    return new CommandProcessingResult(entityId, order.getClientId());	
