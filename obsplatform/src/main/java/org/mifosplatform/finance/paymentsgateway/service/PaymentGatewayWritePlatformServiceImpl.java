@@ -161,12 +161,14 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 						paymentGateway.setAuto(false);
 						this.paymentGatewayRepository.save(paymentGateway);
 					}else{
-						paymentGateway.setStatus("Failure, payment is not Processed.");
+						paymentGateway.setStatus("Failure");
+						paymentGateway.setRemarks("Payment is Not Processed .");
 						this.paymentGatewayRepository.save(paymentGateway);
 					}
 					return result.resourceId();
 				} else {
-					paymentGateway.setStatus("Failure, Hardware with this " + serialNumberId + " not Found.");
+					paymentGateway.setStatus("Failure");
+					paymentGateway.setRemarks("Hardware with this " + serialNumberId + " not Found.");
 					this.paymentGatewayRepository.save(paymentGateway);
 					return null;
 				}
@@ -224,12 +226,14 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 					paymentGateway.setAuto(false);
 					this.paymentGatewayRepository.save(paymentGateway);
 				}else{
-					paymentGateway.setStatus("Failure, payment is not Processed.");
+					paymentGateway.setStatus("Failure");
+					paymentGateway.setRemarks("Payment is Not Processed .");
 					this.paymentGatewayRepository.save(paymentGateway);
 				}
 				return result.resourceId();
 			} else {
-				paymentGateway.setStatus("Failure, Hardware with this " + serialNumberId + " not Found.");
+				paymentGateway.setStatus("Failure");
+				paymentGateway.setRemarks("Hardware with this " + serialNumberId + " not Found.");
 				this.paymentGatewayRepository.save(paymentGateway);
 				return null;
 			}
@@ -388,7 +392,17 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 			JSONArray fieldArray = resultset.getJSONObject("field_values").getJSONObject("field_values").getJSONArray("field");
 			String currency = fieldArray.getJSONObject(2).getString("currency");
 			String emailAddress = fieldArray.getJSONObject(3).getString("email_address");
-			String globalpayMerchanttxnref = fieldArray.getJSONObject(5).getString("merchant_txnref");
+			String globalpayMerchanttxnref=null;
+			
+			if(fieldArray.getJSONObject(5).has("merch_txnref")){
+				globalpayMerchanttxnref = fieldArray.getJSONObject(5).getString("merch_txnref");
+			}else{
+				globalpayMerchanttxnref = fieldArray.getJSONObject(5).getString("merchant_txnref");
+			}
+			/*else if(fieldArray.getJSONObject(5).has("merchant_txnref")){
+				globalpayMerchanttxnref = fieldArray.getJSONObject(5).getString("merchant_txnref");
+			}*/
+			
 
 			JSONObject otherDataObject = new JSONObject();
 			otherDataObject.put("currency", currency);
@@ -401,7 +415,7 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 			String[] clientIdString = globalpayMerchanttxnref.split("-");
 			String status = "SUCCESSFUL";
 
-			if (!globalpayMerchanttxnref.equals(MerchantTxnRef)) {
+			if (!MerchantTxnRef.equals(globalpayMerchanttxnref)) {
 				status = "FAILURE";
 			}
 
@@ -413,6 +427,7 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 			pgConfigJsonObj.put("otherData", otherDataObject);
 			pgConfigJsonObj.put("device", "");
 			pgConfigJsonObj.put("status", status);
+			pgConfigJsonObj.put("currency", currency);
 			
 			return pgConfigJsonObj.toString();
 		}
@@ -428,7 +443,9 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 		public CommandProcessingResult onlinePaymentGateway(JsonCommand command) {
 
 		try {
-
+			context.authenticatedUser();
+			this.paymentGatewayCommandFromApiJsonDeserializer.validateForOnlinePayment(command.json());
+			
 			String commandJson = null;
 			final String source = command.stringValueOfParameterNamed("source");
 			final String transactionId = command.stringValueOfParameterNamed("transactionId");
@@ -471,12 +488,12 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 		Map<String, Object> withChanges = new HashMap<String, Object>();
 
 		final JSONObject json = new JSONObject(jsonData);
-
+		final String currency = json.getString("currency");
 		final Long clientId = json.getLong("clientId");
 		final String txnId = json.getString("transactionId");
 		final String amount = json.getString("total_amount");
 		final String source = json.getString("source");
-		final String data = json.getJSONObject("otherData").toString();
+		final String data = json.get("otherData").toString();
 		deviceId = json.getString("device");
 		final BigDecimal totalAmount = new BigDecimal(amount);
 		
@@ -489,6 +506,8 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 		withChanges.put("txnId", txnId);
 		withChanges.put("amount", amount);
 		withChanges.put("pgId", paymentGateway.getId());
+		withChanges.put("currency", currency);
+		
 		
 		return new CommandProcessingResultBuilder().with(withChanges).build();
 
@@ -533,28 +552,41 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 				paymentGateway.setAuto(false);
 				withChanges.put("Result", "SUCCESS");
 				withChanges.put("Description", "Transaction Successfully Completed");
-				withChanges.put("paymentId", result.resourceId().toString());
+				withChanges.put("Amount", amount);
+				withChanges.put("ObsPaymentId", result.resourceId().toString());
+				withChanges.put("TransactionId", txnId);
 				
 			} else {
-				paymentGateway.setStatus("Failure: Payment is Not Processed..");
+				paymentGateway.setStatus("Failure");
+				paymentGateway.setRemarks("Payment is Not Processed..");
+				
 				withChanges.put("Result", "FAILURE");
 				withChanges.put("Description", "Transaction Rejected");
-				withChanges.put("paymentId", txnId);
+				withChanges.put("Amount", amount);
+				withChanges.put("ObsPaymentId", "");
+				withChanges.put("TransactionId", txnId);
 			}
-
+			
+			this.paymentGatewayRepository.save(paymentGateway);
 			return withChanges.toString();
 		} catch (ReceiptNoDuplicateException e) {
+			
 			PaymentGateway paymentGateway = this.paymentGatewayRepository.findOne(id);
-			paymentGateway.setStatus("Failure: Transaction Already Exist with This Id:" + txnId + " in Payments");
+			paymentGateway.setStatus("Failure");
+			paymentGateway.setRemarks("Transaction Already Exist with This Id:" + txnId + " in Payments");
+			
 			withChanges.put("Result", "FAILURE");
 			withChanges.put("Description", "Transaction Already Exist with This Id : " + txnId);
-			withChanges.put("paymentId", txnId);
+			withChanges.put("Amount", amount);
+			withChanges.put("ObsPaymentId", "");
+			withChanges.put("TransactionId", txnId);
+			this.paymentGatewayRepository.save(paymentGateway);
 			return withChanges.toString();
 		}
 	}
 	
 	@Override
-	public void emailSending(Long clientId, String Result, String Description, String orderId, String paymentId, String amount){
+	public void emailSending(Long clientId, String Result, String Description, String orderId, String amount){
 		
 		Client client = this.clientRepository.findOne(clientId);
 		if(client == null){
@@ -574,8 +606,9 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 		header = header.replace("<PARAM1>", (client.getDisplayName()==null) || (client.getDisplayName()=="") ?client.getFirstname()+client.getLastname():client.getDisplayName());
 		body = body.replace("<PARAM2>", Result);
 		body = body.replace("<PARAM3>", Description);
-		body = body.replace("<PARAM4>", (paymentId==null)?orderId:paymentId);
-		body = body.replace("<PARAM5>", amount);
+		body = body.replace("<PARAM4>", amount);
+		body = body.replace("<PARAM5>", orderId);
+		
 		
 		BillingMessage billingMessage = new BillingMessage(header, body, footer, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_EMAIL_FROM, client.getEmail(),
 				subject, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_STATUS, messageDetails, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_MESSAGE_TYPE, null);

@@ -245,7 +245,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 
     
     @Override
-    public CommandProcessingResult createClient(final JsonCommand command,final boolean mailNotification) {
+    public CommandProcessingResult createClient(final JsonCommand command) {
 
         try {
             context.authenticatedUser();
@@ -280,7 +280,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     				selfcarecreation.put("uniqueReference", newClient.getEmail());
     				selfcarecreation.put("clientId", newClient.getId());
     				selfcarecreation.put("device", command.stringValueOfParameterNamed("device"));
-    				selfcarecreation.put("mailNotification",mailNotification);
+    				selfcarecreation.put("mailNotification",true);
     				
     				final CommandWrapper selfcareCommandRequest = new CommandWrapperBuilder().createSelfCare().withJson(selfcarecreation.toString()).build();
     				this.portfolioCommandSourceWritePlatformService.logCommandSource(selfcareCommandRequest);

@@ -157,9 +157,9 @@ public class EntitlementWritePlatformServiceImpl implements EntitlementWritePlat
 			}
 		}
 
-		if (processRequest.getRequestType().equalsIgnoreCase("DEVICE_SWAP") && !checkProcessDetailsUpdated(details)) {
+		/*if (processRequest.getRequestType().equalsIgnoreCase("DEVICE_SWAP") && !checkProcessDetailsUpdated(details)) {
 			status = 'F';
-		}
+		}*/
 		processRequest.setProcessStatus(status);
 
 		// this.entitlementRepository.save(processRequest);
@@ -169,12 +169,12 @@ public class EntitlementWritePlatformServiceImpl implements EntitlementWritePlat
 
 	}
 
-	private boolean checkProcessDetailsUpdated(List<ProcessRequestDetails> details) {
+	/*private boolean checkProcessDetailsUpdated(List<ProcessRequestDetails> details) {
 		boolean flag = true;
 		if (details.get(0).getReceiveMessage().contains("failure : Exce")) {
 			flag = false;
 		}
 		return flag;
-	}
+	}*/
 
 }

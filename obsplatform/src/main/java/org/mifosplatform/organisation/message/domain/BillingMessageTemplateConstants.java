@@ -12,9 +12,6 @@ public class BillingMessageTemplateConstants {
 	public static final String MESSAGE_TEMPLATE_CREATE_USER="CREATE USER";
 	public static final String MESSAGE_TEMPLATE_PAYMENT_RECEIPT = "PAYMENT_RECEIPT";
 	
-	
-	
-	
 	//constants
 	public static final String MESSAGE_TEMPLATE_STATUS = "N";
 	public static final String MESSAGE_TEMPLATE_EMAIL_FROM = "";

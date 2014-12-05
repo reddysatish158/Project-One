@@ -14,6 +14,6 @@ public interface PaymentGatewayWritePlatformService {
 	
 	String payment(Long clientId, Long id, String txnId, String amount) throws JSONException;
 
-	void emailSending(Long clientId, String result, String description,String txnId, String paymentId, String amount);
+	void emailSending(Long clientId, String result, String description,String txnId, String amount);
 
 }

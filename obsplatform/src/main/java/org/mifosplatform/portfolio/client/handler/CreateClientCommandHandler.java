@@ -28,6 +28,6 @@ public class CreateClientCommandHandler implements NewCommandSourceHandler {
     public CommandProcessingResult processCommand(final JsonCommand command) {
     	
        
-        return this.clientWritePlatformService.createClient(command,true);
+        return this.clientWritePlatformService.createClient(command);
     }
 }
