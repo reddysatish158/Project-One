@@ -342,7 +342,6 @@ try{
 	return new CommandProcessingResult(order.getId(),order.getClientId());
 }
 	
-    @Transactional
 	@Override
 	public CommandProcessingResult disconnectOrder(final JsonCommand command, final Long orderId ) {
 		
@@ -461,7 +460,7 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 					orderprice.setPrice(price.getPrice());
 				}
 		  	}
-		  orderprice.setDatesOnOrderStatus(newStartdate,renewalEndDate,orderDetails.getStatus());//setBillEndDate(renewalEndDate);
+		  orderprice.setDatesOnOrderStatus(newStartdate,renewalEndDate,orderDetails.getUserAction());//setBillEndDate(renewalEndDate);
 		  this.OrderPriceRepository.save(orderprice);
 		  orderDetails.setNextBillableDay(null);
 	  }
