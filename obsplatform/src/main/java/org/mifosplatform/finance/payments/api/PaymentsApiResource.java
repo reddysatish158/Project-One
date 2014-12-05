@@ -33,7 +33,6 @@ import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformSer
 import org.mifosplatform.finance.payments.data.McodeData;
 import org.mifosplatform.finance.payments.data.PaymentData;
 import org.mifosplatform.finance.payments.exception.DalpayRequestFailureException;
-import org.mifosplatform.finance.payments.exception.KortaRequestFailureException;
 import org.mifosplatform.finance.payments.service.PaymentReadPlatformService;
 import org.mifosplatform.infrastructure.codes.data.CodeData;
 import org.mifosplatform.infrastructure.core.api.ApiRequestParameterHelper;
@@ -253,7 +252,7 @@ public class PaymentsApiResource {
 
 	/**
 	 * This method is using for posting data to create payment using korta
-	 */
+	 *//*
 	@POST
 	@Path("korta")
 	@Consumes({ MediaType.APPLICATION_JSON })
@@ -307,6 +306,6 @@ public class PaymentsApiResource {
 		} catch (Exception e) {
 			return e.getMessage();
 		}
-	}
+	}*/
 
 }

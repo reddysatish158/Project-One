@@ -50,52 +50,16 @@ public class EntitlementsData {
 	private Long zebraSubscriberId;
 	private BigDecimal itemPrice;
 	private Long itemId;
+	
+	private String displayName;
+	private String login;
+	private String password;
 
 	public EntitlementsData() {
 
 	}
 	
-	public EntitlementsData(Long id,Long prdetailsId, String requestType, String hardwareId, String provisioingSystem, String product,
-
-			Long serviceId, Long clientId, Long planId, String orderNo, Long orderId, LocalDate startDate, LocalDate endDate,String servicetype) {
-
-		
-          this.id=id;
-          this.prdetailsId=prdetailsId;
-          this.product=product;
-          this.requestType=requestType;
-          this.hardwareId=hardwareId;
-          this.provisioingSystem=provisioingSystem;
-          this.serviceId=serviceId;
-          this.clientId=clientId;
-          this.planId=planId;
-          this.orderNo=orderNo;
-          this.orderId=orderId;
-          this.startDate=startDate;
-          this.endDate=endDate;
-          this.serviceType=servicetype;
-
-	}
-
-	public EntitlementsData(Long id, Long prdetailsId, String requestType,
-			String hardwareId, String provisioingSystem, String product,
-			Long serviceId, Long clientId, Long planId, String orderNo, String servicetype) {
-
-		this.id = id;
-		this.prdetailsId = prdetailsId;
-		this.product = product;
-		this.requestType = requestType;
-		this.hardwareId = hardwareId;
-		this.provisioingSystem = provisioingSystem;
-		this.serviceId = serviceId;
-		this.clientId = clientId;
-		this.planId = planId;
-		this.orderNo = orderNo;
-		this.serviceType = servicetype;
-	}
-
-	
-
+	//Beenius
 	public EntitlementsData(Long id, Long prdetailsId,String provisioingSystem, Long serviceId, String product,String hardwareId, 
 			String requestType, String itemCode,String itemDescription, Long clientId, String accountNo,String firstName, String lastName,
 			String officeUId, String branch,String regionCode, String regionName, String deviceId,String ipAddress) {
@@ -123,6 +87,7 @@ public class EntitlementsData {
 
 	}
 
+	//ZeebraOTT
 	public EntitlementsData(Long id, Long clientId, String accountNo,String firstName, String lastName, String email, String phone,
 			String city, String zip, String address, String provisioingSystem,Long serviceId, Long prdetailsId, String product,
 			String macId,String requestType, Long zebraSubscriberId, BigDecimal itemPrice,
@@ -149,6 +114,32 @@ public class EntitlementsData {
 		this.itemDescription = itemDescription;
 		this.itemId = itemId;
 		this.requestType = requestType;
+		
+	}
+
+	//General Purpose
+	public EntitlementsData(Long id, Long prdetailsId, String requestType,
+			String hardwareId, String provisioingSystem, String product,
+			Long clientId, Long planId, String orderNo, Long orderId,
+			LocalDate startDate, LocalDate endDate, String servicetype,
+			String displayName, String login, String password) {
+		
+		this.id = id;
+		this.prdetailsId = prdetailsId;
+		this.product = product;
+		this.requestType = requestType;
+		this.hardwareId = hardwareId;
+		this.provisioingSystem = provisioingSystem;
+		this.clientId = clientId;
+		this.planId = planId;
+		this.orderNo = orderNo;
+		this.orderId = orderId;
+		this.startDate = startDate;
+		this.endDate = endDate;
+		this.serviceType = servicetype;
+		this.displayName = displayName;
+		this.login = login;
+		this.password = password;
 		
 	}
 
@@ -267,5 +258,62 @@ public class EntitlementsData {
 		this.stalkerData=data;
 		
 	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public String getZip() {
+		return zip;
+	}
+
+	public StakerData getResults() {
+		return results;
+	}
+
+	public String getServiceType() {
+		return serviceType;
+	}
+
+	public StakerData getStalkerData() {
+		return stalkerData;
+	}
+
+	public Long getZebraSubscriberId() {
+		return zebraSubscriberId;
+	}
+
+	public BigDecimal getItemPrice() {
+		return itemPrice;
+	}
+
+	public Long getItemId() {
+		return itemId;
+	}
+
+	public String getDisplayName() {
+		return displayName;
+	}
+
+	public String getLogin() {
+		return login;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+	
 	
 }

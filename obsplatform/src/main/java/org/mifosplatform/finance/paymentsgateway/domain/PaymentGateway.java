@@ -180,5 +180,13 @@ public class PaymentGateway extends AbstractAuditableCustom<AppUser, Long> {
 		this.paymentId = paymentId;
 	}
 
+	public String getRemarks() {
+		return remarks;
+	}
+
+	public void setRemarks(String remarks) {
+		this.remarks = remarks;
+	}
+
 	
 }
