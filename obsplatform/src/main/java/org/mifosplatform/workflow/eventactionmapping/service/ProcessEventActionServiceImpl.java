@@ -1,9 +1,11 @@
 package org.mifosplatform.workflow.eventactionmapping.service;
 
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import org.codehaus.jettison.json.JSONObject;
 import org.mifosplatform.finance.billingmaster.api.BillingMasterApiResourse;
 import org.mifosplatform.finance.billingmaster.service.BillMasterWritePlatformService;
 import org.mifosplatform.finance.billingorder.service.InvoiceClient;
@@ -25,7 +27,6 @@ import org.mifosplatform.workflow.eventaction.service.ProcessEventActionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.google.gson.JsonElement;
 
@@ -70,6 +71,7 @@ public class ProcessEventActionServiceImpl implements ProcessEventActionService 
 		String jsonObject=eventActionData.getJsonData();
 		 JsonCommand command=null;
 		 JsonElement parsedCommand =null;
+		 SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy");
 		try{
 			switch (eventAction.getActionName()) {
 			
@@ -109,9 +111,15 @@ public class ProcessEventActionServiceImpl implements ProcessEventActionService 
 						null,eventActionData.getClientId(), null, null, null,null, null, null,null);
 					result=this.invoiceClient.createInvoiceBill(command);
 					if(result!=null){
-						command = JsonCommand.from(jsonObject,parsedCommand,this.fromApiJsonHelper,"BILLMASTER",eventActionData.getClientId(), null,
+						JSONObject jsonObj=new JSONObject();
+						jsonObj.put("dateFormat","dd MMMM yyyy");
+						jsonObj.put("locale","en");
+						jsonObj.put("dueDate", dateFormat.format(new Date()));
+						jsonObj.put("message","Statement");
+						parsedCommand = this.fromApiJsonHelper.parse(jsonObj.toString());
+						command = JsonCommand.from(jsonObj.toString(),parsedCommand,this.fromApiJsonHelper,"BILLMASTER",eventActionData.getClientId(), null,
 								null,eventActionData.getClientId(), null, null, null,null, null, null,null);
-			           result = this.billMasterWritePlatformService.createBillMaster(command, command.entityId());
+			            result = this.billMasterWritePlatformService.createBillMaster(command, command.entityId());
 				           if(result.resourceId() != null){
 				        	  this.billingMasterApiResourse.printInvoice(result.resourceId());
 				        	  this.billingMasterApiResourse.sendBillPathToMsg(result.resourceId());
