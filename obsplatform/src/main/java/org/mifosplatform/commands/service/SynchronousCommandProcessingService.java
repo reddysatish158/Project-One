@@ -578,6 +578,11 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
 	   }else if (wrapper.isAddons()) {
 			if (wrapper.isCreate()) {
 			handler = applicationContext.getBean("createAddonsCommandHandler",NewCommandSourceHandler.class);
+			
+			}else if (wrapper.isUpdate()) {
+				handler = applicationContext.getBean("updateAddonsCommandHandler",NewCommandSourceHandler.class);
+		    }else if (wrapper.isDelete()) {
+		    	handler = applicationContext.getBean("deleteAddonsCommandHandler",NewCommandSourceHandler.class);
 		    }else  {
 		    	 throw new UnsupportedCommandException(wrapper.commandName());
 		   }

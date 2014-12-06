@@ -2567,6 +2567,22 @@ public CommandWrapperBuilder createAddons() {
 	return this;
 }
 
+public CommandWrapperBuilder updateAddons(Long addonId) {
+	this.actionName="UPDATE";
+	this.entityName ="ADDONS";
+	this.entityId=addonId;
+	this.href="/addons/"+addonId;
+	return this;
+}
+
+public CommandWrapperBuilder deleteAddons(Long addonId) {
+	this.actionName="DELETE";
+	this.entityName ="ADDONS";
+	this.entityId=addonId;
+	this.href="/addons/"+addonId;
+	return this;
+}
+
 }
 
 

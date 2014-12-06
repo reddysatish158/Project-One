@@ -158,12 +158,12 @@ public class ServiceMappingReadPlatformServiceImpl implements
 
 		try {
 			ServiceMappingDataByIdRowMapper mapper = new ServiceMappingDataByIdRowMapper();
-			String sql = "SELECT s.id as id,s.service_code as serviceCode,ifnull(sp.category,'all') as category,sp.sub_category as subcategory," +
+			String sql = "SELECT s.id as serviceId,s.service_code as serviceCode,ifnull(sp.category,'all') as category,sp.sub_category as subcategory," +
 					" sp.image as image,sp.service_identification as serviceIdentification,s.status as status FROM b_service s " +
 					" left join b_prov_service_details sp on s.id = sp.service_id where s.is_deleted = 'N' "; 
 			
 			if (serviceType != null) {
-				sql = sql + " and s.is_optional=" + serviceType;
+				sql = sql + " and s.is_optional= '"+serviceType+"'";
 			}
 
 			return this.jdbcTemplate.query(sql, mapper, new Object[] {});

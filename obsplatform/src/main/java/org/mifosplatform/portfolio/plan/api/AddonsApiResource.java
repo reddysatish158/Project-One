@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -28,10 +30,10 @@ import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext
 import org.mifosplatform.organisation.priceregion.data.PriceRegionData;
 import org.mifosplatform.organisation.priceregion.service.RegionalPriceReadplatformService;
 import org.mifosplatform.portfolio.addons.data.AddonsData;
+import org.mifosplatform.portfolio.addons.data.AddonsPriceData;
+import org.mifosplatform.portfolio.addons.service.AddonServiceReadPlatformService;
 import org.mifosplatform.portfolio.order.service.OrderReadPlatformService;
 import org.mifosplatform.portfolio.plan.data.PlanCodeData;
-import org.mifosplatform.portfolio.plan.data.ServiceData;
-import org.mifosplatform.portfolio.service.service.ServiceMasterReadPlatformService;
 import org.mifosplatform.portfolio.servicemapping.data.ServiceMappingData;
 import org.mifosplatform.portfolio.servicemapping.service.ServiceMappingReadPlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,9 +53,9 @@ public class AddonsApiResource {
 	 private final DefaultToApiJsonSerializer<AddonsData> toApiJsonSerializer;
 	 private final ApiRequestParameterHelper apiRequestParameterHelper;
 	 private final OrderReadPlatformService orderReadPlatformService;
+	 private final AddonServiceReadPlatformService addonServiceReadPlatformService; 
 	 private final ChargeCodeReadPlatformService chargeCodeReadPlatformService;
 	 private final ServiceMappingReadPlatformService serviceMappingReadPlatformService;
-	 private final ServiceMasterReadPlatformService serviceMasterReadPlatformService;
 	 private final RegionalPriceReadplatformService regionalPriceReadplatformService;
 	 private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 	  
@@ -61,8 +63,8 @@ public class AddonsApiResource {
  public AddonsApiResource(final DefaultToApiJsonSerializer<AddonsData> apiJsonSerializer,final PlatformSecurityContext context,
 			  final ApiRequestParameterHelper apiRequestParameterHelper,final OrderReadPlatformService orderReadPlatformService,
 			  final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService,final RegionalPriceReadplatformService regionalPriceReadplatformService,
-			  final ChargeCodeReadPlatformService chargeCodeReadPlatformService,final ServiceMasterReadPlatformService serviceMasterReadPlatformService,
-			  final ServiceMappingReadPlatformService serviceMappingReadPlatformService){
+			  final ChargeCodeReadPlatformService chargeCodeReadPlatformService,final ServiceMappingReadPlatformService serviceMappingReadPlatformService,
+			  final AddonServiceReadPlatformService addonServiceReadPlatformService){
 		  
 		  this.toApiJsonSerializer=apiJsonSerializer;
 		  this.context=context;
@@ -70,8 +72,8 @@ public class AddonsApiResource {
 		  this.regionalPriceReadplatformService=regionalPriceReadplatformService;
 		  this.orderReadPlatformService=orderReadPlatformService;
 		  this.serviceMappingReadPlatformService=serviceMappingReadPlatformService;
+		  this.addonServiceReadPlatformService=addonServiceReadPlatformService;
 		  this.apiRequestParameterHelper=apiRequestParameterHelper;
-		  this.serviceMasterReadPlatformService=serviceMasterReadPlatformService;
 		  this.commandsSourceWritePlatformService=commandSourceWritePlatformService;
 		  
 	  }
@@ -79,7 +81,7 @@ public class AddonsApiResource {
     @POST
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String addOrderAddonServices(@PathParam("orderId") final Long orderId, final String apiRequestBodyAsJson){
+	public String addAddonServices(final String apiRequestBodyAsJson){
 			
 	final CommandWrapper commandRequest = new CommandWrapperBuilder().createAddons().withJson(apiRequestBodyAsJson).build();
 	final CommandProcessingResult result=this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
@@ -100,13 +102,64 @@ public class AddonsApiResource {
     return this.toApiJsonSerializer.serialize(settings, addonsData, RESPONSE_DATA_PARAMETERS);
 	}
 
-	private AddonsData handleTemplateDate(AddonsData addonsDate) {
+	private AddonsData handleTemplateDate(AddonsData addonsData) {
 		
 		List<PlanCodeData> planDatas = this.orderReadPlatformService.retrieveAllPlatformData(Long.valueOf(0));
 		List<ChargeCodeData> chargeCodeDatas = this.chargeCodeReadPlatformService.retrieveAllChargeCodes();
 		List<PriceRegionData> priceRegionData = this.regionalPriceReadplatformService.getPriceRegionsDetails();
-		 final List<ServiceMappingData> servicedatas = this.serviceMappingReadPlatformService.retrieveOptionalServices("Y");
-		return new AddonsData(planDatas,chargeCodeDatas,priceRegionData,servicedatas);
+		final List<ServiceMappingData> servicedatas = this.serviceMappingReadPlatformService.retrieveOptionalServices("Y");
+	   
+		addonsData=new AddonsData(addonsData,planDatas,chargeCodeDatas,priceRegionData,servicedatas); 
+		return addonsData;
+	}
+	
+	@GET
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public String retrieveAllAddons(@Context final UriInfo uriInfo) {
+		
+	context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+	List<AddonsData> addonsData = this.addonServiceReadPlatformService.retrieveAllPlatformData();
+	final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+    return this.toApiJsonSerializer.serialize(settings, addonsData, RESPONSE_DATA_PARAMETERS);
+	}
+	
+	@GET
+	@Path("{addonId}")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public String retrieveSingleAddonDetails(@PathParam("addonId") final Long addonId,@Context final UriInfo uriInfo) {
+		
+	context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+	AddonsData addonData= this.addonServiceReadPlatformService.retrieveSingleAddonData(addonId);
+	List<AddonsPriceData> addonsPrices = this.addonServiceReadPlatformService.retrieveAddonPriceDetails(addonId);
+	addonData.setPrices(addonsPrices);
+	addonData=handleTemplateDate(addonData);
+	final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+    return this.toApiJsonSerializer.serialize(settings, addonData, RESPONSE_DATA_PARAMETERS);
 	}
 
+	@PUT
+	@Path("{addonId}")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String updateAddonServices(@PathParam("addonId") final Long addonId, final String apiRequestBodyAsJson){
+			
+	final CommandWrapper commandRequest = new CommandWrapperBuilder().updateAddons(addonId).withJson(apiRequestBodyAsJson).build();
+	final CommandProcessingResult result=this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+	return this.toApiJsonSerializer.serialize(result);
+			
+	}
+	
+	@DELETE
+	@Path("{addonId}")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String deleteAddonServices(@PathParam("addonId") final Long addonId){
+			
+	final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteAddons(addonId).build();
+	final CommandProcessingResult result=this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+	return this.toApiJsonSerializer.serialize(result);
+			
+	}
 }

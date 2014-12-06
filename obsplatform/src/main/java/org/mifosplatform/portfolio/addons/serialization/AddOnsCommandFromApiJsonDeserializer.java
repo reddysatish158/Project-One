@@ -31,8 +31,8 @@ public final class AddOnsCommandFromApiJsonDeserializer {
     /**
      * The parameters supported for this command.
      */
-    private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("addonServices","serviceId","chargeCode","price","planId",
-    		"priceRegionId"));
+    private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("addons","serviceId","chargeCode","price","planId","locale",
+    		"priceRegionId","isDeleted"));
     private final FromJsonHelper fromApiJsonHelper;
 
     @Autowired
@@ -49,9 +49,9 @@ public final class AddOnsCommandFromApiJsonDeserializer {
         final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("addons");
         final JsonElement element = fromApiJsonHelper.parse(json);
-        final JsonArray addonServicesArray = fromApiJsonHelper.extractJsonArrayNamed("addonServices", element);
-        baseDataValidator.reset().parameter("addonServices").value(addonServicesArray).arrayNotEmpty();
-        
+        final JsonArray addonServicesArray = fromApiJsonHelper.extractJsonArrayNamed("addons", element);
+	    final int addonsAttributeSize = addonServicesArray.size();
+	    baseDataValidator.reset().parameter("addons").value(addonsAttributeSize).integerGreaterThanZero();
         String[] serviceParameters = null;
 		serviceParameters = new String[addonServicesArray.size()];
 		int arraysize = addonServicesArray.size();
@@ -60,29 +60,18 @@ public final class AddOnsCommandFromApiJsonDeserializer {
 			serviceParameters[i] = addonServicesArray.get(i).toString();
 		}
 	
+		final Long planId = fromApiJsonHelper.extractLongNamed("planId", element);
+		baseDataValidator.reset().parameter("planId").value(planId).notNull();
+		final String chargeCode = fromApiJsonHelper.extractStringNamed("chargeCode", element);
+		baseDataValidator.reset().parameter("chargeCode").value(chargeCode).notBlank();
+		final Long priceRegionId = fromApiJsonHelper.extractLongNamed("priceRegionId", element);
+		baseDataValidator.reset().parameter("priceRegionId").value(priceRegionId).notNull();
 		
-		for (String serviceParameter : serviceParameters) {
-
-			final JsonElement attributeElement = fromApiJsonHelper.parse(serviceParameter);
+		for (JsonElement jsonElement : addonServicesArray) {
 			
-			final Long planId = fromApiJsonHelper.extractLongNamed("planId", attributeElement);
-			baseDataValidator.reset().parameter("planId").value(planId).notNull();
-			final Long seviceId = fromApiJsonHelper.extractLongNamed("seviceId", attributeElement);
-			baseDataValidator.reset().parameter("seviceId").value(seviceId).notNull();
-			
-			final Long priceRegionId = fromApiJsonHelper.extractLongNamed("priceRegionId", attributeElement);
-			baseDataValidator.reset().parameter("priceRegionId").value(priceRegionId).notNull();
-			
-			final String chargeCode = fromApiJsonHelper.extractStringNamed("chargeCode", element);
-			baseDataValidator.reset().parameter("chargeCode").value(chargeCode).notBlank();
-			
-			final BigDecimal price = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("price", element);
-	        baseDataValidator.reset().parameter("price").value(price).notNull();
-
-		
+			final BigDecimal price = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("price", jsonElement);
+			baseDataValidator.reset().parameter("price").value(price).notNull();
 		}
-        
-
 
         throwExceptionIfValidationWarningsExist(dataValidationErrors);
     }

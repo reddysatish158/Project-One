@@ -7,4 +7,8 @@ public interface AddOnsWritePlatformService {
 
 	CommandProcessingResult createAddons(JsonCommand command);
 
+	CommandProcessingResult UpdateAddons(JsonCommand command, Long entityId);
+
+	CommandProcessingResult deleteAddons(Long entityId);
+
 }
