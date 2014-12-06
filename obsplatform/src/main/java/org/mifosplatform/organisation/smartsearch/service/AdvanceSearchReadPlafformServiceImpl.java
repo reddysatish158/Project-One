@@ -45,63 +45,93 @@ public AdvanceSearchReadPlafformServiceImpl(final PlatformSecurityContext securi
 	  try{
 		  this.context.authenticatedUser();
 		  final AdvanceSearchMapper advanceSearchMapper=new AdvanceSearchMapper();
-		  StringBuilder stringBuilder=new StringBuilder(advanceSearchMapper.schema());
 		  final Object[] objectArray = new Object[3];
-	        int arrayPos = 0;
-		  if(searchParameters.getSqlSearch() != null){
-			  stringBuilder.append(" AND (t.description LIKE '%"+searchParameters.getSqlSearch()+"%' OR c.display_name LIKE '%"+searchParameters.getSqlSearch()+"%')");
-		  }
-		  
-		  if(searchParameters.getCategory() != null){
-			  stringBuilder.append(" AND v.id="+searchParameters.getCategory());
-		  }
-		  if(searchParameters.getStatus() != null){
-			  stringBuilder.append(" AND t.status='"+searchParameters.getStatus()+"'");
-		  }
-		  if(searchParameters.getAssignedTo() != null){
-			  stringBuilder.append(" AND t.assigned_to ="+searchParameters.getAssignedTo());
-		  }
-		  if(searchParameters.getClosedBy() != null){
-			  stringBuilder.append(" AND t.lastmodifiedby_id="+searchParameters.getClosedBy());
-		  }
-		  if(searchParameters.getClosedBy() != null){
-			  stringBuilder.append(" AND t.lastmodifiedby_id="+searchParameters.getClosedBy());
-		  }
-		  if (searchParameters.getFromDataParam() != null || searchParameters.getToDateParam() != null) {
-	        	
-	            final DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-	            String fromDateString = null;
-	            String toDateString = null;
-	            
-	            if (searchParameters.getFromDataParam() != null && searchParameters.getToDateParam() != null) {
-	                //sql += "  AND p.payment_date BETWEEN ? AND ?";
-	            	stringBuilder.append("  AND Date_format(t.ticket_date,'%Y-%m-%d') between ? AND ?");
-	                fromDateString = df.format(searchParameters.getFromDataParam());
-	                toDateString = df.format(searchParameters.getToDateParam());
-	                objectArray[arrayPos] = fromDateString;
-	                arrayPos = arrayPos + 1;
-	                objectArray[arrayPos] = toDateString;
-	                arrayPos = arrayPos + 1;
-	                
-	            } else if (searchParameters.getFromDataParam() != null) {
-	                //sql += " AND p.payment_date >= ? ";
-	            	stringBuilder.append(" AND  Date_format(t.ticket_date,'%Y-%m-%d') >= ? ");
-	                fromDateString = df.format(searchParameters.getFromDataParam());
-	                objectArray[arrayPos] = fromDateString;
-	                arrayPos = arrayPos + 1;
-	                
-	            } else if (searchParameters.getToDateParam() != null) {
-	                //sql += "  AND p.payment_date <= ? ";
-	            	stringBuilder.append("  AND  Date_format(t.ticket_date,'%Y-%m-%d') <= ? ");
-	                toDateString = df.format(searchParameters.getToDateParam());
-	                objectArray[arrayPos] = toDateString;
-	                arrayPos = arrayPos + 1;
-	            }
-	        }
+	      int arrayPos = 0;
+	      StringBuilder stringBuilder = null;
+		  if(searchParameters.getSearchType().equalsIgnoreCase("TICKETS")){
+			  
+			  stringBuilder=new StringBuilder(advanceSearchMapper.schema());
+			  
+			  if(searchParameters.getSqlSearch() != null){
+				  stringBuilder.append(" AND (t.description LIKE '%"+searchParameters.getSqlSearch()+"%' OR c.display_name LIKE '%"+searchParameters.getSqlSearch()+"%')");
+			  }
+			  
+			  if(searchParameters.getCategory() != null){
+				  stringBuilder.append(" AND v.id="+searchParameters.getCategory());
+			  }
+			  if(searchParameters.getStatus() != null){
+				  stringBuilder.append(" AND t.status='"+searchParameters.getStatus()+"'");
+			  }
+			  if(searchParameters.getAssignedTo() != null){
+				  stringBuilder.append(" AND t.assigned_to ="+searchParameters.getAssignedTo());
+			  }
+			  if(searchParameters.getClosedBy() != null){
+				  stringBuilder.append(" AND t.lastmodifiedby_id="+searchParameters.getClosedBy());
+			  }
+			  if(searchParameters.getClosedBy() != null){
+				  stringBuilder.append(" AND t.lastmodifiedby_id="+searchParameters.getClosedBy());
+			  }
+			  if (searchParameters.getFromDataParam() != null || searchParameters.getToDateParam() != null) {
+		        	
+		            final DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		            String fromDateString = null;
+		            String toDateString = null;
+		            
+		            if (searchParameters.getFromDataParam() != null && searchParameters.getToDateParam() != null) {
+		                //sql += "  AND p.payment_date BETWEEN ? AND ?";
+		            	stringBuilder.append("  AND Date_format(t.ticket_date,'%Y-%m-%d') between ? AND ?");
+		                fromDateString = df.format(searchParameters.getFromDataParam());
+		                toDateString = df.format(searchParameters.getToDateParam());
+		                objectArray[arrayPos] = fromDateString;
+		                arrayPos = arrayPos + 1;
+		                objectArray[arrayPos] = toDateString;
+		                arrayPos = arrayPos + 1;
+		                
+		            } else if (searchParameters.getFromDataParam() != null) {
+		                //sql += " AND p.payment_date >= ? ";
+		            	stringBuilder.append(" AND  Date_format(t.ticket_date,'%Y-%m-%d') >= ? ");
+		                fromDateString = df.format(searchParameters.getFromDataParam());
+		                objectArray[arrayPos] = fromDateString;
+		                arrayPos = arrayPos + 1;
+		                
+		            } else if (searchParameters.getToDateParam() != null) {
+		                //sql += "  AND p.payment_date <= ? ";
+		            	stringBuilder.append("  AND  Date_format(t.ticket_date,'%Y-%m-%d') <= ? ");
+		                toDateString = df.format(searchParameters.getToDateParam());
+		                objectArray[arrayPos] = toDateString;
+		                arrayPos = arrayPos + 1;
+		            }
+		        }
 
-	        //sql += "  order by p.payment_date limit "+limit+" offset "+offset;
-	        final Object[] finalObjectArray = Arrays.copyOf(objectArray, arrayPos);
-		   stringBuilder.append(" order by t.id limit "+searchParameters.getLimit()+" offset "+searchParameters.getOffset());
+		        //sql += "  order by p.payment_date limit "+limit+" offset "+offset;
+			  stringBuilder.append(" order by t.id limit "+searchParameters.getLimit()+" offset "+searchParameters.getOffset());
+			  
+		  }else if(searchParameters.getSearchType().equalsIgnoreCase("LEADS")){
+			  
+			  stringBuilder = new StringBuilder(advanceSearchMapper.schemaForLeads());
+			  
+			  if(searchParameters.getSqlSearch() != null){
+				  stringBuilder.append(" AND (concat(p.first_name,' ',p.last_name) LIKE '%"+searchParameters.getSqlSearch()+"%' or concat(p.last_name,' ',p.first_name) LIKE '%"+searchParameters.getSqlSearch()+"%')");
+			  }else if(searchParameters.getName() != null){
+				  stringBuilder.append(" AND (concat(p.first_name,' ',p.last_name) LIKE '%"+searchParameters.getName()+"%' or concat(p.last_name,' ',p.first_name) LIKE '%"+searchParameters.getName()+"%')");
+			  }else if(searchParameters.getCreatedBy() != null){
+				  stringBuilder.append(" AND (p.createdby_id ="+searchParameters.getCreatedBy()+")");
+			  }else if(searchParameters.getAssignedTo() != null){
+				  stringBuilder.append(" AND (pd.assigned_to ="+searchParameters.getAssignedTo()+")");
+			  }else if(searchParameters.getEmailId() != null){
+				  stringBuilder.append(" AND (p.email ='"+searchParameters.getEmailId()+"')");
+			  }else if(searchParameters.getSource() != null){
+				  stringBuilder.append(" AND (p.source_of_publicity ='"+searchParameters.getSource()+"')");
+			  }else if(searchParameters.getPhone() != null){
+				  stringBuilder.append(" AND (p.mobile_number ="+searchParameters.getPhone()+")");
+			  }
+			  
+			  stringBuilder.append(" order by p.id limit "+searchParameters.getLimit()+" offset "+searchParameters.getOffset());
+		  }else{
+			  
+		  }
+		   final Object[] finalObjectArray = Arrays.copyOf(objectArray, arrayPos);
+		   
 		   return this.paginationHelper.fetchPage(this.jdbcTemplate, "SELECT FOUND_ROWS()",stringBuilder.toString(),
 				   finalObjectArray, advanceSearchMapper);
 		  
@@ -118,9 +148,22 @@ public AdvanceSearchReadPlafformServiceImpl(final PlatformSecurityContext securi
           		"  t.status as status,v.code_value as category,a.username as userName FROM b_ticket_master t, m_client c, m_code_value  v," +
           		" m_appuser a WHERE  c.id = t.client_id and t.problem_code=v.id AND a.id=t.createdby_id ";
       }
-
+      
+      public String schemaForLeads(){
+    	  
+    	  return "SELECT p.id as id, p.created_date as transactionDate,concat(p.first_name,' ',p.last_name) as clientName,"+
+    			 "p.status as status,p.source_of_publicity as category, a.username as userName,p.mobile_number as mobileNumber," +
+    			 "p.email as email,status_remark as clientId,mc.account_no as accountNo,pd.assigned_to as assignTo "+
+    			 " from b_prospect p left join m_appuser a on (p.createdby_id = a.id) "+
+    			 " left join m_client mc on (p.status_remark=mc.id) "+
+    			 " left join b_prospect_detail pd on(p.id =pd.prospect_id "+ 
+    			 " and pd.id= (select max(id) from b_prospect_detail pd2 "+
+    			 " where  pd2.prospect_id=pd.prospect_id )  ) where  p.is_deleted='N' ";
+    			
+      }
+      
       @Override
-      public AdvanceSearchData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
+      public AdvanceSearchData mapRow(final ResultSet rs, final int rowNum) throws SQLException {
 
           final Long id = rs.getLong("id");
           final LocalDate transactionDate = JdbcSupport.getLocalDate(rs, "transactionDate");
@@ -130,8 +173,8 @@ public AdvanceSearchReadPlafformServiceImpl(final PlatformSecurityContext securi
           final String status = rs.getString("status");
           final String category = rs.getString("category");
           final String userName = rs.getString("userName");
-
-          return new AdvanceSearchData(id,clientId,accountNo,clientName,transactionDate,category,status,userName);
+       
+          return new AdvanceSearchData(id, clientId, accountNo, clientName, transactionDate, category, status, userName);
       }
   }
 }
