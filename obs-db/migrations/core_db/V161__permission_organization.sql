@@ -383,3 +383,5 @@ Update m_permission set grouping='report' where code='READ_OSD_Notice';
 Update m_permission set grouping='report' where code='READ_ProgramStats';
 Update m_permission set grouping='report' where code='READ_ProgramDetails';
 Update m_permission set grouping='report' where code='READ_TxnRunningBalances';
+
+INSERT IGNORE INTO m_permission values(null,'billing','READ_SELFCARE','SELFCARE','READ',0);
