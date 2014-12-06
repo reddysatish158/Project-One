@@ -595,7 +595,7 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 		if(client.getEmail() == null || client.getEmail().isEmpty()){
 			throw new EmailNotFoundException(clientId);
 		}
-		BillingMessageTemplate messageDetails=this.billingMessageTemplateRepository.findByTemplateDescription(BillingMessageTemplateConstants.MESSAGE_TEMPLATE_PAYMENT_RECEIPT);
+		BillingMessageTemplate messageDetails = this.billingMessageTemplateRepository.findByTemplateDescription(BillingMessageTemplateConstants.MESSAGE_TEMPLATE_PAYMENT_RECEIPT);
 		
 		String subject=messageDetails.getSubject();
 		String body=messageDetails.getBody();
