@@ -17,7 +17,6 @@ import org.mifosplatform.finance.billingorder.domain.Invoice;
 import org.mifosplatform.finance.billingorder.domain.InvoiceRepository;
 import org.mifosplatform.finance.clientbalance.domain.ClientBalance;
 import org.mifosplatform.finance.clientbalance.domain.ClientBalanceRepository;
-import org.mifosplatform.finance.clientbalance.service.ClientBalanceReadPlatformService;
 import org.mifosplatform.finance.clientbalance.service.UpdateClientBalance;
 import org.mifosplatform.finance.payments.domain.ChequePayment;
 import org.mifosplatform.finance.payments.domain.ChequePaymentRepository;
@@ -145,7 +144,7 @@ public class PaymentWritePlatformServiceImpl implements PaymentWritePlatformServ
 			
 		} catch (DataIntegrityViolationException dve) {
 			handleDataIntegrityIssues(command, dve);
-			return CommandProcessingResult.empty();
+			return new CommandProcessingResult(Long.valueOf(-1));
 			}
 		}
 	
