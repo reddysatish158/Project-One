@@ -89,7 +89,7 @@ public class BillingMasterApiResourse {
 	@Path("{clientId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrieveBillingProducts(@PathParam("clientId") final Long clientId, final String apiRequestBodyAsJson) {
+	public String generateBillStatement(@PathParam("clientId") final Long clientId, final String apiRequestBodyAsJson) {
 		
 		final JsonElement parsedCommand = this.fromApiJsonHelper.parse(apiRequestBodyAsJson);
         final JsonCommand command = JsonCommand.from(apiRequestBodyAsJson, parsedCommand,this.fromApiJsonHelper,
@@ -153,7 +153,7 @@ public class BillingMasterApiResourse {
 		final BillMaster billMaster = this.billMasterRepository.findOne(billId);
 		final String fileName = billMaster.getFileName();	
 		if("invoice".equalsIgnoreCase(fileName)){
-			final String msg = "No Generate Pdf file For This Statement";
+			final String msg = "No Generated Pdf file For This Statement";
 			throw new BillingOrderNoRecordsFoundException(msg, billId);
 		}
 		final Long msgId = this.billMasterWritePlatformService.sendBillDetailFilePath(billMaster);
