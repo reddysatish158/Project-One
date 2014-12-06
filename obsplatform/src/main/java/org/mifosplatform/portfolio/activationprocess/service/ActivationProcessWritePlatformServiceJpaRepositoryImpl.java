@@ -264,6 +264,10 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 				clientcreation.put("flag", false);
 				clientcreation.put("zipCode", zipCode);
 				clientcreation.put("device", deviceId);
+				
+				if(nationalId !=null && !nationalId.equalsIgnoreCase("")){
+					clientcreation.put("externalId", nationalId);
+				}
 
 				final JsonElement element = fromJsonHelper.parse(clientcreation.toString());
 				JsonCommand clientCommand = new JsonCommand(null,clientcreation.toString(), element, fromJsonHelper,
@@ -410,14 +414,11 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 				SelfCare selfcare =  this.selfCareRepository.findOneByClientId(resultClient.getClientId());
 				
 				if(selfcare != null && resultClient !=null && resultClient.getClientId() > 0 ){
-						
-					if(nationalId != null){
-						selfcare.setNationalId(nationalId);
-					}
 					
 					if(kortaToken !=null && !(kortaToken.equalsIgnoreCase(""))){
 							selfcare.setToken(kortaToken);
-					}			
+					}		
+					this.selfCareRepository.save(selfcare);
 		
 				}
 				
