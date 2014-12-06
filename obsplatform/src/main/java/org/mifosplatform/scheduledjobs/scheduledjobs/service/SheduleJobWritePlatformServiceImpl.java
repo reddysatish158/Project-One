@@ -378,7 +378,7 @@ try {
 							jsonobject.put("message", data.getPromotionalMessage());
 							fw.append("sending jsonData for Statement Generation is: "+jsonobject.toString()+" . \r\n");
 								try{
-									this.billingMasterApiResourse.retrieveBillingProducts(clientId,	jsonobject.toString()); 
+									this.billingMasterApiResourse.generateBillStatement(clientId,	jsonobject.toString()); 
 								}catch(BillingOrderNoRecordsFoundException e){
 									e.getMessage();
 								}
