@@ -214,8 +214,6 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 			String dateFormat = "dd MMMM yyyy";
 			String activationDate = new SimpleDateFormat(dateFormat).format(new Date());
 
-			
-
 			String fullname = command.stringValueOfParameterNamed("fullname");
 			String firstName = command.stringValueOfParameterNamed("firstname");
 			String city = command.stringValueOfParameterNamed("city");
@@ -225,7 +223,6 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 			String email = command.stringValueOfParameterNamed("email");
 			String nationalId = command.stringValueOfParameterNamed("nationalId");
 			String deviceId = command.stringValueOfParameterNamed("device");
-			String kortaToken = command.stringValueOfParameterNamed("kortaToken");
 			
 			SelfCareTemporary temporary = selfCareTemporaryRepository.findOneByEmailId(email);
 			
@@ -409,17 +406,6 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 											+ resultClient.getClientId(),"Book Order Failed");
 						}		
 					}		
-				}
-			
-				SelfCare selfcare =  this.selfCareRepository.findOneByClientId(resultClient.getClientId());
-				
-				if(selfcare != null && resultClient !=null && resultClient.getClientId() > 0 ){
-					
-					if(kortaToken !=null && !(kortaToken.equalsIgnoreCase(""))){
-							selfcare.setToken(kortaToken);
-					}		
-					this.selfCareRepository.save(selfcare);
-		
 				}
 				
 				return resultClient;
