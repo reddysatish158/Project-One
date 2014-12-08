@@ -472,7 +472,7 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 	//  Set<PlanDetails> planDetails=plan.getDetails();
 	 // ServiceMaster serviceMaster=this.serviceMasterRepository.findOneByServiceCode(planDetails.iterator().next().getServiceCode());
 	  Long resourceId=Long.valueOf(0);
-	  	if(!plan.getProvisionSystem().equalsIgnoreCase("None")){
+	  	if(!plan.getProvisionSystem().equalsIgnoreCase("None") && requstStatus != null){
 		    	// if(serviceMaster.isAuto() == 'Y' && requestStatusForProv != null){
 		    	 	//this.prepareRequestWriteplatformService.prepareNewRequest(orderDetails,plan,requestStatusForProv);
 		    	// }else{
