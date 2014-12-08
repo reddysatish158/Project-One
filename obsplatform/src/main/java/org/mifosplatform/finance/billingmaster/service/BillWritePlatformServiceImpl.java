@@ -26,12 +26,19 @@ import org.mifosplatform.finance.billingorder.domain.Invoice;
 import org.mifosplatform.finance.billingorder.domain.InvoiceRepository;
 import org.mifosplatform.finance.billingorder.domain.InvoiceTax;
 import org.mifosplatform.finance.billingorder.domain.InvoiceTaxRepository;
+import org.mifosplatform.finance.billingorder.exceptions.BillingOrderNoRecordsFoundException;
 import org.mifosplatform.finance.financialtransaction.data.FinancialTransactionsData;
 import org.mifosplatform.finance.payments.domain.Payment;
 import org.mifosplatform.finance.payments.domain.PaymentRepository;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.service.FileUtils;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
+import org.mifosplatform.organisation.message.domain.BillingMessage;
+import org.mifosplatform.organisation.message.domain.BillingMessageRepository;
+import org.mifosplatform.organisation.message.domain.BillingMessageTemplate;
+import org.mifosplatform.organisation.message.domain.BillingMessageTemplateRepository;
+import org.mifosplatform.portfolio.client.domain.Client;
+import org.mifosplatform.portfolio.client.domain.ClientRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,13 +72,18 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 	private final InvoiceTaxRepository invoiceTaxRepository;
 	private final InvoiceRepository invoiceRepository;
 	private final TenantAwareRoutingDataSource dataSource;
+    private final ClientRepository clientRepository;
+    private final BillingMessageTemplateRepository messageTemplateRepository;
+    private final BillingMessageRepository messageDataRepository;
 
 	
 	@Autowired
 	public BillWritePlatformServiceImpl(final BillMasterRepository billMasterRepository,
 			final PaymentRepository paymentRepository, final AdjustmentRepository adjustmentRepository,
 			final BillingOrderRepository billingOrderRepository, final InvoiceTaxRepository invoiceTaxRepository, 
-			final InvoiceRepository invoiceRepository,final TenantAwareRoutingDataSource dataSource) {
+			final InvoiceRepository invoiceRepository,final TenantAwareRoutingDataSource dataSource,
+			final ClientRepository clientRepository,final BillingMessageTemplateRepository messageTemplateRepository,
+		    final BillingMessageRepository messageDataRepository) {
 
 		this.dataSource = dataSource;
 		this.invoiceRepository = invoiceRepository;
@@ -80,6 +92,9 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 		this.adjustmentRepository = adjustmentRepository;
 		this.invoiceTaxRepository = invoiceTaxRepository;
 		this.billingOrderRepository = billingOrderRepository;
+		this.clientRepository = clientRepository;
+		this.messageTemplateRepository = messageTemplateRepository;
+		this.messageDataRepository = messageDataRepository;
 		
 	}
 
@@ -133,6 +148,165 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 	}
 }
 
+	@Override
+	public void updateBillId(final List<FinancialTransactionsData> financialTransactionsDatas, final Long billId) {
+		
+		try{
+
+			for (final FinancialTransactionsData transIds : financialTransactionsDatas) {
+				if ("ADJUSTMENT".equalsIgnoreCase(transIds.getTransactionType())) {
+					Adjustment adjustment = this.adjustmentRepository.findOne(transIds.getTransactionId());
+					adjustment.updateBillId(billId);
+					this.adjustmentRepository.save(adjustment);
+				}
+				else if ("TAXES".equalsIgnoreCase(transIds.getTransactionType())) {
+					InvoiceTax tax = this.invoiceTaxRepository.findOne(transIds.getTransactionId());
+					tax.updateBillId(billId);
+					this.invoiceTaxRepository.save(tax);
+				}
+				else if (transIds.getTransactionType().contains("PAYMENT")) {
+					Payment payment = this.paymentRepository.findOne(transIds.getTransactionId());
+					payment.updateBillId(billId);
+					this.paymentRepository.save(payment);
+				}
+				else if ("SERVICE_CHARGES".equalsIgnoreCase(transIds.getTransactionType())) {
+					BillingOrder billingOrder = this.billingOrderRepository.findOne(transIds.getTransactionId());
+					billingOrder.updateBillId(billId);
+					this.billingOrderRepository.save(billingOrder);
+					Invoice invoice = this.invoiceRepository.findOne(billingOrder.getInvoice().getId());
+					invoice.updateBillId(billId);
+					this.invoiceRepository.save(invoice);
+				}
+				else if ("INVOICE".equalsIgnoreCase(transIds.getTransactionType())) {
+					Invoice invoice = this.invoiceRepository.findOne(transIds.getTransactionId());
+					invoice.updateBillId(billId);
+					this.invoiceRepository.save(invoice);
+				}
+				else if ("ONETIME_CHARGES".equalsIgnoreCase(transIds.getTransactionType())) {
+					BillingOrder billingOrder = this.billingOrderRepository.findOne(transIds.getTransactionId());
+					billingOrder.updateBillId(billId);
+					this.billingOrderRepository.save(billingOrder);
+					Invoice invoice = this.invoiceRepository.findOne(billingOrder.getInvoice().getId());
+					invoice.updateBillId(billId);
+					this.invoiceRepository.save(invoice);
+				
+				}
+
+			}
+		}catch(Exception exception){
+		
+		}
+		
+	}
+
+	@Transactional
+	@Override
+	public void generateStatementPdf(final Long billId) throws SQLException {
+		try {
+			String fileLocation = FileUtils.MIFOSX_BASE_DIR;
+
+			/** Recursively create the directory if it does not exist **/
+			if (!new File(fileLocation).isDirectory()) {
+				new File(fileLocation).mkdirs();
+			}
+			BillMaster billMaster=this.billMasterRepository.findOne(billId);
+			final String jpath = fileLocation+File.separator+"jasper"; //System.getProperty("user.home") + File.separator + "billing";
+			final String printStatementdetailsLocation = fileLocation + File.separator + "Bill_" + billMaster.getId() + ".pdf";
+			billMaster.setFileName(printStatementdetailsLocation);
+			this.billMasterRepository.save(billMaster);
+			final String jfilepath =jpath+File.separator+"Bill_Mainreport.jasper";
+			/*Long billNum = null;
+			final Client client = this.clientRepository.findOne(billMaster.getClientId());
+			
+				if(client.getGroupName() != null){
+					billNum = client.getGroupName();
+				}else{
+					billNum = billMaster.getId();
+				}
+				*/
+			Map<String, Object> parameters = new HashMap<String, Object>();
+
+			final Integer id = Integer.valueOf(billMaster.getId().toString());
+			parameters.put("param1", id);
+			
+			parameters.put("SUBREPORT_DIR",jpath+""+File.separator);
+			final Connection connection = this.dataSource.getConnection();
+			try{
+				//System.out.println("Filling report...");
+				final JasperPrint jasperPrint = JasperFillManager.fillReport(jfilepath, parameters, connection);
+				JasperExportManager.exportReportToPdfFile(jasperPrint, printStatementdetailsLocation);
+			}finally{
+	            try {
+	            	connection.close();
+	            }
+	            catch (final SQLException e) {
+	                e.printStackTrace();
+	            }
+			}
+		} catch (final DataIntegrityViolationException exception) {
+			exception.printStackTrace();
+		} catch (final JRException e) {
+			LOGGER.error("unable to generate pdf" + e.getLocalizedMessage());
+			e.printStackTrace();
+		} catch (final SQLException e) {
+			LOGGER.error("unable to retrieve data" + e.getLocalizedMessage());
+		}
+	}
+
+	@Transactional
+	@Override
+	public String generateInovicePdf(final Long invoiceId) throws SQLException {
+		
+		final String fileLocation = FileUtils.MIFOSX_BASE_DIR + File.separator +"InvoicePdfFiles";
+		/** Recursively create the directory if it does not exist **/
+		if (!new File(fileLocation).isDirectory()) {
+			new File(fileLocation).mkdirs();
+		}
+		final String printInvoicedetailsLocation = fileLocation + File.separator + "BillInvoice_" + invoiceId + ".pdf";
+		try {
+			final String jpath = fileLocation+File.separator+"jasper"; 
+			final String jasperfilepath =jpath+File.separator+"Invoicereport.jasper";
+			final Integer id = Integer.valueOf(invoiceId.toString());
+			final Connection connection = this.dataSource.getConnection();
+			Map<String, Object> parameters = new HashMap<String, Object>();
+			parameters.put("param1", id);
+			System.out.println("Filling report...");
+		   final JasperPrint jasperPrint = JasperFillManager.fillReport(jasperfilepath, parameters, connection);
+		   JasperExportManager.exportReportToPdfFile(jasperPrint,printInvoicedetailsLocation);
+	       connection.close();
+		} catch (final DataIntegrityViolationException exception) {
+			exception.printStackTrace();
+		} catch (final JRException e) {
+			LOGGER.error("unable to generate pdf" + e.getLocalizedMessage());
+			e.printStackTrace();
+		} catch (final SQLException e) {
+			LOGGER.error("unable to retrieve data" + e.getLocalizedMessage());
+		}
+		return printInvoicedetailsLocation;	
+}
+	@Transactional
+	@Override
+	public void sendInvoiceToEmail(final String printFileName, final Long clientId) {
+	
+		final Client client = this.clientRepository.findOne(clientId);
+		final String clientEmail = client.getEmail();
+			if(clientEmail == null){
+				final String msg = "Please provide email first";
+				throw new BillingOrderNoRecordsFoundException(msg, client);
+			}
+		BillingMessage billingMessage = null;
+		final List<BillingMessageTemplate> billingMessageTemplate = this.messageTemplateRepository.findAll();
+		for(final BillingMessageTemplate  msgTemplate:billingMessageTemplate){
+			
+     	   if("Bill_EMAIL".equalsIgnoreCase(msgTemplate.getTemplateDescription())){
+				              
+				  billingMessage = new BillingMessage(msgTemplate.getHeader(), msgTemplate.getBody(), msgTemplate.getFooter(), clientEmail, clientEmail, 
+				    		                    msgTemplate.getSubject(), "N", msgTemplate, msgTemplate.getMessageType(), printFileName);
+				    this.messageDataRepository.save(billingMessage);
+	   }
+	}
+ }
+	
 	@Override
 	public String generatePdf(final BillDetailsData billDetails,
 			final List<FinancialTransactionsData> datas) {
@@ -433,111 +607,6 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 		}
 		return printInvoicedetailsLocation;
 
-	}
-
-	@Override
-	public void updateBillId(final List<FinancialTransactionsData> financialTransactionsDatas, final Long billId) {
-		
-		try{
-
-			for (final FinancialTransactionsData transIds : financialTransactionsDatas) {
-				if ("ADJUSTMENT".equalsIgnoreCase(transIds.getTransactionType())) {
-					Adjustment adjustment = this.adjustmentRepository.findOne(transIds.getTransactionId());
-					adjustment.updateBillId(billId);
-					this.adjustmentRepository.save(adjustment);
-				}
-				else if ("TAXES".equalsIgnoreCase(transIds.getTransactionType())) {
-					InvoiceTax tax = this.invoiceTaxRepository.findOne(transIds.getTransactionId());
-					tax.updateBillId(billId);
-					this.invoiceTaxRepository.save(tax);
-				}
-				else if (transIds.getTransactionType().contains("PAYMENT")) {
-					Payment payment = this.paymentRepository.findOne(transIds.getTransactionId());
-					payment.updateBillId(billId);
-					this.paymentRepository.save(payment);
-				}
-				else if ("SERVICE_CHARGES".equalsIgnoreCase(transIds.getTransactionType())) {
-					BillingOrder billingOrder = this.billingOrderRepository.findOne(transIds.getTransactionId());
-					billingOrder.updateBillId(billId);
-					this.billingOrderRepository.save(billingOrder);
-					Invoice invoice = this.invoiceRepository.findOne(billingOrder.getInvoice().getId());
-					invoice.updateBillId(billId);
-					this.invoiceRepository.save(invoice);
-				}
-				else if ("INVOICE".equalsIgnoreCase(transIds.getTransactionType())) {
-					Invoice invoice = this.invoiceRepository.findOne(transIds.getTransactionId());
-					invoice.updateBillId(billId);
-					this.invoiceRepository.save(invoice);
-				}
-				else if ("ONETIME_CHARGES".equalsIgnoreCase(transIds.getTransactionType())) {
-					BillingOrder billingOrder = this.billingOrderRepository.findOne(transIds.getTransactionId());
-					billingOrder.updateBillId(billId);
-					this.billingOrderRepository.save(billingOrder);
-					Invoice invoice = this.invoiceRepository.findOne(billingOrder.getInvoice().getId());
-					invoice.updateBillId(billId);
-					this.invoiceRepository.save(invoice);
-				
-				}
-
-			}
-		}catch(Exception exception){
-		
-		}
-		
-	}
-
-	@Transactional
-	@Override
-	public void ireportPdf(final Long billId) throws SQLException {
-		try {
-			String fileLocation = FileUtils.MIFOSX_BASE_DIR;
-
-			/** Recursively create the directory if it does not exist **/
-			if (!new File(fileLocation).isDirectory()) {
-				new File(fileLocation).mkdirs();
-			}
-			BillMaster billMaster=this.billMasterRepository.findOne(billId);
-			final String jpath = fileLocation+File.separator+"jasper"; //System.getProperty("user.home") + File.separator + "billing";
-			final String printInvoicedetailsLocation = fileLocation + File.separator + "Bill_" + billMaster.getId() + ".pdf";
-			billMaster.setFileName(printInvoicedetailsLocation);
-			this.billMasterRepository.save(billMaster);
-			final String jfilepath =jpath+File.separator+"Bill_Mainreport.jasper";
-			/*Long billNum = null;
-			final Client client = this.clientRepository.findOne(billMaster.getClientId());
-			
-				if(client.getGroupName() != null){
-					billNum = client.getGroupName();
-				}else{
-					billNum = billMaster.getId();
-				}
-				*/
-			Map<String, Object> parameters = new HashMap<String, Object>();
-
-			final Integer id = Integer.valueOf(billMaster.getId().toString());
-			parameters.put("param1", id);
-			
-			parameters.put("SUBREPORT_DIR",jpath+""+File.separator);
-			final Connection connection = this.dataSource.getConnection();
-			try{
-				//System.out.println("Filling report...");
-				final JasperPrint jasperPrint = JasperFillManager.fillReport(jfilepath, parameters, connection);
-				JasperExportManager.exportReportToPdfFile(jasperPrint, printInvoicedetailsLocation);
-			}finally{
-	            try {
-	            	connection.close();
-	            }
-	            catch (final SQLException e) {
-	                e.printStackTrace();
-	            }
-			}
-		} catch (final DataIntegrityViolationException exception) {
-			exception.printStackTrace();
-		} catch (final JRException e) {
-			LOGGER.error("unable to generate pdf" + e.getLocalizedMessage());
-			e.printStackTrace();
-		} catch (final SQLException e) {
-			LOGGER.error("unable to retrieve data" + e.getLocalizedMessage());
-		}
-	}
-
+	}	
+	
 }
