@@ -145,7 +145,7 @@ public class PaymentWritePlatformServiceImpl implements PaymentWritePlatformServ
 			
 		} catch (DataIntegrityViolationException dve) {
 			handleDataIntegrityIssues(command, dve);
-			return CommandProcessingResult.empty();
+			return new CommandProcessingResult(Long.valueOf(-1));
 			}
 		}
 	

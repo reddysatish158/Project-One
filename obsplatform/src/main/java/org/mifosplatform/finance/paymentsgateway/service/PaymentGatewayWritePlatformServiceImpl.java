@@ -11,6 +11,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.json.JSONArray;
@@ -38,6 +39,14 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
+import org.mifosplatform.organisation.message.domain.BillingMessage;
+import org.mifosplatform.organisation.message.domain.BillingMessageRepository;
+import org.mifosplatform.organisation.message.domain.BillingMessageTemplate;
+import org.mifosplatform.organisation.message.domain.BillingMessageTemplateConstants;
+import org.mifosplatform.organisation.message.domain.BillingMessageTemplateRepository;
+import org.mifosplatform.organisation.message.exception.EmailNotFoundException;
+import org.mifosplatform.portfolio.client.domain.Client;
+import org.mifosplatform.portfolio.client.domain.ClientRepository;
 import org.mifosplatform.portfolio.client.exception.ClientNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -63,6 +72,10 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 	    private final ConfigurationRepository configurationRepository;
 	    private final PortfolioCommandSourceWritePlatformService writePlatformService;
 	    private final PaymentGatewayConfigurationRepository paymentGatewayConfigurationRepository;
+	    private final BillingMessageTemplateRepository billingMessageTemplateRepository;
+		private final BillingMessageRepository messageDataRepository;
+		private final ClientRepository clientRepository;
+	   
 	   
 	    @Autowired
 	    public PaymentGatewayWritePlatformServiceImpl(final PlatformSecurityContext context,
@@ -74,7 +87,10 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 	    		final PaymentGatewayReadPlatformService paymentGatewayReadPlatformService,
 	    		final ConfigurationRepository configurationRepository,
 	    		final PortfolioCommandSourceWritePlatformService writePlatformService,
-	    		final PaymentGatewayConfigurationRepository paymentGatewayConfigurationRepository)
+	    		final PaymentGatewayConfigurationRepository paymentGatewayConfigurationRepository,
+	    		final BillingMessageTemplateRepository billingMessageTemplateRepository,
+	    		final BillingMessageRepository messageDataRepository,
+	    		final ClientRepository clientRepository)
 	    {
 	    	this.context=context;
 	    	this.paymentGatewayRepository=paymentGatewayRepository;
@@ -87,6 +103,10 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 	    	this.configurationRepository = configurationRepository;
 	    	this.writePlatformService = writePlatformService;
 	    	this.paymentGatewayConfigurationRepository = paymentGatewayConfigurationRepository;
+	    	this.billingMessageTemplateRepository = billingMessageTemplateRepository;
+	    	this.messageDataRepository = messageDataRepository;
+	    	this.clientRepository = clientRepository;
+	    	
 	    }
 	    
 	    private Long mPesaTransaction(JsonElement element) {
@@ -141,12 +161,14 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 						paymentGateway.setAuto(false);
 						this.paymentGatewayRepository.save(paymentGateway);
 					}else{
-						paymentGateway.setStatus("Failure, payment is not Processed.");
+						paymentGateway.setStatus("Failure");
+						paymentGateway.setRemarks("Payment is Not Processed .");
 						this.paymentGatewayRepository.save(paymentGateway);
 					}
 					return result.resourceId();
 				} else {
-					paymentGateway.setStatus("Failure, Hardware with this " + serialNumberId + " not Found.");
+					paymentGateway.setStatus("Failure");
+					paymentGateway.setRemarks("Hardware with this " + serialNumberId + " not Found.");
 					this.paymentGatewayRepository.save(paymentGateway);
 					return null;
 				}
@@ -204,12 +226,14 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 					paymentGateway.setAuto(false);
 					this.paymentGatewayRepository.save(paymentGateway);
 				}else{
-					paymentGateway.setStatus("Failure, payment is not Processed.");
+					paymentGateway.setStatus("Failure");
+					paymentGateway.setRemarks("Payment is Not Processed .");
 					this.paymentGatewayRepository.save(paymentGateway);
 				}
 				return result.resourceId();
 			} else {
-				paymentGateway.setStatus("Failure, Hardware with this " + serialNumberId + " not Found.");
+				paymentGateway.setStatus("Failure");
+				paymentGateway.setRemarks("Hardware with this " + serialNumberId + " not Found.");
 				this.paymentGatewayRepository.save(paymentGateway);
 				return null;
 			}
@@ -235,6 +259,7 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 					   }else if (obsPaymentType.equalsIgnoreCase("TigoPesa")) {
 						   resourceId= this.tigoPesaTransaction(element);
 					   }  
+					   
 				   }	 
 				   return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(resourceId).build();
 			}catch (DataIntegrityViolationException  e) {
@@ -247,22 +272,25 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 
 	    	  }
 		   }catch (ReceiptNoDuplicateException  e) {
-				   String receiptNo = null;
-				   if(obsPaymentType.equalsIgnoreCase("MPesa")){
-					   receiptNo =fromApiJsonHelper.extractStringNamed("receipt", element);
-				   }else if (obsPaymentType.equalsIgnoreCase("TigoPesa")) {
-					   receiptNo=fromApiJsonHelper.extractStringNamed("TXNID", element);
-				   } 
-		    	  String receiptNO=this.paymentGatewayReadPlatformService.findReceiptNo(receiptNo);
-		    	  if(receiptNO!=null){
-		    	  throw new ReceiptNoDuplicateException(receiptNo);
-		    	  }
-		    	  else{
-		    		   return null;
-		    	  }
-			   } catch (Exception dve) {
-				    handleCodeDataIntegrityIssues(command, dve);
-					return new CommandProcessingResult(Long.valueOf(-1));
+				  
+			   String receiptNo = null;		   
+			   if(obsPaymentType.equalsIgnoreCase("MPesa")){		   
+				   receiptNo =fromApiJsonHelper.extractStringNamed("receipt", element);	   
+			   }else if (obsPaymentType.equalsIgnoreCase("TigoPesa")) {		 
+				   receiptNo=fromApiJsonHelper.extractStringNamed("TXNID", element);	  
+			   } 
+		 
+			   String receiptNO=this.paymentGatewayReadPlatformService.findReceiptNo(receiptNo);
+		    	 
+			   if(receiptNO!=null){ 
+				   throw new ReceiptNoDuplicateException(receiptNo);	    	 
+			   } else{		    	
+				   return null; 
+			   }
+			   
+		   } catch (Exception dve) {	    
+			   handleCodeDataIntegrityIssues(command, dve);	
+			   return new CommandProcessingResult(Long.valueOf(-1));
 	        }		
 			
 		}
@@ -296,173 +324,211 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 			
 			return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(gateway.getId()).with(changes).build();
 		}
+		
+		//For Globalpay
+		private String globalPayProcessing(String MerchantTxnRef, String pgConfig) throws JSONException, IOException {
+
+			JSONObject pgConfigJsonObj = new JSONObject(pgConfig);
+			String merchantId = pgConfigJsonObj.getString("merchantId");
+			String userName = pgConfigJsonObj.getString("userName");
+			String password = pgConfigJsonObj.getString("password");
+
+			String data = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+					+ "<soap12:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+					+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap12=\"http://www.w3.org/2003/05/soap-envelope\">"
+					+ "<soap12:Body>"
+					+ "<getTransactions xmlns=\"https://www.eazypaynigeria.com/globalpay_demo/\">"
+					+ "<merch_txnref>" + MerchantTxnRef + "</merch_txnref>"
+					+ "<channel></channel>" + "<merchantID>" + merchantId
+					+ "</merchantID>" + "<start_date></start_date>"
+					+ "<end_date></end_date>" + "<uid>" + userName + "</uid>"
+					+ "<pwd>" + password + "</pwd>"
+					+ "<payment_status></payment_status>" + "</getTransactions>"
+					+ "</soap12:Body>" + "</soap12:Envelope>";
+
+			URL oURL = new URL("https://demo.globalpay.com.ng/GlobalpayWebService_demo/service.asmx");
+			HttpURLConnection soapConnection = (HttpURLConnection) oURL.openConnection();
+
+			System.out.println("connect to server...");
+			
+			// Send SOAP Message to SOAP Server
+			soapConnection.setRequestMethod("POST");
+			soapConnection.setRequestProperty("Host", "demo.globalpay.com.ng");
+			soapConnection.setRequestProperty("Content-Length", String.valueOf(data.toString().length()));
+			soapConnection.setRequestProperty("Content-Type", "application/soap+xml; charset=utf-8");
+			soapConnection.setRequestProperty("SoapAction", "");
+			soapConnection.setDoOutput(true);
+
+			OutputStream reqStream = soapConnection.getOutputStream();
+			reqStream.write(data.toString().getBytes());
+			StringBuilder responseSB = new StringBuilder();
+			BufferedReader br = new BufferedReader(new InputStreamReader(soapConnection.getInputStream()));
+			String line;
+			while ((line = br.readLine()) != null) {
+				responseSB.append(line);
+			}
+
+			responseSB.append(line);
+			String responseSB1 = responseSB.toString().replaceAll("&lt;", "<");
+			responseSB1 = responseSB1.replaceAll("&gt;", ">");
+
+			JSONObject xmlJSONObj = XML.toJSONObject(responseSB1);
+
+			JSONObject resultset = xmlJSONObj.getJSONObject("soap:Envelope")
+					.getJSONObject("soap:Body")
+					.getJSONObject("getTransactionsResponse")
+					.getJSONObject("getTransactionsResult")
+					.getJSONObject("resultset").getJSONObject("record");
+
+			String paymentDesc = resultset.getString("payment_status_description");
+			System.out.println("paymentDesc From Globalpay: "+ paymentDesc);
+			Double amount = resultset.getDouble("amount");
+
+			String paymentDate = resultset.getString("payment_date");
+			Long txnref = resultset.getLong("txnref");
+			String channel = resultset.getString("channel");
+			String paymentStatus = resultset.getString("payment_status");
+
+			JSONArray fieldArray = resultset.getJSONObject("field_values").getJSONObject("field_values").getJSONArray("field");
+			String currency = fieldArray.getJSONObject(2).getString("currency");
+			String emailAddress = fieldArray.getJSONObject(3).getString("email_address");
+			String globalpayMerchanttxnref=null;
+			
+			if(fieldArray.getJSONObject(5).has("merch_txnref")){
+				globalpayMerchanttxnref = fieldArray.getJSONObject(5).getString("merch_txnref");
+			}else{
+				globalpayMerchanttxnref = fieldArray.getJSONObject(5).getString("merchant_txnref");
+			}
+			/*else if(fieldArray.getJSONObject(5).has("merchant_txnref")){
+				globalpayMerchanttxnref = fieldArray.getJSONObject(5).getString("merchant_txnref");
+			}*/
+			
+
+			JSONObject otherDataObject = new JSONObject();
+			otherDataObject.put("currency", currency);
+			otherDataObject.put("paymentStatus", paymentStatus);
+			otherDataObject.put("channel", channel);
+			otherDataObject.put("paymentDate", paymentDate);
+			otherDataObject.put("paymentDesc", paymentDesc);
+			otherDataObject.put("globalpayMerchanttxnref", globalpayMerchanttxnref);
+
+			String[] clientIdString = globalpayMerchanttxnref.split("-");
+			String status = "SUCCESSFUL";
+
+			if (!MerchantTxnRef.equals(globalpayMerchanttxnref)) {
+				status = "FAILURE";
+			}
+
+			pgConfigJsonObj.put("clientId", clientIdString[0]);
+			pgConfigJsonObj.put("emailId", emailAddress);
+			pgConfigJsonObj.put("transactionId", txnref);
+			pgConfigJsonObj.put("total_amount", String.valueOf(amount));
+			pgConfigJsonObj.put("source", ConfigurationConstants.GLOBALPAY_PAYMENTGATEWAY);
+			pgConfigJsonObj.put("otherData", otherDataObject);
+			pgConfigJsonObj.put("device", "");
+			pgConfigJsonObj.put("status", status);
+			pgConfigJsonObj.put("currency", currency);
+			
+			return pgConfigJsonObj.toString();
+		}
+		
+		private void handleDataIntegrityIssues(final JsonCommand command, final DataIntegrityViolationException dve) {
+			final Throwable realCause = dve.getMostSpecificCause(); 
+			if(realCause.getMessage().contains("receipt_no")){
+			          throw new ReceiptNoDuplicateException(command.stringValueOfParameterNamed("transactionId"));
+			}
+		}
 
 		@Override
 		public CommandProcessingResult onlinePaymentGateway(JsonCommand command) {
-			try{
-				String commandJson = null;
-				final String source = command.stringValueOfParameterNamed("source");
-				final String transactionId = command.stringValueOfParameterNamed("transactionId");
-				
-				
-				if(source.equalsIgnoreCase(ConfigurationConstants.GLOBALPAY_PAYMENTGATEWAY)){
-					
-					PaymentGatewayConfiguration pgConfig = this.paymentGatewayConfigurationRepository.findOneByName(ConfigurationConstants.GLOBALPAY_PAYMENTGATEWAY);
-					
-					if(pgConfig != null && pgConfig.getValue() != null){
-						
-						commandJson = globalPayProcessing(transactionId, pgConfig.getValue());
-						
-						if(commandJson == null){
-							return null;
-						}
+
+		try {
+			context.authenticatedUser();
+			this.paymentGatewayCommandFromApiJsonDeserializer.validateForOnlinePayment(command.json());
+			String commandJson = null;
+			final String source = command.stringValueOfParameterNamed("source");
+			final String transactionId = command.stringValueOfParameterNamed("transactionId");
+
+			if (source.equalsIgnoreCase(ConfigurationConstants.GLOBALPAY_PAYMENTGATEWAY)) {
+
+				PaymentGatewayConfiguration pgConfig = this.paymentGatewayConfigurationRepository.findOneByName(ConfigurationConstants.GLOBALPAY_PAYMENTGATEWAY);
+
+				if (pgConfig != null && pgConfig.getValue() != null) {
+
+					commandJson = globalPayProcessing(transactionId, pgConfig.getValue());
+
+					if (commandJson == null) {
+						return null;
 					}
-					
-				}else{
-					commandJson = command.json();
 				}
-				return processOnlinePayment(commandJson);
-				
-			} catch (JSONException e) {
-				try {
-					throw new JSONException(e.getCause());
-				} catch (JSONException e1) {
-					return null;
-				}
-			} catch (IOException e) {
-				try {
-					throw new Exception("IOException occured...", e.getCause());
-				} catch (Exception e1) {
-					return null;
-				}
+
+			} else {
+				commandJson = command.json();
 			}
+
+			return processOnlinePayment(commandJson);
+
+		} catch (DataIntegrityViolationException dve) {
+			handleDataIntegrityIssues(command, dve);
+			return new CommandProcessingResult(Long.valueOf(-1));
 			
-		}
+		} catch (JSONException e) {
+			return new CommandProcessingResult(Long.valueOf(-1));
 			
-	private String globalPayProcessing(String MerchantTxnRef, String pgConfig) throws JSONException, IOException {
-
-		JSONObject pgConfigJsonObj = new JSONObject(pgConfig);
-		String merchantId = pgConfigJsonObj.getString("merchantId");
-		String userName = pgConfigJsonObj.getString("userName");
-		String password = pgConfigJsonObj.getString("password");
-
-		String data = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
-				+ "<soap12:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-				+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap12=\"http://www.w3.org/2003/05/soap-envelope\">"
-				+ "<soap12:Body>"
-				+ "<getTransactions xmlns=\"https://www.eazypaynigeria.com/globalpay_demo/\">"
-				+ "<merch_txnref>" + MerchantTxnRef + "</merch_txnref>"
-				+ "<channel></channel>" + "<merchantID>" + merchantId
-				+ "</merchantID>" + "<start_date></start_date>"
-				+ "<end_date></end_date>" + "<uid>" + userName + "</uid>"
-				+ "<pwd>" + password + "</pwd>"
-				+ "<payment_status></payment_status>" + "</getTransactions>"
-				+ "</soap12:Body>" + "</soap12:Envelope>";
-
-		URL oURL = new URL("https://demo.globalpay.com.ng/GlobalpayWebService_demo/service.asmx");
-		HttpURLConnection soapConnection = (HttpURLConnection) oURL.openConnection();
-
-		System.out.println("connect to server...");
-		
-		// Send SOAP Message to SOAP Server
-		soapConnection.setRequestMethod("POST");
-		soapConnection.setRequestProperty("Host", "demo.globalpay.com.ng");
-		soapConnection.setRequestProperty("Content-Length", String.valueOf(data.toString().length()));
-		soapConnection.setRequestProperty("Content-Type", "application/soap+xml; charset=utf-8");
-		soapConnection.setRequestProperty("SoapAction", "");
-		soapConnection.setDoOutput(true);
-
-		OutputStream reqStream = soapConnection.getOutputStream();
-		reqStream.write(data.toString().getBytes());
-		StringBuilder responseSB = new StringBuilder();
-		BufferedReader br = new BufferedReader(new InputStreamReader(soapConnection.getInputStream()));
-		String line;
-		while ((line = br.readLine()) != null) {
-			responseSB.append(line);
+		} catch (IOException e) {
+			return new CommandProcessingResult(Long.valueOf(-1));
 		}
 
-		responseSB.append(line);
-		String responseSB1 = responseSB.toString().replaceAll("&lt;", "<");
-		responseSB1 = responseSB1.replaceAll("&gt;", ">");
-
-		JSONObject xmlJSONObj = XML.toJSONObject(responseSB1);
-
-		JSONObject resultset = xmlJSONObj.getJSONObject("soap:Envelope")
-				.getJSONObject("soap:Body")
-				.getJSONObject("getTransactionsResponse")
-				.getJSONObject("getTransactionsResult")
-				.getJSONObject("resultset").getJSONObject("record");
-
-		String paymentDesc = resultset.getString("payment_status_description");
-		System.out.println("paymentDesc From Globalpay: "+ paymentDesc);
-		Double amount = resultset.getDouble("amount");
-
-		String paymentDate = resultset.getString("payment_date");
-		Long txnref = resultset.getLong("txnref");
-		String channel = resultset.getString("channel");
-		String paymentStatus = resultset.getString("payment_status");
-
-		JSONArray fieldArray = resultset.getJSONObject("field_values").getJSONObject("field_values").getJSONArray("field");
-		String currency = fieldArray.getJSONObject(2).getString("currency");
-		String emailAddress = fieldArray.getJSONObject(3).getString("email_address");
-		String globalpayMerchanttxnref = fieldArray.getJSONObject(5).getString("merch_txnref");
-
-		JSONObject otherDataObject = new JSONObject();
-		otherDataObject.put("currency", currency);
-		otherDataObject.put("paymentStatus", paymentStatus);
-		otherDataObject.put("channel", channel);
-		otherDataObject.put("paymentDate", paymentDate);
-		otherDataObject.put("paymentDesc", paymentDesc);
-		otherDataObject.put("globalpayMerchanttxnref", globalpayMerchanttxnref);
-
-		String[] clientIdString = globalpayMerchanttxnref.split("-");
-		String status = "SUCCESSFUL";
-
-		if (!globalpayMerchanttxnref.equals(MerchantTxnRef)) {
-			status = "FAILURE";
-		}
-
-		pgConfigJsonObj.put("clientId", clientIdString[0]);
-		pgConfigJsonObj.put("emailId", emailAddress);
-		pgConfigJsonObj.put("transactionId", txnref);
-		pgConfigJsonObj.put("total_amount", String.valueOf(amount));
-		pgConfigJsonObj.put("source", ConfigurationConstants.GLOBALPAY_PAYMENTGATEWAY);
-		pgConfigJsonObj.put("transactionId", txnref);
-		pgConfigJsonObj.put("otherData", otherDataObject);
-		pgConfigJsonObj.put("device", "");
-		pgConfigJsonObj.put("status", status);
-
-		return pgConfigJsonObj.toString();
 	}
 
 	private CommandProcessingResult processOnlinePayment(String jsonData) throws JSONException {
 
-		Long value = null;
 		String deviceId = "";
-
-		Configuration configuration = configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_ONLINEPAYMODE);
-
-		if (configuration == null || configuration.getValue() == null || configuration.getValue() == "") {
-			throw new ConfigurationPropertyNotFoundException(ConfigurationConstants.CONFIG_PROPERTY_ONLINEPAYMODE);
-		}
-
-		value = Long.parseLong(configuration.getValue());
+		Map<String, Object> withChanges = new HashMap<String, Object>();
 
 		final JSONObject json = new JSONObject(jsonData);
-
+		final String currency = json.getString("currency");
 		final Long clientId = json.getLong("clientId");
 		final String txnId = json.getString("transactionId");
 		final String amount = json.getString("total_amount");
 		final String source = json.getString("source");
-		final String data = json.getJSONObject("otherData").toString();
+		final String data = json.get("otherData").toString();
 		deviceId = json.getString("device");
 		final BigDecimal totalAmount = new BigDecimal(amount);
+		
 		Date date = new Date();
 
 		PaymentGateway paymentGateway = new PaymentGateway(deviceId, " ", date, totalAmount, txnId, source, data);
+		this.paymentGatewayRepository.save(paymentGateway);
+		
+		withChanges.put("clientId", clientId);
+		withChanges.put("txnId", txnId);
+		withChanges.put("amount", amount);
+		withChanges.put("pgId", paymentGateway.getId());
+		withChanges.put("currency", currency);
+		
+		
+		return new CommandProcessingResultBuilder().with(withChanges).build();
 
-		if (clientId != null && clientId > 0) {
+	}
+	
+	@Override
+	public String payment(Long clientId, Long id, String txnId, String amount) throws JSONException{
+		
+		JSONObject withChanges = new JSONObject();
+		
+		try {
+			PaymentGateway paymentGateway = this.paymentGatewayRepository.findOne(id);
+			
+			Configuration configuration = configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_ONLINEPAYMODE);
 
+			if (configuration == null || configuration.getValue() == null || configuration.getValue() == "") {
+				throw new ConfigurationPropertyNotFoundException(ConfigurationConstants.CONFIG_PROPERTY_ONLINEPAYMODE);
+			}
+
+			Long value = Long.parseLong(configuration.getValue());
+			final BigDecimal totalAmount = new BigDecimal(amount);
+			
 			final String formattedDate = new SimpleDateFormat("dd MMMM yyyy").format(new Date());
 			final JsonObject object = new JsonObject();
 			object.addProperty("txn_id", txnId);
@@ -474,29 +540,79 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 			object.addProperty("receiptNo", txnId);
 			object.addProperty("remarks", "Payment Done");
 			object.addProperty("paymentCode", value);
-
+			
 			final CommandWrapper commandRequest = new CommandWrapperBuilder().createPayment(clientId).withJson(object.toString()).build();
-			final CommandProcessingResult result = this.writePlatformService.logCommandSource(commandRequest);
+			CommandProcessingResult result = this.writePlatformService.logCommandSource(commandRequest);	
 
-			if (result.resourceId() != null) {
+			if (result !=null && result.resourceId() != Long.valueOf(-1)) {
 				paymentGateway.setObsId(result.getClientId());
 				paymentGateway.setPaymentId(result.resourceId().toString());
 				paymentGateway.setStatus("Success");
 				paymentGateway.setAuto(false);
+				withChanges.put("Result", "SUCCESS");
+				withChanges.put("Description", "Transaction Successfully Completed");
+				withChanges.put("Amount", amount);
+				withChanges.put("ObsPaymentId", result.resourceId().toString());
+				withChanges.put("TransactionId", txnId);
+				
 			} else {
-				paymentGateway.setStatus("Failure: Payment is Not Processed..");
+				paymentGateway.setStatus("Failure");
+				paymentGateway.setRemarks("Payment is Not Processed..");
+				
+				withChanges.put("Result", "FAILURE");
+				withChanges.put("Description", "Transaction Rejected");
+				withChanges.put("Amount", amount);
+				withChanges.put("ObsPaymentId", "");
+				withChanges.put("TransactionId", txnId);
 			}
-
+			
 			this.paymentGatewayRepository.save(paymentGateway);
-
-			return result;
-
-		} else {
+			return withChanges.toString();
+		} catch (ReceiptNoDuplicateException e) {
+			
+			PaymentGateway paymentGateway = this.paymentGatewayRepository.findOne(id);
 			paymentGateway.setStatus("Failure");
+			paymentGateway.setRemarks("Transaction Already Exist with This Id:" + txnId + " in Payments");
+			
+			withChanges.put("Result", "FAILURE");
+			withChanges.put("Description", "Transaction Already Exist with This Id : " + txnId);
+			withChanges.put("Amount", amount);
+			withChanges.put("ObsPaymentId", "");
+			withChanges.put("TransactionId", txnId);
 			this.paymentGatewayRepository.save(paymentGateway);
+			return withChanges.toString();
+		}
+	}
+	
+	@Override
+	public void emailSending(Long clientId, String Result, String Description, String orderId, String amount){
+		
+		Client client = this.clientRepository.findOne(clientId);
+		if(client == null){
 			throw new ClientNotFoundException(clientId);
 		}
-
+		
+		if(client.getEmail() == null || client.getEmail().isEmpty()){
+			throw new EmailNotFoundException(clientId);
+		}
+		BillingMessageTemplate messageDetails = this.billingMessageTemplateRepository.findByTemplateDescription(BillingMessageTemplateConstants.MESSAGE_TEMPLATE_PAYMENT_RECEIPT);
+		
+		String subject=messageDetails.getSubject();
+		String body=messageDetails.getBody();
+		String header=messageDetails.getHeader();
+		String footer=messageDetails.getFooter();
+		
+		header = header.replace("<PARAM1>", (client.getDisplayName()==null) || (client.getDisplayName()=="") ?client.getFirstname()+client.getLastname():client.getDisplayName());
+		body = body.replace("<PARAM2>", Result);
+		body = body.replace("<PARAM3>", Description);
+		body = body.replace("<PARAM4>", amount);
+		body = body.replace("<PARAM5>", orderId);
+		
+		
+		BillingMessage billingMessage = new BillingMessage(header, body, footer, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_EMAIL_FROM, client.getEmail(),
+				subject, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_STATUS, messageDetails, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_MESSAGE_TYPE, null);
+		
+		this.messageDataRepository.save(billingMessage);
 	}
 	
 }
