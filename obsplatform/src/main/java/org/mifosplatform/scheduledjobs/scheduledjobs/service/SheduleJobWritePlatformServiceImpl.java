@@ -535,7 +535,7 @@ public void processNotify() {
 	  			fw.append("BillingMessageData id="+emailDetail.getId()+" ,MessageTo="+emailDetail.getMessageTo()+" ,MessageType="
 	  					+emailDetail.getMessageType()+" ,MessageFrom="+emailDetail.getMessageFrom()+" ,Message="+emailDetail.getBody()+"\r\n");
 	  			if(emailDetail.getMessageType()=='E'){
-	  				String Result=this.messagePlatformEmailService.sendTicketMessage(emailDetail);
+	  				String Result=this.messagePlatformEmailService.sendToUserEmail(emailDetail);
 	  				fw.append("b_message_data processing id="+emailDetail.getId()+"-- and Result :"+Result+" ... \r\n");
 	  			
 	  			}else if(emailDetail.getMessageType()=='M'){
