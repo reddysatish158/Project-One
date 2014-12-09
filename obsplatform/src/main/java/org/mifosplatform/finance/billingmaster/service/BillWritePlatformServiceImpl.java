@@ -262,7 +262,7 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 		if (!new File(fileLocation).isDirectory()) {
 			new File(fileLocation).mkdirs();
 		}
-		final String printInvoicedetailsLocation = fileLocation + File.separator + "BillInvoice_" + invoiceId + ".pdf";
+		final String printInvoicedetailsLocation = fileLocation + File.separator + "Invoice_" + invoiceId + ".pdf";
 		try {
 			final String jpath = fileLocation+File.separator+"jasper"; 
 			final String jasperfilepath =jpath+File.separator+"Invoicereport.jasper";
