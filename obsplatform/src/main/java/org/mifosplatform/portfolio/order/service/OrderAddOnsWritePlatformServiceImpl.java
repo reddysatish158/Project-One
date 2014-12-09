@@ -1,9 +1,12 @@
 package org.mifosplatform.portfolio.order.service;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 import org.joda.time.LocalDate;
+import org.mifosplatform.billing.discountmaster.domain.DiscountMaster;
+import org.mifosplatform.billing.discountmaster.domain.DiscountMasterRepository;
 import org.mifosplatform.finance.billingorder.service.InvoiceClient;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
@@ -16,6 +19,7 @@ import org.mifosplatform.portfolio.order.domain.HardwareAssociationRepository;
 import org.mifosplatform.portfolio.order.domain.Order;
 import org.mifosplatform.portfolio.order.domain.OrderAddons;
 import org.mifosplatform.portfolio.order.domain.OrderAddonsRepository;
+import org.mifosplatform.portfolio.order.domain.OrderDiscount;
 import org.mifosplatform.portfolio.order.domain.OrderPrice;
 import org.mifosplatform.portfolio.order.domain.OrderRepository;
 import org.mifosplatform.portfolio.order.domain.StatusTypeEnum;
@@ -44,6 +48,7 @@ public class OrderAddOnsWritePlatformServiceImpl implements OrderAddOnsWritePlat
 	private final ProvisioningWritePlatformService provisioningWritePlatformService;
 	private final OrderAssembler orderAssembler;
 	private final InvoiceClient invoiceClient;
+	private final DiscountMasterRepository discountMasterRepository;
 	private final OrderRepository orderRepository;
 	private final HardwareAssociationRepository hardwareAssociationRepository;
 	private final OrderAddonsRepository addonsRepository;
@@ -52,7 +57,8 @@ public class OrderAddOnsWritePlatformServiceImpl implements OrderAddOnsWritePlat
  public OrderAddOnsWritePlatformServiceImpl(final PlatformSecurityContext context,final OrderAddOnsCommandFromApiJsonDeserializer fromApiJsonDeserializer,
 		 final FromJsonHelper fromJsonHelper,final ContractRepository contractRepository,final OrderAssembler orderAssembler,final OrderRepository orderRepository,
 		 final ServiceMappingRepository serviceMappingRepository,final OrderAddonsRepository addonsRepository,final InvoiceClient invoiceClient,
-		 final ProvisioningWritePlatformService provisioningWritePlatformService,final HardwareAssociationRepository associationRepository){
+		 final ProvisioningWritePlatformService provisioningWritePlatformService,final HardwareAssociationRepository associationRepository,
+		 final DiscountMasterRepository discountMasterRepository ){
 		
 	this.context=context;
 	this.fromJsonHelper=fromJsonHelper;
@@ -63,6 +69,7 @@ public class OrderAddOnsWritePlatformServiceImpl implements OrderAddOnsWritePlat
 	this.orderAssembler=orderAssembler;
 	this.hardwareAssociationRepository=associationRepository;
 	this.invoiceClient=invoiceClient;
+	this.discountMasterRepository=discountMasterRepository;
 	this.addonsRepository=addonsRepository;
 	this.serviceMappingRepository=serviceMappingRepository;
 	
@@ -79,10 +86,21 @@ public CommandProcessingResult createOrderAddons(JsonCommand command,Long orderI
 		final JsonElement element = fromJsonHelper.parse(command.json());
 		final JsonArray addonServices = fromJsonHelper.extractJsonArrayNamed("addonServices", element);
 		final String planName=command.stringValueOfParameterNamed("planName");
+		final Long contractId=command.longValueOfParameterNamed("contractId");
+		final LocalDate startDate=command.localDateValueOfParameterNamed("startDate");
 	    Order order=this.orderRepository.findOne(orderId);
+	    Contract contract=this.contractRepository.findOne(contractId);
+	    
+	    final LocalDate endDate = this.orderAssembler.calculateEndDate(new LocalDate(startDate),
+                contract.getSubscriptionType(), contract.getUnits());
+	    
+	    if(order.getEndDate() != null && endDate.isAfter(new LocalDate(order.getEndDate()))){
+            throw new AddonEndDateValidationException(orderId);
+	    }
+	    
 	    HardwareAssociation association=this.hardwareAssociationRepository.findOneByOrderId(orderId);
 		for (JsonElement jsonElement : addonServices) {
-			OrderAddons addons=assembleOrderAddons(jsonElement,fromJsonHelper,order);
+			OrderAddons addons=assembleOrderAddons(jsonElement,fromJsonHelper,order,startDate,endDate,contractId);
 			this.addonsRepository.saveAndFlush(addons);
 			
 			if(!"None".equalsIgnoreCase(addons.getProvisionSystem())){
@@ -95,29 +113,28 @@ public CommandProcessingResult createOrderAddons(JsonCommand command,Long orderI
 			this.invoiceClient.invoicingSingleClient(order.getClientId(),new LocalDate());
 		}
 		
+		return new CommandProcessingResult(orderId);
+		
 	}catch(DataIntegrityViolationException dve){
 		handleCodeDataIntegrityIssues(command, dve);
+		return new CommandProcessingResult(Long.valueOf(-1));
 	}
-	return null;
+	
 }
 
 
-private OrderAddons assembleOrderAddons(JsonElement jsonElement,FromJsonHelper fromJsonHelper, Order order) {
+private OrderAddons assembleOrderAddons(JsonElement jsonElement,FromJsonHelper fromJsonHelper, Order order, LocalDate startDate,
+		                                    LocalDate endDate, Long contractId) {
 	
-	OrderAddons orderAddons = OrderAddons.fromJson(jsonElement,fromJsonHelper,order.getId());
+	OrderAddons orderAddons = OrderAddons.fromJson(jsonElement,fromJsonHelper,order.getId(),startDate,contractId);
 	final BigDecimal price=fromJsonHelper.extractBigDecimalWithLocaleNamed("price", jsonElement);
-	Contract contract=this.contractRepository.findOne(orderAddons.getContractId());
-	final LocalDate endDate = this.orderAssembler.calculateEndDate(new LocalDate(orderAddons.getStartDate()),
-			                    contract.getSubscriptionType(), contract.getUnits());
-	
-	if(order.getEndDate() != null && endDate.isAfter(new LocalDate(order.getEndDate()))){
-		throw new AddonEndDateValidationException(orderAddons.getServiceId());
-	}
 	
 	List<OrderPrice> orderPrices = order.getPrice();
 	OrderPrice orderPrice =new OrderPrice(orderAddons.getServiceId(),orderPrices.get(0).getChargeCode(),orderPrices.get(0).getChargeType(), price,null,
 			orderPrices.get(0).getChargeType(),orderPrices.get(0).getChargeDuration(),orderPrices.get(0).getDurationType(),
-			orderAddons.getStartDate(),endDate,orderPrices.get(0).isTaxInclusive());
+			startDate.toDate(),endDate,orderPrices.get(0).isTaxInclusive());
+	OrderDiscount orderDiscount=new OrderDiscount(order, orderPrice,Long.valueOf(0), new Date(), new LocalDate(), "NONE", BigDecimal.ZERO);
+	orderPrice.addOrderDiscount(orderDiscount);
 	order.addOrderDeatils(orderPrice);
 	
 	this.orderRepository.saveAndFlush(order);

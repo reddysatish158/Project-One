@@ -157,7 +157,7 @@ public class OrdersApiResource {
     final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
     return this.toApiJsonSerializer.serialize(settings, orderData, RESPONSE_DATA_PARAMETERS);
 	    }
-	 
+	  
 	 @GET
 	 @Path("{orderId}/orderprice")
 	 @Consumes({MediaType.APPLICATION_JSON})
@@ -168,23 +168,23 @@ public class OrdersApiResource {
 	        final List<OrderPriceData> priceDatas = this.orderReadPlatformService.retrieveOrderPriceDetails(orderId,null);
 	        final List<OrderLineData> services = this.orderReadPlatformService.retrieveOrderServiceDetails(orderId);
 	        final List<OrderDiscountData> discountDatas= this.orderReadPlatformService.retrieveOrderDiscountDetails(orderId);
-	         OrderData orderDetailsData = this.orderReadPlatformService.retrieveOrderDetails(orderId);
-	         final List<OrderHistoryData> historyDatas = this.orderReadPlatformService.retrieveOrderHistoryDetails(orderDetailsData.getOrderNo());
-	         orderDetailsData=new OrderData(priceDatas,historyDatas,orderDetailsData,services,discountDatas);
+	        OrderData orderDetailsData = this.orderReadPlatformService.retrieveOrderDetails(orderId);
+	        final List<OrderHistoryData> historyDatas = this.orderReadPlatformService.retrieveOrderHistoryDetails(orderDetailsData.getOrderNo());
+	        orderDetailsData=new OrderData(priceDatas,historyDatas,orderDetailsData,services,discountDatas);
 	        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 	        return this.toApiJsonSerializer.serialize(settings, orderDetailsData, RESPONSE_DATA_PARAMETERS);
 	    }
 
 	 @PUT
-		@Path("{orderId}/orderprice")
-		@Consumes({ MediaType.APPLICATION_JSON })
-		@Produces({ MediaType.APPLICATION_JSON })
-		public String updateOrderPrice(@PathParam("orderId") final Long orderId,final String apiRequestBodyAsJson) {
-		 final CommandWrapper commandRequest = new CommandWrapperBuilder().updateOrderPrice(orderId).withJson(apiRequestBodyAsJson).build();
-		 final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-		  return this.toApiJsonSerializer.serialize(result);
-
-		}
+	 @Path("{orderId}/orderprice")
+	 @Consumes({ MediaType.APPLICATION_JSON })
+	 @Produces({ MediaType.APPLICATION_JSON })
+	 public String updateOrderPrice(@PathParam("orderId") final Long orderId,final String apiRequestBodyAsJson) {
+	 final CommandWrapper commandRequest = new CommandWrapperBuilder().updateOrderPrice(orderId).withJson(apiRequestBodyAsJson).build();
+	 final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+	 return this.toApiJsonSerializer.serialize(result);
+	 }
+	 
 	@PUT
 	@Path("{orderId}")
 	@Consumes({ MediaType.APPLICATION_JSON })

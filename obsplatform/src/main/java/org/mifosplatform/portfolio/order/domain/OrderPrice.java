@@ -25,6 +25,7 @@ public class OrderPrice extends AbstractAuditableCustom<AppUser, Long> {
 	@GeneratedValue
 	@Column(name = "id")
 	private Long id;*/
+	
 
 	@Column(name = "service_id")
 	private Long serviceId;
@@ -126,9 +127,9 @@ public class OrderPrice extends AbstractAuditableCustom<AppUser, Long> {
 		return taxInclusive;
 	}
 
-	public OrderDiscount getOrderDiscount() {
+	/*public OrderDiscount getOrderDiscount() {
 		return orderDiscount;
-	}
+	}*/
 
 	public void updateDates(LocalDate date) {
 		this.billEndDate =date.toDate();
@@ -213,10 +214,7 @@ public class OrderPrice extends AbstractAuditableCustom<AppUser, Long> {
 		
 	}
 
-	public void addOrderDiscount(OrderDiscount orderDiscount) {
-
-		this.orderDiscount=orderDiscount;
-	}
+	
 
 	public void setBillEndDate(LocalDate endDate) {
 
@@ -256,5 +254,12 @@ public class OrderPrice extends AbstractAuditableCustom<AppUser, Long> {
 		}
 		this.nextBillableDay=null;
 		this.invoiceTillDate=null;
+	}
+
+
+	public void addOrderDiscount(OrderDiscount orderDiscount) {
+		orderDiscount.updateOrderPrice(this);
+		this.orderDiscount=orderDiscount;
+		
 	}
 }

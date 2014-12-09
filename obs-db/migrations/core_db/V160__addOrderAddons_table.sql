@@ -64,3 +64,4 @@ END //
 DELIMITER ;
 call serviceProvisioning();
 Drop procedure IF EXISTS serviceProvisioning;
+insert ignore into m_permission values(null,'Client&orders','CREATE_ORDERADDONS','ORDERADDONS','CREATE',0);

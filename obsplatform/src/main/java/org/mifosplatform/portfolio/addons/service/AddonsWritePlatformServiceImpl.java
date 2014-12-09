@@ -75,7 +75,7 @@ private void handleCodeDataIntegrityIssues(JsonCommand command,DataIntegrityViol
 	
 	 final Throwable realCause = dve.getMostSpecificCause();
        if (realCause.getMessage().contains("unique_addser_serv")) {
-           final String name = command.stringValueOfParameterNamed("unique_addser_serv");
+           final String name = command.stringValueOfParameterNamed("unique_addser_plan_ch");
            throw new PlatformDataIntegrityException("error.msg.code.duplicate.plan", "A plan with this service'" + name + "' already exists");
        }else{
       

@@ -173,8 +173,8 @@ public class OrderReadPlatformServiceImpl implements OrderReadPlatformService
         	  Long id = rs.getLong("id");
 			  Long orderId = rs.getLong("order_id");
 			  Long clientId = rs.getLong("clientId");
-	            String chargeCode = rs.getString("serviceDescription");
-	            String chargeType = rs.getString("chargeDescription");
+	            String serviceDescription = rs.getString("serviceDescription");
+	            String chargeDescription = rs.getString("chargeDescription");
 	            String chargeDuration = rs.getString("chargeDuration");
 	            String durationtype = rs.getString("durationType");
 	            String billingAlign = rs.getString("billingAlign");
@@ -185,7 +185,7 @@ public class OrderReadPlatformServiceImpl implements OrderReadPlatformService
 	            LocalDate nextBillDate=JdbcSupport.getLocalDate(rs,"nextBillableDay");
 	            LocalDate invoiceTillDate=JdbcSupport.getLocalDate(rs,"invoiceTillDate");
 	            
-	            return new OrderPriceData(id,orderId,clientId,chargeCode,chargeType,chargeDuration,durationtype,price,billStartDate,
+	            return new OrderPriceData(id,orderId,clientId,serviceDescription,chargeDescription,chargeDuration,durationtype,price,billStartDate,
 	            		billEndDate,nextBillDate,invoiceTillDate,billingAlign,billingFrequency);
 }
 }

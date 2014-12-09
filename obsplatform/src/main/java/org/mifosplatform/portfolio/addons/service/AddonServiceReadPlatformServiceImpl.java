@@ -9,7 +9,7 @@ import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSourc
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.portfolio.addons.data.AddonsData;
 import org.mifosplatform.portfolio.addons.data.AddonsPriceData;
-import org.mifosplatform.portfolio.addons.domain.AddonsPrices;
+import org.mifosplatform.portfolio.order.data.OrderAddonsData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -125,5 +125,46 @@ public List<AddonsPriceData> retrieveAddonPriceDetails(Long addonId) {
 	}
 	
 }
+
+
+
+
+@Transactional
+@Override
+public List<AddonsPriceData> retrievePlanAddonDetails(Long planId,String chargeCode) {
+ 
+	try{
+
+		this.context.authenticatedUser();
+		PlanAddonsMapper mapper=new PlanAddonsMapper();
+		final String sql="select "+mapper.schema()+" AND c.billfrequency_code = ? AND ads.plan_id = ?";
+		return this.jdbcTemplate.query(sql,mapper,new Object[]{chargeCode,planId});
+	
+	}catch(EmptyResultDataAccessException dve){
+	 return null;
+ }
+	
+	
+}
+
+private class PlanAddonsMapper implements RowMapper<AddonsPriceData>{
+	
+	public String schema(){
+		return "  ads.id AS id,adp.service_id AS serviceId,s.service_code AS serviceCode,adp.price AS price " +
+			   "  FROM b_addons_service ads,b_addons_service_price adp,b_service s,b_charge_codes c " +
+			   "  WHERE ads.id = adp.adservice_id AND ads.is_deleted = 'N' AND ads.charge_code = c.charge_code AND s.id = adp.service_id ";
+	}
+
+	@Override
+	public AddonsPriceData mapRow(ResultSet rs, int rowNum) throws SQLException {
+		 final Long id= rs.getLong("id");
+		 final Long serviceId=rs.getLong("serviceId");
+		 final String serviceCode=rs.getString("serviceCode");
+		 final BigDecimal price =rs.getBigDecimal("price");
+		 return new AddonsPriceData(id,serviceId,serviceCode,price);
+	}
+	
+}
+
 
 }

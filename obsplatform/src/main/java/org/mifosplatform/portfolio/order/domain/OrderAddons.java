@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.joda.time.LocalDate;
 import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
 import org.mifosplatform.useradministration.domain.AppUser;
@@ -53,13 +54,10 @@ public class OrderAddons extends AbstractAuditableCustom<AppUser,Long>{
 		this.startDate=startDate;
 	}
 
-	public static OrderAddons fromJson(final JsonElement element,final FromJsonHelper fromJsonHelper,final Long orderId) {
+	public static OrderAddons fromJson(final JsonElement element,final FromJsonHelper fromJsonHelper,final Long orderId, LocalDate startDate, Long contractId) {
 		
 		final Long serviceId=fromJsonHelper.extractLongNamed("serviceId", element);
-		final Long contractId=fromJsonHelper.extractLongNamed("contractId", element);
-		final Date startDate =fromJsonHelper.extractLocalDateNamed("startDate", element).toDate();
-		
-		return new OrderAddons(orderId,serviceId,contractId,startDate);
+		return new OrderAddons(orderId,serviceId,contractId,startDate.toDate());
 	}
 
 	public Long getOrderId() {

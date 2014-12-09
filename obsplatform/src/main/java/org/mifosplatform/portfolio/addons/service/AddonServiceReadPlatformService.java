@@ -13,4 +13,6 @@ public interface AddonServiceReadPlatformService {
 
 	List<AddonsPriceData> retrieveAddonPriceDetails(Long addonId);
 
+	List<AddonsPriceData> retrievePlanAddonDetails(Long planId,String chargeCode);
+
 }

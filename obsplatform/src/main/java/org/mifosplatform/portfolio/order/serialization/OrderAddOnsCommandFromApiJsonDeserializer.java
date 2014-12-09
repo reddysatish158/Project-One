@@ -1,6 +1,7 @@
 package org.mifosplatform.portfolio.order.serialization;
 
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -31,7 +32,8 @@ public final class OrderAddOnsCommandFromApiJsonDeserializer {
     /**
      * The parameters supported for this command.
      */
-    private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("addonServices","serviceId","startDate","endDate","contractId"));
+    private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("addonServices","serviceId","startDate","endDate","contractId","price",
+    		"locale","planName","dateFormat"));
     private final FromJsonHelper fromApiJsonHelper;
 
     @Autowired
@@ -48,9 +50,11 @@ public final class OrderAddOnsCommandFromApiJsonDeserializer {
         final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("addons");
         final JsonElement element = fromApiJsonHelper.parse(json);
+        final Long contractId = fromApiJsonHelper.extractLongNamed("contractId", element);
+		baseDataValidator.reset().parameter("contractId").value(contractId).notNull();
+		final LocalDate startDate = fromApiJsonHelper.extractLocalDateNamed("startDate", element);
+		baseDataValidator.reset().parameter("startDate").value(startDate).notBlank();
         final JsonArray addonServicesArray = fromApiJsonHelper.extractJsonArrayNamed("addonServices", element);
-        baseDataValidator.reset().parameter("addonServices").value(addonServicesArray).arrayNotEmpty();
-        
         String[] serviceParameters = null;
 		serviceParameters = new String[addonServicesArray.size()];
 		int arraysize = addonServicesArray.size();
@@ -58,19 +62,16 @@ public final class OrderAddOnsCommandFromApiJsonDeserializer {
 		for (int i = 0; i < addonServicesArray.size(); i++) {
 			serviceParameters[i] = addonServicesArray.get(i).toString();
 		}
-	
-		
+
 		for (String serviceParameter : serviceParameters) {
 
 			final JsonElement attributeElement = fromApiJsonHelper.parse(serviceParameter);
-			final Long seviceId = fromApiJsonHelper.extractLongNamed("seviceId", attributeElement);
-			baseDataValidator.reset().parameter("seviceId").value(seviceId).notNull();
+			final Long serviceId = fromApiJsonHelper.extractLongNamed("serviceId", attributeElement);
+			baseDataValidator.reset().parameter("serviceId").value(serviceId).notNull();
+			final BigDecimal price= fromApiJsonHelper.extractBigDecimalWithLocaleNamed("price", attributeElement);
+			baseDataValidator.reset().parameter("price").value(price).notNull();
 			
-			final Long contractId = fromApiJsonHelper.extractLongNamed("contractId", attributeElement);
-			baseDataValidator.reset().parameter("contractId").value(contractId).notNull();
-			 
-			final LocalDate startDate = fromApiJsonHelper.extractLocalDateNamed("startDate", element);
-			baseDataValidator.reset().parameter("startDate").value(startDate).notBlank();
+			
 
 		
 		}
