@@ -16,6 +16,7 @@ import org.mifosplatform.billing.selfcare.domain.SelfCareTemporary;
 import org.mifosplatform.billing.selfcare.domain.SelfCareTemporaryRepository;
 import org.mifosplatform.billing.selfcare.exception.SelfCareNotVerifiedException;
 import org.mifosplatform.billing.selfcare.exception.SelfCareTemporaryEmailIdNotFoundException;
+import org.mifosplatform.billing.selfcare.service.SelfCareRepository;
 import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -175,8 +176,8 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 		        	
 		        	JsonCommand comm=new JsonCommand(null, order.toString(),order, fromJsonHelper, null, null, null, null, null, null, null, null, null, null, null,null);
 		        	resultOrder=this.orderWritePlatformService.createOrder(resultClient.getClientId(),comm);
-		        
-		        }
+		           
+	         }
 	        return resultClient;
 
            
@@ -192,6 +193,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
         logger.error(dve.getMessage(), dve);
     }
 
+	//@SuppressWarnings("unused")
 	@Override
 	public CommandProcessingResult selfRegistrationProcess(JsonCommand command) {
 
@@ -225,6 +227,10 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 				throw new SelfCareTemporaryEmailIdNotFoundException(email);
 			}
 
+			/*if(temporary.getPaymentStatus().equalsIgnoreCase("ACTIVE")){
+				throw new PaymentStatusAlreadyActivatedException(email);
+			}*/
+			
 			if (temporary.getStatus().equalsIgnoreCase("ACTIVE")) {
 				
                   throw new ClientAlreadyCreatedException();
@@ -260,7 +266,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 				if(nationalId !=null && !nationalId.equalsIgnoreCase("")){
 					clientcreation.put("externalId", nationalId);
 				}
-				
+
 				final JsonElement element = fromJsonHelper.parse(clientcreation.toString());
 				JsonCommand clientCommand = new JsonCommand(null,clientcreation.toString(), element, fromJsonHelper,
 						null, null, null, null, null, null, null, null, null, null, 
@@ -274,86 +280,89 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 				temporary.setStatus("ACTIVE");
 				
 				//book device
-				if (deviceStatusConfiguration != null && deviceStatusConfiguration.isEnabled()) {
+				if (deviceStatusConfiguration != null) {
 
-					JSONObject bookDevice = new JSONObject();
-					deviceStatusConfiguration = configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);
+					if (deviceStatusConfiguration.isEnabled()) {
 
-					if (deviceStatusConfiguration != null && deviceStatusConfiguration.isEnabled() &&
-							 deviceStatusConfiguration.getValue().equalsIgnoreCase(ConfigurationConstants.CONFIR_PROPERTY_SALE)) {
+						JSONObject bookDevice = new JSONObject();
+						deviceStatusConfiguration = configurationRepository
+								.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);
 
-						device = command.stringValueOfParameterNamed("device");
-						ItemDetails detail = itemDetailsRepository.getInventoryItemDetailBySerialNum(device);
+						if (deviceStatusConfiguration != null&& deviceStatusConfiguration.isEnabled()
+								&& deviceStatusConfiguration.getValue().equalsIgnoreCase(ConfigurationConstants.CONFIR_PROPERTY_SALE)) {
 
-						if (detail == null) {
-							throw new SerialNumberNotFoundException(device);
-						}
-						
-						ItemMaster itemMaster = this.itemRepository.findOne(detail.getItemMasterId());
-						
-						if (itemMaster == null) {
-							throw new ItemNotFoundException(deviceId);
-						}
+							device = command.stringValueOfParameterNamed("device");
+							ItemDetails detail = itemDetailsRepository.getInventoryItemDetailBySerialNum(device);
 
-						if (detail != null && detail.getStatus().equalsIgnoreCase("Used")) {
-							throw new SerialNumberAlreadyExistException(device);
-						}
-						
-						JSONObject serialNumberObject = new JSONObject();
-						serialNumberObject.put("serialNumber", device);
-						serialNumberObject.put("clientId", resultClient.getClientId());
-						serialNumberObject.put("status", "allocated");
-						serialNumberObject.put("itemMasterId", detail.getItemMasterId());
-						serialNumberObject.put("isNewHw", "Y");
-						JSONArray serialNumber = new JSONArray();
-						serialNumber.put(0, serialNumberObject);
+							if (detail == null) {
+								throw new SerialNumberNotFoundException(device);
+							}
 
-						bookDevice.put("chargeCode", itemMaster.getChargeCode());
-						bookDevice.put("unitPrice", itemMaster.getUnitPrice());
-						bookDevice.put("itemId", itemMaster.getId());
-						bookDevice.put("discountId", id);
-						bookDevice.put("officeId", detail.getOfficeId());
-						bookDevice.put("totalPrice", itemMaster.getUnitPrice());
+							ItemMaster itemMaster = this.itemRepository.findOne(detail.getItemMasterId());
 
-						bookDevice.put("quantity", id);
-						bookDevice.put("locale", "en");
-						bookDevice.put("dateFormat", dateFormat);
-						bookDevice.put("saleType", "SALE");
-						bookDevice.put("saleDate", activationDate);
-						bookDevice.put("serialNumber", serialNumber);
+							if (itemMaster == null) {
+								throw new ItemNotFoundException(deviceId);
+							}
 
-						final JsonElement deviceElement = fromJsonHelper.parse(bookDevice.toString());
-						JsonCommand comm = new JsonCommand(null, bookDevice.toString(), deviceElement, fromJsonHelper, null, 
-								null, null, null, null, null, null, null, null, null, null, null);
-						
-						resultSale = this.oneTimeSaleWritePlatformService.createOneTimeSale(comm, resultClient.getClientId());
+							if (detail != null && detail.getStatus().equalsIgnoreCase("Used")) {
+								throw new SerialNumberAlreadyExistException(device);
+							}
 
-						if (resultSale == null) {
-							throw new PlatformDataIntegrityException("error.msg.client.device.assign.failed",
-									"Device Assign Failed for ClientId :" + resultClient.getClientId(), "Device Assign Failed");
-						}
+							JSONObject serialNumberObject = new JSONObject();
+							serialNumberObject.put("serialNumber", device);
+							serialNumberObject.put("clientId", resultClient.getClientId());
+							serialNumberObject.put("status", "allocated");
+							serialNumberObject.put("itemMasterId", detail.getItemMasterId());
+							serialNumberObject.put("isNewHw", "Y");
+							JSONArray serialNumber = new JSONArray();
+							serialNumber.put(0, serialNumberObject);
 
-					} else{
-						
-						List<ItemMaster> itemMaster = this.itemRepository.findAll();
-						bookDevice.put("locale", "en");
-						bookDevice.put("dateFormat", dateFormat);
-						bookDevice.put("allocationDate", activationDate);
-						bookDevice.put("provisioningSerialNumber", deviceId);
-						bookDevice.put("itemType", itemMaster.get(0).getId());
-						bookDevice.put("serialNumber", deviceId);
-						bookDevice.put("status", "ACTIVE");
-						CommandWrapper commandWrapper = new CommandWrapperBuilder().createOwnedHardware(resultClient.getClientId()).withJson(bookDevice.toString()).build();
-						final CommandProcessingResult result = portfolioCommandSourceWritePlatformService.logCommandSource(commandWrapper);
-						
-						if (result == null) {
-							throw new PlatformDataIntegrityException("error.msg.client.device.assign.failed", "Device Assign Failed for ClientId :"
-											+ resultClient.getClientId(), "Device Assign Failed");
+							bookDevice.put("chargeCode", itemMaster.getChargeCode());
+							bookDevice.put("unitPrice", itemMaster.getUnitPrice());
+							bookDevice.put("itemId", itemMaster.getId());
+							bookDevice.put("discountId", id);
+							bookDevice.put("officeId", detail.getOfficeId());
+							bookDevice.put("totalPrice", itemMaster.getUnitPrice());
+
+							bookDevice.put("quantity", id);
+							bookDevice.put("locale", "en");
+							bookDevice.put("dateFormat", dateFormat);
+							bookDevice.put("saleType", "SALE");
+							bookDevice.put("saleDate", activationDate);
+							bookDevice.put("serialNumber", serialNumber);
+
+							final JsonElement deviceElement = fromJsonHelper.parse(bookDevice.toString());
+							JsonCommand comm = new JsonCommand(null, bookDevice.toString(), deviceElement, fromJsonHelper,
+									null, null, null, null, null, null, null, null, null, null, null, null);
+
+							resultSale = this.oneTimeSaleWritePlatformService.createOneTimeSale(comm, resultClient.getClientId());
+
+							if (resultSale == null) {
+								throw new PlatformDataIntegrityException("error.msg.client.device.assign.failed", 
+										"Device Assign Failed for ClientId :" + resultClient.getClientId(), "Device Assign Failed");
+							}
+
+						} else {
+
+							List<ItemMaster> itemMaster = this.itemRepository.findAll();
+							bookDevice.put("locale", "en");
+							bookDevice.put("dateFormat", dateFormat);
+							bookDevice.put("allocationDate", activationDate);
+							bookDevice.put("provisioningSerialNumber", deviceId);
+							bookDevice.put("itemType", itemMaster.get(0).getId());
+							bookDevice.put("serialNumber", deviceId);
+							bookDevice.put("status", "ACTIVE");
+							CommandWrapper commandWrapper = new CommandWrapperBuilder().createOwnedHardware(resultClient.getClientId()).withJson(bookDevice.toString()).build();
+							final CommandProcessingResult result = portfolioCommandSourceWritePlatformService.logCommandSource(commandWrapper);
+
+							if (result == null) {
+								throw new PlatformDataIntegrityException("error.msg.client.device.assign.failed",
+										"Device Assign Failed for ClientId :" + resultClient.getClientId(), "Device Assign Failed");
+							}
 						}
 					}
 				}
   				
-				
 				// book order
 				Configuration selfregistrationconfiguration = configurationRepository.findOneByName(ConfigurationConstants.CONFIR_PROPERTY_SELF_REGISTRATION);
 				
@@ -402,23 +411,23 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 
 					} 		
 				}
-				
-				return resultClient;
-				
-			} else if (temporary.getStatus().equalsIgnoreCase("INACTIVE")) {
-				throw new SelfCareNotVerifiedException(email);			
+  				
+  				return resultClient;
+  				
+  			} else if (temporary.getStatus().equalsIgnoreCase("INACTIVE")) {
+  				throw new SelfCareNotVerifiedException(email);			
 
-			} else {
-				return new CommandProcessingResult(Long.valueOf(-1));
-			}	
+  			} else {
+  				return new CommandProcessingResult(Long.valueOf(-1));
+  			}	
 
 
-		} catch (DataIntegrityViolationException dve) {
-			handleDataIntegrityIssues(command, dve);
-			return new CommandProcessingResult(Long.valueOf(-1));
-		} catch (JSONException e) {
-			return new CommandProcessingResult(Long.valueOf(-1));
-		}
+  		} catch (DataIntegrityViolationException dve) {
+  			handleDataIntegrityIssues(command, dve);
+  			return new CommandProcessingResult(Long.valueOf(-1));
+  		} catch (JSONException e) {
+  			return new CommandProcessingResult(Long.valueOf(-1));
+  		}
 
-	}
+  	}
 }

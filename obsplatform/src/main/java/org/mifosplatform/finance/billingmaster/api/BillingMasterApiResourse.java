@@ -89,7 +89,7 @@ public class BillingMasterApiResourse {
 	@Path("{clientId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrieveBillingProducts(@PathParam("clientId") final Long clientId, final String apiRequestBodyAsJson) {
+	public String generateBillStatement(@PathParam("clientId") final Long clientId, final String apiRequestBodyAsJson) {
 		
 		final JsonElement parsedCommand = this.fromApiJsonHelper.parse(apiRequestBodyAsJson);
         final JsonCommand command = JsonCommand.from(apiRequestBodyAsJson, parsedCommand,this.fromApiJsonHelper,
@@ -113,14 +113,14 @@ public class BillingMasterApiResourse {
 	@Path("{billId}/print")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public Response printInvoice(@PathParam("billId") final Long billId) {
+	public Response printStatement(@PathParam("billId") final Long billId) {
 		
 		final BillMaster billMaster = this.billMasterRepository.findOne(billId);
 		final String fileName = billMaster.getFileName();
 		    
 		if("invoice".equalsIgnoreCase(fileName)){
 			try {
-					this.billWritePlatformService.ireportPdf(billId);
+					this.billWritePlatformService.generateStatementPdf(billId);
 			} catch (SQLException e) {
 				   e.printStackTrace();
 			}
@@ -153,7 +153,7 @@ public class BillingMasterApiResourse {
 		final BillMaster billMaster = this.billMasterRepository.findOne(billId);
 		final String fileName = billMaster.getFileName();	
 		if("invoice".equalsIgnoreCase(fileName)){
-			final String msg = "No Generate Pdf file For This Statement";
+			final String msg = "No Generated Pdf file For This Statement";
 			throw new BillingOrderNoRecordsFoundException(msg, billId);
 		}
 		final Long msgId = this.billMasterWritePlatformService.sendBillDetailFilePath(billMaster);
@@ -170,4 +170,21 @@ public class BillingMasterApiResourse {
         return this.toApiJsonSerializer.serialize(result);
 	}
 	
+	@GET
+	@Path("/print/{clientId}/{invoiceId}")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response printInvoice(@PathParam("invoiceId") final Long invoiceId, @PathParam("clientId") final Long clientId) {
+		 String printFileName = "";
+		try{
+		 printFileName=this.billWritePlatformService.generateInovicePdf(invoiceId);
+		 System.out.println(printFileName);
+		}catch(SQLException e) {e.printStackTrace();}
+		 final File file = new File(printFileName);
+		 this.billWritePlatformService.sendInvoiceToEmail(printFileName,clientId);
+		 final ResponseBuilder response = Response.ok(file);
+		 response.header("Content-Disposition", "attachment; filename=\"" + printFileName + "\"");
+		 response.header("Content-Type", "application/pdf");
+		 return response.build();
+	}
 }

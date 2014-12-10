@@ -148,8 +148,11 @@ public final class ClientDataValidator {
             	if(!isValid)
             dataValidationErrors.add(ApiParameterError.parameterError("Invalid Email Address","Invalid Email Address", "email",email));
             
-            }
-            
+            }   
+        }
+        if (isSelfcareEnable) {
+        	final String email = fromApiJsonHelper.extractStringNamed(ClientApiConstants.emailParamName, element);
+        	baseDataValidator.reset().parameter(ClientApiConstants.emailParamName).value(email).notNull();
         }
         
         if (isSelfcareEnable) {

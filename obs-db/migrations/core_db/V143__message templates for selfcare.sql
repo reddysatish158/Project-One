@@ -1,7 +1,11 @@
 delete from b_message_template where template_description = "CREATE SELFCARE";
 
+<<<<<<< HEAD
 INSERT IGNORE INTO b_message_template(template_description,subject,header,body,footer,message_type) values ('CREATE SELFCARE', 'OBS Selfcare','Dear <PARAM1>','Your Selfcare User Account has been successfully created,Following are the User login Details. 
  <br/> userName : <PARAM2> , <br/> password : <PARAM3> .','Thankyou','E');
+=======
+INSERT IGNORE INTO b_message_template(template_description,subject,header,body,footer,message_type) values ('CREATE SELFCARE', 'OBS Selfcare','Dear <PARAM1>','Your Selfcare User Account has been successfully created,Following are the User login Details. <br/> userName : <PARAM2> , <br/> password : <PARAM3> .','Thankyou','E');
+>>>>>>> obsplatform-2.03
 
 delete from b_message_template where template_description = "SELFCARE REGISTRATION";
 
@@ -11,7 +15,11 @@ delete from b_message_template where template_description = "NEW SELFCARE PASSWO
 
 INSERT IGNORE INTO b_message_template(template_description,subject,header,body,footer,message_type) values ('NEW SELFCARE PASSWORD','Reset Password','Dear <PARAM1>','The password for your SelfCare User Portal Account- <PARAM2>  was reset. . <br/> Password : <PARAM3>.','Thankyou','E');
 
+<<<<<<< HEAD
 INSERT IGNORE INTO b_message_template(template_description,subject,header,body,footer,message_type) values ('PROVISION CREDENTIALS','OBS Provision Credentials','Dear <PARAM1>','Your OBS Subscriber Account has been successfully created And Following are the Account Details.  <br/> subscriberUid : <PARAM2> , <br/> Authpin : <PARAM3> .','Thankyou','E');
+=======
+INSERT IGNORE INTO b_message_template(template_description,subject,header,body,footer,message_type) values ('PROVISION CREDENTIALS','OBS Provision Credentials','Dear <PARAM1>','Your OBS Subscriber Account has been successfully created And Following are the Account Details.  <br/> subscriberUid : <PARAM2> , <br/>  Authpin : <PARAM3> .','Thankyou','E');
+>>>>>>> obsplatform-2.03
 
 Drop procedure IF EXISTS deviceId; 
 DELIMITER //

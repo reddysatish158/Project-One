@@ -15,7 +15,6 @@ import java.util.Properties;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
-import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
@@ -296,7 +295,6 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 	@Override
 	public String sendGeneralMessage(String emailId, String body ,String subject) {
 
-		
 		smtpDataProcessing();
 		
 		if(configuration != null){
@@ -305,27 +303,6 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 			
 			email.setAuthenticator(new DefaultAuthenticator(authuser, authpwd));
 			email.setHostName(hostName);
-			/*Email email = new SimpleEmail();
-				// Very Important, Don't use email.setAuthentication()
-			email.setAuthenticator(new DefaultAuthenticator(authuser, authpwd));
-			email.setDebug(false); // true if you want to debug
-			email.setHostName(hostName);
-		
-			try {
-				String sendToEmail = emailId;
-				StringBuilder messageBuilder = new StringBuilder().append(body);			
-				email.getMailSession().getProperties().put("mail.smtp.starttls.enable", starttlsValue);
-				email.setFrom(authuser, authuser);
-				email.setSmtpPort(portNumber);
-				email.setSubject(subject);		
-				email.addTo(sendToEmail, sendToEmail);
-				email.setMsg(messageBuilder.toString());
-				email.send();
-				return "Success";
-			} catch (Exception e) {
-				handleCodeDataIntegrityIssues(null, e);
-				return e.getMessage();
-			}*/
 				try{
 					String sendToEmail = emailId;
 					email.setStartTLSRequired(starttlsValue.equalsIgnoreCase("true"));
