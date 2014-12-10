@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.HashMap;
@@ -30,6 +29,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.mifosplatform.crm.ticketmaster.api.TicketMasterApiResource;
 import org.mifosplatform.crm.ticketmaster.service.TicketMasterReadPlatformService;
 import org.mifosplatform.finance.billingmaster.api.BillingMasterApiResourse;
+import org.mifosplatform.finance.billingorder.domain.Invoice;
 import org.mifosplatform.finance.billingorder.exceptions.BillingOrderNoRecordsFoundException;
 import org.mifosplatform.finance.billingorder.service.InvoiceClient;
 import org.mifosplatform.infrastructure.configuration.domain.Configuration;
@@ -188,12 +188,12 @@ try
 				for (Long clientId : clientIds) {
 					try {
 						if(data.isDynamic().equalsIgnoreCase("Y")){
-							BigDecimal amount=this.invoiceClient.invoicingSingleClient(clientId,new LocalDate());	
-							fw.append("ClientId: "+clientId+"\tAmount: "+amount.toString()+"\r\n");
+							Invoice  invoice=this.invoiceClient.invoicingSingleClient(clientId,new LocalDate());	
+							fw.append("ClientId: "+clientId+"\tAmount: "+invoice.getInvoiceAmount().toString()+"\r\n");
 						
 						}else{
-							BigDecimal amount=this.invoiceClient.invoicingSingleClient(clientId,data.getProcessDate());
-							fw.append("ClientId: "+clientId+"\tAmount: "+amount.toString()+"\r\n");	
+							Invoice invoice=this.invoiceClient.invoicingSingleClient(clientId,data.getProcessDate());
+							fw.append("ClientId: "+clientId+"\tAmount: "+invoice.getInvoiceAmount().toString()+"\r\n");	
 						}
 					} catch (Exception dve) {
 						handleCodeDataIntegrityIssues(null, dve);
@@ -536,16 +536,12 @@ public void processNotify() {
 	  					+emailDetail.getMessageType()+" ,MessageFrom="+emailDetail.getMessageFrom()+" ,Message="+emailDetail.getBody()+"\r\n");
 	  			
 	  			if(emailDetail.getMessageType()=='E'){
-	  				
 	  				String Result=this.messagePlatformEmailService.sendToUserEmail(emailDetail);
-	  				fw.append("b_message_data processing id="+emailDetail.getId()+"-- and Result :"+Result+" ... \r\n");
-	  			
-	  			}else if(emailDetail.getMessageType()=='M'){
-	  				
+	  				fw.append("b_message_data processing id="+emailDetail.getId()+"-- and Result :"+Result+" ... \r\n");	
+	  			}else if(emailDetail.getMessageType()=='M'){		
 	  				String message = this.sheduleJobReadPlatformService.retrieveMessageData(emailDetail.getId());
 	  				String Result=this.messagePlatformEmailService.sendToUserMobile(message,emailDetail.getId());	
-	  				fw.append("b_message_data processing id="+emailDetail.getId()+"-- and Result:"+Result+" ... \r\n");
-	  			
+	  				fw.append("b_message_data processing id="+emailDetail.getId()+"-- and Result:"+Result+" ... \r\n");	
 	  			}else{
 	  				fw.append("Message Type Unknown ..\r\n");
 	  			}	
@@ -1278,7 +1274,7 @@ public void eventActionProcessor() {
 		}
 	}
 
-@SuppressWarnings("null")
+
 @Override
 @CronTarget(jobName = JobName.REPORT_EMAIL)
 public void reportEmail() {
@@ -1381,7 +1377,7 @@ public void reportStatmentPdf() {
 	    	   }
 	    	   for(Long billId:billIds){
 	    		   fw.append("processing statement  billId: "+billId+ " \r\n");
-	    		   this.billingMasterApiResourse.printInvoice(billId);
+	    		   this.billingMasterApiResourse.printStatement(billId);
 	    	   }
 	       }
 	       fw.append("statement pdf files Job is Completed..."+ ThreadLocalContextUtil.getTenant().getTenantIdentifier()+" . \r\n");
