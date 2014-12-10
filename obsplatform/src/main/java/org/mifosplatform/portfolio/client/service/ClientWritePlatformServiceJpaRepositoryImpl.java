@@ -267,7 +267,8 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 
             final Client newClient = Client.createNew(clientOffice, clientParentGroup, command);
             this.clientRepository.save(newClient);
-           final Address address = Address.fromJson(newClient.getId(),command);
+            
+            final Address address = Address.fromJson(newClient.getId(),command);
 			this.addressRepository.save(address);
 
             if (newClient.isAccountNumberRequiresAutoGeneration()) {
