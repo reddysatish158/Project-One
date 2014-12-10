@@ -151,12 +151,12 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 								client.setStatus(ClientStatus.ACTIVE.getValue());
 								this.orderRepository.saveAndFlush(order);
 								
-									if(plan.isPrepaid() == 'Y'){
+									
 										List<ActionDetaislData> actionDetaislDatas=this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_ACTIVE_ORDER);
 										if(actionDetaislDatas.size() != 0){
 											this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,order.getClientId(), order.getId().toString(),null);
 										}
-									}
+								
 					 
 							}else if(detailsData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.DISCONNECTION.toString())){
 					 

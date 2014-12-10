@@ -6,7 +6,6 @@ import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 
@@ -24,7 +23,6 @@ public class OnlinePaymentGatewayCommandhandler implements NewCommandSourceHandl
 		this.paymentGatewayWritePlatformService = paymentGatewayWritePlatformService;
 	}
 
-	@Transactional
 	@Override
 	public CommandProcessingResult processCommand(JsonCommand command) {
 

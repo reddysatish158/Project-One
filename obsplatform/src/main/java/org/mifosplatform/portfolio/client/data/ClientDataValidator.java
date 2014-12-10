@@ -42,7 +42,7 @@ public final class ClientDataValidator {
         this.fromApiJsonHelper = fromApiJsonHelper;
     }
 
-    public void validateForCreate(final String json) {
+    public void validateForCreate(final String json, boolean isSelfcareEnable) {
 
         if (StringUtils.isBlank(json)) { throw new InvalidJsonException(); }
 
@@ -140,7 +140,7 @@ public final class ClientDataValidator {
         }
         if (fromApiJsonHelper.parameterExists(ClientApiConstants.emailParamName, element)) {
             final String email = fromApiJsonHelper.extractStringNamed(ClientApiConstants.emailParamName, element);
-            
+       
             baseDataValidator.reset().parameter(ClientApiConstants.emailParamName).value(email).notNull();
                  
             if(email!=null){
@@ -148,8 +148,16 @@ public final class ClientDataValidator {
             	if(!isValid)
             dataValidationErrors.add(ApiParameterError.parameterError("Invalid Email Address","Invalid Email Address", "email",email));
             
-            }
-            
+            }   
+        }
+        if (isSelfcareEnable) {
+        	final String email = fromApiJsonHelper.extractStringNamed(ClientApiConstants.emailParamName, element);
+        	baseDataValidator.reset().parameter(ClientApiConstants.emailParamName).value(email).notNull();
+        }
+        
+        if (isSelfcareEnable) {
+        	final String email = fromApiJsonHelper.extractStringNamed(ClientApiConstants.emailParamName, element);
+        	baseDataValidator.reset().parameter(ClientApiConstants.emailParamName).value(email).notNull();
         }
 
         throwExceptionIfValidationWarningsExist(dataValidationErrors);

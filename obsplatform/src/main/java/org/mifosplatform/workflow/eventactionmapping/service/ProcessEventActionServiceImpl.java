@@ -4,8 +4,10 @@ package org.mifosplatform.workflow.eventactionmapping.service;
 import java.util.Date;
 import java.util.List;
 
+import org.mifosplatform.finance.billingmaster.api.BillingMasterApiResourse;
 import org.mifosplatform.finance.billingorder.service.InvoiceClient;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
+import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
 import org.mifosplatform.portfolio.association.data.HardwareAssociationData;
 import org.mifosplatform.portfolio.association.service.HardwareAssociationReadplatformService;
@@ -22,7 +24,6 @@ import org.mifosplatform.workflow.eventaction.service.ProcessEventActionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.google.gson.JsonElement;
 
@@ -38,13 +39,15 @@ public class ProcessEventActionServiceImpl implements ProcessEventActionService 
 	private final ProcessRequestRepository processRequestRepository;
     private final OrderWritePlatformService orderWritePlatformService;
     private final HardwareAssociationReadplatformService hardwareAssociationReadplatformService;
+    private final BillingMasterApiResourse billingMasterApiResourse;
     
  
 
 	@Autowired
 	public ProcessEventActionServiceImpl(final EventActionRepository eventActionRepository,final FromJsonHelper fromJsonHelper,
 			final OrderWritePlatformService orderWritePlatformService,final InvoiceClient invoiceClient,
-			final ProcessRequestRepository processRequestRepository,final HardwareAssociationReadplatformService hardwareAssociationReadplatformService)
+			final ProcessRequestRepository processRequestRepository,final HardwareAssociationReadplatformService hardwareAssociationReadplatformService,
+			final BillingMasterApiResourse billingMasterApiResourse)
 	{
 		this.invoiceClient=invoiceClient;
         this.fromApiJsonHelper=fromJsonHelper;
@@ -52,6 +55,8 @@ public class ProcessEventActionServiceImpl implements ProcessEventActionService 
         this.processRequestRepository=processRequestRepository;
         this.orderWritePlatformService=orderWritePlatformService;
         this.hardwareAssociationReadplatformService=hardwareAssociationReadplatformService;
+        this.billingMasterApiResourse = billingMasterApiResourse;
+        
 	}
 	
 	@Override
@@ -94,10 +99,28 @@ public class ProcessEventActionServiceImpl implements ProcessEventActionService 
 				
 			case EventActionConstants.ACTION_INVOICE :
 				try{
+					CommandProcessingResult result = null;
 					parsedCommand = this.fromApiJsonHelper.parse(jsonObject);
 					command = JsonCommand.from(jsonObject,parsedCommand,this.fromApiJsonHelper,"CreateInvoice",eventActionData.getClientId(), null,
 						null,eventActionData.getClientId(), null, null, null,null, null, null,null);
-					this.invoiceClient.createInvoiceBill(command);
+					result=this.invoiceClient.createInvoiceBill(command);
+					if(result!=null){
+						this.billingMasterApiResourse.printInvoice(result.resourceId(),eventActionData.getClientId());
+					}
+						/*JSONObject jsonObj=new JSONObject();
+						jsonObj.put("dateFormat","dd MMMM yyyy");
+						jsonObj.put("locale","en");
+						jsonObj.put("dueDate", dateFormat.format(new Date()));
+						jsonObj.put("message","Statement");
+						parsedCommand = this.fromApiJsonHelper.parse(jsonObj.toString());
+						command = JsonCommand.from(jsonObj.toString(),parsedCommand,this.fromApiJsonHelper,"BILLMASTER",eventActionData.getClientId(), null,
+								null,eventActionData.getClientId(), null, null, null,null, null, null,null);
+			            result = this.billMasterWritePlatformService.createBillMaster(command, command.entityId());
+				           if(result.resourceId() != null){
+				        	  this.billingMasterApiResourse.printInvoice(result.resourceId());
+				        	  this.billingMasterApiResourse.sendBillPathToMsg(result.resourceId());
+				           }*/
+					
 				}catch(Exception exception){
 					
 				}

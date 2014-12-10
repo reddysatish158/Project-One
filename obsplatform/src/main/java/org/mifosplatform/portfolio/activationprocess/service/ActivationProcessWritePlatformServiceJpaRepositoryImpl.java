@@ -5,7 +5,6 @@
  */
 package org.mifosplatform.portfolio.activationprocess.service;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -13,10 +12,8 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.mifosplatform.billing.selfcare.domain.SelfCare;
 import org.mifosplatform.billing.selfcare.domain.SelfCareTemporary;
 import org.mifosplatform.billing.selfcare.domain.SelfCareTemporaryRepository;
-import org.mifosplatform.billing.selfcare.exception.PaymentStatusAlreadyActivatedException;
 import org.mifosplatform.billing.selfcare.exception.SelfCareNotVerifiedException;
 import org.mifosplatform.billing.selfcare.exception.SelfCareTemporaryEmailIdNotFoundException;
 import org.mifosplatform.billing.selfcare.service.SelfCareRepository;
@@ -60,7 +57,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 @Service
 public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements ActivationProcessWritePlatformService {
 
@@ -69,7 +65,6 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
     private final PlatformSecurityContext context;
     private final FromJsonHelper fromJsonHelper;
     private final ItemRepository itemRepository;
-    private final SelfCareRepository selfCareRepository;
     private final ClientWritePlatformService clientWritePlatformService;
     private final OneTimeSaleWritePlatformService oneTimeSaleWritePlatformService;
     private final OrderWritePlatformService orderWritePlatformService;
@@ -91,7 +86,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
     		final OwnedHardwareWritePlatformService ownedHardwareWritePlatformService, final AddressReadPlatformService addressReadPlatformService,
     		final ActivationProcessCommandFromApiJsonDeserializer commandFromApiJsonDeserializer, final ItemDetailsRepository itemDetailsRepository,
     		final SelfCareTemporaryRepository selfCareTemporaryRepository,final PortfolioCommandSourceWritePlatformService portfolioCommandSourceWritePlatformService,
-    		final CodeValueRepository codeValueRepository, final SelfCareRepository selfCareRepository,final ItemRepository itemRepository,
+    		final CodeValueRepository codeValueRepository,final ItemRepository itemRepository,
     		final BillingMessageTemplateRepository billingMessageTemplateRepository,final MessagePlatformEmailService messagePlatformEmailService,
     		final BillingMessageRepository messageDataRepository) {
 
@@ -99,7 +94,6 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
     	this.context = context;
     	this.itemRepository=itemRepository;
         this.fromJsonHelper = fromJsonHelper;
-        this.selfCareRepository = selfCareRepository;
         this.clientWritePlatformService = clientWritePlatformService;
         this.oneTimeSaleWritePlatformService = oneTimeSaleWritePlatformService;
         this.orderWritePlatformService = orderWritePlatformService;
@@ -182,15 +176,15 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 		        	
 		        	JsonCommand comm=new JsonCommand(null, order.toString(),order, fromJsonHelper, null, null, null, null, null, null, null, null, null, null, null,null);
 		        	resultOrder=this.orderWritePlatformService.createOrder(resultClient.getClientId(),comm);
-		        
-		        }
+		           
+	         }
 	        return resultClient;
 
            
         } catch (DataIntegrityViolationException dve) {
         	
             handleDataIntegrityIssues(command, dve);
-            return new CommandProcessingResult(-1l).empty();
+            return new CommandProcessingResult(Long.valueOf(-1));
         }
 	
     }
@@ -217,8 +211,6 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 			String dateFormat = "dd MMMM yyyy";
 			String activationDate = new SimpleDateFormat(dateFormat).format(new Date());
 
-			
-
 			String fullname = command.stringValueOfParameterNamed("fullname");
 			String firstName = command.stringValueOfParameterNamed("firstname");
 			String city = command.stringValueOfParameterNamed("city");
@@ -228,7 +220,6 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 			String email = command.stringValueOfParameterNamed("email");
 			String nationalId = command.stringValueOfParameterNamed("nationalId");
 			String deviceId = command.stringValueOfParameterNamed("device");
-			String kortaToken = command.stringValueOfParameterNamed("kortaToken");
 			
 			SelfCareTemporary temporary = selfCareTemporaryRepository.findOneByEmailId(email);
 			
@@ -236,9 +227,9 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 				throw new SelfCareTemporaryEmailIdNotFoundException(email);
 			}
 
-			if(temporary.getPaymentStatus().equalsIgnoreCase("ACTIVE")){
+			/*if(temporary.getPaymentStatus().equalsIgnoreCase("ACTIVE")){
 				throw new PaymentStatusAlreadyActivatedException(email);
-			}
+			}*/
 			
 			if (temporary.getStatus().equalsIgnoreCase("ACTIVE")) {
 				
@@ -271,6 +262,10 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 				clientcreation.put("flag", false);
 				clientcreation.put("zipCode", zipCode);
 				clientcreation.put("device", deviceId);
+				
+				if(nationalId !=null && !nationalId.equalsIgnoreCase("")){
+					clientcreation.put("externalId", nationalId);
+				}
 
 				final JsonElement element = fromJsonHelper.parse(clientcreation.toString());
 				JsonCommand clientCommand = new JsonCommand(null,clientcreation.toString(), element, fromJsonHelper,
@@ -285,193 +280,154 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 				temporary.setStatus("ACTIVE");
 				
 				//book device
-				if(deviceStatusConfiguration != null){
-					
-					if(deviceStatusConfiguration.isEnabled()){
-						
+				if (deviceStatusConfiguration != null) {
+
+					if (deviceStatusConfiguration.isEnabled()) {
+
 						JSONObject bookDevice = new JSONObject();
-						deviceStatusConfiguration = configurationRepository.
-								findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);
-						 
-						if(deviceStatusConfiguration != null && deviceStatusConfiguration.isEnabled() &&
-								 deviceStatusConfiguration.getValue().equalsIgnoreCase(ConfigurationConstants.CONFIR_PROPERTY_SALE)){
-						
-						device = command.stringValueOfParameterNamed("device");
-						ItemDetails detail = itemDetailsRepository.getInventoryItemDetailBySerialNum(device);
+						deviceStatusConfiguration = configurationRepository
+								.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);
 
-						if (detail == null) {
-							throw new SerialNumberNotFoundException(device);
-						}
-						ItemMaster itemMaster=this.itemRepository.findOne(detail.getItemMasterId());
-						if(itemMaster == null){
-							throw new ItemNotFoundException(deviceId);
-						}
+						if (deviceStatusConfiguration != null&& deviceStatusConfiguration.isEnabled()
+								&& deviceStatusConfiguration.getValue().equalsIgnoreCase(ConfigurationConstants.CONFIR_PROPERTY_SALE)) {
 
-						if (detail != null && detail.getStatus().equalsIgnoreCase("Used")) {
-							throw new SerialNumberAlreadyExistException(device);
-						}
-						JSONObject serialNumberObject = new JSONObject();
-						serialNumberObject.put("serialNumber", device);
-						serialNumberObject.put("clientId", resultClient.getClientId());
-						serialNumberObject.put("status", "allocated");
-						serialNumberObject.put("itemMasterId", detail.getItemMasterId());
-						serialNumberObject.put("isNewHw", "Y");
-						JSONArray serialNumber = new JSONArray();
-						serialNumber.put(0, serialNumberObject);
-						
-						bookDevice.put("chargeCode", itemMaster.getChargeCode());
-						bookDevice.put("unitPrice", itemMaster.getUnitPrice());
-						bookDevice.put("itemId", itemMaster.getId());
-						bookDevice.put("discountId", id);
-						bookDevice.put("officeId",detail.getOfficeId());
-						bookDevice.put("totalPrice", itemMaster.getUnitPrice());
+							device = command.stringValueOfParameterNamed("device");
+							ItemDetails detail = itemDetailsRepository.getInventoryItemDetailBySerialNum(device);
 
-						bookDevice.put("quantity", id);
-						bookDevice.put("locale", "en");
-						bookDevice.put("dateFormat", dateFormat);
-						bookDevice.put("saleType", "SALE");
-						bookDevice.put("saleDate", activationDate);
-						bookDevice.put("serialNumber",serialNumber);
+							if (detail == null) {
+								throw new SerialNumberNotFoundException(device);
+							}
 
-						final JsonElement deviceElement = fromJsonHelper.parse(bookDevice.toString());
-						JsonCommand comm = new JsonCommand(null, bookDevice.toString(),
-								deviceElement, fromJsonHelper, null, null, null, null,
-								null, null, null, null, null, null, null, null);
-						resultSale = this.oneTimeSaleWritePlatformService.createOneTimeSale(comm, resultClient.getClientId());
-						
-						if (resultSale == null) {
-							throw new PlatformDataIntegrityException("error.msg.client.device.assign.failed","Device Assign Failed for ClientId :"
-											+ resultClient.getClientId(),"Device Assign Failed");
+							ItemMaster itemMaster = this.itemRepository.findOne(detail.getItemMasterId());
+
+							if (itemMaster == null) {
+								throw new ItemNotFoundException(deviceId);
+							}
+
+							if (detail != null && detail.getStatus().equalsIgnoreCase("Used")) {
+								throw new SerialNumberAlreadyExistException(device);
+							}
+
+							JSONObject serialNumberObject = new JSONObject();
+							serialNumberObject.put("serialNumber", device);
+							serialNumberObject.put("clientId", resultClient.getClientId());
+							serialNumberObject.put("status", "allocated");
+							serialNumberObject.put("itemMasterId", detail.getItemMasterId());
+							serialNumberObject.put("isNewHw", "Y");
+							JSONArray serialNumber = new JSONArray();
+							serialNumber.put(0, serialNumberObject);
+
+							bookDevice.put("chargeCode", itemMaster.getChargeCode());
+							bookDevice.put("unitPrice", itemMaster.getUnitPrice());
+							bookDevice.put("itemId", itemMaster.getId());
+							bookDevice.put("discountId", id);
+							bookDevice.put("officeId", detail.getOfficeId());
+							bookDevice.put("totalPrice", itemMaster.getUnitPrice());
+
+							bookDevice.put("quantity", id);
+							bookDevice.put("locale", "en");
+							bookDevice.put("dateFormat", dateFormat);
+							bookDevice.put("saleType", "SALE");
+							bookDevice.put("saleDate", activationDate);
+							bookDevice.put("serialNumber", serialNumber);
+
+							final JsonElement deviceElement = fromJsonHelper.parse(bookDevice.toString());
+							JsonCommand comm = new JsonCommand(null, bookDevice.toString(), deviceElement, fromJsonHelper,
+									null, null, null, null, null, null, null, null, null, null, null, null);
+
+							resultSale = this.oneTimeSaleWritePlatformService.createOneTimeSale(comm, resultClient.getClientId());
+
+							if (resultSale == null) {
+								throw new PlatformDataIntegrityException("error.msg.client.device.assign.failed", 
+										"Device Assign Failed for ClientId :" + resultClient.getClientId(), "Device Assign Failed");
+							}
+
+						} else {
+
+							List<ItemMaster> itemMaster = this.itemRepository.findAll();
+							bookDevice.put("locale", "en");
+							bookDevice.put("dateFormat", dateFormat);
+							bookDevice.put("allocationDate", activationDate);
+							bookDevice.put("provisioningSerialNumber", deviceId);
+							bookDevice.put("itemType", itemMaster.get(0).getId());
+							bookDevice.put("serialNumber", deviceId);
+							bookDevice.put("status", "ACTIVE");
+							CommandWrapper commandWrapper = new CommandWrapperBuilder().createOwnedHardware(resultClient.getClientId()).withJson(bookDevice.toString()).build();
+							final CommandProcessingResult result = portfolioCommandSourceWritePlatformService.logCommandSource(commandWrapper);
+
+							if (result == null) {
+								throw new PlatformDataIntegrityException("error.msg.client.device.assign.failed",
+										"Device Assign Failed for ClientId :" + resultClient.getClientId(), "Device Assign Failed");
+							}
 						}
-						
-					}else{
-						
-						List<ItemMaster> itemMaster=this.itemRepository.findAll(); 
-						bookDevice.put("locale", "en");
-						bookDevice.put("dateFormat", dateFormat);
-						bookDevice.put("allocationDate",activationDate);
-						bookDevice.put("provisioningSerialNumber",deviceId);
-						bookDevice.put("itemType",itemMaster.get(0).getId());
-						bookDevice.put("serialNumber",deviceId);
-						bookDevice.put("status","ACTIVE");
-						CommandWrapper commandWrapper = new CommandWrapperBuilder().createOwnedHardware(resultClient.getClientId()).withJson(bookDevice.toString()).build();
-						final CommandProcessingResult result = portfolioCommandSourceWritePlatformService.logCommandSource(commandWrapper);
-						if (result == null) {
-							throw new PlatformDataIntegrityException("error.msg.client.device.assign.failed","Device Assign Failed for ClientId :"
-											+ resultClient.getClientId(),"Device Assign Failed");
-						}		
 					}
-					}
-					
 				}
-				
+  				
 				// book order
 				Configuration selfregistrationconfiguration = configurationRepository.findOneByName(ConfigurationConstants.CONFIR_PROPERTY_SELF_REGISTRATION);
 				
-				if (selfregistrationconfiguration != null) {
-					
-					if (selfregistrationconfiguration.isEnabled()) {
+				if (selfregistrationconfiguration != null && selfregistrationconfiguration.isEnabled()) {
 						
+					if (selfregistrationconfiguration.getValue() != null) {
+
 						JSONObject ordeJson = new JSONObject(selfregistrationconfiguration.getValue());
-						if (ordeJson.getString("paytermCode") != null && Long.valueOf(ordeJson.getLong("planCode")) != null
-								&& Long.valueOf(ordeJson.getLong("contractPeriod")) != null) {
-							ordeJson.put("locale", "en");
-							ordeJson.put("isNewplan", true);
-							ordeJson.put("dateFormat", dateFormat);
-							ordeJson.put("start_date", activationDate);
-							
-							CommandWrapper commandRequest = new CommandWrapperBuilder().createOrder(resultClient.getClientId()).withJson(ordeJson.toString()).build();
-							resultOrder = this.portfolioCommandSourceWritePlatformService.logCommandSource(commandRequest);
-							
-							if (resultOrder == null) {
-								throw new PlatformDataIntegrityException("error.msg.client.order.creation","Book Order Failed for ClientId:"
-												+ resultClient.getClientId(),"Book Order Failed");
-							}
+						ordeJson.put("locale", "en");
+						ordeJson.put("isNewplan", true);
+						ordeJson.put("dateFormat", dateFormat);
+						ordeJson.put("start_date", activationDate);
+
+						CommandWrapper commandRequest = new CommandWrapperBuilder().createOrder(resultClient.getClientId()).withJson(ordeJson.toString()).build();
+						resultOrder = this.portfolioCommandSourceWritePlatformService.logCommandSource(commandRequest);
+
+						if (resultOrder == null) {
+							throw new PlatformDataIntegrityException("error.msg.client.order.creation", "Book Order Failed for ClientId:"	
+									+ resultClient.getClientId(), "Book Order Failed");
 						}
-					} else{
-						
-						JSONObject beeniusOrderJson = new JSONObject();
+
+					} else {
+
 						String paytermCode = command.stringValueOfParameterNamed("paytermCode");
 						Long contractPeriod = command.longValueOfParameterNamed("contractPeriod");
 						Long planCode = command.longValueOfParameterNamed("planCode");
-						
-						beeniusOrderJson.put("planCode", planCode);
-						beeniusOrderJson.put("contractPeriod", contractPeriod);
-						beeniusOrderJson.put("paytermCode", paytermCode);
-						beeniusOrderJson.put("billAlign", false);
-						beeniusOrderJson.put("locale", "en");
-						beeniusOrderJson.put("isNewplan", true);
-						beeniusOrderJson.put("dateFormat", dateFormat);
-						beeniusOrderJson.put("start_date", activationDate);
-											
-						CommandWrapper commandRequest = new CommandWrapperBuilder().createOrder(resultClient.getClientId()).withJson(beeniusOrderJson.toString()).build();
+
+						JSONObject ordeJson = new JSONObject();
+
+						ordeJson.put("planCode", planCode);
+						ordeJson.put("contractPeriod", contractPeriod);
+						ordeJson.put("paytermCode", paytermCode);
+						ordeJson.put("billAlign", false);
+						ordeJson.put("locale", "en");
+						ordeJson.put("isNewplan", true);
+						ordeJson.put("dateFormat", dateFormat);
+						ordeJson.put("start_date", activationDate);
+
+						CommandWrapper commandRequest = new CommandWrapperBuilder().createOrder(resultClient.getClientId()).withJson(ordeJson.toString()).build();
 						resultOrder = this.portfolioCommandSourceWritePlatformService.logCommandSource(commandRequest);
-						
+
 						if (resultOrder == null) {
-							throw new PlatformDataIntegrityException("error.msg.client.order.creation","Book Order Failed for ClientId:"
-											+ resultClient.getClientId(),"Book Order Failed");
-						}		
-					}		
+							throw new PlatformDataIntegrityException("error.msg.client.order.creation",
+									"Book Order Failed for ClientId:" + resultClient.getClientId(), "Book Order Failed");
+						}
+
+					} 		
 				}
-				
-				// payment Processing
-				if(temporary.getPaymentStatus().equalsIgnoreCase("PENDING")){
-					  temporary.setPaymentStatus("ACTIVE");
-					  JSONObject json= new JSONObject(temporary.getPaymentData());
-					  
-				   	  String orderNumber = json.getString("order_num");				   	  
-				   	  String amount = json.getString("total_amount");
-				   	  BigDecimal totalAmount = new BigDecimal(amount);
-				   	  	   	  
-					  JsonObject object=new JsonObject();
-					  object.addProperty("txn_id", orderNumber);
-					  object.addProperty("dateFormat",dateFormat);
-					  object.addProperty("locale","en");
-					  object.addProperty("paymentDate",activationDate);
-					  object.addProperty("amountPaid",totalAmount);
-					  object.addProperty("isChequeSelected","no");
-					  object.addProperty("receiptNo",orderNumber);
-					  object.addProperty("remarks",email);
-					  object.addProperty("paymentCode",27);
-					  
-					  final CommandWrapper paymentCommandRequest = new CommandWrapperBuilder().createPayment(resultClient.getClientId()).withJson(object.toString()).build();
-					  final CommandProcessingResult result = this.portfolioCommandSourceWritePlatformService.logCommandSource(paymentCommandRequest);
-					  if (result == null) {
-							throw new PlatformDataIntegrityException("error.msg.client.payment.creation","Payment Failed for ClientId:"
-											+ resultClient.getClientId(),"Payment Failed");
-					  }
-				}
-				
-				SelfCare selfcare =  this.selfCareRepository.findOneByClientId(resultClient.getClientId());
-				
-				if(selfcare != null && resultClient !=null && resultClient.getClientId() > 0 ){
-						
-					if(nationalId != null){
-						selfcare.setNationalId(nationalId);
-					}
-					
-					if(kortaToken !=null && !(kortaToken.equalsIgnoreCase(""))){
-							selfcare.setToken(kortaToken);
-					}			
-		
-				}
-				
-				return resultClient;
-				
-			} else if (temporary.getStatus().equalsIgnoreCase("INACTIVE")) {
-				throw new SelfCareNotVerifiedException(email);			
+  				
+  				return resultClient;
+  				
+  			} else if (temporary.getStatus().equalsIgnoreCase("INACTIVE")) {
+  				throw new SelfCareNotVerifiedException(email);			
 
-			} else {
-				return new CommandProcessingResult(-1l).empty();
-			}	
+  			} else {
+  				return new CommandProcessingResult(Long.valueOf(-1));
+  			}	
 
 
-		} catch (DataIntegrityViolationException dve) {
-			handleDataIntegrityIssues(command, dve);
-			return new CommandProcessingResult(-1l).empty();
-		} catch (JSONException e) {
-			return new CommandProcessingResult(-1l).empty();
-		}
+  		} catch (DataIntegrityViolationException dve) {
+  			handleDataIntegrityIssues(command, dve);
+  			return new CommandProcessingResult(Long.valueOf(-1));
+  		} catch (JSONException e) {
+  			return new CommandProcessingResult(Long.valueOf(-1));
+  		}
 
-	}
+  	}
 }

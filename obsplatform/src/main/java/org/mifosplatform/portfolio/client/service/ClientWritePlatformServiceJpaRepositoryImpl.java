@@ -29,6 +29,7 @@ import org.mifosplatform.infrastructure.codes.domain.CodeValueRepository;
 import org.mifosplatform.infrastructure.configuration.domain.Configuration;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
+import org.mifosplatform.infrastructure.configuration.exception.ConfigurationPropertyNotFoundException;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -249,8 +250,13 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 
         try {
             context.authenticatedUser();
-
-            this.fromApiJsonDeserializer.validateForCreate(command.json());
+            final Configuration configuration=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_IS_SELFCAREUSER);
+            
+            if(configuration == null){
+            	throw new ConfigurationPropertyNotFoundException(ConfigurationConstants.CONFIG_IS_SELFCAREUSER);
+            }
+            
+            this.fromApiJsonDeserializer.validateForCreate(command.json(),configuration.isEnabled());
             final Long officeId = command.longValueOfParameterNamed(ClientApiConstants.officeIdParamName);
             final Office clientOffice = this.officeRepository.findOne(officeId);
 
@@ -261,7 +267,8 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 
             final Client newClient = Client.createNew(clientOffice, clientParentGroup, command);
             this.clientRepository.save(newClient);
-           final Address address = Address.fromJson(newClient.getId(),command);
+            
+            final Address address = Address.fromJson(newClient.getId(),command);
 			this.addressRepository.save(address);
 
             if (newClient.isAccountNumberRequiresAutoGeneration()) {
@@ -270,21 +277,21 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                 newClient.updateAccountNo(accountNoGenerator.generate());
                 this.clientRepository.saveAndFlush(newClient);
             }
-            
-            final Configuration configuration=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_IS_SELFCAREUSER);
-            
-            if(configuration !=null && configuration.isEnabled()){
-            	
-            		final JSONObject selfcarecreation = new JSONObject();
-            		selfcarecreation.put("userName", newClient.getFirstname());
-    				selfcarecreation.put("uniqueReference", newClient.getEmail());
-    				selfcarecreation.put("clientId", newClient.getId());
-    				selfcarecreation.put("device", command.stringValueOfParameterNamed("device"));
-    				selfcarecreation.put("mailNotification",true);
-    				
-    				final CommandWrapper selfcareCommandRequest = new CommandWrapperBuilder().createSelfCare().withJson(selfcarecreation.toString()).build();
-    				this.portfolioCommandSourceWritePlatformService.logCommandSource(selfcareCommandRequest);
-            	}
+
+			if (configuration.isEnabled()) {
+
+				final JSONObject selfcarecreation = new JSONObject();
+				selfcarecreation.put("userName", newClient.getFirstname());
+				selfcarecreation.put("uniqueReference", newClient.getEmail());
+				selfcarecreation.put("clientId", newClient.getId());
+				selfcarecreation.put("device", command.stringValueOfParameterNamed("device"));
+				selfcarecreation.put("mailNotification", true);
+
+				final CommandWrapper selfcareCommandRequest = new CommandWrapperBuilder().createSelfCare()
+						.withJson(selfcarecreation.toString()).build();
+				this.portfolioCommandSourceWritePlatformService.logCommandSource(selfcareCommandRequest);
+			}
+
             
             
             final List<ActionDetaislData> actionDetailsDatas=this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_CREATE_CLIENT);

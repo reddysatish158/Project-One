@@ -18,6 +18,7 @@ import org.mifosplatform.organisation.smartsearch.service.AdvanceSearchReadPlaff
 import org.mifosplatform.portfolio.group.service.SearchParameters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Component;
 
 
@@ -48,11 +49,14 @@ public class AdvanceSearchApiResource {
 	            @QueryParam("fromDate") final DateParam fromDateParam, @QueryParam("toDate") final DateParam toDateParam,
 	            @QueryParam("assignedTo") final Long assignedTo, @QueryParam("closedBy") final Long closedBy,
 	            @QueryParam("category") final String category,@QueryParam("status") final String status,
-	            @QueryParam("limit") final Integer limit,@QueryParam("offset") final Integer offset) {
+	            @QueryParam("limit") final Integer limit,@QueryParam("offset") final Integer offset,
+	            @QueryParam("name") final String name, @QueryParam("createdBy") final Long createdBy,
+	            @QueryParam("emailId") final String emailId, @QueryParam("source") final String source,
+	            @QueryParam("phone") final String phone, @QueryParam("searchType") final String searchType) {
 		 
 		 this.securityContext.authenticatedUser().validateHasReadPermission(RESOURCENAME_FOR_PERMISSION);
 		 final SearchParameters searchParameters = SearchParameters.forTickets(searchText,fromDateParam,toDateParam,assignedTo,closedBy,category,status,
-				 limit,offset);
+				 limit,offset,name,createdBy,emailId,source,phone,searchType);
 	     Page<AdvanceSearchData>  searchDatas  =this.advanceSearchReadPlafformService.retrieveAllSearchData(searchParameters);
 		return this.apiJsonSerializer.serialize(searchDatas);
 	    }
