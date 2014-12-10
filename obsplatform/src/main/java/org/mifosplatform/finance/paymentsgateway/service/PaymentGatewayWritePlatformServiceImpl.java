@@ -445,7 +445,6 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 		try {
 			context.authenticatedUser();
 			this.paymentGatewayCommandFromApiJsonDeserializer.validateForOnlinePayment(command.json());
-			
 			String commandJson = null;
 			final String source = command.stringValueOfParameterNamed("source");
 			final String transactionId = command.stringValueOfParameterNamed("transactionId");
@@ -508,9 +507,7 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 		withChanges.put("pgId", paymentGateway.getId());
 		withChanges.put("currency", currency);
 		
-		
 		return new CommandProcessingResultBuilder().with(withChanges).build();
-
 	}
 	
 	@Override
@@ -596,7 +593,8 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 		if(client.getEmail() == null || client.getEmail().isEmpty()){
 			throw new EmailNotFoundException(clientId);
 		}
-		BillingMessageTemplate messageDetails=this.billingMessageTemplateRepository.findByTemplateDescription(BillingMessageTemplateConstants.MESSAGE_TEMPLATE_PAYMENT_RECEIPT);
+
+		BillingMessageTemplate messageDetails = this.billingMessageTemplateRepository.findByTemplateDescription(BillingMessageTemplateConstants.MESSAGE_TEMPLATE_PAYMENT_RECEIPT);
 		
 		String subject=messageDetails.getSubject();
 		String body=messageDetails.getBody();

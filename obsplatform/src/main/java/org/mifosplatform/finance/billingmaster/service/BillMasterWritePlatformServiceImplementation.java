@@ -158,14 +158,14 @@ public class BillMasterWritePlatformServiceImplementation implements
 	@Override
 	public Long sendBillDetailFilePath(final BillMaster billMaster) {
 		
-		context.authenticatedUser();
+		//context.authenticatedUser();
 		final Client client = this.clientRepository.findOne(billMaster.getClientId());
 		final String clientEmail = client.getEmail();
+		final String filePath = billMaster.getFileName();
 		if(clientEmail == null){
 			final String msg = "Please provide email first";
 			throw new BillingOrderNoRecordsFoundException(msg, client);
 		}
-		final String filePath = billMaster.getFileName();
 		BillingMessage billingMessage = null;
 		final List<BillingMessageTemplate> billingMessageTemplate = this.messageTemplateRepository.findAll();
 		
@@ -176,9 +176,7 @@ public class BillMasterWritePlatformServiceImplementation implements
 		    billingMessage = new BillingMessage(msgTemplate.getHeader(), msgTemplate.getBody(), msgTemplate.getFooter(), clientEmail, clientEmail, 
 		    		                    msgTemplate.getSubject(), "N", msgTemplate, msgTemplate.getMessageType(), filePath);
 		    this.messageDataRepository.save(billingMessage);
-			
 	    }
-
 	}
 		
 	return billMaster.getId();

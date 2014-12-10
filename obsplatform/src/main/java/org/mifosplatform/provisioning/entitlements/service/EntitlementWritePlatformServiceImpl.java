@@ -96,12 +96,14 @@ public class EntitlementWritePlatformServiceImpl implements EntitlementWritePlat
 				header = header.replace("<PARAM1>", Name);
 				body = body.replace("<PARAM2>", client.getAccountNumber());
 				body = body.replace("<PARAM3>", authPin);
-				
+			
 				BillingMessage billingMessage = new BillingMessage(header, body, footer, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_EMAIL_FROM, client.getEmail(),
 						subject, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_STATUS, messageDetails, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_MESSAGE_TYPE, null);
 				
-				this.messageDataRepository.save(billingMessage);		
+				this.messageDataRepository.save(billingMessage);
+						
 			}
+			
 		}
 		
 		if(provSystem != null && requestType !=null && provSystem.equalsIgnoreCase("ZebraOTT") 

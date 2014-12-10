@@ -41,7 +41,7 @@ public class InvoiceClient {
 	}
 	
 	
-	public BigDecimal invoicingSingleClient(Long clientId, LocalDate processDate) {
+	public Invoice invoicingSingleClient(Long clientId, LocalDate processDate) {
 
 		     // Get list of qualified orders
     		List<BillingOrderData> billingOrderDatas= billingOrderReadPlatformService.retrieveOrderIds(clientId, processDate);
@@ -50,21 +50,22 @@ public class InvoiceClient {
 		          }
 		             BigDecimal invoiceAmount=BigDecimal.ZERO;
 		             Date nextBillableDate=null;
+		             GenerateInvoiceData invoiceData=null;
 		               for (BillingOrderData billingOrderData : billingOrderDatas) {
 		            	   
                                   nextBillableDate=billingOrderData.getNextBillableDate();		            	
 		            	   while(processDate.toDate().after(nextBillableDate) || processDate.toDate().compareTo(nextBillableDate) == 0){
 		            	  
-          	                   GenerateInvoiceData invoice=invoiceServices(billingOrderData,clientId,processDate);
+          	                        invoiceData=invoiceServices(billingOrderData,clientId,processDate);
                  	             
-          	                   if(invoice!=null){
+          	                   if(invoiceData!=null){
           	            	
-	                               invoiceAmount=invoiceAmount.add(invoice.getInvoiceAmount());
-	                               nextBillableDate=invoice.getNextBillableDay();
+	                               invoiceAmount=invoiceAmount.add(invoiceData.getInvoiceAmount());
+	                               nextBillableDate=invoiceData.getNextBillableDay();
           	            }
 		}
 		               }
-		return invoiceAmount;
+		return invoiceData.getInvoice();
 	}
 	
 	public GenerateInvoiceData invoiceServices(BillingOrderData billingOrderData,Long clientId,LocalDate processDate){
@@ -88,7 +89,7 @@ public class InvoiceClient {
                if(invoice.getInvoiceAmount() == null){
             	   return null;
                }
-		return new GenerateInvoiceData(clientId,billingOrderCommands.get(0).getNextBillableDate(),invoice.getInvoiceAmount());
+		return new GenerateInvoiceData(clientId,billingOrderCommands.get(0).getNextBillableDate(),invoice.getInvoiceAmount(),invoice);
 	}
 	
 	public CommandProcessingResult createInvoiceBill(JsonCommand command) {
@@ -96,9 +97,9 @@ public class InvoiceClient {
 			// validation not written
 			 this.apiJsonDeserializer.validateForCreate(command.json());
 			LocalDate processDate = ProcessDate.fromJson(command);
-			BigDecimal invoiceAmount=this.invoicingSingleClient(command.entityId(), processDate);
+			Invoice invoice=this.invoicingSingleClient(command.entityId(), processDate);
 			
-			return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withResourceIdAsString(invoiceAmount.toString()).build();
+			return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(invoice.getId()).build();
 
 		} catch (DataIntegrityViolationException dve) {
 			return CommandProcessingResult.empty();
