@@ -12,7 +12,6 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.mifosplatform.billing.selfcare.domain.SelfCare;
 import org.mifosplatform.billing.selfcare.domain.SelfCareTemporary;
 import org.mifosplatform.billing.selfcare.domain.SelfCareTemporaryRepository;
 import org.mifosplatform.billing.selfcare.exception.SelfCareNotVerifiedException;
@@ -66,7 +65,6 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
     private final PlatformSecurityContext context;
     private final FromJsonHelper fromJsonHelper;
     private final ItemRepository itemRepository;
-    private final SelfCareRepository selfCareRepository;
     private final ClientWritePlatformService clientWritePlatformService;
     private final OneTimeSaleWritePlatformService oneTimeSaleWritePlatformService;
     private final OrderWritePlatformService orderWritePlatformService;
@@ -88,7 +86,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
     		final OwnedHardwareWritePlatformService ownedHardwareWritePlatformService, final AddressReadPlatformService addressReadPlatformService,
     		final ActivationProcessCommandFromApiJsonDeserializer commandFromApiJsonDeserializer, final ItemDetailsRepository itemDetailsRepository,
     		final SelfCareTemporaryRepository selfCareTemporaryRepository,final PortfolioCommandSourceWritePlatformService portfolioCommandSourceWritePlatformService,
-    		final CodeValueRepository codeValueRepository, final SelfCareRepository selfCareRepository,final ItemRepository itemRepository,
+    		final CodeValueRepository codeValueRepository,final ItemRepository itemRepository,
     		final BillingMessageTemplateRepository billingMessageTemplateRepository,final MessagePlatformEmailService messagePlatformEmailService,
     		final BillingMessageRepository messageDataRepository) {
 
@@ -96,7 +94,6 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
     	this.context = context;
     	this.itemRepository=itemRepository;
         this.fromJsonHelper = fromJsonHelper;
-        this.selfCareRepository = selfCareRepository;
         this.clientWritePlatformService = clientWritePlatformService;
         this.oneTimeSaleWritePlatformService = oneTimeSaleWritePlatformService;
         this.orderWritePlatformService = orderWritePlatformService;
@@ -214,8 +211,6 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 			String dateFormat = "dd MMMM yyyy";
 			String activationDate = new SimpleDateFormat(dateFormat).format(new Date());
 
-			
-
 			String fullname = command.stringValueOfParameterNamed("fullname");
 			String firstName = command.stringValueOfParameterNamed("firstname");
 			String city = command.stringValueOfParameterNamed("city");
@@ -225,7 +220,6 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 			String email = command.stringValueOfParameterNamed("email");
 			String nationalId = command.stringValueOfParameterNamed("nationalId");
 			String deviceId = command.stringValueOfParameterNamed("device");
-			String kortaToken = command.stringValueOfParameterNamed("kortaToken");
 			
 			SelfCareTemporary temporary = selfCareTemporaryRepository.findOneByEmailId(email);
 			
@@ -268,7 +262,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 				if(nationalId !=null && !nationalId.equalsIgnoreCase("")){
 					clientcreation.put("externalId", nationalId);
 				}
-
+				
 				final JsonElement element = fromJsonHelper.parse(clientcreation.toString());
 				JsonCommand clientCommand = new JsonCommand(null,clientcreation.toString(), element, fromJsonHelper,
 						null, null, null, null, null, null, null, null, null, null, 
@@ -365,61 +359,50 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 				// book order
 				Configuration selfregistrationconfiguration = configurationRepository.findOneByName(ConfigurationConstants.CONFIR_PROPERTY_SELF_REGISTRATION);
 				
-				if (selfregistrationconfiguration != null) {
-					
-					if (selfregistrationconfiguration.isEnabled()) {
+				if (selfregistrationconfiguration != null && selfregistrationconfiguration.isEnabled()) {
 						
+					if (selfregistrationconfiguration.getValue() != null) {
+
 						JSONObject ordeJson = new JSONObject(selfregistrationconfiguration.getValue());
-						if (ordeJson.getString("paytermCode") != null && Long.valueOf(ordeJson.getLong("planCode")) != null
-								&& Long.valueOf(ordeJson.getLong("contractPeriod")) != null) {
-							ordeJson.put("locale", "en");
-							ordeJson.put("isNewplan", true);
-							ordeJson.put("dateFormat", dateFormat);
-							ordeJson.put("start_date", activationDate);
-							
-							CommandWrapper commandRequest = new CommandWrapperBuilder().createOrder(resultClient.getClientId()).withJson(ordeJson.toString()).build();
-							resultOrder = this.portfolioCommandSourceWritePlatformService.logCommandSource(commandRequest);
-							
-							if (resultOrder == null) {
-								throw new PlatformDataIntegrityException("error.msg.client.order.creation","Book Order Failed for ClientId:"
-												+ resultClient.getClientId(),"Book Order Failed");
-							}
+						ordeJson.put("locale", "en");
+						ordeJson.put("isNewplan", true);
+						ordeJson.put("dateFormat", dateFormat);
+						ordeJson.put("start_date", activationDate);
+
+						CommandWrapper commandRequest = new CommandWrapperBuilder().createOrder(resultClient.getClientId()).withJson(ordeJson.toString()).build();
+						resultOrder = this.portfolioCommandSourceWritePlatformService.logCommandSource(commandRequest);
+
+						if (resultOrder == null) {
+							throw new PlatformDataIntegrityException("error.msg.client.order.creation", "Book Order Failed for ClientId:"	
+									+ resultClient.getClientId(), "Book Order Failed");
 						}
-					} else{
-						
-						JSONObject beeniusOrderJson = new JSONObject();
+
+					} else {
+
 						String paytermCode = command.stringValueOfParameterNamed("paytermCode");
 						Long contractPeriod = command.longValueOfParameterNamed("contractPeriod");
 						Long planCode = command.longValueOfParameterNamed("planCode");
-						
-						beeniusOrderJson.put("planCode", planCode);
-						beeniusOrderJson.put("contractPeriod", contractPeriod);
-						beeniusOrderJson.put("paytermCode", paytermCode);
-						beeniusOrderJson.put("billAlign", false);
-						beeniusOrderJson.put("locale", "en");
-						beeniusOrderJson.put("isNewplan", true);
-						beeniusOrderJson.put("dateFormat", dateFormat);
-						beeniusOrderJson.put("start_date", activationDate);
-											
-						CommandWrapper commandRequest = new CommandWrapperBuilder().createOrder(resultClient.getClientId()).withJson(beeniusOrderJson.toString()).build();
+
+						JSONObject ordeJson = new JSONObject();
+
+						ordeJson.put("planCode", planCode);
+						ordeJson.put("contractPeriod", contractPeriod);
+						ordeJson.put("paytermCode", paytermCode);
+						ordeJson.put("billAlign", false);
+						ordeJson.put("locale", "en");
+						ordeJson.put("isNewplan", true);
+						ordeJson.put("dateFormat", dateFormat);
+						ordeJson.put("start_date", activationDate);
+
+						CommandWrapper commandRequest = new CommandWrapperBuilder().createOrder(resultClient.getClientId()).withJson(ordeJson.toString()).build();
 						resultOrder = this.portfolioCommandSourceWritePlatformService.logCommandSource(commandRequest);
-						
+
 						if (resultOrder == null) {
-							throw new PlatformDataIntegrityException("error.msg.client.order.creation","Book Order Failed for ClientId:"
-											+ resultClient.getClientId(),"Book Order Failed");
-						}		
-					}		
-				}
-			
-				SelfCare selfcare =  this.selfCareRepository.findOneByClientId(resultClient.getClientId());
-				
-				if(selfcare != null && resultClient !=null && resultClient.getClientId() > 0 ){
-					
-					if(kortaToken !=null && !(kortaToken.equalsIgnoreCase(""))){
-							selfcare.setToken(kortaToken);
-					}		
-					this.selfCareRepository.save(selfcare);
-		
+							throw new PlatformDataIntegrityException("error.msg.client.order.creation",
+									"Book Order Failed for ClientId:" + resultClient.getClientId(), "Book Order Failed");
+						}
+
+					} 		
 				}
 				
 				return resultClient;
