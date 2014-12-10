@@ -15,7 +15,6 @@ import java.util.Properties;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
-import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
@@ -125,38 +124,38 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 				message.setSubject(emailDetail.getSubject());
 
 				StringBuilder messageBuilder = new StringBuilder()
-						.append(emailDetail.getHeader() + '\n')
-						.append(emailDetail.getBody() + '\n')
+						.append(emailDetail.getHeader())
+						.append(emailDetail.getBody())
 						.append(emailDetail.getFooter());
 
 				// 3) create MimeBodyPart object and set your message text
-				BodyPart messageBodyPart = new MimeBodyPart();
-				messageBodyPart.setText(messageBuilder.toString());
-
+				MimeBodyPart messageBodyPart = new MimeBodyPart();
+				messageBodyPart.setContent(messageBuilder.toString(),"text/html");
+				
+				// 4) create new MimeBodyPart object and set DataHandler object to this object
+				MimeBodyPart mimeBodyAttachPart = new MimeBodyPart();
+				String filelocation = emailDetail.getAttachment();// change accordingly
+				
+				if (filelocation != null) {
+					DataSource source = new FileDataSource(filelocation);
+					mimeBodyAttachPart.setDataHandler(new DataHandler(source));
+					mimeBodyAttachPart.setFileName(source.getName());
+				}
+				
 				// 5) create Multipart object and add MimeBodyPart objects to this object
 				Multipart multipart = new MimeMultipart();
 				multipart.addBodyPart(messageBodyPart);
-				if (emailDetail.getAttachment() != null) {
-					Date date = new Date();
-					String dateTime = date.getHours() + "" + date.getMinutes();
-					String fileName = "estatement_" + new LocalDate().toString().replace("-", "") + "_" + dateTime + ".pdf";
-					
-					// 4) create new MimeBodyPart object and set DataHandler object to this object
-					MimeBodyPart mimeBodyPart = new MimeBodyPart();
-					String filename = emailDetail.getAttachment();// change accordingly
-					DataSource source = new FileDataSource(filename);
-					mimeBodyPart.setDataHandler(new DataHandler(source));
-					mimeBodyPart.setFileName(fileName);
-					multipart.addBodyPart(mimeBodyPart);
+				
+				if(filelocation != null){
+					multipart.addBodyPart(mimeBodyAttachPart);
 				}
-
+				
 				// 6) set the multiplart object to the message object
 				message.setContent(multipart);
 
 				// 7) send message
-				System.out.println("message sending....");
 				Transport.send(message);
-				System.out.println("message sent....");
+				System.out.println("message sent Successfully....");
 				BillingMessage billingMessage = this.messageDataRepository.findOne(emailDetail.getId());
 				if (billingMessage.getStatus().contentEquals("N")) {
 					billingMessage.updateStatus();
@@ -296,7 +295,6 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 	@Override
 	public String sendGeneralMessage(String emailId, String body ,String subject) {
 
-		
 		smtpDataProcessing();
 		
 		if(configuration != null){
@@ -305,27 +303,6 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 			
 			email.setAuthenticator(new DefaultAuthenticator(authuser, authpwd));
 			email.setHostName(hostName);
-			/*Email email = new SimpleEmail();
-				// Very Important, Don't use email.setAuthentication()
-			email.setAuthenticator(new DefaultAuthenticator(authuser, authpwd));
-			email.setDebug(false); // true if you want to debug
-			email.setHostName(hostName);
-		
-			try {
-				String sendToEmail = emailId;
-				StringBuilder messageBuilder = new StringBuilder().append(body);			
-				email.getMailSession().getProperties().put("mail.smtp.starttls.enable", starttlsValue);
-				email.setFrom(authuser, authuser);
-				email.setSmtpPort(portNumber);
-				email.setSubject(subject);		
-				email.addTo(sendToEmail, sendToEmail);
-				email.setMsg(messageBuilder.toString());
-				email.send();
-				return "Success";
-			} catch (Exception e) {
-				handleCodeDataIntegrityIssues(null, e);
-				return e.getMessage();
-			}*/
 				try{
 					String sendToEmail = emailId;
 					email.setStartTLSRequired(starttlsValue.equalsIgnoreCase("true"));
