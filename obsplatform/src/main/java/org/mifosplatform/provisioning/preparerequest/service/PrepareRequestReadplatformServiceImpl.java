@@ -13,6 +13,8 @@ import org.mifosplatform.logistics.onetimesale.data.AllocationDetailsData;
 import org.mifosplatform.portfolio.allocation.service.AllocationReadPlatformService;
 import org.mifosplatform.portfolio.order.data.OrderStatusEnumaration;
 import org.mifosplatform.portfolio.order.domain.Order;
+import org.mifosplatform.portfolio.order.domain.OrderAddons;
+import org.mifosplatform.portfolio.order.domain.OrderAddonsRepository;
 import org.mifosplatform.portfolio.order.domain.OrderLine;
 import org.mifosplatform.portfolio.order.domain.OrderRepository;
 import org.mifosplatform.portfolio.order.domain.StatusTypeEnum;
@@ -48,6 +50,7 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 	  private final AllocationReadPlatformService allocationReadPlatformService;
 	  private final ServiceMappingRepository provisionServiceDetailsRepository;
 	  private final ServiceMasterRepository serviceMasterRepository;
+	  private final OrderAddonsRepository orderAddonsRepository;
 	  public final static String PROVISIONGSYS_COMVENIENT="Comvenient";
 	  private final PlanMappingRepository planMappingRepository;
 	
@@ -56,11 +59,13 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 	    public PrepareRequestReadplatformServiceImpl(final DataSourcePerTenantService dataSourcePerTenantService,final OrderRepository orderRepository,
 	    		final ServiceMasterRepository serviceMasterRepository,final ProcessRequestRepository processRequestRepository,
 	    		final AllocationReadPlatformService allocationReadPlatformService,final PrepareRequsetRepository prepareRequsetRepository,
-	    		final ServiceMappingRepository provisionServiceDetailsRepository,final PlanMappingRepository planMappingRepository) {
+	    		final ServiceMappingRepository provisionServiceDetailsRepository,final PlanMappingRepository planMappingRepository,
+	    		final OrderAddonsRepository orderAddonsRepository) {
 	            
 	    	    
 	    	    this.orderRepository=orderRepository;
 	    	    this.serviceMasterRepository=serviceMasterRepository;
+	    	    this.orderAddonsRepository=orderAddonsRepository;
 	            this.processRequestRepository=processRequestRepository;
 	            this.prepareRequsetRepository=prepareRequsetRepository;
 	            this.dataSourcePerTenantService = dataSourcePerTenantService;
@@ -199,6 +204,23 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 		 }
 
 		 JSONArray newServiceArray = new JSONArray();
+		 
+		 if(requestType.equalsIgnoreCase(UserActionStatusTypeEnum.ADDON_ACTIVATION.toString())){
+			 
+			 List<OrderAddons> orderAddons=this.orderAddonsRepository.findAddonsByOrderId(requestData.getOrderId());
+			 for(OrderAddons orderAddon:orderAddons){
+				 
+				 List<ServiceMapping> provisionServiceDetails=this.provisionServiceDetailsRepository.findOneByServiceId(orderAddon.getServiceId());
+				 	ServiceMaster service=this.serviceMasterRepository.findOne(orderAddon.getServiceId());
+				 	 JSONObject subjson = new JSONObject();
+					 subjson.put("serviceName", service.getServiceCode());
+					 subjson.put("serviceIdentification", provisionServiceDetails.get(0).getServiceIdentification());
+					 subjson.put("serviceType", service.getServiceType());
+					 newServiceArray.add(subjson.toString());	 
+			 }
+			 
+		 }else{
+		  
 		 for(OrderLine orderLine:orderLineData){
 			 
 			 List<ServiceMapping> provisionServiceDetails=this.provisionServiceDetailsRepository.findOneByServiceId(orderLine.getServiceId());
@@ -217,6 +239,7 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 				 subjson.put("serviceType", service.getServiceType());
 				 newServiceArray.add(subjson.toString());	 
 			 }
+		  }
 		 }
 
 		 jsonObject.put("services", new Gson().toJson(newServiceArray));

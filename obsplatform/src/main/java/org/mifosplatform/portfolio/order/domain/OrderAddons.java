@@ -40,7 +40,7 @@ public class OrderAddons extends AbstractAuditableCustom<AppUser,Long>{
 	private String provisionSystem;
 	
 	@Column(name ="is_deleted")
-	private char isDelete;
+	private char isDelete = 'N';
 	
 	public OrderAddons(){
 		

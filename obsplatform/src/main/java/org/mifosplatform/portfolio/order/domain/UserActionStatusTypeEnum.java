@@ -17,7 +17,8 @@ public enum UserActionStatusTypeEnum {
 	RETRACK(12,"CategoryType.retrack"),
 	SUSPENTATION(13,"CategoryType.suspension"),
 	REACTIVATION(14,"CategoryType.reactive"),
-	INVALID(15, "CategoryType.invalid");
+	ADDON_ACTIVATION(15,"CategoryType.addon activation"),
+	INVALID(16, "CategoryType.invalid");
 
 
     private final Integer value;

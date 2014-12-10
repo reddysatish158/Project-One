@@ -21,6 +21,7 @@ import org.mifosplatform.portfolio.order.domain.OrderAddons;
 import org.mifosplatform.portfolio.order.domain.OrderAddonsRepository;
 import org.mifosplatform.portfolio.order.domain.OrderDiscount;
 import org.mifosplatform.portfolio.order.domain.OrderPrice;
+import org.mifosplatform.portfolio.order.domain.OrderPriceRepository;
 import org.mifosplatform.portfolio.order.domain.OrderRepository;
 import org.mifosplatform.portfolio.order.domain.StatusTypeEnum;
 import org.mifosplatform.portfolio.order.domain.UserActionStatusTypeEnum;
@@ -50,6 +51,7 @@ public class OrderAddOnsWritePlatformServiceImpl implements OrderAddOnsWritePlat
 	private final InvoiceClient invoiceClient;
 	private final DiscountMasterRepository discountMasterRepository;
 	private final OrderRepository orderRepository;
+	private final OrderPriceRepository orderPriceRepository;
 	private final HardwareAssociationRepository hardwareAssociationRepository;
 	private final OrderAddonsRepository addonsRepository;
 	
@@ -58,7 +60,7 @@ public class OrderAddOnsWritePlatformServiceImpl implements OrderAddOnsWritePlat
 		 final FromJsonHelper fromJsonHelper,final ContractRepository contractRepository,final OrderAssembler orderAssembler,final OrderRepository orderRepository,
 		 final ServiceMappingRepository serviceMappingRepository,final OrderAddonsRepository addonsRepository,final InvoiceClient invoiceClient,
 		 final ProvisioningWritePlatformService provisioningWritePlatformService,final HardwareAssociationRepository associationRepository,
-		 final DiscountMasterRepository discountMasterRepository ){
+		 final DiscountMasterRepository discountMasterRepository,final OrderPriceRepository orderPriceRepository ){
 		
 	this.context=context;
 	this.fromJsonHelper=fromJsonHelper;
@@ -66,6 +68,7 @@ public class OrderAddOnsWritePlatformServiceImpl implements OrderAddOnsWritePlat
 	this.contractRepository=contractRepository;
 	this.orderRepository=orderRepository;
 	this.provisioningWritePlatformService=provisioningWritePlatformService;
+	this.orderPriceRepository=orderPriceRepository;
 	this.orderAssembler=orderAssembler;
 	this.hardwareAssociationRepository=associationRepository;
 	this.invoiceClient=invoiceClient;
@@ -104,7 +107,7 @@ public CommandProcessingResult createOrderAddons(JsonCommand command,Long orderI
 			this.addonsRepository.saveAndFlush(addons);
 			
 			if(!"None".equalsIgnoreCase(addons.getProvisionSystem())){
-				this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order, planName, UserActionStatusTypeEnum.ACTIVATION.toString(),
+				this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order, planName, UserActionStatusTypeEnum.ADDON_ACTIVATION.toString(),
 						Long.valueOf(0), null,association.getSerialNo(),orderId, addons.getProvisionSystem(), null);
 			}
 		}
@@ -133,12 +136,12 @@ private OrderAddons assembleOrderAddons(JsonElement jsonElement,FromJsonHelper f
 	OrderPrice orderPrice =new OrderPrice(orderAddons.getServiceId(),orderPrices.get(0).getChargeCode(),orderPrices.get(0).getChargeType(), price,null,
 			orderPrices.get(0).getChargeType(),orderPrices.get(0).getChargeDuration(),orderPrices.get(0).getDurationType(),
 			startDate.toDate(),endDate,orderPrices.get(0).isTaxInclusive());
-	OrderDiscount orderDiscount=new OrderDiscount(order, orderPrice,Long.valueOf(0), new Date(), new LocalDate(), "NONE", BigDecimal.ZERO);
-	orderPrice.addOrderDiscount(orderDiscount);
+	//OrderDiscount orderDiscount=new OrderDiscount(order, orderPrice,Long.valueOf(0), new Date(), new LocalDate(), "NONE", BigDecimal.ZERO);
+	orderPrice.update(order);
 	order.addOrderDeatils(orderPrice);
 	
+	this.orderPriceRepository.saveAndFlush(orderPrice);
 	this.orderRepository.saveAndFlush(order);
-	
 	List<ServiceMapping> serviceMapping=this.serviceMappingRepository.findOneByServiceId(orderAddons.getServiceId());
 	String status=StatusTypeEnum.ACTIVE.toString();
 	if(!"None".equalsIgnoreCase(serviceMapping.get(0).getProvisionSystem())){

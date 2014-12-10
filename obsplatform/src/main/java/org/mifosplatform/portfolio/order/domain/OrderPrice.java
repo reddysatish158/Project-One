@@ -7,6 +7,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
@@ -68,9 +70,9 @@ public class OrderPrice extends AbstractAuditableCustom<AppUser, Long> {
 	private Order orders;
  
 
-	@OneToOne(cascade = CascadeType.ALL, mappedBy = "orderpriceid", orphanRemoval = true)
+/*	@OneToOne(cascade = CascadeType.ALL, mappedBy = "orderpriceid", orphanRemoval = true)
 	private OrderDiscount orderDiscount = new OrderDiscount();
-
+*/
 	public OrderPrice(final Long serviceId, final String chargeCode,
 			final String chargeType, final BigDecimal price,
 			final Date invoiceTillDate, final String chargetype,
@@ -257,9 +259,9 @@ public class OrderPrice extends AbstractAuditableCustom<AppUser, Long> {
 	}
 
 
-	public void addOrderDiscount(OrderDiscount orderDiscount) {
+	/*public void addOrderDiscount(OrderDiscount orderDiscount) {
 		orderDiscount.updateOrderPrice(this);
 		this.orderDiscount=orderDiscount;
 		
-	}
+	}*/
 }
