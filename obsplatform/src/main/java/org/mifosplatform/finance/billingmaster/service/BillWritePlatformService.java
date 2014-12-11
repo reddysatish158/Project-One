@@ -16,8 +16,12 @@ public interface BillWritePlatformService {
 	
 	String generatePdf(BillDetailsData billDetails,List<FinancialTransactionsData> data);
 	
-	void updateBillId(List<FinancialTransactionsData> financialTransactionsDatas, Long billId);
-	
-	void ireportPdf(Long billId) throws SQLException;
+	void generateStatementPdf(Long billId) throws SQLException;
+
+	String generateInovicePdf(Long billId) throws SQLException;
+
+	void sendInvoiceToEmail(String printFileName, Long clientId);
+
+	Long sendStatementToEmail(BillMaster billMaster);
 
 }

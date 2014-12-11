@@ -26,10 +26,6 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
-import org.mifosplatform.organisation.message.domain.BillingMessage;
-import org.mifosplatform.organisation.message.domain.BillingMessageTemplate;
-import org.mifosplatform.organisation.message.domain.BillingMessageTemplateRepository;
-import org.mifosplatform.organisation.message.domain.BillingMessageRepository;
 import org.mifosplatform.portfolio.client.domain.Client;
 import org.mifosplatform.portfolio.client.domain.ClientRepository;
 import org.slf4j.Logger;
@@ -50,8 +46,6 @@ public class BillMasterWritePlatformServiceImplementation implements
 		private final BillWritePlatformService billWritePlatformService;
 	    private final BillMasterCommandFromApiJsonDeserializer  apiJsonDeserializer;
 	    private final ClientRepository clientRepository;
-	    private final BillingMessageRepository messageDataRepository;
-	    private final BillingMessageTemplateRepository messageTemplateRepository;
 		private final BillingOrderRepository billingOrderRepository;
 		private final InvoiceTaxRepository invoiceTaxRepository;
 		private final InvoiceRepository invoiceRepository;
@@ -62,8 +56,6 @@ public class BillMasterWritePlatformServiceImplementation implements
 	 public BillMasterWritePlatformServiceImplementation(final PlatformSecurityContext context,final BillMasterRepository billMasterRepository,
 				final BillMasterReadPlatformService billMasterReadPlatformService,final BillWritePlatformService billWritePlatformService,
 				final BillMasterCommandFromApiJsonDeserializer apiJsonDeserializer,final ClientRepository clientRepository,
-				final BillingMessageRepository messageDataRepository,
-				final BillingMessageTemplateRepository messageTemplateRepository,
 				final BillingOrderRepository billingOrderRepository, final InvoiceTaxRepository invoiceTaxRepository,
 		        final InvoiceRepository invoiceRepository, final PaymentRepository paymentRepository,
 		        final AdjustmentRepository adjustmentRepository){
@@ -74,8 +66,6 @@ public class BillMasterWritePlatformServiceImplementation implements
 			this.billMasterReadPlatformService = billMasterReadPlatformService;
 			this.billWritePlatformService = billWritePlatformService;
 			this.apiJsonDeserializer = apiJsonDeserializer;
-			this.messageDataRepository = messageDataRepository;
-			this.messageTemplateRepository = messageTemplateRepository;
 			this.billingOrderRepository = billingOrderRepository;
 			this.invoiceRepository = invoiceRepository;
 			this.invoiceTaxRepository = invoiceTaxRepository;
@@ -134,8 +124,8 @@ public class BillMasterWritePlatformServiceImplementation implements
 	
 		billMaster = this.billMasterRepository.saveAndFlush(billMaster);
 	
-		billWritePlatformService.updateBillMaster(listOfBillingDetail, billMaster, previousBal);
-		billWritePlatformService.updateBillId(financialTransactionsDatas, billMaster.getId());
+		this.billWritePlatformService.updateBillMaster(listOfBillingDetail, billMaster, previousBal);
+		this.updateBillId(financialTransactionsDatas, billMaster.getId());
 		
         return new CommandProcessingResultBuilder().withCommandId(command.commandId())
         		     .withClientId(clientId).withEntityId(billMaster.getId()).build();
@@ -145,45 +135,55 @@ public class BillMasterWritePlatformServiceImplementation implements
 		return  CommandProcessingResult.empty();
 	}
 }
-
-	private void handleCodeDataIntegrityIssues(final JsonCommand command,
-			final DataIntegrityViolationException dve) {
-		final Throwable realCause = dve.getMostSpecificCause(); 
-		if(realCause.getMessage().contains("plan_code"))
-		throw new PlatformDataIntegrityException("error.msg.data.truncation.issue",
-                "Data truncation: Data too long for column 'plan_code'");
+	
+	public void updateBillId(final List<FinancialTransactionsData> financialTransactionsDatas, final Long billId) {
 		
-	}
+		try{
 
-	@Override
-	public Long sendBillDetailFilePath(final BillMaster billMaster) {
+			for (final FinancialTransactionsData transIds : financialTransactionsDatas) {
+				if ("ADJUSTMENT".equalsIgnoreCase(transIds.getTransactionType())) {
+					Adjustment adjustment = this.adjustmentRepository.findOne(transIds.getTransactionId());
+					adjustment.updateBillId(billId);
+					this.adjustmentRepository.save(adjustment);
+				}
+				else if ("TAXES".equalsIgnoreCase(transIds.getTransactionType())) {
+					InvoiceTax tax = this.invoiceTaxRepository.findOne(transIds.getTransactionId());
+					tax.updateBillId(billId);
+					this.invoiceTaxRepository.save(tax);
+				}
+				else if (transIds.getTransactionType().contains("PAYMENT")) {
+					Payment payment = this.paymentRepository.findOne(transIds.getTransactionId());
+					payment.updateBillId(billId);
+					this.paymentRepository.save(payment);
+				}
+				else if ("SERVICE_CHARGES".equalsIgnoreCase(transIds.getTransactionType())) {
+					BillingOrder billingOrder = this.billingOrderRepository.findOne(transIds.getTransactionId());
+					billingOrder.updateBillId(billId);
+					this.billingOrderRepository.save(billingOrder);
+					Invoice invoice = this.invoiceRepository.findOne(billingOrder.getInvoice().getId());
+					invoice.updateBillId(billId);
+					this.invoiceRepository.save(invoice);
+				}
+				else if ("INVOICE".equalsIgnoreCase(transIds.getTransactionType())) {
+					Invoice invoice = this.invoiceRepository.findOne(transIds.getTransactionId());
+					invoice.updateBillId(billId);
+					this.invoiceRepository.save(invoice);
+				}
+				else if ("ONETIME_CHARGES".equalsIgnoreCase(transIds.getTransactionType())) {
+					BillingOrder billingOrder = this.billingOrderRepository.findOne(transIds.getTransactionId());
+					billingOrder.updateBillId(billId);
+					this.billingOrderRepository.save(billingOrder);
+					Invoice invoice = this.invoiceRepository.findOne(billingOrder.getInvoice().getId());
+					invoice.updateBillId(billId);
+					this.invoiceRepository.save(invoice);
+				
+				}
+
+			}
+		}catch(Exception exception){
 		
-		context.authenticatedUser();
-		final Client client = this.clientRepository.findOne(billMaster.getClientId());
-		final String clientEmail = client.getEmail();
-		if(clientEmail == null){
-			final String msg = "Please provide email first";
-			throw new BillingOrderNoRecordsFoundException(msg, client);
 		}
-		final String filePath = billMaster.getFileName();
-		BillingMessage billingMessage = null;
-		final List<BillingMessageTemplate> billingMessageTemplate = this.messageTemplateRepository.findAll();
-		
-		for(final BillingMessageTemplate  msgTemplate:billingMessageTemplate){
-
-			if("Bill_EMAIL".equalsIgnoreCase(msgTemplate.getTemplateDescription())){
-		              
-		    billingMessage = new BillingMessage(msgTemplate.getHeader(), msgTemplate.getBody(), msgTemplate.getFooter(), clientEmail, clientEmail, 
-		    		                    msgTemplate.getSubject(), "N", msgTemplate, msgTemplate.getMessageType(), filePath);
-		    this.messageDataRepository.save(billingMessage);
-			
-	    }
-
 	}
-		
-	return billMaster.getId();
-	}
-
 
 	@Override
 	public CommandProcessingResult cancelBill(final Long billId) {
@@ -237,5 +237,13 @@ public class BillMasterWritePlatformServiceImplementation implements
 	   }
 		
    }
+	
+	private void handleCodeDataIntegrityIssues(final JsonCommand command,final DataIntegrityViolationException dve) {
+		final Throwable realCause = dve.getMostSpecificCause(); 
+		if(realCause.getMessage().contains("plan_code"))
+		throw new PlatformDataIntegrityException("error.msg.data.truncation.issue",
+                "Data truncation: Data too long for column 'plan_code'");
+		
+	}
 	
 }	
