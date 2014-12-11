@@ -120,10 +120,8 @@ public class BillingMasterApiResourse {
 		    
 		if("invoice".equalsIgnoreCase(fileName)){
 			try {
-					this.billWritePlatformService.generateStatementPdf(billId);
-			} catch (SQLException e) {
-				   e.printStackTrace();
-			}
+			      this.billWritePlatformService.generateStatementPdf(billId);
+			} catch (SQLException e) {  e.printStackTrace();}
 		 }
 		 final BillMaster updatedBillMaster = this.billMasterRepository.findOne(billId);
 		 final String printFileName = updatedBillMaster.getFileName();
@@ -156,7 +154,7 @@ public class BillingMasterApiResourse {
 			final String msg = "No Generated Pdf file For This Statement";
 			throw new BillingOrderNoRecordsFoundException(msg, billId);
 		}
-		final Long msgId = this.billMasterWritePlatformService.sendBillDetailFilePath(billMaster);
+		final Long msgId = this.billWritePlatformService.sendStatementToEmail(billMaster);
 	    return this.toApiJsonSerializer.serialize(CommandProcessingResult.resourceResult(msgId, null));
 	}
 	
@@ -178,7 +176,7 @@ public class BillingMasterApiResourse {
 		 String printFileName = "";
 		try{
 		 printFileName=this.billWritePlatformService.generateInovicePdf(invoiceId);
-		 System.out.println(printFileName);
+		
 		}catch(SQLException e) {e.printStackTrace();}
 		 final File file = new File(printFileName);
 		 this.billWritePlatformService.sendInvoiceToEmail(printFileName,clientId);
