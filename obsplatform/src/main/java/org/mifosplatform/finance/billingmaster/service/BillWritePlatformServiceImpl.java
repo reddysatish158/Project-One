@@ -14,22 +14,12 @@ import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 
-import org.mifosplatform.finance.adjustment.domain.Adjustment;
-import org.mifosplatform.finance.adjustment.domain.AdjustmentRepository;
 import org.mifosplatform.finance.billingmaster.domain.BillDetail;
 import org.mifosplatform.finance.billingmaster.domain.BillMaster;
 import org.mifosplatform.finance.billingmaster.domain.BillMasterRepository;
 import org.mifosplatform.finance.billingorder.data.BillDetailsData;
-import org.mifosplatform.finance.billingorder.domain.BillingOrder;
-import org.mifosplatform.finance.billingorder.domain.BillingOrderRepository;
-import org.mifosplatform.finance.billingorder.domain.Invoice;
-import org.mifosplatform.finance.billingorder.domain.InvoiceRepository;
-import org.mifosplatform.finance.billingorder.domain.InvoiceTax;
-import org.mifosplatform.finance.billingorder.domain.InvoiceTaxRepository;
 import org.mifosplatform.finance.billingorder.exceptions.BillingOrderNoRecordsFoundException;
 import org.mifosplatform.finance.financialtransaction.data.FinancialTransactionsData;
-import org.mifosplatform.finance.payments.domain.Payment;
-import org.mifosplatform.finance.payments.domain.PaymentRepository;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.service.FileUtils;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
@@ -66,11 +56,6 @@ import com.lowagie.text.pdf.PdfWriter;
 public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 	private final static Logger LOGGER = LoggerFactory.getLogger(BillWritePlatformServiceImpl.class);
 	private final BillMasterRepository billMasterRepository;
-	private final PaymentRepository paymentRepository;
-	private final AdjustmentRepository adjustmentRepository;
-	private final BillingOrderRepository billingOrderRepository;
-	private final InvoiceTaxRepository invoiceTaxRepository;
-	private final InvoiceRepository invoiceRepository;
 	private final TenantAwareRoutingDataSource dataSource;
     private final ClientRepository clientRepository;
     private final BillingMessageTemplateRepository messageTemplateRepository;
@@ -78,20 +63,12 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 
 	
 	@Autowired
-	public BillWritePlatformServiceImpl(final BillMasterRepository billMasterRepository,
-			final PaymentRepository paymentRepository, final AdjustmentRepository adjustmentRepository,
-			final BillingOrderRepository billingOrderRepository, final InvoiceTaxRepository invoiceTaxRepository, 
-			final InvoiceRepository invoiceRepository,final TenantAwareRoutingDataSource dataSource,
+	public BillWritePlatformServiceImpl(final BillMasterRepository billMasterRepository,final TenantAwareRoutingDataSource dataSource,
 			final ClientRepository clientRepository,final BillingMessageTemplateRepository messageTemplateRepository,
 		    final BillingMessageRepository messageDataRepository) {
 
 		this.dataSource = dataSource;
-		this.invoiceRepository = invoiceRepository;
-		this.paymentRepository = paymentRepository;
 		this.billMasterRepository = billMasterRepository;
-		this.adjustmentRepository = adjustmentRepository;
-		this.invoiceTaxRepository = invoiceTaxRepository;
-		this.billingOrderRepository = billingOrderRepository;
 		this.clientRepository = clientRepository;
 		this.messageTemplateRepository = messageTemplateRepository;
 		this.messageDataRepository = messageDataRepository;
@@ -148,73 +125,26 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 	}
 }
 
-	@Override
-	public void updateBillId(final List<FinancialTransactionsData> financialTransactionsDatas, final Long billId) {
-		
-		try{
-
-			for (final FinancialTransactionsData transIds : financialTransactionsDatas) {
-				if ("ADJUSTMENT".equalsIgnoreCase(transIds.getTransactionType())) {
-					Adjustment adjustment = this.adjustmentRepository.findOne(transIds.getTransactionId());
-					adjustment.updateBillId(billId);
-					this.adjustmentRepository.save(adjustment);
-				}
-				else if ("TAXES".equalsIgnoreCase(transIds.getTransactionType())) {
-					InvoiceTax tax = this.invoiceTaxRepository.findOne(transIds.getTransactionId());
-					tax.updateBillId(billId);
-					this.invoiceTaxRepository.save(tax);
-				}
-				else if (transIds.getTransactionType().contains("PAYMENT")) {
-					Payment payment = this.paymentRepository.findOne(transIds.getTransactionId());
-					payment.updateBillId(billId);
-					this.paymentRepository.save(payment);
-				}
-				else if ("SERVICE_CHARGES".equalsIgnoreCase(transIds.getTransactionType())) {
-					BillingOrder billingOrder = this.billingOrderRepository.findOne(transIds.getTransactionId());
-					billingOrder.updateBillId(billId);
-					this.billingOrderRepository.save(billingOrder);
-					Invoice invoice = this.invoiceRepository.findOne(billingOrder.getInvoice().getId());
-					invoice.updateBillId(billId);
-					this.invoiceRepository.save(invoice);
-				}
-				else if ("INVOICE".equalsIgnoreCase(transIds.getTransactionType())) {
-					Invoice invoice = this.invoiceRepository.findOne(transIds.getTransactionId());
-					invoice.updateBillId(billId);
-					this.invoiceRepository.save(invoice);
-				}
-				else if ("ONETIME_CHARGES".equalsIgnoreCase(transIds.getTransactionType())) {
-					BillingOrder billingOrder = this.billingOrderRepository.findOne(transIds.getTransactionId());
-					billingOrder.updateBillId(billId);
-					this.billingOrderRepository.save(billingOrder);
-					Invoice invoice = this.invoiceRepository.findOne(billingOrder.getInvoice().getId());
-					invoice.updateBillId(billId);
-					this.invoiceRepository.save(invoice);
-				
-				}
-
-			}
-		}catch(Exception exception){
-		
-		}
-		
-	}
-
 	@Transactional
 	@Override
 	public void generateStatementPdf(final Long billId) throws SQLException {
+		
 		try {
-			String fileLocation = FileUtils.MIFOSX_BASE_DIR;
-
+			final String fileLocation = FileUtils.MIFOSX_BASE_DIR;
 			/** Recursively create the directory if it does not exist **/
 			if (!new File(fileLocation).isDirectory()) {
 				new File(fileLocation).mkdirs();
 			}
 			BillMaster billMaster=this.billMasterRepository.findOne(billId);
-			final String jpath = fileLocation+File.separator+"jasper"; //System.getProperty("user.home") + File.separator + "billing";
-			final String printStatementdetailsLocation = fileLocation + File.separator + "Bill_" + billMaster.getId() + ".pdf";
-			billMaster.setFileName(printStatementdetailsLocation);
-			this.billMasterRepository.save(billMaster);
+			
+			final String statementDetailsLocation = fileLocation + File.separator + "StatementPdfFiles"; 
+			if (!new File(statementDetailsLocation).isDirectory()) {
+				new File(statementDetailsLocation).mkdirs();
+			}
+			final String printStatementLocation = statementDetailsLocation + File.separator + "Bill_" + billMaster.getId() + ".pdf";
+			final String jpath = fileLocation+File.separator+"jasper"; 
 			final String jfilepath =jpath+File.separator+"Bill_Mainreport.jasper";
+			final Connection connection = this.dataSource.getConnection();
 			/*Long billNum = null;
 			final Client client = this.clientRepository.findOne(billMaster.getClientId());
 			
@@ -225,27 +155,20 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 				}
 				*/
 			Map<String, Object> parameters = new HashMap<String, Object>();
-
 			final Integer id = Integer.valueOf(billMaster.getId().toString());
 			parameters.put("param1", id);
-			
 			parameters.put("SUBREPORT_DIR",jpath+""+File.separator);
-			final Connection connection = this.dataSource.getConnection();
-			try{
-				//System.out.println("Filling report...");
-				final JasperPrint jasperPrint = JasperFillManager.fillReport(jfilepath, parameters, connection);
-				JasperExportManager.exportReportToPdfFile(jasperPrint, printStatementdetailsLocation);
-			}finally{
-	            try {
-	            	connection.close();
-	            }
-	            catch (final SQLException e) {
-	                e.printStackTrace();
-	            }
-			}
+			final JasperPrint jasperPrint = JasperFillManager.fillReport(jfilepath, parameters, connection);
+			JasperExportManager.exportReportToPdfFile(jasperPrint, printStatementLocation);
+			billMaster.setFileName(printStatementLocation);
+			this.billMasterRepository.save(billMaster);
+			connection.close();
+			System.out.println("Filling report successfully...");
+			
 		} catch (final DataIntegrityViolationException exception) {
 			exception.printStackTrace();
 		} catch (final JRException e) {
+			System.out.println("Filling report failed...");
 			LOGGER.error("unable to generate pdf" + e.getLocalizedMessage());
 			e.printStackTrace();
 		} catch (final SQLException e) {
@@ -257,12 +180,16 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 	@Override
 	public String generateInovicePdf(final Long invoiceId) throws SQLException {
 		
-		final String fileLocation = FileUtils.MIFOSX_BASE_DIR + File.separator +"InvoicePdfFiles";
+		final String fileLocation = FileUtils.MIFOSX_BASE_DIR ;
 		/** Recursively create the directory if it does not exist **/
 		if (!new File(fileLocation).isDirectory()) {
 			new File(fileLocation).mkdirs();
 		}
-		final String printInvoicedetailsLocation = fileLocation + File.separator + "Invoice_" + invoiceId + ".pdf";
+		final String InvoiceDetailsLocation = fileLocation + File.separator +"InvoicePdfFiles";
+		if (!new File(InvoiceDetailsLocation).isDirectory()) {
+			 new File(InvoiceDetailsLocation).mkdirs();
+		}
+		final String printInvoiceLocation = InvoiceDetailsLocation +File.separator + "Invoice_" + invoiceId + ".pdf";
 		try {
 			final String jpath = fileLocation+File.separator+"jasper"; 
 			final String jasperfilepath =jpath+File.separator+"Invoicereport.jasper";
@@ -270,19 +197,20 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 			final Connection connection = this.dataSource.getConnection();
 			Map<String, Object> parameters = new HashMap<String, Object>();
 			parameters.put("param1", id);
-			System.out.println("Filling report...");
 		   final JasperPrint jasperPrint = JasperFillManager.fillReport(jasperfilepath, parameters, connection);
-		   JasperExportManager.exportReportToPdfFile(jasperPrint,printInvoicedetailsLocation);
+		   JasperExportManager.exportReportToPdfFile(jasperPrint,printInvoiceLocation);
 	       connection.close();
+	       System.out.println("Filling report successfully...");
 		} catch (final DataIntegrityViolationException exception) {
 			exception.printStackTrace();
 		} catch (final JRException e) {
+			System.out.println("Filling report failed...");
 			LOGGER.error("unable to generate pdf" + e.getLocalizedMessage());
 			e.printStackTrace();
 		} catch (final SQLException e) {
 			LOGGER.error("unable to retrieve data" + e.getLocalizedMessage());
 		}
-		return printInvoicedetailsLocation;	
+		return printInvoiceLocation;	
 }
 	@Transactional
 	@Override
@@ -306,6 +234,33 @@ public class BillWritePlatformServiceImpl implements BillWritePlatformService {
 	   }
 	}
  }
+	@Transactional
+	@Override
+	public Long sendStatementToEmail(final BillMaster billMaster) {
+		
+		//context.authenticatedUser();
+		final Client client = this.clientRepository.findOne(billMaster.getClientId());
+		final String clientEmail = client.getEmail();
+		final String filePath = billMaster.getFileName();
+		if(clientEmail == null){
+			final String msg = "Please provide email first";
+			throw new BillingOrderNoRecordsFoundException(msg, client);
+		}
+		BillingMessage billingMessage = null;
+		final List<BillingMessageTemplate> billingMessageTemplate = this.messageTemplateRepository.findAll();
+		
+		for(final BillingMessageTemplate  msgTemplate:billingMessageTemplate){
+
+			if("Bill_EMAIL".equalsIgnoreCase(msgTemplate.getTemplateDescription())){
+		              
+		    billingMessage = new BillingMessage(msgTemplate.getHeader(), msgTemplate.getBody(), msgTemplate.getFooter(), clientEmail, clientEmail, 
+		    		                    msgTemplate.getSubject(), "N", msgTemplate, msgTemplate.getMessageType(), filePath);
+		    this.messageDataRepository.save(billingMessage);
+	    }
+	}
+		
+	return billMaster.getId();
+	}
 	
 	@Override
 	public String generatePdf(final BillDetailsData billDetails,
