@@ -88,7 +88,7 @@ public class ConfigurationApiResource {
         final ConfigurationData configurationData = this.readPlatformService.retrieveGlobalConfiguration();
         String defaultConfiguration = "{\"payment\":\"false\", \"IPTV\":\"false\", " +
         								"\"IsClientIndividual\":\"false\", \"deviceAgrementType\":\"SALE\", " +
-        								"\"SubscriptionPayment\":\"false\"}";
+        								"\"SubscriptionPayment\":\"false\",\"nationalId\":\"false\"}";
         String readDatas;
         File fileForPath = new File(CONFIGURATION_PATH_LOCATION);
         if(!fileForPath.isDirectory()){
