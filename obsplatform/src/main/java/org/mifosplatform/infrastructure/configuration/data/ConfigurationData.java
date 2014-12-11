@@ -14,8 +14,17 @@ public class ConfigurationData {
 
     @SuppressWarnings("unused")
     private final List<ConfigurationPropertyData> globalConfiguration;
+    private String clientConfiguration;
 
     public ConfigurationData(final List<ConfigurationPropertyData> globalConfiguration) {
         this.globalConfiguration = globalConfiguration;
     }
+
+	public String getClientConfiguration() {
+		return clientConfiguration;
+	}
+    
+	public void setClientConfiguration(final String clientConfiguration){
+		this.clientConfiguration = clientConfiguration;
+	}
 }
