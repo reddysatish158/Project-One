@@ -48,9 +48,10 @@ public class SelfCare extends AbstractPersistable<Long>{
 	private Long zebraSubscriberId;
 	
 	public SelfCare() {
-		// TODO Auto-generated constructor stub
+		
 	}
-	public SelfCare(Long clientId,String userName, String password, String uniqueReference, Boolean isDeleted, String device){
+	
+	public SelfCare(Long clientId,String userName, String password, String uniqueReference, Boolean isDeleted,String device){
 		this.clientId = clientId;
 		this.userName = userName;
 		this.password = password;
@@ -63,7 +64,7 @@ public class SelfCare extends AbstractPersistable<Long>{
 	public static SelfCare fromJson(JsonCommand command) {
 		String uniqueReference = command.stringValueOfParameterNamed("uniqueReference");
 		String device = command.stringValueOfParameterNamed("device");
-		return new SelfCare(null,uniqueReference, null, uniqueReference, false, device);
+		return new SelfCare(null,uniqueReference, null, uniqueReference,false,device);
 	}
 	
 	public static SelfCare fromJsonODP(JsonCommand command) {
@@ -103,6 +104,7 @@ public class SelfCare extends AbstractPersistable<Long>{
 	public void setUniqueReference(String uniqueReference) {
 		this.uniqueReference = uniqueReference;
 	}
+
 	public Boolean getIsDeleted() {
 		return isDeleted;
 	}
