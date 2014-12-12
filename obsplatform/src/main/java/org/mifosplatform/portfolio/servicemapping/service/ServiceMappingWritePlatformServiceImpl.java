@@ -45,7 +45,7 @@ public class ServiceMappingWritePlatformServiceImpl implements ServiceMappingWri
 		
 		try{
 			platformSecurityContext.authenticatedUser();
-			serviceMappingCommandFromApiJsonDeserializer.validateForCreate(command.json());
+			serviceMappingCommandFromApiJsonDeserializer.validateForCreate(command.json(), command.hasParameter("sortBy"));
 			final ServiceMapping serviceMapping = ServiceMapping.fromJson(command);
 			serviceMappingRepository.save(serviceMapping);
 			return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(serviceMapping.getId()).build();
@@ -61,11 +61,20 @@ public class ServiceMappingWritePlatformServiceImpl implements ServiceMappingWri
 		try {
 
 			this.platformSecurityContext.authenticatedUser();
-			this.serviceMappingCommandFromApiJsonDeserializer.validateForCreate(command.json());
+			Map<String, Object> changes = null;
+			this.serviceMappingCommandFromApiJsonDeserializer.validateForCreate(command.json(), command.hasParameter("sortBy"));
 			final ServiceMapping serviceMapping = retrieveServiceMappingById(serviceMapId);
-			final Map<String, Object> changes = serviceMapping.update(command);
-			this.serviceMappingRepository.save(serviceMapping);
-
+			
+			if(command.hasParameter("sortBy")){
+				serviceMapping.setSortBy(command.integerValueOfParameterNamed("sortBy"));
+				this.serviceMappingRepository.save(serviceMapping);
+			}else{
+				changes = serviceMapping.update(command);
+				if (!changes.isEmpty()) {
+					this.serviceMappingRepository.save(serviceMapping);
+				}
+			}
+			
 			return new CommandProcessingResultBuilder() //
 					.withCommandId(command.commandId()) //
 					.withEntityId(serviceMapId) //
