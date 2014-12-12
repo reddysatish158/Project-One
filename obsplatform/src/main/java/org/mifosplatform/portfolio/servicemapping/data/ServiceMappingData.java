@@ -23,6 +23,7 @@ public class ServiceMappingData {
 	private List<EnumOptionData> statusData;
 	private Collection<ReportParameterData> serviceParameters;
 	private Collection<McodeData> categories;
+	private String sortBy;
 	
 	public Collection<McodeData> getCategories() {
 		return categories;
@@ -47,7 +48,7 @@ public class ServiceMappingData {
 
 	public ServiceMappingData(final Long id, final String serviceCode, 
 			final String serviceIndentification, final String status,
-			final String image, final String category, final String subCategory) {
+			final String image, final String category, final String subCategory, final String sortBy) {
 		
 		this.id=id;
 		this.serviceCode=serviceCode;
@@ -56,6 +57,7 @@ public class ServiceMappingData {
 		this.image=image;
 		this.category=category;
 		this.subCategory=subCategory;
+		this.sortBy = sortBy;
 	}
 	
 	public ServiceMappingData( final List<ServiceMappingData> serviceMappingData,	

@@ -4,7 +4,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.mifosplatform.crm.clientprospect.service.SearchSqlQuery;
+import org.mifosplatform.infrastructure.core.service.Page;
+import org.mifosplatform.infrastructure.core.service.PaginationHelper;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
+import org.mifosplatform.portfolio.service.data.ServiceMasterOptionsData;
 import org.mifosplatform.portfolio.servicemapping.data.ServiceCodeData;
 import org.mifosplatform.portfolio.servicemapping.data.ServiceMappingData;
 import org.mifosplatform.provisioning.provisioning.data.ServiceParameterData;
@@ -20,6 +24,7 @@ public class ServiceMappingReadPlatformServiceImpl implements
 		ServiceMappingReadPlatformService {
 
 	private final JdbcTemplate jdbcTemplate;
+	private final PaginationHelper<ServiceMappingData> paginationHelper = new PaginationHelper<ServiceMappingData>();
 
 	@Autowired
 	public ServiceMappingReadPlatformServiceImpl(
@@ -31,7 +36,7 @@ public class ServiceMappingReadPlatformServiceImpl implements
 		public String schema() {
 
 			return " ps.id as id, bs.service_code as serviceCode, ps.service_identification as serviceIdentification, bs.status as status,ps.image as image, "
-					+ "ps.category as category,ps.sub_category as subCategory from  b_service bs,  b_prov_service_details ps where bs.status='ACTIVE' and ps.service_id=bs.id ORDER BY ps.id ";
+					+ "ps.category as category,ps.sub_category as subCategory,ps.sort_by as sortBy from  b_service bs,  b_prov_service_details ps where bs.status='ACTIVE' and ps.service_id=bs.id ";
 
 		}
 
@@ -45,15 +50,26 @@ public class ServiceMappingReadPlatformServiceImpl implements
 			String image = rs.getString("image");
 			String category = rs.getString("category");
 			String subCategory = rs.getString("subCategory");
+			final String sortBy = rs.getString("sortBy");
 			return new ServiceMappingData(id, serviceCode,
-					serviceIdentification, status, image, category, subCategory);
+					serviceIdentification, status, image, category, subCategory, sortBy);
 		}
 	}
 
-	public List<ServiceMappingData> getServiceMapping() {
+	public Page<ServiceMappingData> getServiceMapping(SearchSqlQuery searchCodes) {
 		ServiceMappingMapper mapper = new ServiceMappingMapper();
-		String sql = "Select " + mapper.schema();
-		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
+		String sql = "Select " + mapper.schema() + " ORDER BY ISNULL(ps.sort_by), ps.sort_by ASC ";
+		StringBuilder sqlBuilder = new StringBuilder(200);
+		sqlBuilder.append(sql);
+		if (searchCodes.isLimited()) {
+            sqlBuilder.append(" limit ").append(searchCodes.getLimit());
+        }
+        if (searchCodes.isOffset()) {
+            sqlBuilder.append(" offset ").append(searchCodes.getOffset());
+        }
+		//return this.jdbcTemplate.query(sql, mapper, new Object[] {});
+		return this.paginationHelper.fetchPage(this.jdbcTemplate, "SELECT FOUND_ROWS()",sqlBuilder.toString(),
+	            new Object[] {}, mapper);
 	}
 
 	private class ServiceCodeDataMapper implements RowMapper<ServiceCodeData> {
@@ -80,7 +96,7 @@ public class ServiceMappingReadPlatformServiceImpl implements
 		public String schema() {
 
 			return " bs.id as serviceId,bs.service_code as serviceCode, ps.service_identification as serviceIdentification, bs.status as status,"
-					+ "ps.image as image,ps.category as category,ps.sub_category as subCategory  from b_service bs, b_prov_service_details ps ";
+					+ "ps.image as image,ps.category as category,ps.sub_category as subCategory,ps.sort_by as sortBy from b_service bs, b_prov_service_details ps ";
 
 		}
 
@@ -96,8 +112,9 @@ public class ServiceMappingReadPlatformServiceImpl implements
 			String image = rs.getString("image");
 			String category = rs.getString("category");
 			String subCategory = rs.getString("subCategory");
+			final String sortBy = rs.getString("sortBy");
 			return new ServiceMappingData(serviceId, serviceCode,
-					serviceIdentification, status, image, category, subCategory);
+					serviceIdentification, status, image, category, subCategory, sortBy);
 		}
 	}
 
