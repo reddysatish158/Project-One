@@ -9,4 +9,7 @@ public interface PlanServiceReadPlatformService {
 	Collection<PlanServiceData> retrieveClientPlanService(Long clientId,
 			String serviceType,String category);
 
+	Collection<PlanServiceData> retrieveClientPlanService(Long clientId,
+			String serviceType, Boolean isCategoryOnly);
+
 }
