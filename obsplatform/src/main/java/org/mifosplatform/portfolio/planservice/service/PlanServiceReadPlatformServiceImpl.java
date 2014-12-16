@@ -68,4 +68,31 @@ public class PlanServiceReadPlatformServiceImpl implements PlanServiceReadPlatfo
 					" AND s.service_type = ? AND s.id = sd.service_id AND o.order_status = 1 ";
 		}
 	}
+	
+	@Override
+	public Collection<PlanServiceData> retrieveClientPlanService(Long clientId,String serviceType, Boolean isCategoryOnly) {
+
+		planServiceMapperForCategories mapper = new planServiceMapperForCategories();
+		String sql = "select " + mapper.schema();
+		return this.jdbcTemplate.query(sql, mapper, new Object[] {clientId,serviceType});
+	}
+	
+	protected static final class planServiceMapperForCategories implements RowMapper<PlanServiceData> {
+
+		@Override
+		public PlanServiceData mapRow(final ResultSet rs, final int rowNum)
+				throws SQLException {
+			
+			String category=rs.getString("category");
+			return new PlanServiceData(null, null, null, null, null, null, category, null);
+			
+		}
+
+
+		public String schema() {
+			return " distinct sd.category as category FROM b_orders o," +
+					"b_plan_detail p,b_service s,b_prov_service_details sd WHERE o.client_id = ? AND p.plan_id = o.plan_id AND s.service_code = p.service_code" +
+					" AND s.service_type = ? AND s.id = sd.service_id AND o.order_status = 1  GROUP BY s.id";
+		}
+	}
 }
