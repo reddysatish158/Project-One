@@ -57,7 +57,8 @@ public class PlanServicesApiResource {
 			@Consumes({ MediaType.APPLICATION_JSON })
 			@Produces({ MediaType.APPLICATION_JSON })
 			public String getClientPlanService(@PathParam("clientId") final Long clientId,
-					@QueryParam("serviceType") final String serviceType,@Context final UriInfo uriInfo) {
+					@QueryParam("serviceType") final String serviceType,@Context final UriInfo uriInfo,
+					@QueryParam("category") final String category) {
 	        	
 			   context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
 
@@ -74,7 +75,7 @@ public class PlanServicesApiResource {
 				       throw new InsufficientAmountException(clientId);
 				   }
 			   }*/
-				final Collection<PlanServiceData> masterOptionsDatas = this.planServiceReadPlatformService.retrieveClientPlanService(clientId,serviceType);
+				final Collection<PlanServiceData> masterOptionsDatas = this.planServiceReadPlatformService.retrieveClientPlanService(clientId,serviceType,category);
 				final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 				return this.toApiJsonSerializer.serialize(settings, masterOptionsDatas, RESPONSE_DATA_PARAMETERS);
 			}
