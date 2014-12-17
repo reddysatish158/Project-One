@@ -277,7 +277,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                 newClient.updateAccountNo(accountNoGenerator.generate());
                 this.clientRepository.saveAndFlush(newClient);
             }
-            
+
 			if (configuration.isEnabled()) {
 
 				final JSONObject selfcarecreation = new JSONObject();
@@ -291,6 +291,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 						.withJson(selfcarecreation.toString()).build();
 				this.portfolioCommandSourceWritePlatformService.logCommandSource(selfcareCommandRequest);
 			}
+
             
             
             final List<ActionDetaislData> actionDetailsDatas=this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_CREATE_CLIENT);
@@ -362,8 +363,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                       if(order.getStatus().equals(StatusTypeEnum.ACTIVE.getValue().longValue())){
                     	  final CommandProcessingResult processingResult=this.prepareRequestWriteplatformService.prepareNewRequest(order, plan, UserActionStatusTypeEnum.CHANGE_GROUP.toString());
                	        this.ProvisioningWritePlatformService.postOrderDetailsForProvisioning(order,plan.getCode(),UserActionStatusTypeEnum.CHANGE_GROUP.toString(),
-               			processingResult.resourceId(),oldGroup,null,order.getId(),plan.getProvisionSystem(),
-               			this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
+               			processingResult.resourceId(),oldGroup,null,order.getId(),plan.getProvisionSystem(),null);
                       }
             	   }
             		

@@ -37,11 +37,14 @@ import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext
 import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
 import org.mifosplatform.organisation.mcodevalues.service.MCodeReadPlatformService;
 import org.mifosplatform.portfolio.contract.data.SubscriptionData;
+import org.mifosplatform.portfolio.order.data.OrderAddonsData;
 import org.mifosplatform.portfolio.order.data.OrderData;
 import org.mifosplatform.portfolio.order.data.OrderDiscountData;
 import org.mifosplatform.portfolio.order.data.OrderHistoryData;
 import org.mifosplatform.portfolio.order.data.OrderLineData;
 import org.mifosplatform.portfolio.order.data.OrderPriceData;
+import org.mifosplatform.portfolio.order.service.OrderAddOnsReadPlaformService;
+import org.mifosplatform.portfolio.order.service.OrderAddOnsWritePlatformService;
 import org.mifosplatform.portfolio.order.service.OrderReadPlatformService;
 import org.mifosplatform.portfolio.plan.data.PlanCodeData;
 import org.mifosplatform.portfolio.plan.service.PlanReadPlatformService;
@@ -66,6 +69,7 @@ public class OrdersApiResource {
 	  private final MCodeReadPlatformService mCodeReadPlatformService;
 	  private final ApiRequestParameterHelper apiRequestParameterHelper;
 	  private final ConfigurationRepository configurationRepository;
+	  private final OrderAddOnsReadPlaformService orderAddOnsReadPlaformService;
 	  private final DefaultToApiJsonSerializer<OrderData> toApiJsonSerializer;
 	  private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 	  
@@ -74,7 +78,8 @@ public class OrdersApiResource {
 	   public OrdersApiResource(final PlatformSecurityContext context,final ConfigurationRepository configurationRepository,  
 	   final DefaultToApiJsonSerializer<OrderData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper,
 	   final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,final OrderReadPlatformService orderReadPlatformService,
-	   final PlanReadPlatformService planReadPlatformService, final MCodeReadPlatformService mCodeReadPlatformService) {
+	   final PlanReadPlatformService planReadPlatformService, final MCodeReadPlatformService mCodeReadPlatformService,
+	   final OrderAddOnsReadPlaformService orderAddOnsReadPlaformService) {
 
 		        this.context = context;
 		        this.toApiJsonSerializer = toApiJsonSerializer;
@@ -82,6 +87,7 @@ public class OrdersApiResource {
 		        this.configurationRepository=configurationRepository;
 		        this.mCodeReadPlatformService=mCodeReadPlatformService;
 		        this.orderReadPlatformService=orderReadPlatformService;
+		        this.orderAddOnsReadPlaformService=orderAddOnsReadPlaformService;
 		        this.apiRequestParameterHelper = apiRequestParameterHelper;
 		        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
 		        
@@ -157,7 +163,7 @@ public class OrdersApiResource {
     final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
     return this.toApiJsonSerializer.serialize(settings, orderData, RESPONSE_DATA_PARAMETERS);
 	    }
-	 
+	  
 	 @GET
 	 @Path("{orderId}/orderprice")
 	 @Consumes({MediaType.APPLICATION_JSON})
@@ -168,23 +174,24 @@ public class OrdersApiResource {
 	        final List<OrderPriceData> priceDatas = this.orderReadPlatformService.retrieveOrderPriceDetails(orderId,null);
 	        final List<OrderLineData> services = this.orderReadPlatformService.retrieveOrderServiceDetails(orderId);
 	        final List<OrderDiscountData> discountDatas= this.orderReadPlatformService.retrieveOrderDiscountDetails(orderId);
-	         OrderData orderDetailsData = this.orderReadPlatformService.retrieveOrderDetails(orderId);
-	         final List<OrderHistoryData> historyDatas = this.orderReadPlatformService.retrieveOrderHistoryDetails(orderDetailsData.getOrderNo());
-	         orderDetailsData=new OrderData(priceDatas,historyDatas,orderDetailsData,services,discountDatas);
+	        OrderData orderDetailsData = this.orderReadPlatformService.retrieveOrderDetails(orderId);
+	        final List<OrderAddonsData> orderAddonsDatas = this.orderAddOnsReadPlaformService.retrieveAllOrderAddons(orderId);
+	        final List<OrderHistoryData> historyDatas = this.orderReadPlatformService.retrieveOrderHistoryDetails(orderDetailsData.getOrderNo());
+	        orderDetailsData=new OrderData(priceDatas,historyDatas,orderDetailsData,services,discountDatas,orderAddonsDatas);
 	        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 	        return this.toApiJsonSerializer.serialize(settings, orderDetailsData, RESPONSE_DATA_PARAMETERS);
 	    }
 
 	 @PUT
-		@Path("{orderId}/orderprice")
-		@Consumes({ MediaType.APPLICATION_JSON })
-		@Produces({ MediaType.APPLICATION_JSON })
-		public String updateOrderPrice(@PathParam("orderId") final Long orderId,final String apiRequestBodyAsJson) {
-		 final CommandWrapper commandRequest = new CommandWrapperBuilder().updateOrderPrice(orderId).withJson(apiRequestBodyAsJson).build();
-		 final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-		  return this.toApiJsonSerializer.serialize(result);
-
-		}
+	 @Path("{orderId}/orderprice")
+	 @Consumes({ MediaType.APPLICATION_JSON })
+	 @Produces({ MediaType.APPLICATION_JSON })
+	 public String updateOrderPrice(@PathParam("orderId") final Long orderId,final String apiRequestBodyAsJson) {
+	 final CommandWrapper commandRequest = new CommandWrapperBuilder().updateOrderPrice(orderId).withJson(apiRequestBodyAsJson).build();
+	 final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+	 return this.toApiJsonSerializer.serialize(result);
+	 }
+	 
 	@PUT
 	@Path("{orderId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
@@ -402,5 +409,6 @@ public class OrdersApiResource {
 		return this.toApiJsonSerializer.serialize(result);
 		
 	}
-
+	
+	
 }

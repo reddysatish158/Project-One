@@ -170,15 +170,15 @@ public class ServiceMasterReadPlatformServiceImpl implements  ServiceMasterReadP
 	}
 
 	@Override
-	public List<ServiceData> retrieveAllServices() {
+	public List<ServiceData> retrieveAllServices(String serviceType) {
 
 
 		context.authenticatedUser();
 		ServiceDetailsMapper mapper = new ServiceDetailsMapper();
 
-		String sql = "select " + mapper.schema();
+		String sql = "select " + mapper.schema()+" and da.is_optional = ?";
 
-		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
+		return this.jdbcTemplate.query(sql, mapper, new Object[] {serviceType});
 
 	
 }

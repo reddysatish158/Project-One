@@ -3,6 +3,7 @@ package org.mifosplatform.provisioning.processrequest.service;
 import java.util.List;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.mifosplatform.cms.eventmaster.domain.EventMasterRepository;
 import org.mifosplatform.cms.eventorder.domain.EventOrderRepository;
 import org.mifosplatform.infrastructure.configuration.domain.EnumDomainService;
@@ -22,6 +23,8 @@ import org.mifosplatform.portfolio.client.domain.ClientRepository;
 import org.mifosplatform.portfolio.client.domain.ClientStatus;
 import org.mifosplatform.portfolio.order.data.OrderStatusEnumaration;
 import org.mifosplatform.portfolio.order.domain.Order;
+import org.mifosplatform.portfolio.order.domain.OrderAddons;
+import org.mifosplatform.portfolio.order.domain.OrderAddonsRepository;
 import org.mifosplatform.portfolio.order.domain.OrderRepository;
 import org.mifosplatform.portfolio.order.domain.StatusTypeEnum;
 import org.mifosplatform.portfolio.order.domain.UserActionStatusTypeEnum;
@@ -58,22 +61,23 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 
 	  private static final Logger logger =LoggerFactory.getLogger(ProcessRequestReadplatformServiceImpl.class);
 	  private final PlanRepository planRepository;
-	  private final PlatformSecurityContext context;
-	  private final OrderRepository orderRepository;
-	  private final ClientRepository clientRepository;
-	  private final EventOrderRepository eventOrderRepository;
-	  private final TenantDetailsService tenantDetailsService;
-	  private final EventMasterRepository eventMasterRepository;
-	  private final OrderReadPlatformService orderReadPlatformService;
-	  private final PrepareRequsetRepository prepareRequsetRepository;
-	  private final ProcessRequestRepository processRequestRepository;
-	  private final DataSourcePerTenantService dataSourcePerTenantService;
-	  private final EnumDomainServiceRepository enumDomainServiceRepository;
-	  private final ServiceParametersRepository serviceParametersRepository;
 	  private final IpPoolManagementJpaRepository ipPoolManagementJpaRepository;
 	  private final ActionDetailsReadPlatformService actionDetailsReadPlatformService;
 	  private final PrepareRequestReadplatformService prepareRequestReadplatformService;
 	  private final ActiondetailsWritePlatformService actiondetailsWritePlatformService; 
+	  private final PlatformSecurityContext context;
+	  private final OrderRepository orderRepository;
+	  private final ClientRepository clientRepository;
+	  private final OrderReadPlatformService orderReadPlatformService;
+	  private final PrepareRequsetRepository prepareRequsetRepository;
+	  private final ProcessRequestRepository processRequestRepository;
+	  private final DataSourcePerTenantService dataSourcePerTenantService;
+	  private final EventOrderRepository eventOrderRepository;
+	  private final TenantDetailsService tenantDetailsService;
+	  private final EventMasterRepository eventMasterRepository;
+	  private final EnumDomainServiceRepository enumDomainServiceRepository;
+	  private final ServiceParametersRepository serviceParametersRepository;
+	  private final OrderAddonsRepository orderAddonsRepository;
 
 	  
 	  
@@ -85,25 +89,26 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 	    		final ClientRepository clientRepository,final PlanRepository planRepository,final ActionDetailsReadPlatformService actionDetailsReadPlatformService,
 	    		final ActiondetailsWritePlatformService actiondetailsWritePlatformService,final PlatformSecurityContext context,final EventMasterRepository eventMasterRepository,
 	    		final EnumDomainServiceRepository enumDomainServiceRepository,final EventOrderRepository eventOrderRepository,final ServiceParametersRepository parametersRepository,
-	    		final IpPoolManagementJpaRepository ipPoolManagementJpaRepository) {
+	    		final IpPoolManagementJpaRepository ipPoolManagementJpaRepository,final OrderAddonsRepository orderAddonsRepository) {
 	    	
 	    	    this.context = context;
 	    	    this.planRepository=planRepository;
+	    	    this.dataSourcePerTenantService = dataSourcePerTenantService;
+	    	    this.ipPoolManagementJpaRepository=ipPoolManagementJpaRepository;
+	    	    this.actionDetailsReadPlatformService=actionDetailsReadPlatformService;
+	    	    this.prepareRequestReadplatformService=prepareRequestReadplatformService;
+	    	    this.actiondetailsWritePlatformService=actiondetailsWritePlatformService;
+	    	    this.orderAddonsRepository=orderAddonsRepository;
 	    	    this.orderRepository=orderRepository;
-	    	    this.clientRepository=clientRepository;
-	    	    this.eventOrderRepository=eventOrderRepository;
-	    	    this.tenantDetailsService = tenantDetailsService;
-	    	    this.eventMasterRepository=eventMasterRepository;
 	    	    this.serviceParametersRepository=parametersRepository;
 	    	    this.prepareRequsetRepository=prepareRequsetRepository;
 	    	    this.processRequestRepository=processRequestRepository;
 	    	    this.orderReadPlatformService=orderReadPlatformService;
+	    	    this.clientRepository=clientRepository;
+	    	    this.eventOrderRepository=eventOrderRepository;
+	    	    this.tenantDetailsService = tenantDetailsService;
+	    	    this.eventMasterRepository=eventMasterRepository;
 	    	    this.enumDomainServiceRepository=enumDomainServiceRepository;
-	            this.dataSourcePerTenantService = dataSourcePerTenantService;
-	            this.ipPoolManagementJpaRepository=ipPoolManagementJpaRepository;
-	            this.actionDetailsReadPlatformService=actionDetailsReadPlatformService;
-	            this.prepareRequestReadplatformService=prepareRequestReadplatformService;
-	            this.actiondetailsWritePlatformService=actiondetailsWritePlatformService;
 	             
 	    }
 
@@ -144,21 +149,102 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 						Order order=this.orderRepository.findOne(detailsData.getOrderId());
 						Client client=this.clientRepository.findOne(order.getClientId());
 						Plan plan=this.planRepository.findOne(order.getPlanId());
-							
-							if(detailsData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.ACTIVATION.toString())){
+						
+						switch(detailsData.getRequestType()){
+ 						   
+							case ProvisioningApiConstants.REQUEST_ACTIVATION :
 								
 								order.setStatus(OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.ACTIVE).getId());
 								client.setStatus(ClientStatus.ACTIVE.getValue());
 								this.orderRepository.saveAndFlush(order);
+								List<ActionDetaislData> actionDetaislDatas=this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_ACTIVE_ORDER);
+								if(actionDetaislDatas.size() != 0){
+										this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,order.getClientId(), order.getId().toString(),null);
+								}
 								
+								break;
+								
+							case ProvisioningApiConstants.REQUEST_DISCONNECTION :
+								
+								order.setStatus(OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.DISCONNECTED).getId());
+								this.orderRepository.saveAndFlush(order);
+								Long activeOrders=this.orderReadPlatformService.retrieveClientActiveOrderDetails(order.getClientId(), null);
+								if(activeOrders == 0){
+									client.setStatus(ClientStatus.DEACTIVE.getValue());
+								}
+								
+								
+								break;
+								
+	                      case ProvisioningApiConstants.REQUEST_SUSPENTATION :
+								
+	                    		
+								EnumDomainService enumDomainService=this.enumDomainServiceRepository.findOneByEnumMessageProperty(StatusTypeEnum.SUSPENDED.toString());
+								order.setStatus(enumDomainService.getEnumId());
+								this.orderRepository.saveAndFlush(order);
+								
+								break;
+								
+	                      case ProvisioningApiConstants.REQUEST_REACTIVATION :
+								
+	                    		
+								 enumDomainService=this.enumDomainServiceRepository.findOneByEnumMessageProperty(StatusTypeEnum.ACTIVE.toString());
+								order.setStatus(enumDomainService.getEnumId());
+								this.orderRepository.saveAndFlush(order);
+								
+								break;
+								
+							case ProvisioningApiConstants.REQUEST_TERMINATION :
+
+								order.setStatus(OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.TERMINATED).getId());
+								this.orderRepository.saveAndFlush(order);
+								if(plan.getProvisionSystem().equalsIgnoreCase(ProvisioningApiConstants.PROV_PACKETSPAN)){
 									
-										List<ActionDetaislData> actionDetaislDatas=this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_ACTIVE_ORDER);
-										if(actionDetaislDatas.size() != 0){
-											this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,order.getClientId(), order.getId().toString(),null);
+									List<ServiceParameters> parameters=this.serviceParametersRepository.findDataByOrderId(order.getId());
+									for(ServiceParameters serviceParameter:parameters){
+										if(serviceParameter.getParameterName().equalsIgnoreCase(ProvisioningApiConstants.PROV_DATA_IPADDRESS)){
+											JSONArray ipAddresses = new  JSONArray(serviceParameter.getParameterValue());
+											for(int i=0;i<ipAddresses.length();i++){
+												IpPoolManagementDetail ipPoolManagementDetail= this.ipPoolManagementJpaRepository.findAllocatedIpAddressData(ipAddresses.getString(i));
+												if(ipPoolManagementDetail != null){
+													ipPoolManagementDetail.setStatus('T');
+													ipPoolManagementDetail.setClientId(null);
+													this.ipPoolManagementJpaRepository.save(ipPoolManagementDetail);
+												}
+											}
 										}
+									}
+										}
+							
+								break;
 								
-					 
-							}else if(detailsData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.DISCONNECTION.toString())){
+                                case ProvisioningApiConstants.REQUEST_ADDON_ACTIVATION :
+                                	
+                                	List<ProcessRequestDetails> requestDetails=detailsData.getProcessRequestDetails();
+                                	JSONObject jsonObject=new JSONObject(requestDetails.get(0).getSentMessage());
+                                	JSONArray array=jsonObject.getJSONArray("services");
+                                	for(int i=0;i<array.length();i++){
+                                		JSONObject object=array.getJSONObject(i);
+                                		Long addonId=object.getLong("addonId");
+                                		OrderAddons addons=this.orderAddonsRepository.findOne(addonId);
+                                		addons.setStatus(StatusTypeEnum.ACTIVE.toString());
+                                		this.orderAddonsRepository.saveAndFlush(addons);
+                                	}
+                                	
+								break;
+								
+								default : 
+
+									order.setStatus(OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.ACTIVE).getId());
+									client.setStatus(ClientStatus.ACTIVE.getValue());
+									this.clientRepository.saveAndFlush(client);
+									this.orderRepository.saveAndFlush(order);
+								
+									break;
+						}
+						
+							
+							/*if(detailsData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.ACTIVATION.toString())){}else if(detailsData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.DISCONNECTION.toString())){
 					 
 								order.setStatus(OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.DISCONNECTED).getId());
 								this.orderRepository.saveAndFlush(order);
@@ -168,29 +254,7 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 								}
 								
 							
-							}else if(detailsData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.TERMINATION.toString())){
-								order.setStatus(OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.TERMINATED).getId());
-								this.orderRepository.saveAndFlush(order);
-									if(plan.getProvisionSystem().equalsIgnoreCase(ProvisioningApiConstants.PROV_PACKETSPAN)){
-										
-										List<ServiceParameters> parameters=this.serviceParametersRepository.findDataByOrderId(order.getId());
-											
-											for(ServiceParameters serviceParameter:parameters){
-												
-												if(serviceParameter.getParameterName().equalsIgnoreCase(ProvisioningApiConstants.PROV_DATA_IPADDRESS)){
-													JSONArray ipAddresses = new  JSONArray(serviceParameter.getParameterValue());
-								  	            	for(int i=0;i<ipAddresses.length();i++){
-								  	            		IpPoolManagementDetail ipPoolManagementDetail= this.ipPoolManagementJpaRepository.findAllocatedIpAddressData(ipAddresses.getString(i));
-								  	            			if(ipPoolManagementDetail != null){
-								  	            				ipPoolManagementDetail.setStatus('T');
-								  	            				ipPoolManagementDetail.setClientId(null);
-								  	            				this.ipPoolManagementJpaRepository.save(ipPoolManagementDetail);
-								  	            			}
-								  	            	}
-												}
-											}
-									}
-							}else if(detailsData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.SUSPENTATION.toString())){
+							}else if(detailsData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.TERMINATION.toString())){}else if(detailsData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.SUSPENTATION.toString())){
 								
 								EnumDomainService enumDomainService=this.enumDomainServiceRepository.findOneByEnumMessageProperty(StatusTypeEnum.SUSPENDED.toString());
 								order.setStatus(enumDomainService.getEnumId());
@@ -206,7 +270,7 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 								client.setStatus(ClientStatus.ACTIVE.getValue());
 								this.clientRepository.saveAndFlush(client);
 								this.orderRepository.saveAndFlush(order);
-							}	
+							}	*/
 						//	this.orderRepository.saveAndFlush(order);
 							this.clientRepository.saveAndFlush(client);
 							detailsData.setNotify();

@@ -36,7 +36,9 @@ public class ServiceMappingReadPlatformServiceImpl implements
 		public String schema() {
 
 			return " ps.id as id, bs.service_code as serviceCode, ps.service_identification as serviceIdentification, bs.status as status,ps.image as image, "
-					+ "ps.category as category,ps.sub_category as subCategory,ps.sort_by as sortBy from  b_service bs,  b_prov_service_details ps where bs.status='ACTIVE' and ps.service_id=bs.id ";
+					+ "ps.category as category,ps.sub_category as subCategory,ps.provision_system as provisionSystem,ps.sort_by as sortBy " +
+					"  from  b_service bs,  b_prov_service_details ps where bs.status='ACTIVE' and ps.service_id=bs.id ";
+
 
 		}
 
@@ -50,9 +52,9 @@ public class ServiceMappingReadPlatformServiceImpl implements
 			String image = rs.getString("image");
 			String category = rs.getString("category");
 			String subCategory = rs.getString("subCategory");
+			String provisionSystem = rs.getString("provisionSystem");
 			final String sortBy = rs.getString("sortBy");
-			return new ServiceMappingData(id, serviceCode,
-					serviceIdentification, status, image, category, subCategory, sortBy);
+			return new ServiceMappingData(id, serviceCode,serviceIdentification, status, image, category, subCategory,provisionSystem, sortBy);
 		}
 	}
 
@@ -96,7 +98,8 @@ public class ServiceMappingReadPlatformServiceImpl implements
 		public String schema() {
 
 			return " bs.id as serviceId,bs.service_code as serviceCode, ps.service_identification as serviceIdentification, bs.status as status,"
-					+ "ps.image as image,ps.category as category,ps.sub_category as subCategory,ps.sort_by as sortBy from b_service bs, b_prov_service_details ps ";
+					+ "ps.image as image,ps.category as category,ps.sub_category as subCategory,ps.provision_system as provisionSystem ,ps.sort_by as sortBy" +
+					"  from b_service bs, b_prov_service_details ps ";
 
 		}
 
@@ -112,9 +115,9 @@ public class ServiceMappingReadPlatformServiceImpl implements
 			String image = rs.getString("image");
 			String category = rs.getString("category");
 			String subCategory = rs.getString("subCategory");
+			String provisionSystem = rs.getString("provisionSystem");
 			final String sortBy = rs.getString("sortBy");
-			return new ServiceMappingData(serviceId, serviceCode,
-					serviceIdentification, status, image, category, subCategory, sortBy);
+			return new ServiceMappingData(serviceId, serviceCode,serviceIdentification, status, image, category, subCategory, sortBy,provisionSystem);
 		}
 	}
 
@@ -159,6 +162,27 @@ public class ServiceMappingReadPlatformServiceImpl implements
 			String sql = "select " + mapper.schema() + " and o.id = " + orderId;
 			if (serviceId != null) {
 				sql = sql + " and sd.service_id=" + serviceId;
+			}
+
+			return this.jdbcTemplate.query(sql, mapper, new Object[] {});
+
+		} catch (EmptyResultDataAccessException accessException) {
+			return null;
+		}
+
+	}
+
+	@Override
+	public List<ServiceMappingData> retrieveOptionalServices(String serviceType) {
+
+		try {
+			ServiceMappingDataByIdRowMapper mapper = new ServiceMappingDataByIdRowMapper();
+			String sql = "SELECT s.id as serviceId,s.service_code as serviceCode,ifnull(sp.category,'all') as category,sp.sub_category as subcategory," +
+					" sp.image as image,sp.service_identification as serviceIdentification,s.status as status FROM b_service s " +
+					" left join b_prov_service_details sp on s.id = sp.service_id where s.is_deleted = 'N' "; 
+			
+			if (serviceType != null) {
+				sql = sql + " and s.is_optional= '"+serviceType+"'";
 			}
 
 			return this.jdbcTemplate.query(sql, mapper, new Object[] {});

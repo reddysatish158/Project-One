@@ -16,7 +16,6 @@ import org.mifosplatform.billing.selfcare.domain.SelfCareTemporary;
 import org.mifosplatform.billing.selfcare.domain.SelfCareTemporaryRepository;
 import org.mifosplatform.billing.selfcare.exception.SelfCareNotVerifiedException;
 import org.mifosplatform.billing.selfcare.exception.SelfCareTemporaryEmailIdNotFoundException;
-import org.mifosplatform.billing.selfcare.service.SelfCareRepository;
 import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -198,6 +197,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 	public CommandProcessingResult selfRegistrationProcess(JsonCommand command) {
 
 		try {
+			
 			context.authenticatedUser();
 			Configuration deviceStatusConfiguration = configurationRepository.
 					findOneByName(ConfigurationConstants.CONFIR_PROPERTY_REGISTRATION_DEVICE);

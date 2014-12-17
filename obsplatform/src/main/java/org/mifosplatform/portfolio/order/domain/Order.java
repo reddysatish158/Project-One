@@ -7,6 +7,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -82,7 +83,7 @@ public class Order extends AbstractAuditableCustom<AppUser, Long> {
 	
 	//for OrderDiscount
 	@LazyCollection(LazyCollectionOption.FALSE)
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "orderId", orphanRemoval = true)
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "order", orphanRemoval = true)
 	private List<OrderDiscount> orderDiscount = new ArrayList<OrderDiscount>();
 
 	 public Order() {
@@ -326,5 +327,12 @@ public Order(Long clientId, Long planId, Long contractPeriod, String paytermCode
 	}
 	public void setContractPeriod(Long contarctPeriod) {
 		this.contarctPeriod=contarctPeriod;
+	}
+
+
+	public void addOrderDiscount(OrderDiscount orderDiscount) {
+		orderDiscount.update(this);
+		this.orderDiscount.add(orderDiscount);
+		
 	}
 }
