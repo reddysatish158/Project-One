@@ -49,7 +49,6 @@ public class OrderAddOnsWritePlatformServiceImpl implements OrderAddOnsWritePlat
 	private final ProvisioningWritePlatformService provisioningWritePlatformService;
 	private final OrderAssembler orderAssembler;
 	private final InvoiceClient invoiceClient;
-	private final DiscountMasterRepository discountMasterRepository;
 	private final OrderRepository orderRepository;
 	private final OrderPriceRepository orderPriceRepository;
 	private final HardwareAssociationRepository hardwareAssociationRepository;
@@ -60,7 +59,7 @@ public class OrderAddOnsWritePlatformServiceImpl implements OrderAddOnsWritePlat
 		 final FromJsonHelper fromJsonHelper,final ContractRepository contractRepository,final OrderAssembler orderAssembler,final OrderRepository orderRepository,
 		 final ServiceMappingRepository serviceMappingRepository,final OrderAddonsRepository addonsRepository,final InvoiceClient invoiceClient,
 		 final ProvisioningWritePlatformService provisioningWritePlatformService,final HardwareAssociationRepository associationRepository,
-		 final DiscountMasterRepository discountMasterRepository,final OrderPriceRepository orderPriceRepository ){
+		 final OrderPriceRepository orderPriceRepository ){
 		
 	this.context=context;
 	this.fromJsonHelper=fromJsonHelper;
@@ -72,7 +71,6 @@ public class OrderAddOnsWritePlatformServiceImpl implements OrderAddOnsWritePlat
 	this.orderAssembler=orderAssembler;
 	this.hardwareAssociationRepository=associationRepository;
 	this.invoiceClient=invoiceClient;
-	this.discountMasterRepository=discountMasterRepository;
 	this.addonsRepository=addonsRepository;
 	this.serviceMappingRepository=serviceMappingRepository;
 	
@@ -108,7 +106,7 @@ public CommandProcessingResult createOrderAddons(JsonCommand command,Long orderI
 			
 			if(!"None".equalsIgnoreCase(addons.getProvisionSystem())){
 				this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order, planName, UserActionStatusTypeEnum.ADDON_ACTIVATION.toString(),
-						Long.valueOf(0), null,association.getSerialNo(),orderId, addons.getProvisionSystem(), null);
+						Long.valueOf(0), null,association.getSerialNo(),orderId, addons.getProvisionSystem(),addons.getId());
 			}
 		}
 		

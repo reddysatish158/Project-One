@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
-import org.mifosplatform.portfolio.plan.data.ServiceData;
 import org.mifosplatform.portfolio.servicemapping.data.ServiceCodeData;
 import org.mifosplatform.portfolio.servicemapping.data.ServiceMappingData;
 import org.mifosplatform.provisioning.provisioning.data.ServiceParameterData;
@@ -32,7 +31,8 @@ public class ServiceMappingReadPlatformServiceImpl implements
 		public String schema() {
 
 			return " ps.id as id, bs.service_code as serviceCode, ps.service_identification as serviceIdentification, bs.status as status,ps.image as image, "
-					+ "ps.category as category,ps.sub_category as subCategory from  b_service bs,  b_prov_service_details ps where bs.status='ACTIVE' and ps.service_id=bs.id ORDER BY ps.id ";
+					+ "ps.category as category,ps.sub_category as subCategory,ps.provision_system as provisionSystem " +
+					"   from  b_service bs,  b_prov_service_details ps where bs.status='ACTIVE' and ps.service_id=bs.id ORDER BY ps.id ";
 
 		}
 
@@ -46,8 +46,8 @@ public class ServiceMappingReadPlatformServiceImpl implements
 			String image = rs.getString("image");
 			String category = rs.getString("category");
 			String subCategory = rs.getString("subCategory");
-			return new ServiceMappingData(id, serviceCode,
-					serviceIdentification, status, image, category, subCategory);
+			String provisionSystem = rs.getString("provisionSystem");
+			return new ServiceMappingData(id, serviceCode,serviceIdentification, status, image, category, subCategory,provisionSystem);
 		}
 	}
 
@@ -81,7 +81,7 @@ public class ServiceMappingReadPlatformServiceImpl implements
 		public String schema() {
 
 			return " bs.id as serviceId,bs.service_code as serviceCode, ps.service_identification as serviceIdentification, bs.status as status,"
-					+ "ps.image as image,ps.category as category,ps.sub_category as subCategory  from b_service bs, b_prov_service_details ps ";
+					+ "ps.image as image,ps.category as category,ps.sub_category as subCategory,ps.provision_system as provisionSystem  from b_service bs, b_prov_service_details ps ";
 
 		}
 
@@ -97,8 +97,9 @@ public class ServiceMappingReadPlatformServiceImpl implements
 			String image = rs.getString("image");
 			String category = rs.getString("category");
 			String subCategory = rs.getString("subCategory");
-			return new ServiceMappingData(serviceId, serviceCode,
-					serviceIdentification, status, image, category, subCategory);
+			String provisionSystem = rs.getString("provisionSystem");
+			
+			return new ServiceMappingData(serviceId, serviceCode,serviceIdentification, status, image, category, subCategory,provisionSystem);
 		}
 	}
 

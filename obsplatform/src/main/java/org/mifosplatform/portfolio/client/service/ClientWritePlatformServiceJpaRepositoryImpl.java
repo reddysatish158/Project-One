@@ -363,8 +363,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                       if(order.getStatus().equals(StatusTypeEnum.ACTIVE.getValue().longValue())){
                     	  final CommandProcessingResult processingResult=this.prepareRequestWriteplatformService.prepareNewRequest(order, plan, UserActionStatusTypeEnum.CHANGE_GROUP.toString());
                	        this.ProvisioningWritePlatformService.postOrderDetailsForProvisioning(order,plan.getCode(),UserActionStatusTypeEnum.CHANGE_GROUP.toString(),
-               			processingResult.resourceId(),oldGroup,null,order.getId(),plan.getProvisionSystem(),
-               			this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
+               			processingResult.resourceId(),oldGroup,null,order.getId(),plan.getProvisionSystem(),null);
                       }
             	   }
             		

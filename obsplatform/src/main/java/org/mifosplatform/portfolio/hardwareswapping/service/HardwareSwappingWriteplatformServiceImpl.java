@@ -178,8 +178,7 @@ public CommandProcessingResult doHardWareSwapping(final Long entityId,final Json
 	         //   if(plan.getProvisionSystem().equalsIgnoreCase(ProvisioningApiConstants.PROV_PACKETSPAN)){
 					
 				CommandProcessingResult commandProcessingResult=	this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order,plan.getPlanCode(),UserActionStatusTypeEnum.DEVICE_SWAP.toString(),
-							Long.valueOf(0),null,serialNo,order.getId(),plan.getProvisionSystem(),
-							this.globalConfigurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
+							Long.valueOf(0),null,serialNo,order.getId(),plan.getProvisionSystem(),null);
 				resouceId=commandProcessingResult.resourceId();
 			//	}
 			}

@@ -7,8 +7,19 @@ public class ProvisioningApiConstants {
 	public static final String PROV_COMVENIENT="Comvenient";
 	public static final String PROV_STALKER="Stalker";
 	public static final String PROV_BEENIUS="Beenius";
+
+	//Request Status	
 	public static final String REQUEST_TERMINATE="TERMINATE";
 	public static final String REQUEST_ACTIVATION_VOD="ACTIVATION_VOD";
+	public static final String REQUEST_ACTIVATION="ACTIVATION";
+	public static final String REQUEST_DISCONNECTION ="DISCONNECTION";
+	public static final String REQUEST_RECONNECTION ="RECONNECTION";
+	public static final String REQUEST_RENEWAL_AE ="RENEWAL_AE";
+	public static final String REQUEST_RENEWAL_BE ="RENEWAL_BE";
+	public static final String REQUEST_TERMINATION ="TERMINATION";
+	public static final String REQUEST_REACTIVATION ="REACTIVATION";
+	public static final String REQUEST_SUSPENTATION ="SUSPENTATION";
+	public static final String REQUEST_ADDON_ACTIVATION="ADDON_ACTIVATION";
 	
 	//Json Data
 	public static final String PROV_DATA_CLIENTID="clientId";
@@ -40,3 +51,4 @@ public class ProvisioningApiConstants {
 	public static final String PROV_EVENT_CLOSE_CLIENT="Close Client";
 
 }
+

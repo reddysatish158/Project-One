@@ -166,7 +166,7 @@ public class AllocationReadPlatformServiceImpl implements AllocationReadPlatform
 				}
 
 					@Override
-					public AllocationDetailsData getDisconnectedHardwareItemDetails(final Long orderId,final Long clientId,final String associationType) {
+					public AllocationDetailsData getDisconnectedHardwareItemDetails(final Long orderId,final Long clientId) {
 
 						try {
 							
