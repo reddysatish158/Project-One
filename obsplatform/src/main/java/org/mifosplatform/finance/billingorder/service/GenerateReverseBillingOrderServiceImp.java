@@ -102,18 +102,21 @@ public class GenerateReverseBillingOrderServiceImp implements GenerateReverseBil
 		for (BillingOrderCommand billingOrderCommand : billingOrderCommands) {
 			
 			BigDecimal netChargeTaxAmount = BigDecimal.ZERO;
-			BigDecimal discountAmount = billingOrderCommand.getDiscountMasterData().getDiscountAmount();
+			BigDecimal discountAmount = BigDecimal.ZERO;
+			String discountCode="None";
 			BigDecimal netChargeAmount = billingOrderCommand.getPrice().subtract(discountAmount);
 			
 			DiscountMaster discountMaster = null;
 			if(billingOrderCommand.getDiscountMasterData()!= null){
 				discountMaster = this.discountMasterRepository.findOne(billingOrderCommand.getDiscountMasterData().getId());
+				 discountAmount = billingOrderCommand.getDiscountMasterData().getDiscountAmount();
+				 discountCode=discountMaster.getDiscountCode();
 			}
 			
 			List<InvoiceTaxCommand> invoiceTaxCommands = billingOrderCommand.getListOfTax();
 
 			BillingOrder charge = new BillingOrder(billingOrderCommand.getClientId(), billingOrderCommand.getClientOrderId(), billingOrderCommand.getOrderPriceId(),
-					billingOrderCommand.getChargeCode(),billingOrderCommand.getChargeType(),discountMaster.getDiscountCode(), billingOrderCommand.getPrice(), discountAmount,
+					billingOrderCommand.getChargeCode(),billingOrderCommand.getChargeType(),discountCode, billingOrderCommand.getPrice(), discountAmount,
 					netChargeAmount, billingOrderCommand.getStartDate(), billingOrderCommand.getEndDate());
 			//client taxExemption
 			if(tax.getTaxExemption().equalsIgnoreCase("N")){

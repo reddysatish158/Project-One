@@ -105,7 +105,8 @@ public OrderAssembler(final OrderDetailsReadPlatformServices orderDetailsReadPla
 				//discount Order
 				OrderDiscount orderDiscount=new OrderDiscount(order,price,discountMaster.getId(),discountMaster.getStartDate(),null,discountMaster.getDiscountType(),
 						discountMaster.getDiscountRate());
-				price.addOrderDiscount(orderDiscount);
+				//price.addOrderDiscount(orderDiscount);
+				order.addOrderDiscount(orderDiscount);
 			}
 			
 			for (ServiceData data : details) {

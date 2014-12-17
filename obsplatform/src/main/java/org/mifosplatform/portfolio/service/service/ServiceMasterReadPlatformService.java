@@ -13,7 +13,7 @@ import org.mifosplatform.portfolio.service.data.ServiceMasterOptionsData;
 public interface ServiceMasterReadPlatformService {
 	
 
-	List<ServiceData> retrieveAllServices();
+	List<ServiceData> retrieveAllServices(String serviceType);
 	
 	 Collection<ServiceMasterData> retrieveAllServiceMasterData() ;
 

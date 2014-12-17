@@ -18,6 +18,8 @@ public interface ServiceMappingReadPlatformService {
 	ServiceMappingData getServiceMapping(Long serviceMappingId);
 
 	List<ServiceParameterData> getSerivceParameters(Long orderId, Long serviceId);
+
+	List<ServiceMappingData> retrieveOptionalServices(String string);
 	
 //	ServiceMappingData getServiceMapping(Long serviceMappingId);
 

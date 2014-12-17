@@ -51,6 +51,7 @@ public class OrderData {
 	private Collection<MCodeData> extensionPeriodDatas;
 	private String groupName;
 	private Long planStatus;
+	private List<OrderAddonsData> orderAddonsDatas;
 
 	public OrderData(List<PlanCodeData> allowedtypes,List<PaytermData> paytermData,
 			List<SubscriptionData> contractPeriod, OrderData data) {
@@ -107,12 +108,13 @@ public class OrderData {
 	}
 
 	public OrderData(List<OrderPriceData> priceDatas, List<OrderHistoryData> historyDatas, OrderData orderDetailsData,
-			  List<OrderLineData> services, List<OrderDiscountData> discountDatas) {
+			  List<OrderLineData> services, List<OrderDiscountData> discountDatas, List<OrderAddonsData> orderAddonsDatas) {
 		this.orderPriceData = priceDatas;
 		this.orderHistory=historyDatas;
 		this.orderData=orderDetailsData;
 		this.orderServices=services;
 		this.orderDiscountDatas=discountDatas;
+		this.orderAddonsDatas=orderAddonsDatas;
        
 	}
 

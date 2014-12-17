@@ -64,11 +64,11 @@ public class BillingOrderReadPlatformServiceImplementation implements BillingOrd
 		public String orderIdSchema() {
 			
 			return " distinct os.id as orderId,op.duration_type as durationType,Date_format(IFNULL(op.invoice_tilldate,op.bill_start_date), '%Y-%m-%d') as billStartDate," +
-				    "ifnull(os.next_billable_day,op.bill_start_date) as  nextBillableDate FROM b_orders os "+
+				    "ifnull(op.next_billable_day,op.bill_start_date) as  nextBillableDate FROM b_orders os "+
 					" left outer join b_order_price op on os.id = op.order_id"+
-					" WHERE os.client_id = ? and os.order_status=1 AND Date_format(IFNULL(os.next_billable_day, ?), '%Y-%m-%d') < ? and os.is_deleted = 'N' "+
-					" and Date_format(IFNULL(os.next_billable_day,Date_format(IFNULL(op.bill_start_date, '3099-12-12'),'%Y-%m-%d')), '%Y-%m-%d')" +
-					" <=Date_format(IFNULL(op.bill_end_date, '3099-12-12'),'%Y-%m-%d'); ";
+					" WHERE os.client_id = ? and os.order_status=1 AND Date_format(IFNULL(op.next_billable_day, ?), '%Y-%m-%d') <= ? and os.is_deleted = 'N' "+
+					" and Date_format(IFNULL(op.next_billable_day,Date_format(IFNULL(op.bill_start_date, '3099-12-12'),'%Y-%m-%d')), '%Y-%m-%d')" +
+					" <=Date_format(IFNULL(op.bill_end_date, '3099-12-12'),'%Y-%m-%d') group by os.id; ";
 		}
 		
 	}

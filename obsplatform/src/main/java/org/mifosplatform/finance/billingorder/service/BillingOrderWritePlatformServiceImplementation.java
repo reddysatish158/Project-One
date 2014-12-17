@@ -30,7 +30,7 @@ public class BillingOrderWritePlatformServiceImplementation implements BillingOr
 		this.clientBalanceRepository = clientBalanceRepository;
 	}
 
-	@Transactional
+
 	@Override
 	public CommandProcessingResult updateBillingOrder(List<BillingOrderCommand> commands) {
 		Order clientOrder = null;
@@ -48,7 +48,7 @@ public class BillingOrderWritePlatformServiceImplementation implements BillingOr
 							orderPriceData.setNextBillableDay(billingOrderCommand.getNextBillableDate());
 						}
 				}
-				this.orderRepository.save(clientOrder);
+				this.orderRepository.saveAndFlush(clientOrder);
 		}
 	
 		return new CommandProcessingResult(Long.valueOf(clientOrder.getId()));

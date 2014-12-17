@@ -10,12 +10,13 @@ public class PrepareRequestData {
 	private final String provisioningSystem;
 	private final String planName;
 	private final String ishardwareReq;
+	private final Long addonId;
 
 	
 
 	
 	public PrepareRequestData(Long id, Long clientId, Long orderId,String requestType, String hardWareId, String userName,
-			String provisioningSys, String planName, String ishwReq) {
+			String provisioningSys, String planName, String ishwReq, Long addonId) {
 		      this.requestId=id;
 		      this.clientId=clientId;
 		      this.orderId=orderId;
@@ -25,6 +26,7 @@ public class PrepareRequestData {
 		      this.provisioningSystem=provisioningSys;
 		      this.planName=planName;
 		      this.ishardwareReq=ishwReq;
+		      this.addonId=addonId;
 		      
 		
 	}
@@ -48,6 +50,11 @@ public class PrepareRequestData {
 	}
 
 	
+
+	public Long getAddonId() {
+		return addonId;
+	}
+
 
 	public String getHardwareId() {
 		return hardwareId;

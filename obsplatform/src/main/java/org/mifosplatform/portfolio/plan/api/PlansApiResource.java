@@ -115,7 +115,7 @@ public class PlansApiResource  {
 	
 	private PlanData handleTemplateData(PlanData planData) {
 		
-		 final List<ServiceData> data = this.serviceMasterReadPlatformService.retrieveAllServices();
+		 final List<ServiceData> data = this.serviceMasterReadPlatformService.retrieveAllServices("N");
 	     final List<BillRuleData> billData = this.planReadPlatformService.retrievebillRules();
 		 final List<EnumOptionData> status = this.planReadPlatformService.retrieveNewStatus();
 		 final Collection<MCodeData> provisionSysData = this.mCodeReadPlatformService.getCodeValue("Provisioning");

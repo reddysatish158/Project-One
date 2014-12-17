@@ -31,6 +31,8 @@ import org.mifosplatform.infrastructure.core.serialization.ApiRequestJsonSeriali
 import org.mifosplatform.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.mifosplatform.infrastructure.core.service.Page;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
+import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
+import org.mifosplatform.organisation.mcodevalues.service.MCodeReadPlatformService;
 import org.mifosplatform.portfolio.plan.service.PlanReadPlatformService;
 import org.mifosplatform.portfolio.servicemapping.data.ServiceCodeData;
 import org.mifosplatform.portfolio.servicemapping.data.ServiceMappingData;
@@ -45,32 +47,30 @@ import org.springframework.stereotype.Component;
 public class ServiceMappingApiResource {
 
 	private final Set<String> RESPONSE_PARAMETERS = new HashSet<String>(
-			Arrays.asList("id", "serviceCode", "serviceId",
-					"serviceIdentification", "status", "image"));
+			Arrays.asList("id", "serviceCode", "serviceId","serviceIdentification", "status", "image"));
+	
 	private final String resourceNameForPermissions = "SERVICEMAPPING";
-
-	private PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService;
-	private DefaultToApiJsonSerializer<ServiceMappingData> toApiJsonSerializer;
-	private ApiRequestParameterHelper apiRequestParameterHelper;
-	private PlatformSecurityContext context;
-	private ServiceMappingReadPlatformService serviceMappingReadPlatformService;
+	private final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService;
+	private final DefaultToApiJsonSerializer<ServiceMappingData> toApiJsonSerializer;
+	private final ApiRequestParameterHelper apiRequestParameterHelper;
+	private final PlatformSecurityContext context;
+	private final ServiceMappingReadPlatformService serviceMappingReadPlatformService;
 	private final PlanReadPlatformService planReadPlatformService;
 	private final PaymentReadPlatformService paymodeReadPlatformService;
+	private final MCodeReadPlatformService mCodeReadPlatformService;
 
 	@Autowired
-	public ServiceMappingApiResource(
-			final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService,
-			final DefaultToApiJsonSerializer<ServiceMappingData> toApiJsonSerializer,
-			final ApiRequestParameterHelper apiRequestParameterHelper,
-			final PlatformSecurityContext context,
-			final ServiceMappingReadPlatformService serviceMappingReadPlatformService,
-			final PlanReadPlatformService planReadPlatformService,
-			final PaymentReadPlatformService paymodeReadPlatformService) {
-		this.commandSourceWritePlatformService = commandSourceWritePlatformService;
+	public ServiceMappingApiResource(final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService,
+			final DefaultToApiJsonSerializer<ServiceMappingData> toApiJsonSerializer,final ApiRequestParameterHelper apiRequestParameterHelper,
+			final PlatformSecurityContext context,final ServiceMappingReadPlatformService serviceMappingReadPlatformService,
+			final PlanReadPlatformService planReadPlatformService,final PaymentReadPlatformService paymodeReadPlatformService,
+			final MCodeReadPlatformService mCodeReadPlatformService) {
+
 		this.context = context;
 		this.toApiJsonSerializer = toApiJsonSerializer;
 		this.planReadPlatformService = planReadPlatformService;
 		this.apiRequestParameterHelper = apiRequestParameterHelper;
+		this.mCodeReadPlatformService=mCodeReadPlatformService;
 		this.commandSourceWritePlatformService = commandSourceWritePlatformService;
 		this.serviceMappingReadPlatformService = serviceMappingReadPlatformService;
 		this.paymodeReadPlatformService = paymodeReadPlatformService;
@@ -100,14 +100,11 @@ public class ServiceMappingApiResource {
 		final List<ServiceCodeData> serviceCodeData = this.serviceMappingReadPlatformService.getServiceCode();
 
 		final List<EnumOptionData> status = this.planReadPlatformService.retrieveNewStatus();
-		// Collection<ReportParameterData>
-		// serviceParameters=this.readReportingService.getAllowedServiceParameters();
 		final Collection<McodeData> categories = this.paymodeReadPlatformService.retrievemCodeDetails("Service Category");
 		final Collection<McodeData> subCategories = this.paymodeReadPlatformService.retrievemCodeDetails("Asset language");
-		final ServiceMappingData serviceMappingData = new ServiceMappingData(null,
-				serviceCodeData, status, null, categories, subCategories);
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper
-				.process(uriInfo.getQueryParameters());
+		final Collection<MCodeData> provisionSysData = this.mCodeReadPlatformService.getCodeValue("Provisioning");
+		final ServiceMappingData serviceMappingData = new ServiceMappingData(null,serviceCodeData, status, null, categories, subCategories,provisionSysData);
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 		return this.toApiJsonSerializer.serialize(settings, serviceMappingData, RESPONSE_PARAMETERS);
 	}
 
@@ -135,10 +132,13 @@ public class ServiceMappingApiResource {
 		final List<EnumOptionData> status = this.planReadPlatformService.retrieveNewStatus();
 		final Collection<McodeData> categories = this.paymodeReadPlatformService.retrievemCodeDetails("Service Category");
 		final Collection<McodeData> subCategories = this.paymodeReadPlatformService.retrievemCodeDetails("Asset language");
+		final Collection<MCodeData> provisionSysData = this.mCodeReadPlatformService.getCodeValue("Provisioning");
 		serviceMappingData.setServiceCodeData(this.serviceMappingReadPlatformService.getServiceCode());
+		
 		serviceMappingData.setStatusData(status);
 		serviceMappingData.setCategories(categories);
 		serviceMappingData.setSubCategories(subCategories);
+		serviceMappingData.setProvisionSysData(provisionSysData);
 		}
 		return this.toApiJsonSerializer.serialize(settings, serviceMappingData, RESPONSE_PARAMETERS);
 	}
@@ -154,4 +154,6 @@ public class ServiceMappingApiResource {
 		final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 	}
+	
+	
 }
