@@ -39,6 +39,9 @@ public class ServiceMapping extends AbstractPersistable<Long> {
 	@Column(name = "provision_system")
 	private String provisionSystem;
 
+	@Column(name = "sort_by")
+	private Integer sortBy;
+
 	public ServiceMapping() {
 	}
 
@@ -154,5 +157,12 @@ public class ServiceMapping extends AbstractPersistable<Long> {
 		return actualChanges;
 
 	}
+	
+	public Integer getSortBy() {
+		return sortBy;
+	}
 
+	public void setSortBy(Integer sortBy) {
+		this.sortBy = sortBy;
+	}
 }

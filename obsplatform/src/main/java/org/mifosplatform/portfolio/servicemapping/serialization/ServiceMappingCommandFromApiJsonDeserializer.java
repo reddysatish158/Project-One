@@ -23,8 +23,10 @@ import com.google.gson.reflect.TypeToken;
 @Component
 public class ServiceMappingCommandFromApiJsonDeserializer {
 	
+
 	final private Set<String> supportedParameters = new HashSet<String>(Arrays.asList("serviceId","serviceIdentification","status","image","category",
 			                                     "subCategory","provisionSystem"));
+
 	private final FromJsonHelper fromApiJsonHelper;  
 	
 	@Autowired
@@ -32,7 +34,7 @@ public class ServiceMappingCommandFromApiJsonDeserializer {
 		this.fromApiJsonHelper = fromApiJsonHelper;
 	}
 
-	 public void validateForCreate(final String json) {
+	 public void validateForCreate(final String json, Boolean isSortValue) {
 	        if (StringUtils.isBlank(json)) { throw new InvalidJsonException(); }
 
 	        final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
@@ -42,7 +44,11 @@ public class ServiceMappingCommandFromApiJsonDeserializer {
 	        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("ServiceMapping");
 
 	        final JsonElement element = fromApiJsonHelper.parse(json);
-
+	        
+	        if(isSortValue){
+	        	final Integer sortBy = fromApiJsonHelper.extractIntegerWithLocaleNamed("sortBy", element);
+	        	baseDataValidator.reset().parameter("sortBy").value(sortBy).notExceedingLengthOf(5);
+	        }else{
 	        final Long serviceId = fromApiJsonHelper.extractLongNamed("serviceId", element);
 	        final String serviceIdentification = fromApiJsonHelper.extractStringNamed("serviceIdentification", element);
 	        final String status = fromApiJsonHelper.extractStringNamed("status", element);
@@ -54,9 +60,15 @@ public class ServiceMappingCommandFromApiJsonDeserializer {
 			baseDataValidator.reset().parameter("serviceIdentification").value(serviceIdentification).notBlank();
 			baseDataValidator.reset().parameter("status").value(status).notBlank();
 			baseDataValidator.reset().parameter("image").value(image).notBlank();
+
 			baseDataValidator.reset().parameter("provisionSystem").value(provisionSystem).notBlank();
 			//baseDataValidator.reset().parameter("subCategory").value(subCategory).notBlank();*/
 		
+
+			/*baseDataValidator.reset().parameter("category").value(category).notBlank();
+			baseDataValidator.reset().parameter("subCategory").value(subCategory).notBlank();*/
+	        }
+
 
 	        throwExceptionIfValidationWarningsExist(dataValidationErrors);
 	    }

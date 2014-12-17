@@ -12,6 +12,11 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @Table(name="b_clientuser",uniqueConstraints = @UniqueConstraint(name = "username", columnNames = { "username","unique_reference"}))
 public class SelfCare extends AbstractPersistable<Long>{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Column(name="client_id")
 	private Long clientId;
 	
@@ -23,9 +28,6 @@ public class SelfCare extends AbstractPersistable<Long>{
 	
 	@Column(name="unique_reference")
 	private String uniqueReference;
-	
-	@Column(name="national_id")
-	private String nationalId;
 	
 	@Column(name="status")
 	private String status;
@@ -46,36 +48,26 @@ public class SelfCare extends AbstractPersistable<Long>{
 	private Long zebraSubscriberId;
 	
 	public SelfCare() {
-		// TODO Auto-generated constructor stub
+		
 	}
-	public SelfCare(Long clientId,String userName, String password, String uniqueReference, Boolean isDeleted,String nationalId,String device){
+	
+	public SelfCare(Long clientId,String userName, String password, String uniqueReference, Boolean isDeleted,String device){
 		this.clientId = clientId;
 		this.userName = userName;
 		this.password = password;
 		this.uniqueReference = uniqueReference;
 		this.isDeleted = isDeleted;
 		this.status="INACTIVE";
-		this.nationalId=nationalId;
 		this.deviceId=device;
 	}
 	
 	public static SelfCare fromJson(JsonCommand command) {
-		//String userName = command.stringValueOfParameterNamed("userName");
 		String uniqueReference = command.stringValueOfParameterNamed("uniqueReference");
-		String nationalId = command.stringValueOfParameterNamed("nationalId");
 		String device = command.stringValueOfParameterNamed("device");
-		return new SelfCare(null,uniqueReference, null, uniqueReference,false,nationalId,device);
-	/*	selfCare.setUserName(userName);
-		selfCare.setUniqueReference(uniqueReference);
-		selfCare.setNationalId(nationalId);
-		selfCare.setIsDeleted(false);
-		selfCare.setStatus("INACTIVE");*/
-		 
-		
+		return new SelfCare(null,uniqueReference, null, uniqueReference,false,device);
 	}
 	
 	public static SelfCare fromJsonODP(JsonCommand command) {
-		//String userName = command.stringValueOfParameterNamed("userName");
 		String uniqueReference = command.stringValueOfParameterNamed("uniqueReference");
 		String password = command.stringValueOfParameterNamed("password");
 		SelfCare selfCare = new SelfCare();
@@ -112,12 +104,7 @@ public class SelfCare extends AbstractPersistable<Long>{
 	public void setUniqueReference(String uniqueReference) {
 		this.uniqueReference = uniqueReference;
 	}
-	public String getNationalId() {
-		return nationalId;
-	}
-	public void setNationalId(String nationalId) {
-		this.nationalId = nationalId;
-	}
+
 	public Boolean getIsDeleted() {
 		return isDeleted;
 	}

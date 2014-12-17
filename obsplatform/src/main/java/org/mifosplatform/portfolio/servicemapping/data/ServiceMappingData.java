@@ -27,6 +27,7 @@ public class ServiceMappingData {
 	private Collection<McodeData> subCategories;
 	private Collection<MCodeData> provisionSysData;
 	private String provisionSystem;
+	private String sortBy;
 	
 	public Collection<McodeData> getCategories() {
 		return categories;
@@ -49,9 +50,8 @@ public class ServiceMappingData {
 
 	
 
-	public ServiceMappingData(final Long id, final String serviceCode, 
-			final String serviceIndentification, final String status,
-			final String image, final String category, final String subCategory, String provisionSystem) {
+	public ServiceMappingData(final Long id, final String serviceCode,final String serviceIndentification, final String status,
+			final String image, final String category, final String subCategory, String provisionSystem,final String sortBy) {
 		
 		this.id=id;
 		this.serviceCode=serviceCode;
@@ -61,6 +61,7 @@ public class ServiceMappingData {
 		this.category=category;
 		this.provisionSystem=provisionSystem;
 		this.subCategory=subCategory;
+		this.sortBy = sortBy;
 	}
 	
 	public ServiceMappingData( final List<ServiceMappingData> serviceMappingData,	

@@ -193,10 +193,10 @@ public class OrderReadPlatformServiceImpl implements OrderReadPlatformService
 	@Override
 	public List<OrderData> retrieveClientOrderDetails(Long clientId) {
 		try {
-			final ClientOrderMapper mapper = new ClientOrderMapper();
+			final ClientOrderMapper mapper = new ClientOrderMapper(); //and  o.order_status != 3
 
 			final String sql = "select " + mapper.clientOrderLookupSchema()+" where o.plan_id = p.id and o.client_id= ? and o.is_deleted='n' and " +
-					"o.contract_period = co.id and  o.order_status != 3 AND c.id=o.client_id order by o.id desc";
+					"o.contract_period = co.id AND c.id=o.client_id order by o.id desc";
 
 			return jdbcTemplate.query(sql, mapper, new Object[] { clientId});
 			} catch (EmptyResultDataAccessException e) {
