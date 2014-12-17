@@ -1224,4 +1224,8 @@ public class CommandWrapper {
 		public boolean isOnlinePaymentGateway() {
 			return this.actionName.equalsIgnoreCase("ONLINE") && this.entityName.equalsIgnoreCase("PAYMENTGATEWAY");
 		}
+		
+		public boolean isLinkupAccount() {
+			return this.entityName.equalsIgnoreCase("LINKUPACCOUNT");
+		}
 }
