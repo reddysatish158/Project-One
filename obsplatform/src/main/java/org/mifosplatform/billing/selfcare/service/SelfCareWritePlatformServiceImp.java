@@ -83,11 +83,13 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 		
 		SelfCare selfCare = null;
 		Long clientId = null;
+		String password = null;
 		try{
 			context.authenticatedUser();
 			selfCareCommandFromApiJsonDeserializer.validateForCreate(command);
 			selfCare = SelfCare.fromJson(command);
 			clientId = command.longValueOfParameterNamed("clientId");
+			password = command.stringValueOfParameterNamed("password");
 			if(clientId == null){
 				try{
 					clientId = selfCareReadPlatformService.getClientId(selfCare.getUniqueReference());					
@@ -109,9 +111,14 @@ public class SelfCareWritePlatformServiceImp implements SelfCareWritePlatformSer
 			if(clientId !=null && clientId > 0 ){
 				
 				selfCare.setClientId(clientId);
-				RandomPasswordGenerator passwordGenerator = new RandomPasswordGenerator(8);
-				String unencodedPassword = passwordGenerator.generate();
-				selfCare.setPassword(unencodedPassword);
+				if(password != null && password != ""){
+					selfCare.setPassword(password);
+				}else{
+					RandomPasswordGenerator passwordGenerator = new RandomPasswordGenerator(8);
+					String unencodedPassword = passwordGenerator.generate();
+					selfCare.setPassword(unencodedPassword);
+				}
+				
 				selfCareRepository.save(selfCare);
 				if(mailnotification){
 				//platformEmailService.sendToUserAccount(new EmailDetail("OBS Self Care Organisation ", "SelfCare",email, selfCare.getUserName()), unencodedPassword); 

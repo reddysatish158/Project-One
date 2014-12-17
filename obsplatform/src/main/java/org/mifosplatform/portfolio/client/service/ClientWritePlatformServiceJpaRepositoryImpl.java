@@ -286,6 +286,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 				selfcarecreation.put("clientId", newClient.getId());
 				selfcarecreation.put("device", command.stringValueOfParameterNamed("device"));
 				selfcarecreation.put("mailNotification", true);
+				selfcarecreation.put("password", newClient.getPassword());
 
 				final CommandWrapper selfcareCommandRequest = new CommandWrapperBuilder().createSelfCare()
 						.withJson(selfcarecreation.toString()).build();
