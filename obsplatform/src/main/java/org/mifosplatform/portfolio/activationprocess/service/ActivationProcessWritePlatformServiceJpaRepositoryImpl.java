@@ -331,7 +331,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 							bookDevice.put("quantity", id);
 							bookDevice.put("locale", "en");
 							bookDevice.put("dateFormat", dateFormat);
-							bookDevice.put("saleType", "SALE");
+							bookDevice.put("saleType", "NEWSALE");
 							bookDevice.put("saleDate", activationDate);
 							bookDevice.put("serialNumber", serialNumber);
 
