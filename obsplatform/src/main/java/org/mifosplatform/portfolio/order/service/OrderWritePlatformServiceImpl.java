@@ -68,14 +68,12 @@ import org.mifosplatform.portfolio.order.serialization.OrderCommandFromApiJsonDe
 import org.mifosplatform.portfolio.plan.domain.Plan;
 import org.mifosplatform.portfolio.plan.domain.PlanDetails;
 import org.mifosplatform.portfolio.plan.domain.PlanRepository;
-import org.mifosplatform.portfolio.service.domain.ProvisionServiceDetailsRepository;
 import org.mifosplatform.portfolio.service.domain.ServiceMaster;
 import org.mifosplatform.portfolio.service.domain.ServiceMasterRepository;
 import org.mifosplatform.provisioning.preparerequest.domain.PrepareRequest;
 import org.mifosplatform.provisioning.preparerequest.domain.PrepareRequsetRepository;
 import org.mifosplatform.provisioning.preparerequest.exception.PrepareRequestActivationException;
 import org.mifosplatform.provisioning.preparerequest.service.PrepareRequestReadplatformService;
-import org.mifosplatform.provisioning.processrequest.domain.ProcessRequestRepository;
 import org.mifosplatform.provisioning.provisioning.service.ProvisioningWritePlatformService;
 import org.mifosplatform.useradministration.domain.AppUser;
 import org.mifosplatform.workflow.eventaction.data.ActionDetaislData;
@@ -108,13 +106,11 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 	private final OrderAssembler  orderAssembler;
 	private final ClientRepository clientRepository;
 	private final EventValidationReadPlatformService eventValidationReadPlatformService;
-	private final ProvisionServiceDetailsRepository provisionServiceDetailsRepository;
 	private final PrepareRequestReadplatformService prepareRequestReadplatformService;
 	private final ActiondetailsWritePlatformService actiondetailsWritePlatformService;
 	private final ContractPeriodReadPlatformService contractPeriodReadPlatformService;
 	private final PrepareRequestWriteplatformService prepareRequestWriteplatformService;
 	private final HardwareAssociationWriteplatformService associationWriteplatformService;
-	private final ProcessRequestRepository processRequestRepository;
 	private final OrderReadPlatformService orderReadPlatformService;
 	private final ServiceMasterRepository serviceMasterRepository;
 	private final PrepareRequsetRepository prepareRequsetRepository;
@@ -146,8 +142,8 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 			final PrepareRequestWriteplatformService prepareRequestWriteplatformService,final OrderHistoryRepository orderHistoryRepository,
 			final  ConfigurationRepository configurationRepository,final AllocationReadPlatformService allocationReadPlatformService,
 			final HardwareAssociationWriteplatformService associationWriteplatformService,final PrepareRequestReadplatformService prepareRequestReadplatformService,
-			final ProvisionServiceDetailsRepository provisionServiceDetailsRepository,final OrderReadPlatformService orderReadPlatformService,
-		    final ProcessRequestRepository processRequestRepository,final HardwareAssociationReadplatformService hardwareAssociationReadplatformService,
+			final OrderReadPlatformService orderReadPlatformService,
+		    final HardwareAssociationReadplatformService hardwareAssociationReadplatformService,
 		    final PrepareRequsetRepository prepareRequsetRepository,final PromotionCodeRepository promotionCodeRepository,
 		    final OrderDiscountRepository orderDiscountRepository, final OrderAssembler orderAssembler,
 		    final ClientRepository clientRepository,final ActionDetailsReadPlatformService actionDetailsReadPlatformService,
@@ -164,7 +160,6 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 		this.fromApiJsonDeserializer=fromApiJsonDeserializer;
 		this.configurationRepository=configurationRepository;
 		this.orderDiscountRepository=orderDiscountRepository;
-		this.processRequestRepository=processRequestRepository;
 		this.prepareRequsetRepository=prepareRequsetRepository;
 		this.orderReadPlatformService = orderReadPlatformService;
 		this.paymentFollowupRepository=paymentFollowupRepository;
@@ -180,7 +175,6 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 		this.promotionCodeRepository=promotionCodeRepository;
 		this.provisioningWritePlatformService=provisioningWritePlatformService;
 		this.prepareRequestReadplatformService=prepareRequestReadplatformService;
-		this.provisionServiceDetailsRepository=provisionServiceDetailsRepository;
 		this.actiondetailsWritePlatformService=actiondetailsWritePlatformService;
 		this.contractPeriodReadPlatformService=contractPeriodReadPlatformService;
 		this.prepareRequestWriteplatformService=prepareRequestWriteplatformService;
