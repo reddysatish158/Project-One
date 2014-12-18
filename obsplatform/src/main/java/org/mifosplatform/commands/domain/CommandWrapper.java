@@ -1232,4 +1232,8 @@ public class CommandWrapper {
 		public boolean isAddons() {
 			return this.entityName.equalsIgnoreCase("ADDONS");
 		}
+		
+		public boolean isLinkupAccount() {
+			return this.entityName.equalsIgnoreCase("LINKUPACCOUNT");
+		}
 }
