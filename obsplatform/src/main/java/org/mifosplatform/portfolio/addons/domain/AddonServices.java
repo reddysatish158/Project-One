@@ -1,6 +1,5 @@
 package org.mifosplatform.portfolio.addons.domain;
 
-import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -16,11 +15,7 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
-import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
-import org.mifosplatform.portfolio.plan.domain.PlanDetails;
 import org.mifosplatform.useradministration.domain.AppUser;
-
-import com.google.gson.JsonElement;
 
 @Entity
 @Table(name="b_addons_service")

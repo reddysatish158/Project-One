@@ -53,7 +53,7 @@ private class OrderAddonMapper implements RowMapper<OrderAddonsData>{
 	
 		return " ad.id as id,ad.service_id as serviceId,s.service_code as serviceCode,ad.start_date as startDate, ad.end_date as endDate," +
 				" ad.status as status,op.price as price FROM b_orders_addons ad, b_service s, b_order_price op " +
-				" WHERE ad.service_id =s.id and op.service_id = s.id and ad.order_id =? and ad.is_deleted = 'N' group by ad.id;";
+				" WHERE ad.service_id =s.id and op.service_id = s.id and ad.order_id=op.order_id and ad.order_id =? and ad.is_deleted = 'N' group by ad.id;";
 	}
 	
 	@Override
