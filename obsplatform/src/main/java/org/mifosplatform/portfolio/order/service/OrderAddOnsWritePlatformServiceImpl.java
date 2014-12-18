@@ -1,12 +1,9 @@
 package org.mifosplatform.portfolio.order.service;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 
 import org.joda.time.LocalDate;
-import org.mifosplatform.billing.discountmaster.domain.DiscountMaster;
-import org.mifosplatform.billing.discountmaster.domain.DiscountMasterRepository;
 import org.mifosplatform.finance.billingorder.service.InvoiceClient;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
@@ -19,7 +16,6 @@ import org.mifosplatform.portfolio.order.domain.HardwareAssociationRepository;
 import org.mifosplatform.portfolio.order.domain.Order;
 import org.mifosplatform.portfolio.order.domain.OrderAddons;
 import org.mifosplatform.portfolio.order.domain.OrderAddonsRepository;
-import org.mifosplatform.portfolio.order.domain.OrderDiscount;
 import org.mifosplatform.portfolio.order.domain.OrderPrice;
 import org.mifosplatform.portfolio.order.domain.OrderPriceRepository;
 import org.mifosplatform.portfolio.order.domain.OrderRepository;
@@ -141,6 +137,7 @@ private OrderAddons assembleOrderAddons(JsonElement jsonElement,FromJsonHelper f
 	this.orderPriceRepository.saveAndFlush(orderPrice);
 	this.orderRepository.saveAndFlush(order);
 	List<ServiceMapping> serviceMapping=this.serviceMappingRepository.findOneByServiceId(orderAddons.getServiceId());
+	if(serviceMapping.isEmpty()){ throw new AddonEndDateValidationException(orderAddons.getServiceId().toString());}
 	String status=StatusTypeEnum.ACTIVE.toString();
 	if(!"None".equalsIgnoreCase(serviceMapping.get(0).getProvisionSystem())){
 		status=StatusTypeEnum.PENDING.toString();
