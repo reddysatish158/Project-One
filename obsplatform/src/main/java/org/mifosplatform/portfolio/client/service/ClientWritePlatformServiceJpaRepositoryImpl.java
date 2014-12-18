@@ -302,8 +302,10 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             ProvisionActions provisionActions=this.provisioningActionsRepository.findOneByProvisionType(ProvisioningApiConstants.PROV_EVENT_CREATE_CLIENT);
 			
             if(provisionActions != null && provisionActions.isEnable() == 'Y'){
-				this.prepareRequestWriteplatformService.prepareRequestForRegistration(newClient.getId(),provisionActions.getAction(),
-						   provisionActions.getProvisioningSystem());
+				/*this.prepareRequestWriteplatformService.prepareRequestForRegistration(newClient.getId(),provisionActions.getAction(),
+						   provisionActions.getProvisioningSystem());*/
+				this.ProvisioningWritePlatformService.postDetailsForProvisioning(newClient.getId(),ProvisioningApiConstants.REQUEST_CLIENT_ACTIVATION,
+						               provisionActions.getProvisioningSystem(),null);
 			}
 
             
