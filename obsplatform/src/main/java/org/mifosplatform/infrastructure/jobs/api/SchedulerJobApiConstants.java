@@ -31,7 +31,7 @@ public class SchedulerJobApiConstants {
     
     public static final String JOB_INVOICE = "Invoice";
     public static final String JOB_GENERATE_STATEMENT = "Generate Statment";
-    public static final String JOB_MESSANGER = "Messanger";
+    //public static final String JOB_MESSANGER = "Messanger";
     public static final String JOB_AUTO_EXIPIRY= "Auto Exipiry";
     public static final String jobReportName = "reportName";
     public static final String jobIsDynamic = "isDynamic";
@@ -53,6 +53,7 @@ public class SchedulerJobApiConstants {
     public static final String JOB_SIMULATOR="Simulator";
     public static final String jobisCreateTicket="isCreateTicket";
     public static final String jobTicket="Ticket";
+    public static final String JOB_MESSANGER = "Merge Messages";
     
     public static final Set<String> JOB_DETAIL_RESPONSE_DATA_PARAMETERS = new HashSet<String>(Arrays.asList(jobIdentifierParamName,
             displayNameParamName, nextRunTimeParamName, initializingErrorParamName, cronExpressionParamName, jobActiveStatusParamName,
