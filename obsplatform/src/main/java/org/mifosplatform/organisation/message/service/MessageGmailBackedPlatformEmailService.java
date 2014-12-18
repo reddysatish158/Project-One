@@ -15,7 +15,6 @@ import java.util.Properties;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
-import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
@@ -130,34 +129,33 @@ public class MessageGmailBackedPlatformEmailService implements MessagePlatformEm
 						.append(emailDetail.getFooter());
 
 				// 3) create MimeBodyPart object and set your message text
-				BodyPart messageBodyPart = new MimeBodyPart();
-				//messageBodyPart.setText(messageBuilder.toString());
+				MimeBodyPart messageBodyPart = new MimeBodyPart();
 				messageBodyPart.setContent(messageBuilder.toString(),"text/html");
-
+				
+				// 4) create new MimeBodyPart object and set DataHandler object to this object
+				MimeBodyPart mimeBodyAttachPart = new MimeBodyPart();
+				String filelocation = emailDetail.getAttachment();// change accordingly
+				
+				if (filelocation != null) {
+					DataSource source = new FileDataSource(filelocation);
+					mimeBodyAttachPart.setDataHandler(new DataHandler(source));
+					mimeBodyAttachPart.setFileName(source.getName());
+				}
+				
 				// 5) create Multipart object and add MimeBodyPart objects to this object
 				Multipart multipart = new MimeMultipart();
 				multipart.addBodyPart(messageBodyPart);
-				if (emailDetail.getAttachment() != null) {
-					Date date = new Date();
-					String dateTime = date.getHours() + "" + date.getMinutes();
-					String fileName = "statement_" + new LocalDate().toString().replace("-", "") + "_" + dateTime + ".pdf";
-					
-					// 4) create new MimeBodyPart object and set DataHandler object to this object
-					MimeBodyPart mimeBodyPart = new MimeBodyPart();
-					String filename = emailDetail.getAttachment();// change accordingly
-					DataSource source = new FileDataSource(filename);
-					mimeBodyPart.setDataHandler(new DataHandler(source));
-					mimeBodyPart.setFileName(fileName);
-					multipart.addBodyPart(mimeBodyPart);
+				
+				if(filelocation != null){
+					multipart.addBodyPart(mimeBodyAttachPart);
 				}
-
+				
 				// 6) set the multiplart object to the message object
 				message.setContent(multipart);
 
 				// 7) send message
-				System.out.println("message sending....");
 				Transport.send(message);
-				System.out.println("message sent....");
+				System.out.println("message sent Successfully....");
 				BillingMessage billingMessage = this.messageDataRepository.findOne(emailDetail.getId());
 				if (billingMessage.getStatus().contentEquals("N")) {
 					billingMessage.updateStatus();

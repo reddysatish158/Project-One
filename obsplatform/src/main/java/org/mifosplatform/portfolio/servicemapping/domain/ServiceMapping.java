@@ -38,6 +38,9 @@ public class ServiceMapping extends AbstractPersistable<Long> {
 
 	@Column(name = "is_deleted")
 	private String isDeleted = "n";
+	
+	@Column(name = "sort_by")
+	private Integer sortBy;
 
 
 
@@ -158,5 +161,12 @@ public class ServiceMapping extends AbstractPersistable<Long> {
 		return actualChanges;
 
 	}
+	
+	public Integer getSortBy() {
+		return sortBy;
+	}
 
+	public void setSortBy(Integer sortBy) {
+		this.sortBy = sortBy;
+	}
 }

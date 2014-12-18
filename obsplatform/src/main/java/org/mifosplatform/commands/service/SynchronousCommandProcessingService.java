@@ -1167,6 +1167,11 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
 				 } else{
 			           throw new UnsupportedCommandException(wrapper.commandName());
 				 }
+            }else if(wrapper.isLinkupAccount()){
+            	if(wrapper.isCreate()){
+            		 handler = applicationContext.getBean("createLinkupAccountCommandHandler",NewCommandSourceHandler.class);
+            	}
+            	
             }else {
             	throw new UnsupportedCommandException(wrapper.commandName());
 		     }
