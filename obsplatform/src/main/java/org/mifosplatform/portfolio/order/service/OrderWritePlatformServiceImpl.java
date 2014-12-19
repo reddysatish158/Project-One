@@ -76,8 +76,6 @@ import org.mifosplatform.provisioning.preparerequest.domain.PrepareRequest;
 import org.mifosplatform.provisioning.preparerequest.domain.PrepareRequsetRepository;
 import org.mifosplatform.provisioning.preparerequest.exception.PrepareRequestActivationException;
 import org.mifosplatform.provisioning.preparerequest.service.PrepareRequestReadplatformService;
-import org.mifosplatform.provisioning.processrequest.domain.ProcessRequest;
-import org.mifosplatform.provisioning.processrequest.domain.ProcessRequestDetails;
 import org.mifosplatform.provisioning.processrequest.domain.ProcessRequestRepository;
 import org.mifosplatform.provisioning.provisioning.service.ProvisioningWritePlatformService;
 import org.mifosplatform.useradministration.domain.AppUser;
@@ -117,7 +115,6 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 	private final ContractPeriodReadPlatformService contractPeriodReadPlatformService;
 	private final PrepareRequestWriteplatformService prepareRequestWriteplatformService;
 	private final HardwareAssociationWriteplatformService associationWriteplatformService;
-	private final ProcessRequestRepository processRequestRepository;
 	private final OrderReadPlatformService orderReadPlatformService;
 	private final ServiceMasterRepository serviceMasterRepository;
 	private final PrepareRequsetRepository prepareRequsetRepository;
@@ -167,7 +164,6 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 		this.fromApiJsonDeserializer=fromApiJsonDeserializer;
 		this.configurationRepository=configurationRepository;
 		this.orderDiscountRepository=orderDiscountRepository;
-		this.processRequestRepository=processRequestRepository;
 		this.prepareRequsetRepository=prepareRequsetRepository;
 		this.orderReadPlatformService = orderReadPlatformService;
 		this.paymentFollowupRepository=paymentFollowupRepository;
@@ -177,13 +173,13 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 		this.eventValidationReadPlatformService=eventValidationReadPlatformService;
 		this.priceRepository=priceRepository;
 		this.planRepository = planRepository;
+		this.provisionServiceDetailsRepository =provisionServiceDetailsRepository;
 		this.orderRepository = orderRepository;
 		this.clientRepository=clientRepository;
 		this.codeValueRepository=codeRepository;
 		this.promotionCodeRepository=promotionCodeRepository;
 		this.provisioningWritePlatformService=provisioningWritePlatformService;
 		this.prepareRequestReadplatformService=prepareRequestReadplatformService;
-		this.provisionServiceDetailsRepository=provisionServiceDetailsRepository;
 		this.actiondetailsWritePlatformService=actiondetailsWritePlatformService;
 		this.contractPeriodReadPlatformService=contractPeriodReadPlatformService;
 		this.prepareRequestWriteplatformService=prepareRequestWriteplatformService;
@@ -597,9 +593,14 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 				if (plan == null) {
 					throw new NoOrdersFoundException(command.entityId());
 				}
+				Long resourceId = Long.valueOf(0);
 				if (requstStatus != null && plan!=null) {
 					
-					final AllocationDetailsData detailsData = this.allocationReadPlatformService.getTheHardwareItemDetails(command.entityId());
+					 CommandProcessingResult commandProcessingResult=this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order,plan.getPlanCode(),requstStatus,
+		    				 Long.valueOf(0),null,null,order.getId(),plan.getProvisionSystem(),null);
+		    		 resourceId=commandProcessingResult.resourceId();
+					
+					/*final AllocationDetailsData detailsData = this.allocationReadPlatformService.getTheHardwareItemDetails(command.entityId());
 					final ProcessRequest processRequest=new ProcessRequest(Long.valueOf(0),order.getClientId(),order.getId(),plan.getProvisionSystem(),requstStatus
 							,'N','N');
 				  processRequest.setNotify();
@@ -621,12 +622,10 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 				  				processRequest.add(processRequestDetails);
 				  			}
 				  	}
-				this.processRequestRepository.save(processRequest);
+				this.processRequestRepository.save(processRequest);*/
 				this.orderRepository.save(order);
-				final AppUser appUser = this.context.authenticatedUser();
-				final Long userId = appUser.getId();
-				final OrderHistory orderHistory = new OrderHistory(order.getId(),new LocalDate(), new LocalDate(), command.entityId(),
-						requstStatus, userId,null);
+				final OrderHistory orderHistory = new OrderHistory(order.getId(),new LocalDate(), new LocalDate(), resourceId,
+						requstStatus, getUserId(),null);
 				this.orderHistoryRepository.save(orderHistory);
 				
 			}

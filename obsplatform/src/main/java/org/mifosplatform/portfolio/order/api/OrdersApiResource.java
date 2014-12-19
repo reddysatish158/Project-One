@@ -182,15 +182,16 @@ public class OrdersApiResource {
 	        return this.toApiJsonSerializer.serialize(settings, orderDetailsData, RESPONSE_DATA_PARAMETERS);
 	    }
 
-	 @PUT
-	 @Path("{orderId}/orderprice")
-	 @Consumes({ MediaType.APPLICATION_JSON })
-	 @Produces({ MediaType.APPLICATION_JSON })
-	 public String updateOrderPrice(@PathParam("orderId") final Long orderId,final String apiRequestBodyAsJson) {
-	 final CommandWrapper commandRequest = new CommandWrapperBuilder().updateOrderPrice(orderId).withJson(apiRequestBodyAsJson).build();
-	 final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-	 return this.toApiJsonSerializer.serialize(result);
-	 }
+	 	@PUT
+		@Path("{orderId}/orderprice")
+		@Consumes({ MediaType.APPLICATION_JSON })
+		@Produces({ MediaType.APPLICATION_JSON })
+		public String updateOrderPrice(@PathParam("orderId") final Long orderId,final String apiRequestBodyAsJson) {
+		 final CommandWrapper commandRequest = new CommandWrapperBuilder().updateOrderPrice(orderId).withJson(apiRequestBodyAsJson).build();
+		 final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+		  return this.toApiJsonSerializer.serialize(result);
+
+		}
 	 
 	@PUT
 	@Path("{orderId}")
@@ -409,6 +410,4 @@ public class OrdersApiResource {
 		return this.toApiJsonSerializer.serialize(result);
 		
 	}
-	
-	
 }

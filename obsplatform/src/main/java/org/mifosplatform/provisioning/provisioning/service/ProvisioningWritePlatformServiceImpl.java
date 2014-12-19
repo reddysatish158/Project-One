@@ -31,6 +31,7 @@ import org.mifosplatform.organisation.ippool.domain.IpPoolManagementJpaRepositor
 import org.mifosplatform.organisation.ippool.exception.IpNotAvailableException;
 import org.mifosplatform.portfolio.association.domain.HardwareAssociation;
 import org.mifosplatform.portfolio.association.exception.PairingNotExistException;
+import org.mifosplatform.portfolio.client.domain.Client;
 import org.mifosplatform.portfolio.order.domain.HardwareAssociationRepository;
 import org.mifosplatform.portfolio.order.domain.Order;
 import org.mifosplatform.portfolio.order.domain.OrderLine;
@@ -66,8 +67,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
 @Service
-public class ProvisioningWritePlatformServiceImpl implements
-		ProvisioningWritePlatformService {
+public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePlatformService {
 
 	private final FromJsonHelper fromJsonHelper;
 	private final PlatformSecurityContext context;
@@ -324,61 +324,51 @@ public class ProvisioningWritePlatformServiceImpl implements
 	public CommandProcessingResult postOrderDetailsForProvisioning(final Order order,final String planName,final String requestType, 
 			final Long prepareId,final String groupname,final String serialNo,final Long orderId,final String provisioningSys,Long addonId) {
 
-		try {
-			
-			Long commandProcessId=null;
-			HardwareAssociation hardwareAssociation = this.associationRepository.findOneByOrderId(order.getId());
-			Plan plan=this.planRepository.findOne(order.getPlanId());
-			
-			if (hardwareAssociation == null && plan.isHardwareReq() == 'Y') {
-				throw new PairingNotExistException(order.getId());
+	try {
+		Long commandProcessId=null;
+		HardwareAssociation hardwareAssociation = this.associationRepository.findOneByOrderId(order.getId());
+		Plan plan=this.planRepository.findOne(order.getPlanId());
+		
+		if (hardwareAssociation == null && plan.isHardwareReq() == 'Y') {
+			throw new PairingNotExistException(order.getId());
+		}
+		List<ServiceParameters> parameters = this.serviceParametersRepository.findDataByOrderId(orderId);
+		
+		if (!parameters.isEmpty()) {
+			ItemDetails inventoryItemDetails =null;
+			if("ALLOT".equalsIgnoreCase(hardwareAssociation.getAllocationType())){
+				inventoryItemDetails = this.inventoryItemDetailsRepository.getInventoryItemDetailBySerialNum(hardwareAssociation.getSerialNo());
+				if (inventoryItemDetails == null) {
+					throw new PairingNotExistException(order.getId());
+				}
 			}
 
-		
-			List<ServiceParameters> parameters = this.serviceParametersRepository.findDataByOrderId(orderId);
-			
-			if (!parameters.isEmpty()) {
-				
-				ItemDetails inventoryItemDetails =null;
-				
-				if("ALLOT".equalsIgnoreCase(hardwareAssociation.getAllocationType())){
-					
-					 inventoryItemDetails = this.inventoryItemDetailsRepository.getInventoryItemDetailBySerialNum(hardwareAssociation.getSerialNo());
-					if (inventoryItemDetails == null) {
-						throw new PairingNotExistException(order.getId());
-					}
-					}
-				ProcessRequest processRequest = new ProcessRequest(prepareId, order.getClientId(), order.getId(),
-						plan.getProvisionSystem(), requestType, 'N', 'N');
-				List<OrderLine> orderLines = order.getServices();
-				JSONObject jsonData=this.provisionHelper.buildJsonForOrderProvision(order.getClientId(),planName,requestType,
-						             groupname,serialNo,orderId, inventoryItemDetails.getSerialNumber(),order.getId(),parameters);
+		   ProcessRequest processRequest = new ProcessRequest(prepareId, order.getClientId(), order.getId(),
+				   ProvisioningApiConstants.PROV_PACKETSPAN, requestType, 'N', 'N');
+		  List<OrderLine> orderLines = order.getServices();
+		  JSONObject jsonData=this.provisionHelper.buildJsonForOrderProvision(order.getClientId(),planName,requestType,
+				  groupname,serialNo,orderId, inventoryItemDetails.getSerialNumber(),order.getId(),parameters);
 
-				for (OrderLine orderLine : orderLines) {
-					
-					ServiceMaster service = this.serviceMasterRepository.findOne(orderLine.getServiceId());
-						jsonData.put(ProvisioningApiConstants.PROV_DATA_SERVICETYPE, service.getServiceType());
-						ProcessRequestDetails processRequestDetails = new ProcessRequestDetails(orderLine.getId(), orderLine.getServiceId(),
-							jsonData.toString(), "Recieved", inventoryItemDetails.getProvisioningSerialNumber(),
-							order.getStartDate(), order.getEndDate(), null, null, 'N', requestType, service.getServiceType());
-					
-						processRequest.add(processRequestDetails);
-				}
-				this.processRequestRepository.save(processRequest);
-				commandProcessId=processRequest.getId();
-				
+		  for (OrderLine orderLine : orderLines) {
+			  
+			  ServiceMaster service = this.serviceMasterRepository.findOne(orderLine.getServiceId());
+			  jsonData.put(ProvisioningApiConstants.PROV_DATA_SERVICETYPE, service.getServiceType());
+			  ProcessRequestDetails processRequestDetails = new ProcessRequestDetails(orderLine.getId(), orderLine.getServiceId(),
+					  jsonData.toString(), "Recieved", inventoryItemDetails.getProvisioningSerialNumber(),order.getStartDate(),
+					       order.getEndDate(), null, null, 'N', requestType, service.getServiceType());
+			  processRequest.add(processRequestDetails);	
+		  }
+		  this.processRequestRepository.save(processRequest);
+		  commandProcessId=processRequest.getId();
+		  
+		}else{
 			
-			}else{
-				
-				//Plan plan=this.planRepository.findOne(order.getPlanId());
-				PrepareRequestData prepareRequestData=new  PrepareRequestData(Long.valueOf(0),order.getClientId(), orderId, requestType, hardwareAssociation.getSerialNo(),
+			PrepareRequestData prepareRequestData=new  PrepareRequestData(Long.valueOf(0),order.getClientId(), orderId, requestType, hardwareAssociation.getSerialNo(),
 						 null, provisioningSys, planName, String.valueOf(plan.isHardwareReq()),addonId);
 			CommandProcessingResult commandProcessingResult =this.prepareRequestReadplatformService.processingClientDetails(prepareRequestData);
 			commandProcessId=commandProcessingResult.resourceId();
-			}
-			
+		}
 			return new CommandProcessingResult(commandProcessId);
-			
 		} catch (DataIntegrityViolationException dve) {
 			handleCodeDataIntegrityIssues(null, dve);
 			return new CommandProcessingResult(Long.valueOf(-1));
@@ -597,5 +587,17 @@ public class ProvisioningWritePlatformServiceImpl implements
 		}
 
 		return datearray;
+	}
+
+	@Override
+	public CommandProcessingResult postDetailsForProvisioning(Long clientId, String requestType,String provisioningSystem,String hardwareId) {
+		Long defaultValue=Long.valueOf(0);
+		ProcessRequest processRequest=new ProcessRequest(defaultValue,clientId,defaultValue, provisioningSystem, requestType,'N','N');
+		 ProcessRequestDetails processRequestDetails=new ProcessRequestDetails(defaultValue,defaultValue,"None","Recieved",
+				 hardwareId,new Date(),new Date(),null,null,'N',requestType,null);
+		 processRequest.add(processRequestDetails);
+		 this.processRequestRepository.save(processRequest);
+		return new CommandProcessingResult(processRequest.getId());
+
 	}
 }

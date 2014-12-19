@@ -159,7 +159,7 @@ public class EventOrderReadplatformServieImpl implements EventOrderReadplatformS
 			RowMapper<EventOrderData> {
 
 		public String schema() {
-			return " eo.id AS id,eo.event_bookeddate AS bookedDate,em.event_name AS eventName,eo.charge_code AS chargeCode,eo.event_status as status,eo.booked_price AS price" +
+			return " eo.id AS id,eo.event_bookeddate AS bookedDate,em.event_name AS eventName,eo.charge_code AS chargeCode,em.status as status,eo.booked_price AS price" +
 					" FROM b_eventorder eo, b_event_master em WHERE eo.event_id = em.id ";
 
 		}

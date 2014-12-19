@@ -2551,6 +2551,7 @@ public CommandWrapperBuilder OnlinePaymentGateway() {
 	return this;
 }
 
+
 public CommandWrapperBuilder createOrderAddons(Long orderId) {
 	
 	this.actionName="CREATE";
@@ -2581,6 +2582,13 @@ public CommandWrapperBuilder deleteAddons(Long addonId) {
 	this.entityId=addonId;
 	this.href="/addons/"+addonId;
 	return this;
+}
+public CommandWrapperBuilder linkUpAccount() {
+	this.actionName = "CREATE";
+	this.entityName = "LINKUPACCOUNT";
+	this.href = "/linkupaccount/template";
+	return this;
+	
 }
 
 }

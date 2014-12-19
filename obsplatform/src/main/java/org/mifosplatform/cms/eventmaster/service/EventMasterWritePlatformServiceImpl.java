@@ -19,6 +19,10 @@ import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
+import org.mifosplatform.workflow.eventaction.data.ActionDetaislData;
+import org.mifosplatform.workflow.eventaction.service.ActionDetailsReadPlatformService;
+import org.mifosplatform.workflow.eventaction.service.ActiondetailsWritePlatformService;
+import org.mifosplatform.workflow.eventaction.service.EventActionConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -42,13 +46,18 @@ public class EventMasterWritePlatformServiceImpl implements
 	private final EventMasterRepository eventMasterRepository;
 	private final EventMasterFromApiJsonDeserializer apiJsonDeserializer;
 	private final MediaAssetReadPlatformService assetReadPlatformService;
+	private final ActionDetailsReadPlatformService actionDetailsReadPlatformService;
+	private final ActiondetailsWritePlatformService actiondetailsWritePlatformService;
 	
 	@Autowired
 	public EventMasterWritePlatformServiceImpl (final PlatformSecurityContext context, final EventMasterRepository eventMasterRepository, 
-	              							final EventMasterFromApiJsonDeserializer apiJsonDeserializer, final MediaAssetRepository assetRepository, 
-	              							final MediaAssetReadPlatformService assetReadPlatformService) {
+	       final EventMasterFromApiJsonDeserializer apiJsonDeserializer, final MediaAssetRepository assetRepository, 
+	       final ActiondetailsWritePlatformService actiondetailsWritePlatformService,final ActionDetailsReadPlatformService actionDetailsReadPlatformService,
+	       final MediaAssetReadPlatformService assetReadPlatformService) {
 		
 		this.context = context;
+		this.actionDetailsReadPlatformService=actionDetailsReadPlatformService;
+		this.actiondetailsWritePlatformService=actiondetailsWritePlatformService;
 		this.assetRepository = assetRepository;
 		this.apiJsonDeserializer = apiJsonDeserializer;
 		this.eventMasterRepository = eventMasterRepository;
@@ -78,6 +87,12 @@ public class EventMasterWritePlatformServiceImpl implements
 			}
 			eventMaster.setCreatedbyId(createdbyId);
 			this.eventMasterRepository.save(eventMaster);
+			
+			 
+            final List<ActionDetaislData> actionDetailsDatas=this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_CREATE_LIVE_EVENT);
+            if(!actionDetailsDatas.isEmpty()){
+            this.actiondetailsWritePlatformService.AddNewActions(actionDetailsDatas,Long.valueOf(0),eventMaster.getId().toString(),null);
+            }
 			
 			return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(eventMaster.getId()).build();
 		} catch(DataIntegrityViolationException dve) {

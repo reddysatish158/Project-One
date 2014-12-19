@@ -24,8 +24,9 @@ import com.google.gson.reflect.TypeToken;
 public class ServiceMappingCommandFromApiJsonDeserializer {
 	
 
+
 	final private Set<String> supportedParameters = new HashSet<String>(Arrays.asList("serviceId","serviceIdentification","status","image","category",
-			                                     "subCategory","provisionSystem"));
+			"subCategory","sortBy","locale","provisionSystem"));
 
 	private final FromJsonHelper fromApiJsonHelper;  
 	
