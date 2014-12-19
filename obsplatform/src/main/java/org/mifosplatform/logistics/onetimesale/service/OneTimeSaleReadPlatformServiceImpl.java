@@ -88,7 +88,7 @@ public class OneTimeSaleReadPlatformServiceImpl implements	OneTimeSaleReadPlatfo
 		public String schema() {
 			
 			return "o.id AS id,i.item_code AS itemCode, i.item_class as itemClass, a.serial_no as serialNo,o.sale_date as saleDate,o.charge_code AS chargeCode,"
-					+ "o.quantity as quantity,o.total_price as totalPrice,o.hardware_allocated as hardwareAllocated,o.units as units  FROM b_item_master i,b_onetime_sale o" +
+					+ "o.quantity as quantity,o.total_price as totalPrice,o.hardware_allocated as hardwareAllocated,o.units as units,o.device_mode as saleType  FROM b_item_master i,b_onetime_sale o" +
 					" left join b_allocation a on a.order_id=o.id and a.is_deleted = 'N' ";
 
 		}
@@ -106,7 +106,8 @@ public class OneTimeSaleReadPlatformServiceImpl implements	OneTimeSaleReadPlatfo
 			final String itemClass = rs.getString("itemClass");
 			final String serialNo = rs.getString("serialNo");
 			final String units = rs.getString("units");
-			return new OneTimeSaleData(id, saleDate, itemCode, chargeCode,quantity, totalPrice,haardwareAllocated,itemClass,serialNo,units);
+			final String saleType = rs.getString("saleType");
+			return new OneTimeSaleData(id, saleDate, itemCode, chargeCode,quantity, totalPrice,haardwareAllocated,itemClass,serialNo,units,saleType);
 
 		}
 
