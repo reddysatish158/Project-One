@@ -438,9 +438,11 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 			   orderDetails.setStatus(StatusTypeEnum.ACTIVE.getValue().longValue());
 			}
 		  requestStatusForProv="RENEWAL_AE";//UserActionStatusTypeEnum.ACTIVATION.toString();
+		  orderDetails.setNextBillableDay(null);
 	  }
 	  LocalDate renewalEndDate=this.orderAssembler.calculateEndDate(newStartdate,contractDetails.getSubscriptionType(),contractDetails.getUnits());
 	  orderDetails.setEndDate(renewalEndDate);
+	 
 	  for(OrderPrice orderprice:orderPrices){
 		  if(plan.isPrepaid() == 'Y'){
 			  ServiceMaster service=this.serviceMasterRepository.findOne(orderprice.getServiceId()); 
@@ -456,9 +458,10 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 				}
 		  	}
 		  orderprice.setDatesOnOrderStatus(newStartdate,renewalEndDate,orderDetails.getUserAction());//setBillEndDate(renewalEndDate);
-		  this.OrderPriceRepository.save(orderprice);
-		  orderDetails.setNextBillableDay(null);
+	//	  this.OrderPriceRepository.save(orderprice);
+		
 	  }
+	
 	  orderDetails.setContractPeriod(contractDetails.getId());
 	  orderDetails.setuserAction(requstStatus);
 	  orderDetails.setRenewalDate(newStartdate.toDate());

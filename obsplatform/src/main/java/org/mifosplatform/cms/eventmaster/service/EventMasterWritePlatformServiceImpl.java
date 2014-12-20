@@ -88,11 +88,12 @@ public class EventMasterWritePlatformServiceImpl implements
 			eventMaster.setCreatedbyId(createdbyId);
 			this.eventMasterRepository.save(eventMaster);
 			
-			 
+		  if("Live Event".equalsIgnoreCase(eventMaster.getEventCategory())){
             final List<ActionDetaislData> actionDetailsDatas=this.actionDetailsReadPlatformService.retrieveActionDetails(EventActionConstants.EVENT_CREATE_LIVE_EVENT);
             if(!actionDetailsDatas.isEmpty()){
             this.actiondetailsWritePlatformService.AddNewActions(actionDetailsDatas,Long.valueOf(0),eventMaster.getId().toString(),null);
             }
+			 }
 			
 			return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(eventMaster.getId()).build();
 		} catch(DataIntegrityViolationException dve) {

@@ -5,7 +5,6 @@ import java.util.List;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.joda.time.LocalDate;
-import org.mifosplatform.cms.eventorder.service.PrepareRequestWriteplatformService;
 import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
