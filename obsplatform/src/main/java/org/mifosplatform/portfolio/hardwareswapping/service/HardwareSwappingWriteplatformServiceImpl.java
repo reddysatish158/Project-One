@@ -8,7 +8,6 @@ import org.joda.time.LocalDate;
 import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
-import org.mifosplatform.infrastructure.configuration.domain.Configuration;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
@@ -104,7 +103,7 @@ public CommandProcessingResult doHardWareSwapping(final Long entityId,final Json
 		final Long associationId=command.longValueOfParameterNamed("associationId");
 		final String serialNo=command.stringValueOfParameterNamed("serialNo");
 		final Long orderId=command.longValueOfParameterNamed("orderId");
-		//final Long planId=command.longValueOfParameterNamed("planId");
+		final String deviceAgrementType=command.stringValueOfParameterNamed("deviceAgrementType");
 		final Long saleId=command.longValueOfParameterNamed("saleId");
 		final String provisionNum=command.stringValueOfParameterNamed("provisionNum");
 		
@@ -115,10 +114,10 @@ public CommandProcessingResult doHardWareSwapping(final Long entityId,final Json
         final Order order=this.orderRepository.findOne(orderId);
 		final Plan plan=this.planRepository.findOne(order.getPlanId());
 		
-		Configuration configurationProperty=this.globalConfigurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);
+	//	Configuration configurationProperty=this.globalConfigurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);
 		
 		
-		if(configurationProperty.getValue().equalsIgnoreCase(ConfigurationConstants.CONFIR_PROPERTY_OWN)){
+		if(deviceAgrementType.equalsIgnoreCase(ConfigurationConstants.CONFIR_PROPERTY_OWN)){
 			
 			OwnedHardware ownedHardware=this.hardwareJpaRepository.findBySerialNumber(serialNo);
 			ownedHardware.updateSerialNumbers(provisionNum);
