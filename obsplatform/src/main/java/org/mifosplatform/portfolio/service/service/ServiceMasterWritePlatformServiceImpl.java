@@ -52,29 +52,24 @@ public class ServiceMasterWritePlatformServiceImpl  implements ServiceMasterWrit
 	@Override
 	public CommandProcessingResult updateService(final Long id,final JsonCommand command) {
 		try
-		{
-			    context.authenticatedUser();
-			    Map<String, Object> changes = null;
-			    if(command.hasParameter("sortBy")){
-			    	this.fromApiJsonDeserializer.validateForCreate(command.json(), command.hasParameter("sortBy"));
-			    	final ServiceMaster serviceMaster = retrieveCodeBy(id);
-			    	serviceMaster.setSortBy(command.integerValueOfParameterNamed("sortBy"));
-			    	this.serviceMasterRepository.save(serviceMaster);
-			    }else{
-			    	this.fromApiJsonDeserializer.validateForCreate(command.json(), command.hasParameter("sortBy"));
-		            final ServiceMaster master = retrieveCodeBy(id);
-		            changes = master.update(command);
-	                if (!changes.isEmpty()) {
-	                	this.serviceMasterRepository.save(master);
-	                }
-			    }
-	            
-         return new CommandProcessingResultBuilder() //
-         .withCommandId(command.commandId()) //
-         .withEntityId(id) //
-         .with(changes) //
-         .build();
-	} catch (DataIntegrityViolationException dve) {
+ {
+			context.authenticatedUser();
+
+			this.fromApiJsonDeserializer.validateForCreate(command.json(),
+					command.hasParameter("sortBy"));
+			final ServiceMaster master = retrieveCodeBy(id);
+
+			final Map<String, Object> changes = master.update(command);
+			if (!changes.isEmpty()) {
+				this.serviceMasterRepository.save(master);
+			}
+
+			return new CommandProcessingResultBuilder() //
+					.withCommandId(command.commandId()) //
+					.withEntityId(id) //
+					.with(changes) //
+					.build();
+		} catch (DataIntegrityViolationException dve) {
 		 handleCodeDataIntegrityIssues(command, dve);
 		return new CommandProcessingResult(Long.valueOf(-1));
 	}
