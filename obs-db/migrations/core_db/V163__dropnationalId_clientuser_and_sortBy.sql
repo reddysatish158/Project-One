@@ -54,3 +54,7 @@ END //
 DELIMITER ;
 call serviceSortBy();
 Drop procedure IF EXISTS serviceSortBy;
+
+INSERT IGNORE INTO  m_permission VALUES(null,'billing', 'CREATE_LINKUPACCOUNT', 'LINKUPACCOUNT', 'CREATE', '0');
+
+INSERT IGNORE INTO b_message_template VALUES(null, 'NONE', 'NONE', 'NONE', 'NONE', '', 'E', '1', NULL, NULL, NULL, 'N');
