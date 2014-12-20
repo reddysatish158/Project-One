@@ -4,7 +4,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -14,16 +13,18 @@ import org.mifosplatform.logistics.onetimesale.data.AllocationDetailsData;
 import org.mifosplatform.portfolio.allocation.service.AllocationReadPlatformService;
 import org.mifosplatform.portfolio.order.data.OrderStatusEnumaration;
 import org.mifosplatform.portfolio.order.domain.Order;
+import org.mifosplatform.portfolio.order.domain.OrderAddons;
+import org.mifosplatform.portfolio.order.domain.OrderAddonsRepository;
 import org.mifosplatform.portfolio.order.domain.OrderLine;
 import org.mifosplatform.portfolio.order.domain.OrderRepository;
 import org.mifosplatform.portfolio.order.domain.StatusTypeEnum;
 import org.mifosplatform.portfolio.order.domain.UserActionStatusTypeEnum;
 import org.mifosplatform.portfolio.planmapping.domain.PlanMapping;
 import org.mifosplatform.portfolio.planmapping.domain.PlanMappingRepository;
-import org.mifosplatform.portfolio.service.domain.ProvisionServiceDetails;
-import org.mifosplatform.portfolio.service.domain.ProvisionServiceDetailsRepository;
 import org.mifosplatform.portfolio.service.domain.ServiceMaster;
 import org.mifosplatform.portfolio.service.domain.ServiceMasterRepository;
+import org.mifosplatform.portfolio.servicemapping.domain.ServiceMapping;
+import org.mifosplatform.portfolio.servicemapping.domain.ServiceMappingRepository;
 import org.mifosplatform.provisioning.preparerequest.data.PrepareRequestData;
 import org.mifosplatform.provisioning.preparerequest.domain.PrepareRequest;
 import org.mifosplatform.provisioning.preparerequest.domain.PrepareRequsetRepository;
@@ -47,8 +48,9 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 	  private final ProcessRequestRepository processRequestRepository;
 	  private final PrepareRequsetRepository prepareRequsetRepository;
 	  private final AllocationReadPlatformService allocationReadPlatformService;
-	  private final ProvisionServiceDetailsRepository provisionServiceDetailsRepository;
+	  private final ServiceMappingRepository provisionServiceDetailsRepository;
 	  private final ServiceMasterRepository serviceMasterRepository;
+	  private final OrderAddonsRepository orderAddonsRepository;
 	  public final static String PROVISIONGSYS_COMVENIENT="Comvenient";
 	  private final PlanMappingRepository planMappingRepository;
 	
@@ -57,11 +59,13 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 	    public PrepareRequestReadplatformServiceImpl(final DataSourcePerTenantService dataSourcePerTenantService,final OrderRepository orderRepository,
 	    		final ServiceMasterRepository serviceMasterRepository,final ProcessRequestRepository processRequestRepository,
 	    		final AllocationReadPlatformService allocationReadPlatformService,final PrepareRequsetRepository prepareRequsetRepository,
-	    		final ProvisionServiceDetailsRepository provisionServiceDetailsRepository,final PlanMappingRepository planMappingRepository) {
+	    		final ServiceMappingRepository provisionServiceDetailsRepository,final PlanMappingRepository planMappingRepository,
+	    		final OrderAddonsRepository orderAddonsRepository) {
 	            
 	    	    
 	    	    this.orderRepository=orderRepository;
 	    	    this.serviceMasterRepository=serviceMasterRepository;
+	    	    this.orderAddonsRepository=orderAddonsRepository;
 	            this.processRequestRepository=processRequestRepository;
 	            this.prepareRequsetRepository=prepareRequsetRepository;
 	            this.dataSourcePerTenantService = dataSourcePerTenantService;
@@ -106,7 +110,7 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 			final String ishwReq=rs.getString("hwRequired");
 			final String provisioningSys=rs.getString("provisioningSystem");
 			
-			return new PrepareRequestData(id, clientId,orderId, requestType,null,userName,provisioningSys,planName,ishwReq);
+			return new PrepareRequestData(id, clientId,orderId, requestType,null,userName,provisioningSys,planName,ishwReq,null);
 				}
 			}	
 			
@@ -141,7 +145,7 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 			}
 
  @Override
- public CommandProcessingResult processingClientDetails(PrepareRequestData requestData,String configProp) {
+ public CommandProcessingResult processingClientDetails(PrepareRequestData requestData) {
 	
 	 PrepareRequest prepareRequest=this.prepareRequsetRepository.findOne(requestData.getRequestId());
 	 try{
@@ -191,7 +195,7 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 			 for(OrderLine orderLine:orderdetails){
 				 
 				 JSONObject oldsubjson = new JSONObject();
-				 List<ProvisionServiceDetails> provisionServiceDetails=this.provisionServiceDetailsRepository.findOneByServiceId(orderLine.getServiceId());
+				 List<ServiceMapping> provisionServiceDetails=this.provisionServiceDetailsRepository.findOneByServiceId(orderLine.getServiceId());
 				 ServiceMaster service=this.serviceMasterRepository.findOne(orderLine.getServiceId()); 
 				 oldsubjson.put("oldServiceIdentification", provisionServiceDetails.get(0).getServiceIdentification());
 				 oldsubjson.put("oldServiceType", service.getServiceType());
@@ -201,24 +205,45 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 		 }
 
 		 JSONArray newServiceArray = new JSONArray();
-		 for(OrderLine orderLine:orderLineData){
+		 
+		 if(requestType.equalsIgnoreCase(UserActionStatusTypeEnum.ADDON_ACTIVATION.toString())){
 			 
-			 List<ProvisionServiceDetails> provisionServiceDetails=this.provisionServiceDetailsRepository.findOneByServiceId(orderLine.getServiceId());
-			 	ServiceMaster service=this.serviceMasterRepository.findOne(orderLine.getServiceId());
-		
-			 	if(requestData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.DEVICE_SWAP.toString())){
-				 AllocationDetailsData allocationDetailsData=this.allocationReadPlatformService.getDisconnectedHardwareItemDetails(requestData.getOrderId(),requestData.getClientId(),configProp);
+			 List<OrderAddons> orderAddons=this.orderAddonsRepository.findAddonsByOrderId(requestData.getOrderId());
+			 for(OrderAddons orderAddon:orderAddons){
+				 
+				 List<ServiceMapping> provisionServiceDetails=this.provisionServiceDetailsRepository.findOneByServiceId(orderAddon.getServiceId());
+				 	ServiceMaster service=this.serviceMasterRepository.findOne(orderAddon.getServiceId());
+				 	 JSONObject subjson = new JSONObject();
+					 subjson.put("serviceName", service.getServiceCode());
+					 subjson.put("addonId", requestData.getAddonId());
+					 subjson.put("serviceIdentification", provisionServiceDetails.get(0).getServiceIdentification());
+					 subjson.put("serviceType", service.getServiceType());
+					 newServiceArray.add(subjson.toString());	 
+			 }
+			 
+		 }else{
+			 
+			 if(requestData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.DEVICE_SWAP.toString())){
+				 AllocationDetailsData allocationDetailsData=this.allocationReadPlatformService.getDisconnectedHardwareItemDetails(requestData.getOrderId(),requestData.getClientId());
 				 jsonObject.put("clientId", order.getClientId());
 				 jsonObject.put("OldHWId", allocationDetailsData.getSerialNo());
 				 jsonObject.put("NewHWId", HardWareId);
 			 
-			 	}else{
+			 	}
+		  
+		 for(OrderLine orderLine:orderLineData){
+			 
+			 List<ServiceMapping> provisionServiceDetails=this.provisionServiceDetailsRepository.findOneByServiceId(orderLine.getServiceId());
+			 	ServiceMaster service=this.serviceMasterRepository.findOne(orderLine.getServiceId());
+		
+			 	
 				 JSONObject subjson = new JSONObject();
 				 subjson.put("serviceName", service.getServiceCode());
 				 subjson.put("serviceIdentification", provisionServiceDetails.get(0).getServiceIdentification());
 				 subjson.put("serviceType", service.getServiceType());
 				 newServiceArray.add(subjson.toString());	 
-			 }
+			 
+		  }
 		 }
 
 		 jsonObject.put("services", new Gson().toJson(newServiceArray));

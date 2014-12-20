@@ -5,7 +5,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.mifosplatform.crm.clientprospect.service.SearchSqlQuery;
+import org.mifosplatform.infrastructure.codes.data.CodeData;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
+import org.mifosplatform.infrastructure.core.service.Page;
+import org.mifosplatform.infrastructure.core.service.PaginationHelper;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.portfolio.plan.data.ServiceData;
@@ -24,6 +28,7 @@ public class ServiceMasterReadPlatformServiceImpl implements  ServiceMasterReadP
 
 	private final JdbcTemplate jdbcTemplate;
 	private final PlatformSecurityContext context;
+	private final PaginationHelper<ServiceMasterOptionsData> paginationHelper = new PaginationHelper<ServiceMasterOptionsData>();
 
 	@Autowired
 	public  ServiceMasterReadPlatformServiceImpl(final PlatformSecurityContext context, final TenantAwareRoutingDataSource dataSource) {
@@ -62,13 +67,24 @@ public class ServiceMasterReadPlatformServiceImpl implements  ServiceMasterReadP
 	}
 
 	@Override
-	public List<ServiceMasterOptionsData> retrieveServices() {
+	public Page<ServiceMasterOptionsData> retrieveServices(SearchSqlQuery searchCodes) {
 		this.context.authenticatedUser();
 
 		final ServiceMapper mapper = new ServiceMapper();
-		final String sql = "select " + mapper.schema()+" where d.is_deleted='n' order by ISNULL(sort_by), sort_by ASC ";
+		final String sql = "select " + mapper.schema()+" where d.is_deleted='n' ";
+		StringBuilder sqlBuilder = new StringBuilder(200);
+		sqlBuilder.append(sql);
+		
+		if (searchCodes.isLimited()) {
+            sqlBuilder.append(" limit ").append(searchCodes.getLimit());
+        }
+        if (searchCodes.isOffset()) {
+            sqlBuilder.append(" offset ").append(searchCodes.getOffset());
+        }
 
-		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
+		//return this.jdbcTemplate.query(sql, mapper, new Object[] {});
+		return this.paginationHelper.fetchPage(this.jdbcTemplate, "SELECT FOUND_ROWS()",sqlBuilder.toString(),
+	            new Object[] {}, mapper);
 
 	}
 
@@ -85,17 +101,16 @@ public class ServiceMasterReadPlatformServiceImpl implements  ServiceMasterReadP
 			final String status=rs.getString("status");
 			final String isOptional=rs.getString("isOptional");
 			final String isAutoProvision=rs.getString("isAuto");
-			final String sortBy = rs.getString("sortBy");
 
-			return new ServiceMasterOptionsData(id,serviceCode,serviceDescription,serviceType,serviceUnitType,status,isOptional,isAutoProvision,sortBy);
+			return new ServiceMasterOptionsData(id,serviceCode,serviceDescription,serviceType,serviceUnitType,status,isOptional,isAutoProvision);
 
 		}
 
 
 		public String schema() {
 			return "d.id AS id,d.service_code AS serviceCode,d.service_description AS serviceDescription,d.service_type AS serviceType," +
-					"d.service_unittype as serviceUnitType,d.status as status,d.is_optional as isOptional,d.is_auto as isAuto,"+
-					"d.sort_by as sortBy FROM b_service d";
+					"d.service_unittype as serviceUnitType,d.status as status,d.is_optional as isOptional,d.is_auto as isAuto "+
+					" FROM b_service d";
 		}
 
 }
@@ -155,15 +170,15 @@ public class ServiceMasterReadPlatformServiceImpl implements  ServiceMasterReadP
 	}
 
 	@Override
-	public List<ServiceData> retrieveAllServices() {
+	public List<ServiceData> retrieveAllServices(String serviceType) {
 
 
 		context.authenticatedUser();
 		ServiceDetailsMapper mapper = new ServiceDetailsMapper();
 
-		String sql = "select " + mapper.schema();
+		String sql = "select " + mapper.schema()+" and da.is_optional = ?";
 
-		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
+		return this.jdbcTemplate.query(sql, mapper, new Object[] {serviceType});
 
 	
 }

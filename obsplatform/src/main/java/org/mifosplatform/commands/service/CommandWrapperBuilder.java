@@ -2551,6 +2551,45 @@ public CommandWrapperBuilder OnlinePaymentGateway() {
 	return this;
 }
 
+public CommandWrapperBuilder createOrderAddons(Long orderId) {
+	
+	this.actionName="CREATE";
+	this.entityName ="ORDERADDONS";
+	this.entityId=orderId;
+	this.href="/orders/addons/"+orderId;
+	return this;
+}
+
+public CommandWrapperBuilder createAddons() {
+	this.actionName="CREATE";
+	this.entityName ="ADDONS";
+	this.href="/addons/";
+	return this;
+}
+
+public CommandWrapperBuilder updateAddons(Long addonId) {
+	this.actionName="UPDATE";
+	this.entityName ="ADDONS";
+	this.entityId=addonId;
+	this.href="/addons/"+addonId;
+	return this;
+}
+
+public CommandWrapperBuilder deleteAddons(Long addonId) {
+	this.actionName="DELETE";
+	this.entityName ="ADDONS";
+	this.entityId=addonId;
+	this.href="/addons/"+addonId;
+	return this;
+}
+
+public CommandWrapperBuilder linkUpAccount() {
+	this.actionName = "CREATE";
+	this.entityName = "LINKUPACCOUNT";
+	this.href = "/linkupaccount/template";
+	return this;
+}
+
 }
 
 

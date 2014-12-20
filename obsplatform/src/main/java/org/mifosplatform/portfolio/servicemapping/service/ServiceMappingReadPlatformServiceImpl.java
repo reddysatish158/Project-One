@@ -4,6 +4,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.mifosplatform.crm.clientprospect.service.SearchSqlQuery;
+import org.mifosplatform.infrastructure.core.service.Page;
+import org.mifosplatform.infrastructure.core.service.PaginationHelper;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
 import org.mifosplatform.portfolio.servicemapping.data.ServiceCodeData;
 import org.mifosplatform.portfolio.servicemapping.data.ServiceMappingData;
@@ -20,6 +23,7 @@ public class ServiceMappingReadPlatformServiceImpl implements
 		ServiceMappingReadPlatformService {
 
 	private final JdbcTemplate jdbcTemplate;
+	private final PaginationHelper<ServiceMappingData> paginationHelper = new PaginationHelper<ServiceMappingData>();
 
 	@Autowired
 	public ServiceMappingReadPlatformServiceImpl(
@@ -31,7 +35,9 @@ public class ServiceMappingReadPlatformServiceImpl implements
 		public String schema() {
 
 			return " ps.id as id, bs.service_code as serviceCode, ps.service_identification as serviceIdentification, bs.status as status,ps.image as image, "
-					+ "ps.category as category,ps.sub_category as subCategory from  b_service bs,  b_prov_service_details ps where bs.status='ACTIVE' and ps.service_id=bs.id ORDER BY ps.id ";
+					+ "ps.category as category,ps.sub_category as subCategory,ps.provision_system as provisionSystem,ps.sort_by as sortBy " +
+					"  from  b_service bs,  b_prov_service_details ps where bs.status='ACTIVE' and ps.service_id=bs.id ";
+
 
 		}
 
@@ -45,15 +51,26 @@ public class ServiceMappingReadPlatformServiceImpl implements
 			String image = rs.getString("image");
 			String category = rs.getString("category");
 			String subCategory = rs.getString("subCategory");
-			return new ServiceMappingData(id, serviceCode,
-					serviceIdentification, status, image, category, subCategory);
+			String provisionSystem = rs.getString("provisionSystem");
+			final String sortBy = rs.getString("sortBy");
+			return new ServiceMappingData(id, serviceCode,serviceIdentification, status, image, category, subCategory,provisionSystem, sortBy);
 		}
 	}
 
-	public List<ServiceMappingData> getServiceMapping() {
+	public Page<ServiceMappingData> getServiceMapping(SearchSqlQuery searchCodes) {
 		ServiceMappingMapper mapper = new ServiceMappingMapper();
-		String sql = "Select " + mapper.schema();
-		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
+		String sql = "Select " + mapper.schema() + " ORDER BY ISNULL(ps.sort_by), ps.sort_by ASC ";
+		StringBuilder sqlBuilder = new StringBuilder(200);
+		sqlBuilder.append(sql);
+		if (searchCodes.isLimited()) {
+            sqlBuilder.append(" limit ").append(searchCodes.getLimit());
+        }
+        if (searchCodes.isOffset()) {
+            sqlBuilder.append(" offset ").append(searchCodes.getOffset());
+        }
+		//return this.jdbcTemplate.query(sql, mapper, new Object[] {});
+		return this.paginationHelper.fetchPage(this.jdbcTemplate, "SELECT FOUND_ROWS()",sqlBuilder.toString(),
+	            new Object[] {}, mapper);
 	}
 
 	private class ServiceCodeDataMapper implements RowMapper<ServiceCodeData> {
@@ -80,7 +97,8 @@ public class ServiceMappingReadPlatformServiceImpl implements
 		public String schema() {
 
 			return " bs.id as serviceId,bs.service_code as serviceCode, ps.service_identification as serviceIdentification, bs.status as status,"
-					+ "ps.image as image,ps.category as category,ps.sub_category as subCategory  from b_service bs, b_prov_service_details ps ";
+					+ "ps.image as image,ps.category as category,ps.sub_category as subCategory,ps.provision_system as provisionSystem ,ps.sort_by as sortBy" +
+					"  from b_service bs, b_prov_service_details ps ";
 
 		}
 
@@ -90,14 +108,14 @@ public class ServiceMappingReadPlatformServiceImpl implements
 
 			Long serviceId = rs.getLong("serviceId");
 			String serviceCode = rs.getString("serviceCode");
-			String serviceIdentification = rs
-					.getString("serviceIdentification");
+			String serviceIdentification = rs.getString("serviceIdentification");
 			String status = rs.getString("status");
 			String image = rs.getString("image");
 			String category = rs.getString("category");
 			String subCategory = rs.getString("subCategory");
-			return new ServiceMappingData(serviceId, serviceCode,
-					serviceIdentification, status, image, category, subCategory);
+			String provisionSystem = rs.getString("provisionSystem");
+			final String sortBy = rs.getString("sortBy");
+			return new ServiceMappingData(serviceId, serviceCode,serviceIdentification, status, image, category, subCategory, sortBy,provisionSystem);
 		}
 	}
 
@@ -142,6 +160,27 @@ public class ServiceMappingReadPlatformServiceImpl implements
 			String sql = "select " + mapper.schema() + " and o.id = " + orderId;
 			if (serviceId != null) {
 				sql = sql + " and sd.service_id=" + serviceId;
+			}
+
+			return this.jdbcTemplate.query(sql, mapper, new Object[] {});
+
+		} catch (EmptyResultDataAccessException accessException) {
+			return null;
+		}
+
+	}
+
+	@Override
+	public List<ServiceMappingData> retrieveOptionalServices(String serviceType) {
+
+		try {
+			ServiceMappingDataByIdRowMapper mapper = new ServiceMappingDataByIdRowMapper();
+			String sql = "SELECT s.id as serviceId,s.service_code as serviceCode,ifnull(sp.category,'all') as category,sp.sub_category as subcategory," +
+					" sp.image as image,sp.service_identification as serviceIdentification,s.status as status,sp.provision_system as provisionSystem ," +
+					" sp.sort_by as sortBy FROM b_service s left join b_prov_service_details sp on s.id = sp.service_id where s.is_deleted = 'N' "; 
+			
+			if (serviceType != null) {
+				sql = sql + " and s.is_optional= '"+serviceType+"'";
 			}
 
 			return this.jdbcTemplate.query(sql, mapper, new Object[] {});

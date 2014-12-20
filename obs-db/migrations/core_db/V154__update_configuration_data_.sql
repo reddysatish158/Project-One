@@ -1,3 +1,4 @@
+set sql_safe_updates=0;
 update c_configuration set name='rounding' where name='Rounding';
 update c_configuration set name='implicit-association' where name='Implicit Association';
 update c_configuration set name='date-format' where name='DateFormat';

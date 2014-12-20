@@ -1224,4 +1224,16 @@ public class CommandWrapper {
 		public boolean isOnlinePaymentGateway() {
 			return this.actionName.equalsIgnoreCase("ONLINE") && this.entityName.equalsIgnoreCase("PAYMENTGATEWAY");
 		}
+
+		public boolean isOrderAddons() {
+			return this.entityName.equalsIgnoreCase("ORDERADDONS");
+		}
+
+		public boolean isAddons() {
+			return this.entityName.equalsIgnoreCase("ADDONS");
+		}
+		
+		public boolean isLinkupAccount() {
+			return this.entityName.equalsIgnoreCase("LINKUPACCOUNT");
+		}
 }

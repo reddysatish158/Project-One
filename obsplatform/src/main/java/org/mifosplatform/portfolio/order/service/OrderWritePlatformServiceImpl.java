@@ -68,10 +68,10 @@ import org.mifosplatform.portfolio.order.serialization.OrderCommandFromApiJsonDe
 import org.mifosplatform.portfolio.plan.domain.Plan;
 import org.mifosplatform.portfolio.plan.domain.PlanDetails;
 import org.mifosplatform.portfolio.plan.domain.PlanRepository;
-import org.mifosplatform.portfolio.service.domain.ProvisionServiceDetails;
-import org.mifosplatform.portfolio.service.domain.ProvisionServiceDetailsRepository;
 import org.mifosplatform.portfolio.service.domain.ServiceMaster;
 import org.mifosplatform.portfolio.service.domain.ServiceMasterRepository;
+import org.mifosplatform.portfolio.servicemapping.domain.ServiceMapping;
+import org.mifosplatform.portfolio.servicemapping.domain.ServiceMappingRepository;
 import org.mifosplatform.provisioning.preparerequest.domain.PrepareRequest;
 import org.mifosplatform.provisioning.preparerequest.domain.PrepareRequsetRepository;
 import org.mifosplatform.provisioning.preparerequest.exception.PrepareRequestActivationException;
@@ -111,7 +111,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 	private final OrderAssembler  orderAssembler;
 	private final ClientRepository clientRepository;
 	private final EventValidationReadPlatformService eventValidationReadPlatformService;
-	private final ProvisionServiceDetailsRepository provisionServiceDetailsRepository;
+	private final ServiceMappingRepository provisionServiceDetailsRepository;
 	private final PrepareRequestReadplatformService prepareRequestReadplatformService;
 	private final ActiondetailsWritePlatformService actiondetailsWritePlatformService;
 	private final ContractPeriodReadPlatformService contractPeriodReadPlatformService;
@@ -149,7 +149,7 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 			final PrepareRequestWriteplatformService prepareRequestWriteplatformService,final OrderHistoryRepository orderHistoryRepository,
 			final  ConfigurationRepository configurationRepository,final AllocationReadPlatformService allocationReadPlatformService,
 			final HardwareAssociationWriteplatformService associationWriteplatformService,final PrepareRequestReadplatformService prepareRequestReadplatformService,
-			final ProvisionServiceDetailsRepository provisionServiceDetailsRepository,final OrderReadPlatformService orderReadPlatformService,
+			final ServiceMappingRepository provisionServiceDetailsRepository,final OrderReadPlatformService orderReadPlatformService,
 		    final ProcessRequestRepository processRequestRepository,final HardwareAssociationReadplatformService hardwareAssociationReadplatformService,
 		    final PrepareRequsetRepository prepareRequsetRepository,final PromotionCodeRepository promotionCodeRepository,
 		    final OrderDiscountRepository orderDiscountRepository, final OrderAssembler orderAssembler,
@@ -387,8 +387,7 @@ try{
 			}else{
 				
 				CommandProcessingResult processingResult=this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order, plan.getPlanCode(), UserActionStatusTypeEnum.DISCONNECTION.toString(),
-						processingResultId, null, null, order.getId(),plan.getProvisionSystem(),
-						this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
+						processingResultId, null, null, order.getId(),plan.getProvisionSystem(),null);
 				processingResultId = processingResult.commandId();
 				
 			}
@@ -472,13 +471,12 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 	//  Set<PlanDetails> planDetails=plan.getDetails();
 	 // ServiceMaster serviceMaster=this.serviceMasterRepository.findOneByServiceCode(planDetails.iterator().next().getServiceCode());
 	  Long resourceId=Long.valueOf(0);
-	  	if(!plan.getProvisionSystem().equalsIgnoreCase("None")){
+	  	if(!plan.getProvisionSystem().equalsIgnoreCase("None") && requestStatusForProv != null){
 		    	// if(serviceMaster.isAuto() == 'Y' && requestStatusForProv != null){
 		    	 	//this.prepareRequestWriteplatformService.prepareNewRequest(orderDetails,plan,requestStatusForProv);
 		    	// }else{
 		    		 CommandProcessingResult commandProcessingResult=this.provisioningWritePlatformService.postOrderDetailsForProvisioning(orderDetails,plan.getPlanCode(),requestStatusForProv,
-		    				 Long.valueOf(0),null,null,orderDetails.getId(),plan.getProvisionSystem(),
-		    				 this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
+		    				 Long.valueOf(0),null,null,orderDetails.getId(),plan.getProvisionSystem(),null);
 		    		 resourceId=commandProcessingResult.resourceId();
 		    	// }
 		     }
@@ -554,8 +552,7 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 			
 			order.setStatus(OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.PENDING).getId());
 			CommandProcessingResult processingResult =this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order,plan.getPlanCode(), requstStatus,
-					Long.valueOf(0),null,null,order.getId(),plan.getProvisionSystem(),
-					this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
+					Long.valueOf(0),null,null,order.getId(),plan.getProvisionSystem(),null);
 			processingResultId=processingResult.commandId();
 		
 		}
@@ -612,7 +609,7 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 				  			if (detailsData != null) {
 				  				hardWareId = detailsData.getSerialNo();
 				  			}
-				  			final List<ProvisionServiceDetails> provisionServiceDetails = this.provisionServiceDetailsRepository.findOneByServiceId(orderLine.getServiceId());
+				  			final List<ServiceMapping> provisionServiceDetails = this.provisionServiceDetailsRepository.findOneByServiceId(orderLine.getServiceId());
 				  			final ServiceMaster service = this.serviceMasterRepository.findOne(orderLine.getServiceId());
 				  			if (!provisionServiceDetails.isEmpty()) {
 				  				if (message == null) {
@@ -696,8 +693,7 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 		
 			if(!plan.getProvisionSystem().equalsIgnoreCase("None")){
 				CommandProcessingResult processingResult=this.provisioningWritePlatformService.postOrderDetailsForProvisioning(newOrder, plan.getCode(),
-						UserActionStatusTypeEnum.CHANGE_PLAN.toString(),new Long(0), null, null,newOrder.getId(),plan.getProvisionSystem(),
-							this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
+						UserActionStatusTypeEnum.CHANGE_PLAN.toString(),new Long(0), null, null,newOrder.getId(),plan.getProvisionSystem(),null);
 				processResuiltId=processingResult.commandId();
 			}
 		     
@@ -912,8 +908,7 @@ public CommandProcessingResult scheduleOrderCreation(Long clientId,JsonCommand c
 			}else{
 				orderStatus = OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.PENDING).getId();
 				CommandProcessingResult processingResult =this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order, plan.getCode(), 
-						UserActionStatusTypeEnum.TERMINATION.toString(),resourceId, null, null,order.getId(),plan.getProvisionSystem(),
-						this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
+						UserActionStatusTypeEnum.TERMINATION.toString(),resourceId, null, null,order.getId(),plan.getProvisionSystem(),null);
 				resourceId=processingResult.resourceId();
 			}
 			order.setStatus(orderStatus);
@@ -955,8 +950,7 @@ public CommandProcessingResult scheduleOrderCreation(Long clientId,JsonCommand c
 				    		order.setStatus(pendingId);
 				    	
 				    			CommandProcessingResult commandProcessingResult=this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order, plan.getCode(), UserActionStatusTypeEnum.SUSPENTATION.toString(), 
-										resourceId, null, null,order.getId(),plan.getProvisionSystem(),
-										this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
+										resourceId, null, null,order.getId(),plan.getProvisionSystem(),null);
 				    			resourceId =commandProcessingResult.resourceId();
 				    	  //}
 				    		  
@@ -999,8 +993,7 @@ public CommandProcessingResult scheduleOrderCreation(Long clientId,JsonCommand c
 		 if(!"None".equalsIgnoreCase(plan.getProvisionSystem())){
 		    	order.setStatus(pendingId);
 				CommandProcessingResult commandProcessingResult=this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order, plan.getCode(), UserActionStatusTypeEnum.REACTIVATION.toString(), 
-									resourceId, null, null, order.getId(),plan.getProvisionSystem(),
-									this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE).getValue());
+									resourceId, null, null, order.getId(),plan.getProvisionSystem(),null);
 				resourceId=commandProcessingResult.resourceId();
 		 
 		 }else{

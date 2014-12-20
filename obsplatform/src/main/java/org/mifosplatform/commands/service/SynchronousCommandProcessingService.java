@@ -567,6 +567,26 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
 		    }else if (wrapper.isDelete()) {
 			handler = applicationContext.getBean("schedulingOrderDeletionCommandHandler",NewCommandSourceHandler.class);
 		   }
+	  
+		} else if (wrapper.isOrderAddons()) {
+			if (wrapper.isCreate()) {
+			handler = applicationContext.getBean("createOrderAddonsCommandHandler",NewCommandSourceHandler.class);
+		    }else  {
+		    	 throw new UnsupportedCommandException(wrapper.commandName());
+		   }
+	   
+	   }else if (wrapper.isAddons()) {
+			if (wrapper.isCreate()) {
+			handler = applicationContext.getBean("createAddonsCommandHandler",NewCommandSourceHandler.class);
+			
+			}else if (wrapper.isUpdate()) {
+				handler = applicationContext.getBean("updateAddonsCommandHandler",NewCommandSourceHandler.class);
+		    }else if (wrapper.isDelete()) {
+		    	handler = applicationContext.getBean("deleteAddonsCommandHandler",NewCommandSourceHandler.class);
+		    }else  {
+		    	 throw new UnsupportedCommandException(wrapper.commandName());
+		   }
+	   
 	   }else if (wrapper.isOrderPriceResource()) {
 			if (wrapper.isUpdatePrice()) {
 				handler = applicationContext.getBean("updateOrderPriceCommandHandler",NewCommandSourceHandler.class);
@@ -1167,6 +1187,11 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
 				 } else{
 			           throw new UnsupportedCommandException(wrapper.commandName());
 				 }
+            }else if(wrapper.isLinkupAccount()){
+            	if(wrapper.isCreate()){
+            		 handler = applicationContext.getBean("createLinkupAccountCommandHandler",NewCommandSourceHandler.class);
+            	}
+            	
             }else {
             	throw new UnsupportedCommandException(wrapper.commandName());
 		     }

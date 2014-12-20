@@ -13,7 +13,6 @@ import org.mifosplatform.portfolio.order.domain.OrderPrice;
 import org.mifosplatform.portfolio.order.domain.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class BillingOrderWritePlatformServiceImplementation implements BillingOrderWritePlatformService {
@@ -30,7 +29,7 @@ public class BillingOrderWritePlatformServiceImplementation implements BillingOr
 		this.clientBalanceRepository = clientBalanceRepository;
 	}
 
-	@Transactional
+
 	@Override
 	public CommandProcessingResult updateBillingOrder(List<BillingOrderCommand> commands) {
 		Order clientOrder = null;
@@ -39,56 +38,24 @@ public class BillingOrderWritePlatformServiceImplementation implements BillingOr
 			
 			clientOrder = this.orderRepository.findOne(billingOrderCommand.getClientOrderId());
 				if (clientOrder != null) {
+					
 						clientOrder.setNextBillableDay(billingOrderCommand.getNextBillableDate());
 						List<OrderPrice> orderPrices = clientOrder.getPrice();
 						
 						for (OrderPrice orderPriceData : orderPrices) {
-						
+							
+						    if(billingOrderCommand.getOrderPriceId().equals(orderPriceData.getId())){
+						    	
 							orderPriceData.setInvoiceTillDate(billingOrderCommand.getInvoiceTillDate());
 							orderPriceData.setNextBillableDay(billingOrderCommand.getNextBillableDate());
 						}
+					}
 				}
-				this.orderRepository.save(clientOrder);
+				this.orderRepository.saveAndFlush(clientOrder);
 		}
 	
 		return new CommandProcessingResult(Long.valueOf(clientOrder.getId()));
 	}
-
-/*	@Override
-	public CommandProcessingResult updateOrderPrice(
-			List<BillingOrderCommand> billingOrderCommands) {
-		Order orderData = null;
-		for (BillingOrderCommand billingOrderCommand : billingOrderCommands) {
-			orderData = this.orderRepository.findOne(billingOrderCommand
-					.getClientOrderId());
-			List<OrderPrice> orderPrices = orderData.getPrice();
-
-			for (OrderPrice orderPriceData : orderPrices) {
-				if ((orderPriceData.getChargeType().equalsIgnoreCase("RC")&& billingOrderCommand.getChargeType().equalsIgnoreCase("RC"))
-						|| ( orderPriceData.getChargeType().equalsIgnoreCase("RC") && billingOrderCommand.getChargeType().equalsIgnoreCase("DC"))){
- 
-					orderPriceData.setInvoiceTillDate(billingOrderCommand
-							.getInvoiceTillDate());
-					orderPriceData.setNextBillableDay(billingOrderCommand
-							.getNextBillableDate());
-					
-
-				} else if (orderPriceData.getChargeType().equalsIgnoreCase(
-						"NRC")
-						&& billingOrderCommand.getChargeType()
-								.equalsIgnoreCase("NRC")) {
-					orderPriceData.setInvoiceTillDate(billingOrderCommand
-							.getInvoiceTillDate());
-					orderPriceData.setNextBillableDay(billingOrderCommand
-							.getNextBillableDate());
-				}
-				//this.orderPriceRepository.saveAndFlush(orderPriceData);
-			}
-			this.orderRepository.saveAndFlush(orderData);
-		}
-
-		return new CommandProcessingResult(Long.valueOf(orderData.getId()));
-	}*/
 
 	@Override
 	public void updateClientBalance(Invoice invoice,Long clientId,boolean isWalletEnable) {

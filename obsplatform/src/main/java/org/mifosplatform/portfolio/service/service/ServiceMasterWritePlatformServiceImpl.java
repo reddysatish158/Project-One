@@ -37,8 +37,8 @@ public class ServiceMasterWritePlatformServiceImpl  implements ServiceMasterWrit
 	@Override
 	public CommandProcessingResult createNewService(final JsonCommand command) {
 		try {
-			context.authenticatedUser();
-			   this.fromApiJsonDeserializer.validateForCreate(command.json(), command.hasParameter("sortBy"));
+			   context.authenticatedUser();
+			   this.fromApiJsonDeserializer.validateForCreate(command.json());
 			   final ServiceMaster serviceMaster = ServiceMaster.fromJson(command);
 			   this.serviceMasterRepository.save(serviceMaster);
 			   
@@ -51,25 +51,22 @@ public class ServiceMasterWritePlatformServiceImpl  implements ServiceMasterWrit
     
 	@Override
 	public CommandProcessingResult updateService(final Long id,final JsonCommand command) {
-		try
- {
-			context.authenticatedUser();
-
-			this.fromApiJsonDeserializer.validateForCreate(command.json(),
-					command.hasParameter("sortBy"));
-			final ServiceMaster master = retrieveCodeBy(id);
-
-			final Map<String, Object> changes = master.update(command);
-			if (!changes.isEmpty()) {
-				this.serviceMasterRepository.save(master);
-			}
-
-			return new CommandProcessingResultBuilder() //
-					.withCommandId(command.commandId()) //
-					.withEntityId(id) //
-					.with(changes) //
-					.build();
-		} catch (DataIntegrityViolationException dve) {
+		
+		try{
+			    context.authenticatedUser();
+			    this.fromApiJsonDeserializer.validateForCreate(command.json());
+		        final ServiceMaster master = retrieveCodeBy(id);
+		        final Map<String, Object> changes = master.update(command);
+	            if (!changes.isEmpty()) {
+	                this.serviceMasterRepository.save(master);
+	            }
+	            
+         return new CommandProcessingResultBuilder() //
+         .withCommandId(command.commandId()) //
+         .withEntityId(id) //
+         .with(changes) //
+         .build();
+	} catch (DataIntegrityViolationException dve) {
 		 handleCodeDataIntegrityIssues(command, dve);
 		return new CommandProcessingResult(Long.valueOf(-1));
 	}

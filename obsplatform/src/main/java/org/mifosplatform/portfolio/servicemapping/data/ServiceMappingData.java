@@ -6,6 +6,7 @@ import java.util.List;
 import org.mifosplatform.finance.payments.data.McodeData;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
 import org.mifosplatform.infrastructure.dataqueries.data.ReportParameterData;
+import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
 
 public class ServiceMappingData {
 
@@ -23,6 +24,10 @@ public class ServiceMappingData {
 	private List<EnumOptionData> statusData;
 	private Collection<ReportParameterData> serviceParameters;
 	private Collection<McodeData> categories;
+	private Collection<McodeData> subCategories;
+	private Collection<MCodeData> provisionSysData;
+	private String provisionSystem;
+	private String sortBy;
 	
 	public Collection<McodeData> getCategories() {
 		return categories;
@@ -42,12 +47,11 @@ public class ServiceMappingData {
 
 
 
-	private Collection<McodeData> subCategories;
+
 	
 
-	public ServiceMappingData(final Long id, final String serviceCode, 
-			final String serviceIndentification, final String status,
-			final String image, final String category, final String subCategory) {
+	public ServiceMappingData(final Long id, final String serviceCode,final String serviceIndentification, final String status,
+			final String image, final String category, final String subCategory, String provisionSystem,final String sortBy) {
 		
 		this.id=id;
 		this.serviceCode=serviceCode;
@@ -55,20 +59,23 @@ public class ServiceMappingData {
 		this.status=status;
 		this.image=image;
 		this.category=category;
+		this.provisionSystem=provisionSystem;
 		this.subCategory=subCategory;
+		this.sortBy = sortBy;
 	}
 	
 	public ServiceMappingData( final List<ServiceMappingData> serviceMappingData,	
 			final List<ServiceCodeData> serviceCodeData, 
 			final List<EnumOptionData> status, 
 			final Collection<ReportParameterData> serviceParameters, 
-			final Collection<McodeData> categories, final Collection<McodeData> subCategories) {
+			final Collection<McodeData> categories, final Collection<McodeData> subCategories,final Collection<MCodeData> provisionSysData) {
 
 		this.serviceMappingData=serviceMappingData;
 		this.serviceCodeData=serviceCodeData;
 		this.statusData=status;
 		this.serviceParameters=serviceParameters;
 		this.categories=categories;
+		this.provisionSysData=provisionSysData;
 		this.subCategories=subCategories;
 	}
 	
@@ -140,6 +147,11 @@ public class ServiceMappingData {
 
 	public void setStatusData(List<EnumOptionData> status) {
 		this.statusData=status;
+		
+	}
+
+	public void setProvisionSysData(Collection<MCodeData> provisionSysData) {
+		this.provisionSysData=provisionSysData;
 		
 	}
 	

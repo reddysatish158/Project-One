@@ -12,8 +12,7 @@ public class OrderPriceData {
 	private final Long id;
 	private final Long orderId;
 	private final Long serviceId;
-	private final String chargeCode;
-	private final String chargeType;
+	private  String chargeCode;
 	private final String chargeDuration;
 	private final String durationType;
 	private final BigDecimal price;
@@ -29,19 +28,22 @@ public class OrderPriceData {
 	private LocalDate nextBillDate;
 	private String billingCycle;
 	private String billingFrequency;
+	private String serviceDescrption;
+	private String chargedesc;
+	private String chargeType;
 
 	
 
 
-	public OrderPriceData(Long id, Long clientId, Long serviceId,String chargeCode, String chargeType, String chargeDuration,
+	public OrderPriceData(Long id, Long clientId, Long serviceId,String serviceDescrption, String chargedesc, String chargeDuration,
 			String durationtype, BigDecimal price, LocalDate billStartDate, LocalDate billEndDate, LocalDate nextBillDate,
 			LocalDate invoiceTillDate, String billingAlign, String billingFrequency) {
 
 		this.id=id;
 		this.orderId=clientId;
 		this.clientId=serviceId;
-		this.chargeCode=chargeCode;
-		this.chargeType=chargeType;
+		this.serviceDescrption=serviceDescrption;
+		this.chargedesc=chargedesc;
 		this.chargeDuration=chargeDuration;
 		this.durationType=durationtype;
 		this.price=price;

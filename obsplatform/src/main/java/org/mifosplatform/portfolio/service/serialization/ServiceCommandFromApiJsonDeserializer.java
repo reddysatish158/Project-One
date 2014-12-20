@@ -30,7 +30,7 @@ public final class ServiceCommandFromApiJsonDeserializer {
      * The parameters supported for this command.
      */
     private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("serviceCode","serviceDescription",
-    		"serviceUnitType","serviceType","status","isOptional","isAutoProvision","sortBy","locale"));
+    		"serviceUnitType","serviceType","status","isOptional","isAutoProvision"));
     private final FromJsonHelper fromApiJsonHelper;
 
     @Autowired
@@ -38,7 +38,7 @@ public final class ServiceCommandFromApiJsonDeserializer {
         this.fromApiJsonHelper = fromApiJsonHelper;
     }
 
-    public void validateForCreate(final String json, Boolean isSortValue) {
+    public void validateForCreate(final String json) {
         if (StringUtils.isBlank(json)) { throw new InvalidJsonException(); }
 
         final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
@@ -49,10 +49,6 @@ public final class ServiceCommandFromApiJsonDeserializer {
 
         final JsonElement element = fromApiJsonHelper.parse(json);
         
-        if(isSortValue){
-        	final Integer sortBy = fromApiJsonHelper.extractIntegerWithLocaleNamed("sortBy", element);
-        	baseDataValidator.reset().parameter("sortBy").value(sortBy).notExceedingLengthOf(5);
-        }else{
         	final String serviceCode = fromApiJsonHelper.extractStringNamed("serviceCode", element);
         	baseDataValidator.reset().parameter("serviceCode").value(serviceCode).notBlank().notExceedingLengthOf(10);
         	final String serviceDescription = fromApiJsonHelper.extractStringNamed("serviceDescription", element);
@@ -63,8 +59,6 @@ public final class ServiceCommandFromApiJsonDeserializer {
         	baseDataValidator.reset().parameter("serviceUnitType").value(serviceUnitType).notBlank();*/
         	final String  status = fromApiJsonHelper.extractStringNamed("status", element);
         	baseDataValidator.reset().parameter("status").value(status).notBlank();
-       
-        }
         
         throwExceptionIfValidationWarningsExist(dataValidationErrors);
     }

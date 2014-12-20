@@ -139,6 +139,7 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
             }
 
             if (changes.containsKey("roles")) {
+            	
                 final String[] roleIds = (String[]) changes.get("roles");
                 final Set<Role> allRoles = assembleSetOfRoles(roleIds);
 

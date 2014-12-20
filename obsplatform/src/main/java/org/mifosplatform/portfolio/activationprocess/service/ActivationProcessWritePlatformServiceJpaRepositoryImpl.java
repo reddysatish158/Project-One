@@ -16,7 +16,6 @@ import org.mifosplatform.billing.selfcare.domain.SelfCareTemporary;
 import org.mifosplatform.billing.selfcare.domain.SelfCareTemporaryRepository;
 import org.mifosplatform.billing.selfcare.exception.SelfCareNotVerifiedException;
 import org.mifosplatform.billing.selfcare.exception.SelfCareTemporaryEmailIdNotFoundException;
-import org.mifosplatform.billing.selfcare.service.SelfCareRepository;
 import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -198,6 +197,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 	public CommandProcessingResult selfRegistrationProcess(JsonCommand command) {
 
 		try {
+			
 			context.authenticatedUser();
 			Configuration deviceStatusConfiguration = configurationRepository.
 					findOneByName(ConfigurationConstants.CONFIR_PROPERTY_REGISTRATION_DEVICE);
@@ -220,6 +220,8 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 			String email = command.stringValueOfParameterNamed("email");
 			String nationalId = command.stringValueOfParameterNamed("nationalId");
 			String deviceId = command.stringValueOfParameterNamed("device");
+			String deviceAgreementType = command.stringValueOfParameterNamed("deviceAgreementType");
+			String password = command.stringValueOfParameterNamed("password");
 			
 			SelfCareTemporary temporary = selfCareTemporaryRepository.findOneByEmailId(email);
 			
@@ -262,6 +264,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 				clientcreation.put("flag", false);
 				clientcreation.put("zipCode", zipCode);
 				clientcreation.put("device", deviceId);
+				clientcreation.put("password", password);
 				
 				if(nationalId !=null && !nationalId.equalsIgnoreCase("")){
 					clientcreation.put("externalId", nationalId);
@@ -285,12 +288,13 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 					if (deviceStatusConfiguration.isEnabled()) {
 
 						JSONObject bookDevice = new JSONObject();
-						deviceStatusConfiguration = configurationRepository
-								.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);
+						/*deviceStatusConfiguration = configurationRepository
+								.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);*/
 
-						if (deviceStatusConfiguration != null&& deviceStatusConfiguration.isEnabled()
-								&& deviceStatusConfiguration.getValue().equalsIgnoreCase(ConfigurationConstants.CONFIR_PROPERTY_SALE)) {
-
+						/*if (deviceStatusConfiguration != null&& deviceStatusConfiguration.isEnabled()
+								&& deviceStatusConfiguration.getValue().equalsIgnoreCase(ConfigurationConstants.CONFIR_PROPERTY_SALE)) {*/
+						if(deviceAgreementType.equalsIgnoreCase(ConfigurationConstants.CONFIR_PROPERTY_SALE)){
+							
 							device = command.stringValueOfParameterNamed("device");
 							ItemDetails detail = itemDetailsRepository.getInventoryItemDetailBySerialNum(device);
 
@@ -327,7 +331,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 							bookDevice.put("quantity", id);
 							bookDevice.put("locale", "en");
 							bookDevice.put("dateFormat", dateFormat);
-							bookDevice.put("saleType", "SALE");
+							bookDevice.put("saleType", "NEWSALE");
 							bookDevice.put("saleDate", activationDate);
 							bookDevice.put("serialNumber", serialNumber);
 
@@ -342,7 +346,7 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 										"Device Assign Failed for ClientId :" + resultClient.getClientId(), "Device Assign Failed");
 							}
 
-						} else {
+						} else if(deviceAgreementType.equalsIgnoreCase(ConfigurationConstants.CONFIR_PROPERTY_OWN)){
 
 							List<ItemMaster> itemMaster = this.itemRepository.findAll();
 							bookDevice.put("locale", "en");
@@ -359,6 +363,8 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 								throw new PlatformDataIntegrityException("error.msg.client.device.assign.failed",
 										"Device Assign Failed for ClientId :" + resultClient.getClientId(), "Device Assign Failed");
 							}
+						}else {
+							
 						}
 					}
 				}

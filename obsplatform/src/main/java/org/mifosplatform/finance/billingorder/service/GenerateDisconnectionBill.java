@@ -105,7 +105,8 @@ public class GenerateDisconnectionBill {
 			 listOfTaxes = this.calculateTax(billingOrderData, price,disconnectionDate);
 				
 		}else { // If Invoice till date not equal to null
-			
+		  
+		   if(discountMasterData !=null){	
            if(discountMasterData.getDiscountRate() !=null&& (billingOrderData.getBillStartDate().after(discountMasterData.getDiscountStartDate().toDate())
         		   ||billingOrderData.getBillStartDate().compareTo(discountMasterData.getDiscountStartDate().toDate())==0)){
 
@@ -116,6 +117,7 @@ public class GenerateDisconnectionBill {
     		     price = price.subtract(discountMasterData.getDiscountRate());
               }
            }
+		   }
 			
 			this.startDate = disconnectionDate;
 			this.endDate = new LocalDate(billingOrderData.getInvoiceTillDate());
@@ -202,6 +204,7 @@ public class GenerateDisconnectionBill {
 						
 		}else{//if invoice till date not null or after invoice disconnect order
 			
+		   if(discountMasterData !=null){
 	       if(discountMasterData.getDiscountRate() !=null && (billingOrderData.getBillStartDate().after(discountMasterData.getDiscountStartDate().toDate())
 	        		   ||billingOrderData.getBillStartDate().compareTo(discountMasterData.getDiscountStartDate().toDate())==0)){
 
@@ -212,7 +215,7 @@ public class GenerateDisconnectionBill {
 		    			  price = price.subtract(discountMasterData.getDiscountRate());
 		              }
 		           }
-	       
+		   }
 			this.startDate = disconnectionDate;
 			this.endDate = new LocalDate(billingOrderData.getInvoiceTillDate());
 			invoiceTillDate = new LocalDate(billingOrderData.getInvoiceTillDate());

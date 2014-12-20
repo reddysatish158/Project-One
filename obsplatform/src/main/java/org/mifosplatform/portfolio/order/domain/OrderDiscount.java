@@ -7,9 +7,10 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.joda.time.LocalDate;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
@@ -17,11 +18,11 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @Table(name = "b_order_discount")
 public class OrderDiscount extends AbstractPersistable<Long> {
 
-	/*@Id
+/*	@Id
 	@GeneratedValue
 	@Column(name = "id")
-	private Long id;*/
-
+	private Long id;
+*/
 	
 	@Column(name = "discount_id")
 	private Long discountId;
@@ -43,20 +44,22 @@ public class OrderDiscount extends AbstractPersistable<Long> {
 
 	@ManyToOne
 	@JoinColumn(name="order_id")
-	private Order orderId;
+	private Order order;
 	
-	@OneToOne
-	@JoinColumn(name="orderprice_id")
+	@ManyToOne
+	@Cascade({CascadeType.ALL})
+	@JoinColumn(name="orderprice_id", nullable=false)
 	private OrderPrice orderpriceid;
 	
 	public  OrderDiscount() {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public OrderDiscount(Order orderId, OrderPrice orderPriceId, Long discountId,Date startDate, LocalDate endDate,
+	public OrderDiscount(Order order, OrderPrice orderPrice, Long discountId,Date startDate, LocalDate endDate,
 			String discountType,BigDecimal discountRate) {
-              this.orderId=orderId;
-              this.orderpriceid=orderPriceId;
+		
+              this.order=order;
+              this.orderpriceid=orderPrice;
               this.discountId=discountId;
               this.discountStartdate=startDate;
               if(endDate!=null){
@@ -64,8 +67,6 @@ public class OrderDiscount extends AbstractPersistable<Long> {
               }
               this.discountType=discountType;
               this.discountRate=discountRate;
-		
-	
 	}
 
 	public Long getDiscountId() {
@@ -88,8 +89,8 @@ public class OrderDiscount extends AbstractPersistable<Long> {
 		return discountEndDate;
 	}
 
-	public Order getOrderId() {
-		return orderId;
+	public Order getOrder() {
+		return order;
 	}
 
 	public OrderPrice getOrderpriceid() {
@@ -104,6 +105,16 @@ public class OrderDiscount extends AbstractPersistable<Long> {
 		  }
 		  this.discountRate=discountRate;
 		  this.discountType=discountType;
+		
+	}
+
+	public void update(Order order) {
+		this.order=order;
+		
+	}
+
+	public void updateOrderPrice(OrderPrice orderPrice) {
+		this.orderpriceid=orderPrice;
 		
 	}
 
