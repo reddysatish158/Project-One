@@ -40,7 +40,7 @@ public class ServiceMaster extends AbstractPersistable<Long> {
 
 	@Column(name = "is_deleted")
 	private String isDeleted="n";
-
+	
 
 public ServiceMaster()
 {}
