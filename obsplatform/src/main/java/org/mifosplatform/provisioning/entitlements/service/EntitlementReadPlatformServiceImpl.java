@@ -89,11 +89,9 @@ public class EntitlementReadPlatformServiceImpl implements
 			return " p.id AS id,p.client_id AS clientId,p.provisioing_system AS provisioingSystem,pr.id AS prdetailsId,pr.service_type as servicetype," +
 					" pr.sent_message AS sentMessage,pr.hardware_id AS hardwareId,pr.request_type AS requestType,o.plan_id AS planId,o.order_no AS orderNo," +
 					" o.id as orderId,o.start_date as startDate,o.end_date as endDate, c.account_no as accountNo," +
-					" ifnull(c.fullname, c.firstname) as displayName, ifnull(c.login,c.id) as login, ifnull(c.password,'0000') as password," +
-					" sc.unique_reference as selfcareUsername, sc.password as selfcarePassword " +
-					" FROM b_process_request_detail pr, b_process_request p LEFT JOIN b_orders o " +
-					" ON o.id = p.order_id LEFT JOIN m_client c ON c.id = p.client_id LEFT JOIN b_clientuser sc ON sc.client_id = p.client_id " +
-					" WHERE p.id = pr.processrequest_id AND p.is_processed = 'N'";
+					" ifnull(c.fullname, c.firstname) as displayName, ifnull(c.login,c.id) as login, ifnull(c.password,'0000') as password" +
+					" FROM b_process_request_detail pr, b_process_request p LEFT JOIN b_orders o" +
+					" ON o.id = p.order_id LEFT JOIN m_client c ON c.id = p.client_id WHERE p.id = pr.processrequest_id AND p.is_processed = 'N'";
 
 		}
 
