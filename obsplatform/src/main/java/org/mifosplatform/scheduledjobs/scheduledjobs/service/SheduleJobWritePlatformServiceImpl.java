@@ -603,7 +603,6 @@ public void processNotify() {
 			output1 = output1 + output;
 		}
 		
-		fw.append("Output from Server: " + output1 + " \r\n");
 		System.out.println(output1);
 		br.close();
 		
@@ -642,20 +641,17 @@ public void processNotify() {
 					FileUtils.BILLING_JOB_PATH = fileHandler.getAbsolutePath();
 					
 					fw.append("Processing Radius Details....... \r\n");
-					fw.append("Staker Server Details.....\r\n");
-					fw.append("UserName of Staker:" + data.getUsername() + " \r\n");
-					fw.append("password of Staker: ************** \r\n");
-					fw.append("url of staker:" + data.getUrl() + " \r\n");
+					fw.append("Radius Server Details.....\r\n");
+					fw.append("UserName of Radius:" + data.getUsername() + " \r\n");
+					fw.append("password of Radius: ************** \r\n");
+					fw.append("url of Radius:" + data.getUrl() + " \r\n");
 
 					for (EntitlementsData entitlementsData : entitlementDataForProcessings) {
 						
-						JSONObject jsonObject = new JSONObject(entitlementsData.getProduct());
-						String planIdentification = jsonObject.getString("planIdentification");
 						
 						fw.append("EntitlementsData id=" + entitlementsData.getId() + " ,clientId="
 								+ entitlementsData.getClientId() + " ,HardwareId=" + entitlementsData.getHardwareId()
-								+ " ,RequestType=" + entitlementsData.getRequestType()
-								+ " Command" + (null == planIdentification ? 0 : planIdentification) + "\r\n");
+								+ " ,RequestType=" + entitlementsData.getRequestType() + "\r\n");
 						
 						Long clientId = entitlementsData.getClientId();
 						
@@ -666,7 +662,7 @@ public void processNotify() {
 									
 							JSONObject object = new JSONObject();
 							
-							object.put("username", clientdata.getSelfcareUsername());
+							object.put("username", entitlementsData.getDisplayName());
 							object.put("attribute", "Cleartext-Password");
 							object.put("op", ":=");
 							object.put("value", clientdata.getSelfcarePassword());
@@ -729,7 +725,9 @@ public void processNotify() {
 							System.out.println(output);
 							
 						} else if (entitlementsData.getRequestType().equalsIgnoreCase(MiddlewareJobConstants.Activation)) {
-
+							JSONObject jsonObject = new JSONObject(entitlementsData.getProduct());
+							String planIdentification = jsonObject.getString("planIdentification");
+							
 							JSONObject object = new JSONObject();
 							object.put("username", entitlementsData.getFirstName());
 							object.put("groupname", planIdentification);
