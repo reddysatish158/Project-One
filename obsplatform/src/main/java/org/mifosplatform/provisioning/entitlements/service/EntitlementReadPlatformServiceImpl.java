@@ -117,12 +117,18 @@ public class EntitlementReadPlatformServiceImpl implements
 			String fullName = rs.getString("fullName");	
 			String login = rs.getString("login");
 			String password = rs.getString("password");
-			return new ClientEntitlementData(emailId,fullName,login,password);
+			String selfcareUsername = rs.getString("selfcareUsername");
+		    String selfcarePassword = rs.getString("selfcarePassword");
+		    
+			return new ClientEntitlementData(emailId, fullName, login, password, selfcareUsername, selfcarePassword);
 		
 		}
 		
 		public String schema() {
-			return "c.email as EmailId,c.display_name as fullName,ifnull(c.login,c.id) as login,ifnull(c.password,'0000') as password from m_client c where c.id=?";
+			return " c.email as EmailId, c.display_name as fullName, ifnull(c.login,c.id) as login, " +
+					" ifnull(c.password,'0000') as password, " +
+					" sc.unique_reference as selfcareUsername, sc.password as selfcarePassword from m_client c " +
+					" LEFT JOIN b_clientuser sc ON sc.client_id = c.id where c.id=?";
 
 		}
 		

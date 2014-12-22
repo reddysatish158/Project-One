@@ -120,9 +120,16 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 		public void notifyProcessingDetails(ProcessRequest detailsData,char status) {
 				try{
 					if(detailsData!=null && !(detailsData.getRequestType().equalsIgnoreCase(ProvisioningApiConstants.REQUEST_TERMINATE)) && status != 'F'){
-						Order order=this.orderRepository.findOne(detailsData.getOrderId());
-						Client client=this.clientRepository.findOne(order.getClientId());
-						Plan plan=this.planRepository.findOne(order.getPlanId());
+						
+							Order order=null;
+							Plan plan = null;
+						
+							if (detailsData.getOrderId() != null && detailsData.getOrderId() > 0) {
+								order = this.orderRepository.findOne(detailsData.getOrderId());
+								plan = this.planRepository.findOne(order.getPlanId());
+							}
+							
+							Client client=this.clientRepository.findOne(detailsData.getClientId());
 							
 							if(detailsData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.ACTIVATION.toString())){
 								
@@ -181,10 +188,14 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 								order.setStatus(enumDomainService.getEnumId());
 								this.orderRepository.saveAndFlush(order);
 							}else{
-								order.setStatus(OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.ACTIVE).getId());
+								
+								if(order != null){
+									order.setStatus(OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.ACTIVE).getId());
+									this.orderRepository.saveAndFlush(order);
+								}
 								client.setStatus(ClientStatus.ACTIVE.getValue());
 								this.clientRepository.saveAndFlush(client);
-								this.orderRepository.saveAndFlush(order);
+								
 							}	
 						//	this.orderRepository.saveAndFlush(order);
 							this.clientRepository.saveAndFlush(client);
