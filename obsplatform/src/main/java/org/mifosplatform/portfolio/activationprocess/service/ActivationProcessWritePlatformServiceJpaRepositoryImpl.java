@@ -222,23 +222,24 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 			String deviceId = command.stringValueOfParameterNamed("device");
 			String deviceAgreementType = command.stringValueOfParameterNamed("deviceAgreementType");
 			String password = command.stringValueOfParameterNamed("password");
+			String isMailCheck=command.stringValueOfParameterNamed("isMailCheck");
+			SelfCareTemporary temporary =null;
 			
-			SelfCareTemporary temporary = selfCareTemporaryRepository.findOneByEmailId(email);
-			
-			if(temporary == null){
-				throw new SelfCareTemporaryEmailIdNotFoundException(email);
-			}
-
-			/*if(temporary.getPaymentStatus().equalsIgnoreCase("ACTIVE")){
-				throw new PaymentStatusAlreadyActivatedException(email);
-			}*/
-			
-			if (temporary.getStatus().equalsIgnoreCase("ACTIVE")) {
+			if(isMailCheck == null || isMailCheck.isEmpty()){
+				 temporary = selfCareTemporaryRepository.findOneByEmailId(email);
 				
-                  throw new ClientAlreadyCreatedException();
+				if(temporary == null){
+					throw new SelfCareTemporaryEmailIdNotFoundException(email);
+				
+				}else if (temporary.getStatus().equalsIgnoreCase("ACTIVE")) {
+					throw new ClientAlreadyCreatedException();
+				
+				}else if (temporary.getStatus().equalsIgnoreCase("INACTIVE")) {
+  				throw new SelfCareNotVerifiedException(email);			
+				}
 			}
 			
-			if (temporary.getStatus().equalsIgnoreCase("PENDING")){
+		//	if (temporary.getStatus().equalsIgnoreCase("PENDING")){
 				
 				String zipCode = command.stringValueOfParameterNamed("zipCode");
 				// client creation
@@ -280,7 +281,10 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
 					throw new PlatformDataIntegrityException("error.msg.client.creation.failed", "Client Creation Failed","Client Creation Failed");
 				}
 				
+				if(temporary != null){
 				temporary.setStatus("ACTIVE");
+				this.selfCareTemporaryRepository.saveAndFlush(temporary);
+				}
 				
 				//book device
 				if (deviceStatusConfiguration != null) {
@@ -420,12 +424,9 @@ public class ActivationProcessWritePlatformServiceJpaRepositoryImpl implements A
   				
   				return resultClient;
   				
-  			} else if (temporary.getStatus().equalsIgnoreCase("INACTIVE")) {
-  				throw new SelfCareNotVerifiedException(email);			
-
-  			} else {
+  			/*}  else {
   				return new CommandProcessingResult(Long.valueOf(-1));
-  			}	
+  			}*/	
 
 
   		} catch (DataIntegrityViolationException dve) {
