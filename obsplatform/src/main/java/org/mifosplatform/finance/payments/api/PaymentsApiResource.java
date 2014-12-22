@@ -120,43 +120,6 @@ public class PaymentsApiResource {
 
 	}
 	
-	
-	/**
-	 * This method is using for posting data to create payment using paypal
-	 */
-	 @POST
-	 @Path("paypal")
-	 @Consumes("application/x-www-form-urlencoded")
-	 @Produces({ MediaType.APPLICATION_JSON })
-	 public String checkout(@FormParam("txn_id") final String txnId,@FormParam("payment_date") final Date paymentDate,@FormParam("mc_gross") final BigDecimal amount,
-			 @FormParam("address_name") final String name,@FormParam("payer_email") final String payerEmail,
-			 @FormParam("transaction_subject") final String clientStringId){
-	   try {
-		   
-		  final Long clientId= Long.parseLong(clientStringId);
-		  final SimpleDateFormat daformat=new SimpleDateFormat("dd MMMM yyyy");
-		  final String date=daformat.format(paymentDate);
-		  final JsonObject object=new JsonObject();
-		  object.addProperty("txn_id", txnId);
-		  object.addProperty("dateFormat","dd MMMM yyyy");
-		  object.addProperty("locale","en");
-		  object.addProperty("paymentDate",date);
-		  object.addProperty("amountPaid",amount);
-		  object.addProperty("isChequeSelected","no");
-		  object.addProperty("receiptNo",txnId);
-		  object.addProperty("remarks",payerEmail);
-		  object.addProperty("paymentCode",27);
-		  
-		  final CommandWrapper commandRequest = new CommandWrapperBuilder().createPayment(clientId).withJson(object.toString()).build();
-		  final CommandProcessingResult result1 = this.writePlatformService.logCommandSource(commandRequest);
-		  return this.toApiJsonSerializer.serialize(result1); 
-	        
-	  } 
-	   catch(Exception e){
-	    return e.getMessage();
-	   }
-	 }
-	 
 	 /**
 	 * This method is using for cancelling payment with payment id
 	 */
@@ -249,63 +212,5 @@ public class PaymentsApiResource {
 		final CommandProcessingResult result = this.writePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 	}
-
-	/**
-	 * This method is using for posting data to create payment using korta
-	 *//*
-	@POST
-	@Path("korta")
-	@Consumes({ MediaType.APPLICATION_JSON })
-	@Produces({ MediaType.APPLICATION_JSON })
-	public String kortaPayment(final String apiRequestBodyAsJson) {
-
-		try {
-			final JSONObject json = new JSONObject(apiRequestBodyAsJson);
-			final Long clientId = json.getLong("clientId");
-			final String reference = json.getString("reference");
-			final String totalAmount = json.getString("amount");
-			
-			if (clientId != null && clientId > 0) {
-				final String date = new SimpleDateFormat("dd MMMM yyyy").format(new Date());
-				final JsonObject object = new JsonObject();
-				object.addProperty("txn_id", reference);
-				object.addProperty("dateFormat", "dd MMMM yyyy");
-				object.addProperty("locale", "en");
-				object.addProperty("paymentDate", date);
-				object.addProperty("amountPaid", totalAmount);
-				object.addProperty("isChequeSelected", "no");
-				object.addProperty("receiptNo", reference);
-				object.addProperty("remarks","Payment With Korta PaymentGateway");
-				object.addProperty("paymentCode", 27);
-
-				final CommandWrapper commandRequest = new CommandWrapperBuilder().createPayment(clientId).withJson(object.toString()).build();
-				final CommandProcessingResult result = this.writePlatformService.logCommandSource(commandRequest);
-				return this.toApiJsonSerializer.serialize(result);
-
-			} else if (clientId != null && clientId == 0) {
-				final String emailId = json.getString("emailId");
-				final SelfCareTemporary selfCareTemporary = this.selfCareTemporaryRepository.findOneByEmailId(emailId);
-				if (selfCareTemporary != null && selfCareTemporary.getPaymentStatus().equalsIgnoreCase("INACTIVE")) {
-					final JsonObject obj = new JsonObject();
-					obj.addProperty("order_num", reference);
-					obj.addProperty("total_amount", totalAmount);
-					obj.addProperty("cust_email", emailId);
-
-					selfCareTemporary.setPaymentData(obj.toString());
-					selfCareTemporary.setPaymentStatus("PENDING");
-					this.selfCareTemporaryRepository.save(selfCareTemporary);
-					return selfCareTemporary.getId().toString();
-				} else if (selfCareTemporary != null) {
-					throw new SelfCareTemporaryAlreadyExistException(emailId);
-				} else {
-					throw new SelfCareTemporaryEmailIdNotFoundException(emailId);
-				}
-			} else {
-				throw new KortaRequestFailureException(clientId);
-			}
-		} catch (Exception e) {
-			return e.getMessage();
-		}
-	}*/
 
 }
