@@ -80,7 +80,7 @@ public class EntitlementsApiResource {
 		    @QueryParam("serviceType") final String serviceType,@Context final UriInfo uriInfo)
 	{
 	       context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-	        List<EntitlementsData> data=this.entitlementReadPlatformService.getProcessingData(No,provisioningSystem,serviceType);
+	        List<EntitlementsData> data=this.entitlementReadPlatformService.getProcessingData(No, provisioningSystem, serviceType);
 	        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 	        return this.toApiJsonSerializer.serialize(settings, data, RESPONSE_DATA_PARAMETERS);
 	}
