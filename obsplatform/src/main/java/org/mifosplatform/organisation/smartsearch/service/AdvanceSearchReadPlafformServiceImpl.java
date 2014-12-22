@@ -47,10 +47,10 @@ public AdvanceSearchReadPlafformServiceImpl(final PlatformSecurityContext securi
 		  final AdvanceSearchMapper advanceSearchMapper=new AdvanceSearchMapper();
 		  final Object[] objectArray = new Object[3];
 	      int arrayPos = 0;
-	      StringBuilder stringBuilder = null;
+	      StringBuilder stringBuilder = new StringBuilder();
 		  if(searchParameters.getSearchType().equalsIgnoreCase("TICKETS")){
 			  
-			  stringBuilder=new StringBuilder(advanceSearchMapper.schema());
+			  stringBuilder.append(advanceSearchMapper.schema());
 			  
 			  if(searchParameters.getSqlSearch() != null){
 				  stringBuilder.append(" AND (t.description LIKE '%"+searchParameters.getSqlSearch()+"%' OR c.display_name LIKE '%"+searchParameters.getSqlSearch()+"%')");
@@ -108,25 +108,58 @@ public AdvanceSearchReadPlafformServiceImpl(final PlatformSecurityContext securi
 			  
 		  }else if(searchParameters.getSearchType().equalsIgnoreCase("LEADS")){
 			  
-			  stringBuilder = new StringBuilder(advanceSearchMapper.schemaForLeads());
+			  stringBuilder.append(advanceSearchMapper.schemaForLeads());
 			  
 			  if(searchParameters.getSqlSearch() != null){
 				  stringBuilder.append(" AND (concat(p.first_name,' ',p.last_name) LIKE '%"+searchParameters.getSqlSearch()+"%' or concat(p.last_name,' ',p.first_name) LIKE '%"+searchParameters.getSqlSearch()+"%')");
-			  }else if(searchParameters.getName() != null){
+			  }
+			  if(searchParameters.getName() != null){
 				  stringBuilder.append(" AND (concat(p.first_name,' ',p.last_name) LIKE '%"+searchParameters.getName()+"%' or concat(p.last_name,' ',p.first_name) LIKE '%"+searchParameters.getName()+"%')");
-			  }else if(searchParameters.getCreatedBy() != null){
+			  }
+			  if(searchParameters.getCreatedBy() != null){
 				  stringBuilder.append(" AND (p.createdby_id ="+searchParameters.getCreatedBy()+")");
-			  }else if(searchParameters.getAssignedTo() != null){
+			  }
+			  if(searchParameters.getAssignedTo() != null){
 				  stringBuilder.append(" AND (pd.assigned_to ="+searchParameters.getAssignedTo()+")");
-			  }else if(searchParameters.getEmailId() != null){
+			  }
+			  if(searchParameters.getEmailId() != null){
 				  stringBuilder.append(" AND (p.email ='"+searchParameters.getEmailId()+"')");
-			  }else if(searchParameters.getSource() != null){
+			  }
+			  if(searchParameters.getSource() != null){
 				  stringBuilder.append(" AND (p.source_of_publicity ='"+searchParameters.getSource()+"')");
-			  }else if(searchParameters.getPhone() != null){
+			  }
+			  if(searchParameters.getPhone() != null){
 				  stringBuilder.append(" AND (p.mobile_number ="+searchParameters.getPhone()+")");
 			  }
 			  
 			  stringBuilder.append(" order by p.id limit "+searchParameters.getLimit()+" offset "+searchParameters.getOffset());
+		  }else if(searchParameters.getSearchType().equalsIgnoreCase("CLIENTS")){
+			  
+			  stringBuilder.append(advanceSearchMapper.schemaForClients());
+			  
+			  if(searchParameters.getSqlSearch() != null){
+				  stringBuilder.append(" AND (concat(mc.firstname,' ',mc.lastname) LIKE '%"+searchParameters.getSqlSearch()+"%' or concat(mc.lastname,' ',mc.firstname) LIKE '%"+searchParameters.getSqlSearch()+"%')");
+			  }
+			  if(searchParameters.getName() != null){
+				  stringBuilder.append(" AND (concat(mc.firstname,' ',mc.lastname) LIKE '%"+searchParameters.getName()+"%' or concat(mc.lastname,' ',mc.firstname) LIKE '%"+searchParameters.getName()+"%')");
+			  }
+			  if(searchParameters.getPhone() != null){
+				  stringBuilder.append(" AND (mc.phone ="+searchParameters.getPhone()+")");
+			  }
+			  if(searchParameters.getEmailId() != null){
+				  stringBuilder.append(" AND (mc.email ='"+searchParameters.getEmailId()+"')");
+			  }
+			  if(searchParameters.getCity() != null){
+				  stringBuilder.append(" AND (a.city ='"+searchParameters.getCity()+"')");
+			  }
+			  if(searchParameters.getAddress() != null){
+				  stringBuilder.append(" AND (a.address_no ='"+searchParameters.getAddress()+"')");
+			  }
+			  if(searchParameters.getExternalId() != null){
+				  stringBuilder.append(" AND (mc.external_id ='"+searchParameters.getExternalId()+"')");
+			  }
+			  
+			  stringBuilder.append(" order by mc.id limit "+searchParameters.getLimit()+" offset "+searchParameters.getOffset()); 
 		  }else{
 			  
 		  }
@@ -160,6 +193,13 @@ public AdvanceSearchReadPlafformServiceImpl(final PlatformSecurityContext securi
     			 " and pd.id= (select max(id) from b_prospect_detail pd2 "+
     			 " where  pd2.prospect_id=pd.prospect_id )  ) where  p.is_deleted='N' ";
     			
+      }
+      
+      public String schemaForClients() {
+          return "select mc.id as id,mc.activation_date as transactionDate,mc.id as clientId,mc.account_no as accountNo,"+
+        		  "concat(mc.firstname,' ',mc.lastname) as clientName,mc.status_enum as status,mc.category_type as category,"+
+        		  "0 as userName,a.city as city FROM m_client mc "+
+        		  "inner join b_client_address a on  a.client_id = mc.id  and a.address_key = 'PRIMARY' ";
       }
       
       @Override
