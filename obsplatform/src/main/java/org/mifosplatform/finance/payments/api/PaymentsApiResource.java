@@ -119,7 +119,8 @@ public class PaymentsApiResource {
 		return this.toApiJsonSerializer.serialize(settings, paymentData,RESPONSE_DATA_PARAMETERS);
 
 	}
-	 
+
+
 	 /**
 	 * This method is using for cancelling payment with payment id
 	 */
@@ -212,23 +213,6 @@ public class PaymentsApiResource {
 		final CommandProcessingResult result = this.writePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 	}
-	
-	
-	@GET
-	@Path("paypaltest")
-	@Produces("text/html")
-	 public String checkout1(@QueryParam("url") final String Url){
-	   try {
-		   
-		  String htmlData = "<a href=\""+Url+"\">Go to JSP form</a>";
-		  System.out.println("s value = " +htmlData);
-		  return htmlData;
-	        
-	  } 
-	   catch(Exception e){
-	    return e.getMessage();
-	   }
-	 }
-	
-	
+
+
 }
