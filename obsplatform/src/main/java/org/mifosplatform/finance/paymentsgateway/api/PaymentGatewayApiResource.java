@@ -3,6 +3,7 @@ package org.mifosplatform.finance.paymentsgateway.api;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -13,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -51,6 +53,8 @@ import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import com.google.gson.JsonObject;
 
 @Path("/paymentgateways")
 @Component
@@ -406,5 +410,89 @@ public class PaymentGatewayApiResource {
 			return null;
 		}		
 	}
+	
+	/**
+	 * This method is using for posting data to create payment using paypal
+	 */
+	 @POST
+	 @Path("paypal")
+	 @Consumes("application/x-www-form-urlencoded")
+	 @Produces("text/html")
+	 public String paypalOnlinePayment(@FormParam("txn_id") final String txnId,@FormParam("payment_date") final Date paymentDate,
+			 @FormParam("mc_gross") final BigDecimal amount,
+			 @FormParam("address_name") final String name,@FormParam("payer_email") final String payerEmail,
+			 @FormParam("custom") final String customData, @FormParam("mc_currency") final String currency,
+			 @FormParam("receiver_email") final String receiverEmail, @FormParam("payer_status") final String payerStatus){
+		 //add "clientId" as supported parameter in create order validation. 
+		try {
+			 //in customData you should get the Parameters are clientId,locale,plancode,paytermcode,contractPeriod,returnUrl.
+			
+			final JSONObject jsonCustomData = new JSONObject(customData);
+			
+			final String dateFormat = "dd MMMM yyyy";
+
+			final SimpleDateFormat daformat = new SimpleDateFormat(dateFormat);
+
+			final String date = daformat.format(paymentDate);
+			
+			final String returnUrl = jsonCustomData.getString("returnUrl");
+			
+			final Long clientId = jsonCustomData.getLong("clientId");
+
+			JsonObject jsonObj = new JsonObject();
+			jsonObj.addProperty("paymentDate", date);
+			jsonObj.addProperty("payerEmail", payerEmail);
+			jsonObj.addProperty("address_name", name);
+			jsonObj.addProperty("receiverEmail", receiverEmail);
+			jsonObj.addProperty("payerStatus", payerStatus);
+			jsonObj.addProperty("currency", currency);
+
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("source", "paypal");
+			jsonObject.put("transactionId", txnId);
+			jsonObject.put("currency", currency);
+			jsonObject.put("clientId", clientId);
+			jsonObject.put("total_amount", amount);
+			jsonObject.put("locale", "en");
+			jsonObject.put("dateFormat", dateFormat);
+			jsonObject.put("otherData", jsonObj.toString());
+			
+			String data = OnlinePaymentMethod(jsonObject.toString());
+			
+			JSONObject resultJsonObject = new JSONObject(data);
+			
+			String Result = resultJsonObject.getString("Result");
+			
+			if(Result.equalsIgnoreCase("SUCCESS")){
+				/*{"billAlign":false,"isNewplan":true,"locale":"en",
+					"dateFormat":"dd MMMM yyyy","start_date":"18 December 2014",
+					"paytermCode":"Monthly","contractPeriod":5,"planCode":22}*/
+				
+				jsonCustomData.put("billAlign", false);
+				jsonCustomData.put("isNewplan", true);
+				jsonCustomData.put("dateFormat", dateFormat);
+				jsonCustomData.put("start_date", date);
+				jsonCustomData.remove("clientId");
+				jsonCustomData.remove("returnUrl");
+				
+				
+				CommandWrapper commandRequest = new CommandWrapperBuilder().createOrder(clientId).withJson(jsonCustomData.toString()).build();
+				CommandProcessingResult resultOrder = this.writePlatformService.logCommandSource(commandRequest);
+
+				if (resultOrder == null) {
+					throw new PlatformDataIntegrityException("error.msg.client.order.creation",
+							"Book Order Failed for ClientId:" + clientId, "Book Order Failed");
+				}
+			}
+			
+			String htmlData = "<a href=\""+returnUrl+"\"> Click On Me</a>";
+			
+			return htmlData;
+
+		} 
+	   catch(Exception e){
+	    return e.getMessage();
+	   }
+	 }
 }
 
