@@ -46,33 +46,27 @@ import org.springframework.stereotype.Component;
 public class EventOrderApiResource {
 			private  final Set<String> RESPONSE_DATA_PARAMETERS=new HashSet<String>(Arrays.asList("eventId","eventBookedDate","eventValidDate","clientId",
 					   "eventPriceId","movieLocation","bookedPrice","eventStatus","chargeCode"));
-		    private final String resourceNameForPermissions = "EVENTORDER";
+		   
+			private final String resourceNameForPermissions = "EVENTORDER";
 		    private final PlatformSecurityContext context;
 			private final DefaultToApiJsonSerializer<EventOrderData> toApiJsonSerializer;
 			private final ApiRequestParameterHelper apiRequestParameterHelper;
 			private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
-			private final FromJsonHelper fromJsonHelper;
 			private final EventOrderReadplatformServie eventOrderReadplatformServie; 
 			private final EventMasterReadPlatformService eventMasterReadPlatformService;
 			private final MCodeReadPlatformService codeReadPlatformService;
 			private final EventPriceReadPlatformService eventPricingReadService;
 				
 			@Autowired
-			public EventOrderApiResource(
-					final PlatformSecurityContext context,
-					final DefaultToApiJsonSerializer<EventOrderData> toApiJsonSerializer,
-					final ApiRequestParameterHelper apiRequestParameterHelper,
-					final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
-					final FromJsonHelper fromJsonHelper,
-					final EventOrderReadplatformServie eventOrderReadplatformServie,
-					final EventMasterReadPlatformService eventMasterReadPlatformService,
-					final MCodeReadPlatformService codeReadPlatformService,
-					final EventPriceReadPlatformService eventPricingReadService) {
+			public EventOrderApiResource(final PlatformSecurityContext context,final DefaultToApiJsonSerializer<EventOrderData> toApiJsonSerializer,
+					final ApiRequestParameterHelper apiRequestParameterHelper,final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
+					final EventOrderReadplatformServie eventOrderReadplatformServie,final EventMasterReadPlatformService eventMasterReadPlatformService,
+					final MCodeReadPlatformService codeReadPlatformService,final EventPriceReadPlatformService eventPricingReadService) {
+				
 				this.context = context;
 				this.toApiJsonSerializer = toApiJsonSerializer;
 				this.apiRequestParameterHelper = apiRequestParameterHelper;
 				this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
-				this.fromJsonHelper = fromJsonHelper;
 				this.eventOrderReadplatformServie = eventOrderReadplatformServie;
 				this.eventMasterReadPlatformService = eventMasterReadPlatformService;
 				this.codeReadPlatformService = codeReadPlatformService;

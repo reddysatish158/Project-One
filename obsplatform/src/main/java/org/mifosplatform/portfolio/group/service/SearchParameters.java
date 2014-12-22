@@ -30,19 +30,22 @@ public final class SearchParameters {
     private final String source;
     private final String phone;
     private final String searchType;
+    private final String city;
+    private final String address;
     
     public static SearchParameters from(final String sqlSearch, final Long officeId, final String externalId, final String name,
             final String hierarchy) {
         return new SearchParameters(sqlSearch, officeId, externalId, name, hierarchy, null, null, null, null, null, null,null,null,
-        		null,null,null,null,null,null,null,null,null,null);
+        		null,null,null,null,null,null,null,null,null,null,null,null);
     }
     
 
 	public static SearchParameters forTickets(String searchText,DateParam fromDateParam, DateParam toDateParam, Long assignedTo,
-			 Long closedBy, String category,String status, Integer limit, Integer offset, String name, Long createdBy, String emailId, String source, String phone,String searchType) {
+			 Long closedBy, String category,String status, Integer limit, Integer offset, String name, Long createdBy, String emailId, String source,
+			 String phone, String searchType, String city, String address, String externalId) {
 		
-		return new SearchParameters(searchText,null,null,name,null,null,null, offset, limit, null, null,null, status,fromDateParam,toDateParam,
-				assignedTo,closedBy,category,createdBy,emailId,source,phone,searchType);
+		return new SearchParameters(searchText,null,externalId,name,null,null,null, offset, limit, null, null,null, status,fromDateParam,toDateParam,
+				assignedTo,closedBy,category,createdBy,emailId,source,phone,searchType,city,address);
 	}
 
     public static SearchParameters forClients(final String sqlSearch, final Long officeId, final String externalId,
@@ -55,14 +58,14 @@ public final class SearchParameters {
         }
 
         return new SearchParameters(sqlSearch, officeId, externalId, displayName, hierarchy, firstname, lastname, offset, maxLimitAllowed,
-                orderBy, sortOrder,groupName,status,null,null,null,null,null,null,null,null,null,null);
+                orderBy, sortOrder,groupName,status,null,null,null,null,null,null,null,null,null,null,null,null);
     }
 
     private SearchParameters(final String sqlSearch, final Long officeId, final String externalId, final String name,
             final String hierarchy, final String firstname, final String lastname, final Integer offset, final Integer limit,
             final String orderBy, final String sortOrder,final String groupName,final String status, DateParam fromDateParam,
             DateParam toDateParam, Long assignedTo, Long closedBy, String category, Long createdBy, String emailId, String source,
-            String phone,String searchType) {
+            String phone,String searchType, String city, String address) {
     	
         this.sqlSearch = sqlSearch;
         this.officeId = officeId;
@@ -87,6 +90,8 @@ public final class SearchParameters {
         this.source = source;
         this.phone = phone;
         this.searchType = searchType;
+        this.city = city;
+        this.address = address;
     }
 
     public String getGroupName() {
@@ -178,7 +183,7 @@ public final class SearchParameters {
 
         Integer maxLimitAllowed = getCheckedLimit(limit);
 
-        return new SearchParameters(null, null, null, null, null, null, null, offset, maxLimitAllowed, orderBy, sortOrder,null,null,null,null,null,null,null,null,null,null,null,null);
+        return new SearchParameters(null, null, null, null, null, null, null, offset, maxLimitAllowed, orderBy, sortOrder,null,null,null,null,null,null,null,null,null,null,null,null,null,null);
     }
 
 	public static Integer getCheckedLimit(final Integer limit) {
@@ -226,6 +231,14 @@ public final class SearchParameters {
 
 	public String getSearchType() {
 		return searchType;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public String getAddress() {
+		return address;
 	}
 	
 	
