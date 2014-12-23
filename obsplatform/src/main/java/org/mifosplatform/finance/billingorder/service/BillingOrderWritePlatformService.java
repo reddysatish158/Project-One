@@ -11,8 +11,6 @@ public interface BillingOrderWritePlatformService {
 	//List<BillingOrder> createBillingProduct(List<BillingOrderCommand> billingOrderCommands);
 	CommandProcessingResult updateBillingOrder(List<BillingOrderCommand> billingOrderCommands);
 	
-	//CommandProcessingResult updateOrderPrice(List<BillingOrderCommand> billingOrderCommands);
-	
 	void updateClientBalance(Invoice invoice,Long clientId, boolean isWalletEnable);
 
 }

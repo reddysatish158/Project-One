@@ -70,13 +70,8 @@ public final class OrderAddOnsCommandFromApiJsonDeserializer {
 			baseDataValidator.reset().parameter("serviceId").value(serviceId).notNull();
 			final BigDecimal price= fromApiJsonHelper.extractBigDecimalWithLocaleNamed("price", attributeElement);
 			baseDataValidator.reset().parameter("price").value(price).notNull();
-			
-			
-
 		
 		}
-        
-
 
         throwExceptionIfValidationWarningsExist(dataValidationErrors);
     }

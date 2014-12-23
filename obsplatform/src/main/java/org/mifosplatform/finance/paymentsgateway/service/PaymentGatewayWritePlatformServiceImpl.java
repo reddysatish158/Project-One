@@ -399,11 +399,7 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 			}else{
 				globalpayMerchanttxnref = fieldArray.getJSONObject(5).getString("merchant_txnref");
 			}
-			/*else if(fieldArray.getJSONObject(5).has("merchant_txnref")){
-				globalpayMerchanttxnref = fieldArray.getJSONObject(5).getString("merchant_txnref");
-			}*/
 			
-
 			JSONObject otherDataObject = new JSONObject();
 			otherDataObject.put("currency", currency);
 			otherDataObject.put("paymentStatus", paymentStatus);
@@ -413,11 +409,6 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 			otherDataObject.put("globalpayMerchanttxnref", globalpayMerchanttxnref);
 
 			String[] clientIdString = globalpayMerchanttxnref.split("-");
-			String status = "SUCCESSFUL";
-
-			if (!MerchantTxnRef.equals(globalpayMerchanttxnref)) {
-				status = "FAILURE";
-			}
 
 			pgConfigJsonObj.put("clientId", clientIdString[0]);
 			pgConfigJsonObj.put("emailId", emailAddress);
@@ -426,10 +417,11 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 			pgConfigJsonObj.put("source", ConfigurationConstants.GLOBALPAY_PAYMENTGATEWAY);
 			pgConfigJsonObj.put("otherData", otherDataObject);
 			pgConfigJsonObj.put("device", "");
-			pgConfigJsonObj.put("status", status);
 			pgConfigJsonObj.put("currency", currency);
+			pgConfigJsonObj.put("status", paymentStatus);		
 			
-			return pgConfigJsonObj.toString();
+			return pgConfigJsonObj.toString(); 
+	       
 		}
 		
 		private void handleDataIntegrityIssues(final JsonCommand command, final DataIntegrityViolationException dve) {
@@ -454,12 +446,7 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 				PaymentGatewayConfiguration pgConfig = this.paymentGatewayConfigurationRepository.findOneByName(ConfigurationConstants.GLOBALPAY_PAYMENTGATEWAY);
 
 				if (pgConfig != null && pgConfig.getValue() != null) {
-
 					commandJson = globalPayProcessing(transactionId, pgConfig.getValue());
-
-					if (commandJson == null) {
-						return null;
-					}
 				}
 
 			} else {
@@ -484,6 +471,8 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 	private CommandProcessingResult processOnlinePayment(String jsonData) throws JSONException {
 
 		String deviceId = "";
+		String status = "SUCCESS";
+		
 		Map<String, Object> withChanges = new HashMap<String, Object>();
 
 		final JSONObject json = new JSONObject(jsonData);
@@ -493,12 +482,29 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 		final String amount = json.getString("total_amount");
 		final String source = json.getString("source");
 		final String data = json.get("otherData").toString();
-		deviceId = json.getString("device");
+		if(json.has("device")){
+			deviceId = json.getString("device");
+		}
+		if(json.has("status")){
+			status = json.getString("status");
+		}
+		
 		final BigDecimal totalAmount = new BigDecimal(amount);
 		
 		Date date = new Date();
 
 		PaymentGateway paymentGateway = new PaymentGateway(deviceId, " ", date, totalAmount, txnId, source, data);
+		
+		if(status.equalsIgnoreCase("pending")){
+			paymentGateway.setStatus("Pending");
+			paymentGateway.setRemarks("This Transaction was Pending in GlobalPay Payment Gateway");
+		}else if(status.equalsIgnoreCase("SUCCESS")){
+			paymentGateway.setStatus(status);
+		}else{
+			paymentGateway.setStatus(status);
+			paymentGateway.setRemarks("Unknown Status Type");
+		}
+		
 		this.paymentGatewayRepository.save(paymentGateway);
 		
 		withChanges.put("clientId", clientId);
@@ -506,6 +512,7 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 		withChanges.put("amount", amount);
 		withChanges.put("pgId", paymentGateway.getId());
 		withChanges.put("currency", currency);
+		withChanges.put("status", status);
 		
 		return new CommandProcessingResultBuilder().with(withChanges).build();
 	}

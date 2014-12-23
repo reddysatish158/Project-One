@@ -8,7 +8,6 @@ import org.mifosplatform.crm.clientprospect.service.SearchSqlQuery;
 import org.mifosplatform.infrastructure.core.service.Page;
 import org.mifosplatform.infrastructure.core.service.PaginationHelper;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
-import org.mifosplatform.portfolio.service.data.ServiceMasterOptionsData;
 import org.mifosplatform.portfolio.servicemapping.data.ServiceCodeData;
 import org.mifosplatform.portfolio.servicemapping.data.ServiceMappingData;
 import org.mifosplatform.provisioning.provisioning.data.ServiceParameterData;
@@ -109,8 +108,7 @@ public class ServiceMappingReadPlatformServiceImpl implements
 
 			Long serviceId = rs.getLong("serviceId");
 			String serviceCode = rs.getString("serviceCode");
-			String serviceIdentification = rs
-					.getString("serviceIdentification");
+			String serviceIdentification = rs.getString("serviceIdentification");
 			String status = rs.getString("status");
 			String image = rs.getString("image");
 			String category = rs.getString("category");
@@ -177,10 +175,10 @@ public class ServiceMappingReadPlatformServiceImpl implements
 
 		try {
 			ServiceMappingDataByIdRowMapper mapper = new ServiceMappingDataByIdRowMapper();
+
 			String sql = "SELECT s.id as serviceId,s.service_code as serviceCode,ifnull(sp.category,'Others') as category,sp.sub_category as subcategory," +
-					" sp.image as image,sp.service_identification as serviceIdentification,sp.provision_system as provisionSystem,sp.sort_by as sortBy," +
-					" s.status as status FROM b_service s " +
-					" left join b_prov_service_details sp on s.id = sp.service_id where s.is_deleted = 'N' "; 
+					" sp.image as image,sp.service_identification as serviceIdentification,s.status as status,sp.provision_system as provisionSystem ," +
+					" sp.sort_by as sortBy FROM b_service s left join b_prov_service_details sp on s.id = sp.service_id where s.is_deleted = 'N' "; 
 			
 			if (serviceType != null) {
 				sql = sql + " and s.is_optional= '"+serviceType+"'";

@@ -13,5 +13,10 @@ public class AddonEndDateValidationException extends AbstractPlatformDomainRuleE
 		super("error.msg.addon.enddate.should.lessthan.order.enddate","Addon end date should lessthan order enddate",serviceId);
 		
 	}
+	
+	public AddonEndDateValidationException(final String serviceId) {
+		super("error.msg.addon.provide.service.mapping.details","Provide service mapping details",serviceId);
+		
+	}
 
 }

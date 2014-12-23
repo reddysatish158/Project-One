@@ -51,8 +51,8 @@ public class ServiceMasterWritePlatformServiceImpl  implements ServiceMasterWrit
     
 	@Override
 	public CommandProcessingResult updateService(final Long id,final JsonCommand command) {
-		try
-		{
+		
+		try{
 			    context.authenticatedUser();
 			    this.fromApiJsonDeserializer.validateForCreate(command.json());
 		        final ServiceMaster master = retrieveCodeBy(id);

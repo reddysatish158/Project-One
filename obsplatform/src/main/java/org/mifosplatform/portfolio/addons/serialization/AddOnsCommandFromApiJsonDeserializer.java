@@ -49,16 +49,26 @@ public final class AddOnsCommandFromApiJsonDeserializer {
         final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("addons");
         final JsonElement element = fromApiJsonHelper.parse(json);
-		final Long planId = fromApiJsonHelper.extractLongNamed("planId", element);
-		baseDataValidator.reset().parameter("planId").value(planId).notNull();
-		final String chargeCode = fromApiJsonHelper.extractStringNamed("chargeCode", element);
-		baseDataValidator.reset().parameter("chargeCode").value(chargeCode).notBlank();
-		final Long priceRegionId = fromApiJsonHelper.extractLongNamed("priceRegionId", element);
-		baseDataValidator.reset().parameter("priceRegionId").value(priceRegionId).notNull();
-		final JsonArray addonServicesArray = fromApiJsonHelper.extractJsonArrayNamed("addons", element);
+
+        
+        final Long planId = fromApiJsonHelper.extractLongNamed("planId", element);
+        baseDataValidator.reset().parameter("planId").value(planId).notNull();
+        final String chargeCode = fromApiJsonHelper.extractStringNamed("chargeCode", element);
+        baseDataValidator.reset().parameter("chargeCode").value(chargeCode).notBlank();
+        final Long priceRegionId = fromApiJsonHelper.extractLongNamed("priceRegionId", element);
+        baseDataValidator.reset().parameter("priceRegionId").value(priceRegionId).notNull();
+        
+        final JsonArray addonServicesArray = fromApiJsonHelper.extractJsonArrayNamed("addons", element);
 	    final int addonsAttributeSize = addonServicesArray.size();
 	    baseDataValidator.reset().parameter("addons").value(addonsAttributeSize).integerGreaterThanZero();
-		
+        String[] serviceParameters = null;
+		serviceParameters = new String[addonServicesArray.size()];
+		int arraysize = addonServicesArray.size();
+		baseDataValidator.reset().parameter(null).value(arraysize).integerGreaterThanZero();
+		for (int i = 0; i < addonServicesArray.size(); i++) {
+			serviceParameters[i] = addonServicesArray.get(i).toString();
+		}
+	
 		for (JsonElement jsonElement : addonServicesArray) {
 			
 			final BigDecimal price = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("price", jsonElement);
