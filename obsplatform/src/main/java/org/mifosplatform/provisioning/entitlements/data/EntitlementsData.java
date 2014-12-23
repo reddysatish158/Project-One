@@ -54,6 +54,9 @@ public class EntitlementsData {
 	private String displayName;
 	private String login;
 	private String password;
+	
+	private String selfcareUsername;
+	private String selfcarePassword;
 
 	public EntitlementsData() {
 
