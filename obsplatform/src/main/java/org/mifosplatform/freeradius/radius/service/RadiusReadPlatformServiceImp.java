@@ -126,7 +126,7 @@ public class RadiusReadPlatformServiceImp implements RadiusReadPlatformService {
 			JobParameterData data = this.sheduleJobReadPlatformService.getJobParameters(JobName.RADIUS.toString());
 			String url ="";
 			if(attribute!=null){
-				url= data.getUrl() + "radservice?"+attribute;
+				url= data.getUrl() + "radservice?attribute="+attribute;
 			}else{
 				url= data.getUrl() + "radservice";
 			}
