@@ -10,20 +10,25 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
+import org.mifosplatform.crm.clientprospect.service.SearchSqlQuery;
 import org.mifosplatform.infrastructure.core.api.ApiRequestParameterHelper;
 import org.mifosplatform.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.mifosplatform.infrastructure.core.serialization.DefaultToApiJsonSerializer;
+import org.mifosplatform.infrastructure.core.service.Page;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.portfolio.contract.domain.Contract;
 import org.mifosplatform.portfolio.contract.domain.ContractRepository;
 import org.mifosplatform.portfolio.order.data.SchedulingOrderData;
 import org.mifosplatform.portfolio.plan.domain.Plan;
 import org.mifosplatform.portfolio.plan.domain.PlanRepository;
+import org.mifosplatform.scheduledjobs.scheduledjobs.data.EventActionData;
 import org.mifosplatform.workflow.eventaction.service.ActionDetailsReadPlatformService;
+import org.mifosplatform.workflow.eventaction.service.EventActionReadPlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -42,12 +47,16 @@ public class EventActionsApiResource {
 	private final ActionDetailsReadPlatformService actionDetailsReadPlatformService; 
 	private final PlanRepository planRepository;
 	private final ContractRepository subscriptionRepository;
+	private final EventActionReadPlatformService eventActionReadPlatformService;
+    private final DefaultToApiJsonSerializer<EventActionData> toApiJsonSerializerEventsAction;
 	
 	    
 	     @Autowired
 	    public EventActionsApiResource(final PlatformSecurityContext context,final DefaultToApiJsonSerializer<SchedulingOrderData> toApiJsonSerializer, 
 	    		final ApiRequestParameterHelper apiRequestParameterHelper,final ActionDetailsReadPlatformService actionDetailsReadPlatformService,
-	    		final PlanRepository planRepository,final ContractRepository subscriptionRepository)
+	    		final PlanRepository planRepository,final ContractRepository subscriptionRepository,
+	    		final EventActionReadPlatformService eventActionReadPlatformService,
+	    		final DefaultToApiJsonSerializer<EventActionData> toApiJsonSerializerEventsAction)
 	     {
 		        this.context = context;
 		        this.toApiJsonSerializer = toApiJsonSerializer;
@@ -55,7 +64,8 @@ public class EventActionsApiResource {
 		        this.actionDetailsReadPlatformService=actionDetailsReadPlatformService;
 		        this.planRepository =planRepository;
 		        this.subscriptionRepository=subscriptionRepository;
-		        
+		        this.eventActionReadPlatformService = eventActionReadPlatformService;
+		        this.toApiJsonSerializerEventsAction = toApiJsonSerializerEventsAction;
 		    }
 
 	        @GET
@@ -76,4 +86,18 @@ public class EventActionsApiResource {
 				final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 				return this.toApiJsonSerializer.serialize(settings, schedulingOrderDatas, RESPONSE_DATA_PARAMETERS);
 			}
+	        
+	        @GET
+	        @Consumes({ MediaType.APPLICATION_JSON })
+	        @Produces({ MediaType.APPLICATION_JSON })
+	        public String retrieveAllEventActions(@Context final UriInfo uriInfo,@QueryParam("sqlSearch") final String sqlSearch,
+	    			@QueryParam("limit") final Integer limit, @QueryParam("offset") final Integer offset,
+	    			@QueryParam("statusType") final String statusType) {
+
+	            context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+	            final SearchSqlQuery searchTicketMaster = SearchSqlQuery.forSearch(sqlSearch, offset,limit );
+	            final Page<EventActionData> data = this.eventActionReadPlatformService.retriveAllEventActions(searchTicketMaster,statusType);
+	            
+	            return this.toApiJsonSerializerEventsAction.serialize(data);
+	        }
 }
