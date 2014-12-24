@@ -64,7 +64,7 @@ public class EntitlementWritePlatformServiceImpl implements EntitlementWritePlat
 		String requestType = command.stringValueOfParameterNamed("requestType");
 		
 		if(provSystem != null && requestType !=null && provSystem.equalsIgnoreCase("Beenius") 
-				&& requestType.equalsIgnoreCase("ACTIVATION")){
+				&& requestType.equalsIgnoreCase("CLIENT ACTIVATION")){
 			
 			authPin = command.stringValueOfParameterNamed("authPin");
 			Long clientId = command.longValueOfParameterNamed("clientId");	
@@ -107,7 +107,7 @@ public class EntitlementWritePlatformServiceImpl implements EntitlementWritePlat
 		}
 		
 		if(provSystem != null && requestType !=null && provSystem.equalsIgnoreCase("ZebraOTT") 
-				&& requestType.equalsIgnoreCase("ACTIVATION")){
+				&& requestType.equalsIgnoreCase("CLIENT ACTIVATION")){
 			
 			String zebraSubscriberId = command.stringValueOfParameterNamed("zebraSubscriberId");
 			Long clientId = command.longValueOfParameterNamed("clientId");	

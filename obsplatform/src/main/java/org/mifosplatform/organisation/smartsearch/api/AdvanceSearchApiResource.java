@@ -52,11 +52,13 @@ public class AdvanceSearchApiResource {
 	            @QueryParam("limit") final Integer limit,@QueryParam("offset") final Integer offset,
 	            @QueryParam("name") final String name, @QueryParam("createdBy") final Long createdBy,
 	            @QueryParam("emailId") final String emailId, @QueryParam("source") final String source,
-	            @QueryParam("phone") final String phone, @QueryParam("searchType") final String searchType) {
+	            @QueryParam("phone") final String phone, @QueryParam("searchType") final String searchType,
+	            @QueryParam("city") final String city,@QueryParam("address") final String address,
+	            @QueryParam("externalId") final String externalId) {
 		 
 		 this.securityContext.authenticatedUser().validateHasReadPermission(RESOURCENAME_FOR_PERMISSION);
 		 final SearchParameters searchParameters = SearchParameters.forTickets(searchText,fromDateParam,toDateParam,assignedTo,closedBy,category,status,
-				 limit,offset,name,createdBy,emailId,source,phone,searchType);
+				 limit,offset,name,createdBy,emailId,source,phone,searchType,city,address,externalId);
 	     Page<AdvanceSearchData>  searchDatas  =this.advanceSearchReadPlafformService.retrieveAllSearchData(searchParameters);
 		return this.apiJsonSerializer.serialize(searchDatas);
 	    }
