@@ -35,7 +35,7 @@ public class SchedulerJobRunnerReadServiceImpl implements SchedulerJobRunnerRead
     @Override
     public List<JobDetailData> findAllJobDeatils() {
         JobDetailMapper detailMapper = new JobDetailMapper();
-        String sql = detailMapper.schema();
+        String sql = detailMapper.schema() + " group by job.id";
         List<JobDetailData> JobDeatils = jdbcTemplate.query(sql, detailMapper, new Object[] {});
         return JobDeatils;
 
@@ -45,7 +45,7 @@ public class SchedulerJobRunnerReadServiceImpl implements SchedulerJobRunnerRead
     public JobDetailData retrieveOne(Long jobId) {
         try {
             JobDetailMapper detailMapper = new JobDetailMapper();
-            String sql = detailMapper.schema() + " where job.id=?";
+            String sql = detailMapper.schema() + " where job.id=? group by job.id";
             return jdbcTemplate.queryForObject(sql, detailMapper, new Object[] { jobId });
         } catch (EmptyResultDataAccessException e) {
             throw new JobNotFoundException(String.valueOf(jobId));
