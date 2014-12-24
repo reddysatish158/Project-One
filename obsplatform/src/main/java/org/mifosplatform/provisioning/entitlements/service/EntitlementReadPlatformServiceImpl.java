@@ -117,12 +117,18 @@ public class EntitlementReadPlatformServiceImpl implements
 			String fullName = rs.getString("fullName");	
 			String login = rs.getString("login");
 			String password = rs.getString("password");
-			return new ClientEntitlementData(emailId,fullName,login,password);
+			String selfcareUsername = rs.getString("selfcareUsername");
+		    String selfcarePassword = rs.getString("selfcarePassword");
+		    
+			return new ClientEntitlementData(emailId, fullName, login, password, selfcareUsername, selfcarePassword);
 		
 		}
 		
 		public String schema() {
-			return "c.email as EmailId,c.display_name as fullName,ifnull(c.login,c.id) as login,ifnull(c.password,'0000') as password from m_client c where c.id=?";
+			return " c.email as EmailId, c.display_name as fullName, ifnull(c.login,c.id) as login, " +
+					" ifnull(c.password,'0000') as password, " +
+					" sc.unique_reference as selfcareUsername, sc.password as selfcarePassword from m_client c " +
+					" LEFT JOIN b_clientuser sc ON sc.client_id = c.id where c.id=?";
 
 		}
 		
@@ -245,10 +251,10 @@ public class EntitlementReadPlatformServiceImpl implements
 					" bim.item_code as itemCode,bim.item_description as itemDescription," +
 					" bprm.priceregion_code as regionCode, bprm.priceregion_name as regionName" +
 					" from m_client c" +
-					" join m_office o on (o.id = c.office_id)" +
-					" join b_process_request bpr on (c.id = bpr.client_id )" +
-					" join b_process_request_detail bprd on (bpr.id = bprd.processrequest_id )" +
-					" join b_client_address bca on (c.id=bca.client_id and address_key='PRIMARY')" +
+					" left join m_office o on (o.id = c.office_id)" +
+					" left join b_process_request bpr on (c.id = bpr.client_id )" +
+					" left join b_process_request_detail bprd on (bpr.id = bprd.processrequest_id )" +
+					" left join b_client_address bca on (c.id=bca.client_id and address_key='PRIMARY')" +
 					" left join b_state bs on (bca.state = bs.state_name )" +
 					" LEFT JOIN b_priceregion_detail bpd ON ((bpd.state_id = bs.id or bpd.state_id=0)  and bpd.country_id=bs.parent_code AND bpd.is_deleted = 'N')" +
 					" left join b_priceregion_master bprm on (bpd.priceregion_id = bprm.id ) " +

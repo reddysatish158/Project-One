@@ -39,7 +39,10 @@ import org.mifosplatform.portfolio.association.service.HardwareAssociationReadpl
 import org.mifosplatform.portfolio.association.service.HardwareAssociationWriteplatformService;
 import org.mifosplatform.portfolio.order.exceptions.NoGrnIdFoundException;
 import org.mifosplatform.portfolio.order.service.OrderReadPlatformService;
+import org.mifosplatform.provisioning.provisioning.api.ProvisioningApiConstants;
 import org.mifosplatform.provisioning.provisioning.service.ProvisioningWritePlatformService;
+import org.mifosplatform.provisioning.provsionactions.domain.ProvisionActions;
+import org.mifosplatform.provisioning.provsionactions.domain.ProvisioningActionsRepository;
 import org.mifosplatform.useradministration.domain.AppUser;
 import org.mifosplatform.workflow.eventactionmapping.exception.EventActionMappingNotFoundException;
 import org.mifosplatform.workflow.eventvalidation.service.EventValidationReadPlatformService;
@@ -73,6 +76,7 @@ public class ItemDetailsWritePlatformServiceImp implements ItemDetailsWritePlatf
 	private final ItemDetailsReadPlatformService inventoryItemDetailsReadPlatformService;
 	private final EventValidationReadPlatformService eventValidationReadPlatformService;
 	private final HardwareAssociationWriteplatformService associationWriteplatformService;
+	private final ProvisioningActionsRepository provisioningActionsRepository;
 	private final ProvisioningWritePlatformService provisioningWritePlatformService;
 	private final ItemDetailsAllocationRepository inventoryItemDetailsAllocationRepository; 
 	private final InventoryTransactionHistoryJpaRepository inventoryTransactionHistoryJpaRepository;
@@ -90,7 +94,8 @@ public class ItemDetailsWritePlatformServiceImp implements ItemDetailsWritePlatf
 			final InventoryTransactionHistoryJpaRepository inventoryTransactionHistoryJpaRepository,final ConfigurationRepository  configurationRepository,
 			final HardwareAssociationReadplatformService associationReadplatformService,final HardwareAssociationWriteplatformService associationWriteplatformService,
 			final ItemRepository itemRepository,final OrderReadPlatformService orderReadPlatformService,
-			final ProvisioningWritePlatformService provisioningWritePlatformService,final EventValidationReadPlatformService eventValidationReadPlatformService) 
+			final ProvisioningWritePlatformService provisioningWritePlatformService,final EventValidationReadPlatformService eventValidationReadPlatformService,
+			final ProvisioningActionsRepository provisioningActionsRepository) 
 	{
 		this.inventoryItemDetailsReadPlatformService = inventoryItemDetailsReadPlatformService;
 		this.context=context;
@@ -102,6 +107,7 @@ public class ItemDetailsWritePlatformServiceImp implements ItemDetailsWritePlatf
 		this.oneTimeSaleReadPlatformService=oneTimeSaleReadPlatformService;
 		this.oneTimeSaleRepository = oneTimeSaleRepository;
 		this.fromJsonHelper=fromJsonHelper;
+		this.provisioningActionsRepository=provisioningActionsRepository;
 		this.inventoryTransactionHistoryJpaRepository = inventoryTransactionHistoryJpaRepository;
 		this.configurationRepository=configurationRepository;
 		this.associationReadplatformService=associationReadplatformService;
@@ -350,9 +356,12 @@ public class ItemDetailsWritePlatformServiceImp implements ItemDetailsWritePlatf
         	   OneTimeSale oneTimeSale=this.oneTimeSaleRepository.findOne(inventoryItemDetailsAllocation.getOrderId());
         	   oneTimeSale.setStatus();
         	   this.oneTimeSaleRepository.save(oneTimeSale);
-/*        		transactionHistoryWritePlatformService.saveTransactionHistory(clientId, "Device Return", new Date(),"Serial Number :"
-	    				+inventoryItemDetailsAllocation.getSerialNumber(),"Item Code:"+itemCode,"Order Id: "+inventoryItemDetailsAllocation.getOrderId());
-*/        	   
+        	   ProvisionActions provisionActions=this.provisioningActionsRepository.findOneByProvisionType(ProvisioningApiConstants.PROV_EVENT_RELEASE_DEVICE);
+               if(provisionActions != null && provisionActions.isEnable() == 'Y'){
+   				
+   				this.provisioningWritePlatformService.postDetailsForProvisioning(clientId,ProvisioningApiConstants.REQUEST_RELEASE_DEVICE,
+   						               provisionActions.getProvisioningSystem(),serialNo);
+   			}       	   
         	   return new CommandProcessingResult(command.entityId(),clientId);
            }catch(DataIntegrityViolationException exception){
         	   

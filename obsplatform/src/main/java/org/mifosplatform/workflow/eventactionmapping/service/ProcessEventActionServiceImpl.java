@@ -4,6 +4,8 @@ package org.mifosplatform.workflow.eventactionmapping.service;
 import java.util.Date;
 import java.util.List;
 
+import org.mifosplatform.cms.eventmaster.domain.EventMaster;
+import org.mifosplatform.cms.eventmaster.domain.EventMasterRepository;
 import org.mifosplatform.finance.billingmaster.api.BillingMasterApiResourse;
 import org.mifosplatform.finance.billingorder.service.InvoiceClient;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
@@ -38,6 +40,7 @@ public class ProcessEventActionServiceImpl implements ProcessEventActionService 
 	private final EventActionRepository eventActionRepository;
 	private final ProcessRequestRepository processRequestRepository;
     private final OrderWritePlatformService orderWritePlatformService;
+    private final EventMasterRepository eventMasterRepository;
     private final HardwareAssociationReadplatformService hardwareAssociationReadplatformService;
     private final BillingMasterApiResourse billingMasterApiResourse;
     
@@ -47,11 +50,12 @@ public class ProcessEventActionServiceImpl implements ProcessEventActionService 
 	public ProcessEventActionServiceImpl(final EventActionRepository eventActionRepository,final FromJsonHelper fromJsonHelper,
 			final OrderWritePlatformService orderWritePlatformService,final InvoiceClient invoiceClient,
 			final ProcessRequestRepository processRequestRepository,final HardwareAssociationReadplatformService hardwareAssociationReadplatformService,
-			final BillingMasterApiResourse billingMasterApiResourse)
+			final BillingMasterApiResourse billingMasterApiResourse,final EventMasterRepository eventMasterRepository)
 	{
 		this.invoiceClient=invoiceClient;
         this.fromApiJsonHelper=fromJsonHelper;
         this.eventActionRepository=eventActionRepository;
+        this.eventMasterRepository=eventMasterRepository;
         this.processRequestRepository=processRequestRepository;
         this.orderWritePlatformService=orderWritePlatformService;
         this.hardwareAssociationReadplatformService=hardwareAssociationReadplatformService;
@@ -141,6 +145,22 @@ public class ProcessEventActionServiceImpl implements ProcessEventActionService 
 				}catch(Exception exception){
 					
 				}
+				break;
+				
+			case EventActionConstants.ACTION_ACTIVE_LIVE_EVENT : 
+				
+				EventMaster eventMaster=this.eventMasterRepository.findOne(eventActionData.getResourceId());
+				eventMaster.setStatus(Integer.valueOf(1));
+				this.eventMasterRepository.saveAndFlush(eventMaster);
+				
+				break;
+				
+			case EventActionConstants.ACTION_INACTIVE_LIVE_EVENT : 
+				
+				eventMaster=this.eventMasterRepository.findOne(eventActionData.getResourceId());
+				eventMaster.setStatus(Integer.valueOf(2));
+				this.eventMasterRepository.saveAndFlush(eventMaster);
+				
 				break;
 			
 			default:
