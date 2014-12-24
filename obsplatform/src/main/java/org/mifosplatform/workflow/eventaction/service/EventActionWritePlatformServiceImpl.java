@@ -109,8 +109,200 @@ public class EventActionWritePlatformServiceImpl implements ActiondetailsWritePl
 			  	if(actionProcedureData.isCheck()){
 				    SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy");
 				    List<SubscriptionData> subscriptionDatas=this.contractPeriodReadPlatformService.retrieveSubscriptionDatabyContractType("Month(s)",1);
+				   
+				    switch(detailsData.getActionName()){
+				  
+				    case EventActionConstants.ACTION_SEND_EMAIL :
+				    	
+
+				    	   
+				          TicketMasterData data = this.ticketMasterReadPlatformService.retrieveTicket(clientId,new Long(resourceId));
+				          TicketMaster ticketMaster=this.repository.findOne(new Long(resourceId));
+				          AppUserData user = this.readPlatformService.retrieveUser(new Long(data.getUserId()));
+				          BillingMessageTemplate billingMessageTemplate = this.messageTemplateRepository.findByTemplateDescription(BillingMessageTemplateConstants.MESSAGE_TEMPLATE_TICKET_TEMPLATE);
+				          String value=ticketURL+""+resourceId;
+				          String removeUrl="<br/><b>URL : </b>"+"<a href="+value+">View Ticket</a>";
+				         // removeUrl.replaceAll("(PARAMURL)", ticketURL+""+resourceId); 	
+				        	if(detailsData.getEventName().equalsIgnoreCase(EventActionConstants.EVENT_CREATE_TICKET)){
+				        	  	if(!user.getEmail().isEmpty()){
+				        	  		BillingMessage billingMessage = new BillingMessage("CREATE TICKET", data.getProblemDescription()+"<br/>"
+				        	  	    +ticketMaster.getDescription()+"\n"+removeUrl, "", user.getEmail(), user.getEmail(),
+									 "Ticket:"+resourceId, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_STATUS, billingMessageTemplate,
+									 BillingMessageTemplateConstants.MESSAGE_TEMPLATE_MESSAGE_TYPE, null);
+				        	  		this.messageDataRepository.save(billingMessage);
+				        	  	}else{
+				        	  	   if(actionProcedureData.getEmailId().isEmpty()){
+				        	  		   
+				        	  			throw new EmailNotFoundException(new Long(data.getUserId()));
+				        	  		}else{
+				        	  			BillingMessage billingMessage = new BillingMessage("CREATE TICKET", data.getProblemDescription()+"<br/>"
+				        	  		    +ticketMaster.getDescription()+"\n"+removeUrl, "", actionProcedureData.getEmailId(), actionProcedureData.getEmailId(),
+										"Ticket:"+resourceId, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_STATUS, billingMessageTemplate,
+										BillingMessageTemplateConstants.MESSAGE_TEMPLATE_MESSAGE_TYPE, null);
+				        	  			this.messageDataRepository.save(billingMessage);
+				        	  		}
+				        	  	}
+				        	
+				        	}else if(detailsData.getEventName().equalsIgnoreCase(EventActionConstants.EVENT_EDIT_TICKET)){
+				        	  		
+				        	    if(!user.getEmail().isEmpty()){
+				        	  		BillingMessage billingMessage = new BillingMessage("ADD COMMENT", data.getProblemDescription()+"<br/>"
+				        	        +ticketMaster.getDescription()+"<br/>"+"COMMENT: "+data.getLastComment()+"<br/>"+removeUrl, "", user.getEmail(), user.getEmail(),
+									"Ticket:"+resourceId, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_STATUS, billingMessageTemplate,
+									BillingMessageTemplateConstants.MESSAGE_TEMPLATE_MESSAGE_TYPE, null);
+				        	  		this.messageDataRepository.save(billingMessage);
+				        	  	}else{
+				        	  		if(actionProcedureData.getEmailId().isEmpty()){
+					        	  			throw new EmailNotFoundException(new Long(data.getUserId()));	
+					        	  	}else{
+					        	  		BillingMessage billingMessage = new BillingMessage("ADD COMMENT", data.getProblemDescription()+"<br/>"
+					        	  	     +ticketMaster.getDescription()+"<br/>"+"COMMENT: \t"+data.getLastComment()+"<br/>"+removeUrl, "", actionProcedureData.getEmailId(),
+					        	  	     actionProcedureData.getEmailId(),"Ticket:"+resourceId, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_STATUS, billingMessageTemplate,
+					        	  	     BillingMessageTemplateConstants.MESSAGE_TEMPLATE_MESSAGE_TYPE, null);
+						        	  		this.messageDataRepository.save(billingMessage);
+					        	  	}
+				        	  	}
+				        	
+				        	}else if(detailsData.getEventName().equalsIgnoreCase(EventActionConstants.EVENT_CLOSE_TICKET)){
+				        	  	if(!user.getEmail().isEmpty()){
+				        	  			BillingMessage billingMessage = new BillingMessage("CLOSED TICKET", data.getProblemDescription()+"<br/>"
+				        	  			+ticketMaster.getDescription()+"<br/>"+"RESOLUTION: \t"+ticketMaster.getResolutionDescription()+"<br/>"+removeUrl, "", user.getEmail(), user.getEmail(),
+										"Ticket:"+resourceId, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_STATUS, billingMessageTemplate,
+										BillingMessageTemplateConstants.MESSAGE_TEMPLATE_MESSAGE_TYPE, null);
+				        	  			this.messageDataRepository.save(billingMessage);
+				        	  	}else{
+				        	  		if(actionProcedureData.getEmailId().isEmpty()){
+					        	  		throw new EmailNotFoundException(new Long(data.getUserId()));	
+					        	  	}else{
+					        	  		     BillingMessage billingMessage = new BillingMessage("CLOSED TICKET", data.getProblemDescription()+"<br/>"
+					        	  		    +ticketMaster.getDescription()+"<br/>"+"RESOLUTION: \t"+ticketMaster.getResolutionDescription()+"<br/>"+removeUrl, "", actionProcedureData.getEmailId(),
+					        	  	         actionProcedureData.getEmailId(),"Ticket:"+resourceId, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_STATUS, billingMessageTemplate,
+					        	  	       BillingMessageTemplateConstants.MESSAGE_TEMPLATE_MESSAGE_TYPE, null);
+						        	        this.messageDataRepository.save(billingMessage);
+					        	  }
+				        	  	}
+				        	  }
+				      
+				       break;
+				       
+				    case EventActionConstants.ACTION_ACTIVE : 
+				    	
+				          AssociationData associationData=this.hardwareAssociationReadplatformService.retrieveSingleDetails(actionProcedureData.getOrderId());
+				          		if(associationData ==null){
+				          			throw new HardwareDetailsNotFoundException(actionProcedureData.getOrderId().toString());
+				          		}
+				          		jsonObject.put("renewalPeriod",subscriptionDatas.get(0).getId());	
+				          		jsonObject.put("description","Order Renewal By Scheduler");
+				          		eventAction=new EventAction(new Date(), "CREATE", "PAYMENT",EventActionConstants.ACTION_RENEWAL.toString(),"/orders/renewal", 
+			        			 Long.parseLong(resourceId), jsonObject.toString(),actionProcedureData.getOrderId(),clientId);
+				          		this.eventActionRepository.save(eventAction);
+				         break; 		
+
+				    case EventActionConstants.ACTION_NEW :
+
+				    	jsonObject.put("billAlign","false");
+				    	jsonObject.put("contractPeriod",subscriptionDatas.get(0).getId());
+				    	jsonObject.put("dateFormat","dd MMMM yyyy");
+                        jsonObject.put("locale","en");
+                        jsonObject.put("paytermCode","Monthly");
+                        jsonObject.put("planCode",actionProcedureData.getPlanId());
+                        jsonObject.put("isNewplan","true");
+                        jsonObject.put("start_date",dateFormat.format(new Date()));
+                        eventAction=new EventAction(new Date(), "CREATE", "PAYMENT",actionProcedureData.getActionName(),"/orders/"+clientId, 
+                        		Long.parseLong(resourceId), jsonObject.toString(),null,clientId);
+			        	this.eventActionRepository.save(eventAction);
+			        	   
+				    	break;
+				    	
+				    case EventActionConstants.ACTION_DISCONNECT :
+
+			        	   eventAction=new EventAction(new Date(), "CREATE", "PAYMENT",EventActionConstants.ACTION_ACTIVE.toString(),"/orders/reconnect/"+clientId, 
+			        	   Long.parseLong(resourceId), jsonObject.toString(),actionProcedureData.getOrderId(),clientId);
+			        	   this.eventActionRepository.save(eventAction);
+
+			        	   break; 
+			        	   
+				    case EventActionConstants.ACTION_INVOICE : 
+				    	  
+			        	  jsonObject.put("dateFormat","dd MMMM yyyy");
+			        	  jsonObject.put("locale","en");
+			        	  jsonObject.put("systemDate",dateFormat.format(new Date()));
+			        	  	if(detailsData.IsSynchronous().equalsIgnoreCase("N")){
+			        	  		eventAction=new EventAction(new Date(), "CREATE",EventActionConstants.EVENT_ACTIVE_ORDER.toString(),
+			        	  		EventActionConstants.ACTION_INVOICE.toString(),"/billingorder/"+clientId,Long.parseLong(resourceId),
+			        	  		jsonObject.toString(),Long.parseLong(resourceId),clientId);
+					        	this.eventActionRepository.save(eventAction);
+			        	  	
+			        	  	}else{
+			            	 
+			        	  		Order order=this.orderRepository.findOne(new Long(resourceId));
+			        	  		jsonObject.put("dateFormat","dd MMMM yyyy");
+			        	  		jsonObject.put("locale","en");
+			        	  		jsonObject.put("systemDate",dateFormat.format(order.getStartDate()));
+			        	  		this.billingOrderApiResourse.retrieveBillingProducts(order.getClientId(),jsonObject.toString());
+			        	  	}
+			        	  break;
+			        	  
+					default:
+						break;
+				    }
+			  	}
+				    
+				    switch(detailsData.getActionName()){
+				 
+				    case EventActionConstants.ACTION_PROVISION_IT : 
+
+				    	Client client=this.clientRepository.findOne(clientId);
+			  	    	EventOrder eventOrder=this.eventOrderRepository.findOne(Long.valueOf(resourceId));
+			  	    	EventMaster eventMaster=this.eventMasterRepository.findOne(eventOrder.getEventId());
+			  	    	String response= AddExternalBeesmartMethod.addVodPackage(client.getOffice().getExternalId().toString(),client.getAccountNo(),
+			  	    			eventMaster.getEventName());
+
+			  	    	ProcessRequest processRequest=new ProcessRequest(Long.valueOf(0), eventOrder.getClientId(),eventOrder.getId(),ProvisioningApiConstants.PROV_BEENIUS,
+								ProvisioningApiConstants.REQUEST_ACTIVATION_VOD,'Y','Y');
+						List<EventOrderdetials> eventDetails=eventOrder.getEventOrderdetials();
+						//EventMaster eventMaster=this.eventMasterRepository.findOne(eventOrder.getEventId());
+						//JSONObject jsonObject=new JSONObject();
+						jsonObject.put("officeUid",client.getOffice().getExternalId());
+						jsonObject.put("subscriberUid",client.getAccountNo());
+						jsonObject.put("vodUid",eventMaster.getEventName());
+								
+							for(EventOrderdetials details:eventDetails){
+								ProcessRequestDetails processRequestDetails=new ProcessRequestDetails(details.getId(),details.getEventDetails().getId(),jsonObject.toString(),
+										response,null,eventMaster.getEventStartDate(), eventMaster.getEventEndDate(),new Date(),new Date(),'N',
+										ProvisioningApiConstants.REQUEST_ACTIVATION_VOD,null);
+								processRequest.add(processRequestDetails);
+							}
+						this.processRequestRepository.save(processRequest);
+
+						break;
+						
+				    case EventActionConstants.ACTION_SEND_PROVISION : 
+
+				    	eventAction=new EventAction(new Date(), "CLOSE", "Client",EventActionConstants.ACTION_SEND_PROVISION.toString(),"/processrequest/"+clientId, 
+				    	Long.parseLong(resourceId),jsonObject.toString(),clientId,clientId);
+				    	this.eventActionRepository.save(eventAction);
+				  	
+			        	break;
+			        	
+				    case EventActionConstants.ACTION_ACTIVE_LIVE_EVENT :
+				    	 eventMaster=this.eventMasterRepository.findOne(Long.valueOf(resourceId));
+				    	 
+				    	 eventAction=new EventAction(eventMaster.getEventStartDate(),"Create","Live Event",EventActionConstants.ACTION_ACTIVE_LIVE_EVENT.toString(),
+				    			 "/eventmaster",Long.parseLong(resourceId),jsonObject.toString(),Long.valueOf(0),Long.valueOf(0));
+				    	 this.eventActionRepository.saveAndFlush(eventAction);
+				    	 
+				    	 eventAction=new EventAction(eventMaster.getEventEndDate(),"Disconnect","Live Event",EventActionConstants.ACTION_INACTIVE_LIVE_EVENT.toString(),
+				    			 "/eventmaster",Long.parseLong(resourceId),jsonObject.toString(),Long.valueOf(0),Long.valueOf(0));
+				    	 this.eventActionRepository.saveAndFlush(eventAction);
+			      
+				    	break; 	   	
+			      
+			       
+				    	
+				    }
 				    	 	
-				       if(detailsData.getActionName().equalsIgnoreCase(EventActionConstants.ACTION_SEND_EMAIL)){
+				      /* if(detailsData.getActionName().equalsIgnoreCase(EventActionConstants.ACTION_SEND_EMAIL)){
 				    	   
 				          TicketMasterData data = this.ticketMasterReadPlatformService.retrieveTicket(clientId,new Long(resourceId));
 				          TicketMaster ticketMaster=this.repository.findOne(new Long(resourceId));
@@ -266,9 +458,10 @@ public class EventActionWritePlatformServiceImpl implements ActiondetailsWritePl
 		        	   eventAction=new EventAction(new Date(), "CLOSE", "Client",EventActionConstants.ACTION_SEND_PROVISION.toString(),"/processrequest/"+clientId, 
 		        	   Long.parseLong(resourceId),jsonObject.toString(),clientId,clientId);
 		        	   this.eventActionRepository.save(eventAction);
-			  	}
-			}
+			  	}*/
+			
 		}
+	}
 	     return null;
     }catch(Exception exception){
     	exception.printStackTrace();

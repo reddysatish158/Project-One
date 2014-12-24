@@ -196,6 +196,7 @@ public class OrderReadPlatformServiceImpl implements OrderReadPlatformService
 			final ClientOrderMapper mapper = new ClientOrderMapper(); //and  o.order_status != 3
 
 			final String sql = "select " + mapper.clientOrderLookupSchema()+" where o.plan_id = p.id and o.client_id= ? and o.is_deleted='n' and " +
+
 					"o.contract_period = co.id AND c.id=o.client_id order by o.id desc";
 
 			return jdbcTemplate.query(sql, mapper, new Object[] { clientId});

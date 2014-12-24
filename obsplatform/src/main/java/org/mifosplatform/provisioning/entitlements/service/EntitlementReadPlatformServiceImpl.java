@@ -120,7 +120,7 @@ public class EntitlementReadPlatformServiceImpl implements
 			String selfcareUsername = rs.getString("selfcareUsername");
 		    String selfcarePassword = rs.getString("selfcarePassword");
 		    
-		    return new ClientEntitlementData(emailId, fullName, login, password, selfcareUsername, selfcarePassword);
+			return new ClientEntitlementData(emailId, fullName, login, password, selfcareUsername, selfcarePassword);
 		
 		}
 		
@@ -251,10 +251,10 @@ public class EntitlementReadPlatformServiceImpl implements
 					" bim.item_code as itemCode,bim.item_description as itemDescription," +
 					" bprm.priceregion_code as regionCode, bprm.priceregion_name as regionName" +
 					" from m_client c" +
-					" join m_office o on (o.id = c.office_id)" +
-					" join b_process_request bpr on (c.id = bpr.client_id )" +
-					" join b_process_request_detail bprd on (bpr.id = bprd.processrequest_id )" +
-					" join b_client_address bca on (c.id=bca.client_id and address_key='PRIMARY')" +
+					" left join m_office o on (o.id = c.office_id)" +
+					" left join b_process_request bpr on (c.id = bpr.client_id )" +
+					" left join b_process_request_detail bprd on (bpr.id = bprd.processrequest_id )" +
+					" left join b_client_address bca on (c.id=bca.client_id and address_key='PRIMARY')" +
 					" left join b_state bs on (bca.state = bs.state_name )" +
 					" LEFT JOIN b_priceregion_detail bpd ON ((bpd.state_id = bs.id or bpd.state_id=0)  and bpd.country_id=bs.parent_code AND bpd.is_deleted = 'N')" +
 					" left join b_priceregion_master bprm on (bpd.priceregion_id = bprm.id ) " +

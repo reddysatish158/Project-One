@@ -49,6 +49,7 @@ public class EventActionsApiResource {
 	private final ContractRepository subscriptionRepository;
 	private final EventActionReadPlatformService eventActionReadPlatformService;
 	private final DefaultToApiJsonSerializer<EventActionData> toApiJsonSerializerEventsAction;
+
 	
 	    
 	     @Autowired
