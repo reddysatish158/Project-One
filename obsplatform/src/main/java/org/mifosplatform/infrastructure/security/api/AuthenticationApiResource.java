@@ -60,7 +60,6 @@ public class AuthenticationApiResource {
     }
 
     @POST
-   
     @Produces({ MediaType.APPLICATION_JSON })
     public String authenticate(@QueryParam("username") final String username, @QueryParam("password") final String password,
     		@Context HttpServletRequest req) {
