@@ -163,6 +163,7 @@ public class ClientsApiResource {
             final Collection<GroupData> groupDatas = this.clientReadPlatformService.retrieveGroupData();
             final List<String> allocationDetailsDatas=this.allocationReadPlatformService.retrieveHardWareDetails(clientId);
             clientData = ClientData.templateOnTop(clientData, allowedOffices,categoryDatas,groupDatas,allocationDetailsDatas,null);
+     
         }else{
         	final List<String> allocationDetailsDatas=this.allocationReadPlatformService.retrieveHardWareDetails(clientId);
              clientData = ClientData.templateOnTop(clientData, null,null,null,allocationDetailsDatas,balanceCheck);
