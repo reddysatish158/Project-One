@@ -164,7 +164,7 @@ public class EntitlementWritePlatformServiceImpl implements EntitlementWritePlat
 		}*/
 		processRequest.setProcessStatus(status);
 
-		// this.entitlementRepository.save(processRequest);
+		 this.entitlementRepository.saveAndFlush(processRequest);
 		this.processRequestWriteplatformService.notifyProcessingDetails(processRequest, status);
 		
 		return new CommandProcessingResult(processRequest.getId());

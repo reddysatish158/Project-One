@@ -308,8 +308,10 @@ public void processSimulator() {
 				jsonobject.put("locale", "en");
 				jsonobject.put("dateFormat", "dd MMMM yyyy");
 				jsonobject.put("ticketTime"," "+new LocalTime().toString(formatter2));
+				if(order != null){
 				jsonobject.put("description","ClientId"+processRequest.getClientId()+" Order No:"+order.getOrderNo()+" Request Type:"+processRequest.getRequestType()
 						+" Generated at:"+new LocalTime().toString(formatter2));
+				}
 							jsonobject.put("ticketDate",formatter1.print(new LocalDate()));
 				jsonobject.put("sourceOfTicket","Phone");
 				jsonobject.put("assignedTo", userId);
