@@ -27,14 +27,14 @@ import org.springframework.stereotype.Component;
 @Path("/freeradius")
 @Component
 @Scope("singleton")
-public class FreeRadiusAPiResource {
+public class RadiusAPiResource {
 
 	private final String resourceNameForPermissions = "RADIUS";
 	private final PlatformSecurityContext context;
 	private final RadiusReadPlatformService radiusReadPlatformService;
 	
 	@Autowired
-	public FreeRadiusAPiResource(final PlatformSecurityContext context,final ApiRequestParameterHelper apiRequestParameterHelper,
+	public RadiusAPiResource(final PlatformSecurityContext context,final ApiRequestParameterHelper apiRequestParameterHelper,
 			final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService,
 			final RadiusReadPlatformService radiusReadPlatformService) {
 		

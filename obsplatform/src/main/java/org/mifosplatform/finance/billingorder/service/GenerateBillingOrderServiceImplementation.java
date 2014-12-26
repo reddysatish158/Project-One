@@ -140,6 +140,7 @@ public class GenerateBillingOrderServiceImplementation implements GenerateBillin
 		BigDecimal invoiceAmount = BigDecimal.ZERO;
 		BigDecimal totalChargeAmount = BigDecimal.ZERO;
 		BigDecimal netTaxAmount = BigDecimal.ZERO;
+		BigDecimal discountAmount = BigDecimal.ZERO;
 
 		TaxMappingRateData tax = this.billingOrderReadPlatformService.retriveExemptionTaxDetails(billingOrderCommands.get(0).getClientId());
 
@@ -149,12 +150,13 @@ public class GenerateBillingOrderServiceImplementation implements GenerateBillin
 		for (BillingOrderCommand billingOrderCommand : billingOrderCommands) {
 			
 			BigDecimal netChargeTaxAmount = BigDecimal.ZERO;
-			BigDecimal discountAmount = billingOrderCommand.getDiscountMasterData().getDiscountAmount();
-			BigDecimal netChargeAmount = billingOrderCommand.getPrice().subtract(discountAmount);
+			BigDecimal netChargeAmount = billingOrderCommand.getPrice();
 
 			DiscountMaster discountMaster = null;
 			if (billingOrderCommand.getDiscountMasterData() != null) {
+				discountAmount = billingOrderCommand.getDiscountMasterData().getDiscountAmount();
 				discountMaster = this.discountMasterRepository.findOne(billingOrderCommand.getDiscountMasterData().getId());
+			    netChargeAmount = billingOrderCommand.getPrice().subtract(discountAmount);
 			}
 
 			List<InvoiceTaxCommand> invoiceTaxCommands = billingOrderCommand.getListOfTax();
