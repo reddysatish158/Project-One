@@ -149,7 +149,7 @@ public class ActionDetailsReadPlatformServiceImpl implements ActionDetailsReadPl
 			Long resourceId=rs.getLong("resourceId");
 			Long orderId=rs.getLong("orderId");
 			Long clientId=rs.getLong("clientId");
-			return new EventActionData(id,eventaction,entityName,actionName,jsonData,resourceId,orderId,clientId);
+			return new EventActionData(id,eventaction,entityName,actionName,jsonData,resourceId,orderId,clientId,null,null);
 
 		}
 	}
