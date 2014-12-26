@@ -62,6 +62,7 @@ public class ConfigurationConstants {
 	//Constants
 	public static final char CONST_IS_Y = 'Y';
 	public static final char CONST_IS_N = 'N';
+	public static final String OSM_COMMAND = "OSM";
 	
 
 }
