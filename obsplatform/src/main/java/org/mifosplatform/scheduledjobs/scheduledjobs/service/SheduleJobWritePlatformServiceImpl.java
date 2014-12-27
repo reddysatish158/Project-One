@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.Types;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -29,12 +30,14 @@ import org.mifosplatform.finance.billingmaster.api.BillingMasterApiResourse;
 import org.mifosplatform.finance.billingorder.domain.Invoice;
 import org.mifosplatform.finance.billingorder.exceptions.BillingOrderNoRecordsFoundException;
 import org.mifosplatform.finance.billingorder.service.InvoiceClient;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
 import org.mifosplatform.infrastructure.core.domain.MifosPlatformTenant;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
 import org.mifosplatform.infrastructure.core.service.FileUtils;
+import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
 import org.mifosplatform.infrastructure.core.service.ThreadLocalContextUtil;
 import org.mifosplatform.infrastructure.dataqueries.service.ReadReportingService;
 import org.mifosplatform.infrastructure.jobs.annotation.CronTarget;
@@ -70,6 +73,9 @@ import org.mifosplatform.workflow.eventaction.service.ActionDetailsReadPlatformS
 import org.mifosplatform.workflow.eventaction.service.ProcessEventActionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.JsonElement;
@@ -102,6 +108,7 @@ private final TicketMasterApiResource ticketMasterApiResource;
 private final TicketMasterReadPlatformService ticketMasterReadPlatformService;
 private final OrderRepository orderRepository;
 private final MCodeReadPlatformService codeReadPlatformService;
+private final JdbcTemplate jdbcTemplate;
 private  String ReceiveMessage;
 
 @Autowired
@@ -114,8 +121,9 @@ public SheduleJobWritePlatformServiceImpl(final InvoiceClient invoiceClient,fina
 	   final BillingMesssageReadPlatformService billingMesssageReadPlatformService,final MessagePlatformEmailService messagePlatformEmailService,
 	   final ScheduleJob scheduleJob,final EntitlementReadPlatformService entitlementReadPlatformService,
 	   final EntitlementWritePlatformService entitlementWritePlatformService,final ReadReportingService readExtraDataAndReportingService,
-	   final OrderRepository orderRepository,final TicketMasterApiResource ticketMasterApiResource, 
-	   final TicketMasterReadPlatformService ticketMasterReadPlatformService,final MCodeReadPlatformService codeReadPlatformService) {
+	   final OrderRepository orderRepository,final ConfigurationRepository globalConfigurationRepository,final TicketMasterApiResource ticketMasterApiResource, 
+	   final TicketMasterReadPlatformService ticketMasterReadPlatformService,final MCodeReadPlatformService codeReadPlatformService,
+	   final TenantAwareRoutingDataSource dataSource) {
 
 	this.sheduleJobReadPlatformService = sheduleJobReadPlatformService;
 	this.invoiceClient = invoiceClient;
@@ -139,6 +147,8 @@ public SheduleJobWritePlatformServiceImpl(final InvoiceClient invoiceClient,fina
 	this.ticketMasterApiResource = ticketMasterApiResource;
 	this.ticketMasterReadPlatformService = ticketMasterReadPlatformService;
 	this.codeReadPlatformService = codeReadPlatformService;
+    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	
 }
 
 
@@ -978,5 +988,58 @@ public void reportStatmentPdf() {
 		}
 
 
+	@Override
+	@CronTarget(jobName = JobName.EXPORT_DATA)
+	public void processExportData() {
+
+		try {
+			System.out.println("Processing export data....");
+			JobParameterData data = this.sheduleJobReadPlatformService.getJobParameters(JobName.EXPORT_DATA.toString());
+			if (data != null) {
+				MifosPlatformTenant tenant = ThreadLocalContextUtil.getTenant();
+				final DateTimeZone zone = DateTimeZone.forID(tenant.getTimezoneId());
+				LocalTime date = new LocalTime(zone);
+				String dateTime = date.getHourOfDay() + "_"+ date.getMinuteOfHour() + "_"+ date.getSecondOfMinute();
+				String path = FileUtils.generateLogFileDirectory()+ JobName.EXPORT_DATA.toString() + File.separator	+ "ExportData_"+ new LocalDate().toString().replace("-", "") + "_"+ dateTime + ".log";
+				File fileHandler = new File(path.trim());
+				fileHandler.createNewFile();
+				FileWriter fw = new FileWriter(fileHandler);
+				FileUtils.BILLING_JOB_PATH = fileHandler.getAbsolutePath();
+				/*DriverManagerDataSource ds=new DriverManagerDataSource();
+			    ds.setUrl(tenant.databaseURL());
+			    ds.setUsername(tenant.getSchemaUsername());
+			    ds.setPassword(tenant.getSchemaPassword());*/
+				fw.append("Processing export data....\r\n");
+			
+				 SimpleJdbcCall simpleJdbcCall=new SimpleJdbcCall(this.jdbcTemplate);
+					simpleJdbcCall.setProcedureName("p_int_fa");//p --> procedure int --> integration fa --> financial account s/w
+					MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+					if (data.isDynamic().equalsIgnoreCase("Y")) {
+					     parameterSource.addValue("p_todt", new LocalDate().toDate(), Types.DATE);
+					   } else {
+						   parameterSource.addValue("p_todt", data.getProcessDate().toDate(), Types.DATE);		
+					 }
+					Map<String, Object> output = simpleJdbcCall.execute(parameterSource);
+					if(output.isEmpty()){
+						fw.append("Exporting data failed....."+ ThreadLocalContextUtil.getTenant().getTenantIdentifier() + "\r\n");
+					}else{
+						fw.append("Exporting data successfully....."+ ThreadLocalContextUtil.getTenant().getTenantIdentifier() + "\r\n");
+					}
+				fw.flush();
+				fw.close();
+				System.out.println("Exporting data successfully....."+ ThreadLocalContextUtil.getTenant().getTenantIdentifier());
+			}
+		} catch (DataIntegrityViolationException e) {
+			System.out.println(e.getMessage());
+			    e.printStackTrace();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			    e.printStackTrace();
+		}
+	}
+	
 }
+
+
+
 
