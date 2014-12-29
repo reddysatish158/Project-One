@@ -1,13 +1,11 @@
 package org.mifosplatform.scheduledjobs.scheduledjobs.service;
 
 
-import java.awt.image.RescaleOp;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -16,17 +14,17 @@ import java.util.Map;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.mifosplatform.billing.selfcare.exception.SelfCareIdNotFoundException;
 import org.mifosplatform.crm.ticketmaster.api.TicketMasterApiResource;
 import org.mifosplatform.crm.ticketmaster.service.TicketMasterReadPlatformService;
 import org.mifosplatform.finance.billingmaster.api.BillingMasterApiResourse;
@@ -53,6 +51,7 @@ import org.mifosplatform.organisation.message.data.BillingMessageDataForProcessi
 import org.mifosplatform.organisation.message.service.BillingMessageDataWritePlatformService;
 import org.mifosplatform.organisation.message.service.BillingMesssageReadPlatformService;
 import org.mifosplatform.organisation.message.service.MessagePlatformEmailService;
+import org.mifosplatform.portfolio.client.exception.ClientNotFoundException;
 import org.mifosplatform.portfolio.order.data.OrderData;
 import org.mifosplatform.portfolio.order.domain.Order;
 import org.mifosplatform.portfolio.order.domain.OrderRepository;
@@ -632,7 +631,7 @@ public void processNotify() {
 				
 				if (!entitlementDataForProcessings.isEmpty()) {
 					
-					String path = FileUtils.generateLogFileDirectory() + JobName.Middleware.toString() + File.separator
+					String path = FileUtils.generateLogFileDirectory() + JobName.RADIUS.toString() + File.separator
 							+ "radius_" + new LocalDate().toString().replace("-", "") + "_" + dateTime + ".log";
 					
 					File fileHandler = new File(path.trim());
@@ -655,149 +654,109 @@ public void processNotify() {
 						
 						Long clientId = entitlementsData.getClientId();
 						
-						ClientEntitlementData clientdata = this.entitlementReadPlatformService.getClientData(clientId);
+						if(clientId == null || clientId==0){
+							throw new ClientNotFoundException(clientId);
+						}
+						
 						ReceiveMessage = "";
 
 						if (entitlementsData.getRequestType().equalsIgnoreCase(MiddlewareJobConstants.Client_Activation)) {
+							
+							try {
+								ClientEntitlementData clientdata = this.entitlementReadPlatformService.getClientData(clientId);
+								
+								if(clientdata != null && clientdata.getSelfcareUsername() != null 
+										&& !clientdata.getSelfcareUsername().equalsIgnoreCase("")){
+								
+									JSONObject object = new JSONObject();
 									
-							JSONObject object = new JSONObject();
-							
-							object.put("username", entitlementsData.getDisplayName());
-							object.put("attribute", "Cleartext-Password");
-							object.put("op", ":=");
-							object.put("value", clientdata.getSelfcarePassword());
-							
-							/*fw.append("data Sending to Server is: " + object.toString() + " \r\n");
-							StringEntity se = new StringEntity(object.toString().trim());
-							fw.append("Url for Activation request:" + data.getUrl() + "radcheck" + "\r\n");
-							HttpPost postRequest = new HttpPost(data.getUrl() + "radcheck");
-							postRequest.setHeader("Authorization", "Basic " + new String(encoded));
-							postRequest.setEntity(se);
-							HttpResponse response = httpClient.execute(postRequest);
-
-							if (response.getStatusLine().getStatusCode() == 404) {
-								System.out.println("ResourceNotFoundException : HTTP error code : "
-												+ response.getStatusLine().getStatusCode());
-								fw.append("ResourceNotFoundException : HTTP error code : " 		
-										+ response.getStatusLine().getStatusCode() + ", Request url:"
-										+ data.getUrl() + "radcheck is not Found. \r\n");
-								fw.flush();
-								fw.close();
-								continue;
-
-							} else if (response.getStatusLine().getStatusCode() == 401) {
-								System.out.println(" Unauthorized Exception : HTTP error code : "
-												+ response.getStatusLine().getStatusCode());
-								fw.append(" Unauthorized Exception : HTTP error code : "
-										+ response.getStatusLine().getStatusCode()
-										+ " , The UserName or Password you entered is incorrect." + "\r\n");
-								fw.flush();
-								fw.close();
-								return;
-
-							} else if (response.getStatusLine().getStatusCode() != 200) {
-								System.out.println("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
-								fw.append("Failed : HTTP error code : " + response.getStatusLine().getStatusCode() + " \r\n");
-							} else{
-								fw.append("Request executed Successfully... \r\n");
+									object.put("username", clientdata.getSelfcareUsername());
+									object.put("attribute", "Cleartext-Password");
+									object.put("op", ":=");
+									object.put("value", clientdata.getSelfcarePassword());
+									
+									String encodePassword = new String(encoded);
+									String url = data.getUrl() + "radcheck";
+									
+									String output = processRadiusRequests(url, encodePassword, object.toString(), fw);
+									
+									if(output.equalsIgnoreCase("UnauthorizedException") || output.equalsIgnoreCase("ResourceNotFoundException")){
+										return;
+									}else if(output.contains(MiddlewareJobConstants.RADCHECK_OUTPUT)){
+										ReceiveMessage = "Success";
+									}else{
+										ReceiveMessage = MiddlewareJobConstants.FAILURE + output;
+									}
+									
+									fw.append("Output from Server: " + output + " \r\n");
+								
+								}else{
+									String output = "Selfcare Not Created with this ClientId: " + clientId + " Properly.";
+									fw.append(output + " \r\n");
+									ReceiveMessage = MiddlewareJobConstants.FAILURE + output;
+								}	
+								
+							} catch (JSONException e) {
+								fw.append("JSON Exeception throwing. StockTrace:" + e.getMessage() + " \r\n");
+								ReceiveMessage = MiddlewareJobConstants.FAILURE + e.getMessage();
 							}
-							
-							BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
-							String output,output1="";
-							
-							while ((output = br.readLine()) != null) {
-								output1 = output1 + output;
-							}*/
-							String encodePassword = new String(encoded);
-							String url = data.getUrl() + "radcheck";
-							
-							String output = processRadiusRequests(url, encodePassword, object.toString(), fw);
-							
-							if(output.equalsIgnoreCase("UnauthorizedException") || output.equalsIgnoreCase("ResourceNotFoundException")){
-								return;
-							}else if(output.contains(MiddlewareJobConstants.RADCHECK_OUTPUT)){
-								ReceiveMessage = "Success";
-							}else{
-								ReceiveMessage = MiddlewareJobConstants.FAILURE + output;
-							}
-							
-							fw.append("Output from Server: " + output + " \r\n");
-							System.out.println(output);
-							
+									
 						} else if (entitlementsData.getRequestType().equalsIgnoreCase(MiddlewareJobConstants.Activation)) {
-							JSONObject jsonObject = new JSONObject(entitlementsData.getProduct());
-							String planIdentification = jsonObject.getString("planIdentification");
 							
-							JSONObject object = new JSONObject();
-							object.put("username", entitlementsData.getFirstName());
-							object.put("groupname", planIdentification);
-							object.put("priority", Long.valueOf(1));
-
-							/*fw.append("data Sending to Server is: " + object.toString() + " \r\n");
-							StringEntity se = new StringEntity(object.toString().trim());
-							fw.append("Url for Activation request:" + data.getUrl() + "raduser" + "\r\n");
-							HttpPost postRequest = new HttpPost(data.getUrl() + "raduser");
-							postRequest.setHeader("Authorization", "Basic " + new String(encoded));
-							postRequest.setEntity(se);
-							HttpResponse response = httpClient.execute(postRequest);
-
-							if (response.getStatusLine().getStatusCode() == 404) {
-								System.out.println("ResourceNotFoundException : HTTP error code : "
-												+ response.getStatusLine().getStatusCode());
-								fw.append("ResourceNotFoundException : HTTP error code : "
-										+ response.getStatusLine().getStatusCode()
-										+ ", Request url:" + data.getUrl() + "raduser is not Found. \r\n");
-								fw.flush();
-								fw.close();
-								continue;
-
-							} else if (response.getStatusLine().getStatusCode() == 401) {
-								System.out.println(" Unauthorized Exception : HTTP error code : "
-												+ response.getStatusLine().getStatusCode());
-								fw.append(" Unauthorized Exception : HTTP error code : "
-										+ response.getStatusLine().getStatusCode()
-										+ " , The UserName or Password you entered is incorrect." + "\r\n");
-								fw.flush();
-								fw.close();
-								return;
-
-							} else if (response.getStatusLine().getStatusCode() != 200) {
-								System.out.println("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
-								fw.append("Failed : HTTP error code : " + response.getStatusLine().getStatusCode() + " \r\n");
+							try {
+								
+								JSONObject jsonObject = new JSONObject(entitlementsData.getProduct());
+								String planIdentification = jsonObject.getString("planIdentification");
+								
+								if(planIdentification != null && !planIdentification.equalsIgnoreCase("")){
+									
+									JSONObject object = new JSONObject();
+									object.put("username", entitlementsData.getFirstName());
+									object.put("groupname", planIdentification);
+									object.put("priority", Long.valueOf(1));
+									
+									String encodePassword = new String(encoded);
+									String url = data.getUrl() + "raduser";
+									
+									String output = processRadiusRequests(url, encodePassword, object.toString(), fw);
+									
+									if(output.equalsIgnoreCase("UnauthorizedException") || output.equalsIgnoreCase("ResourceNotFoundException")){
+										return;
+									}else if(output.equalsIgnoreCase(MiddlewareJobConstants.RADUSER_OUTPUT)){
+										ReceiveMessage = "Success";
+									}else{
+										ReceiveMessage = MiddlewareJobConstants.FAILURE + output;
+									}
+									
+									fw.append("Output from Server: " + output + " \r\n");
+								
+								}else{
+									fw.append("Plan Identification should Not Mapped Properly, Plan Identification=" + planIdentification + " \r\n");
+									ReceiveMessage = MiddlewareJobConstants.FAILURE + "Plan Identification " +
+											" should Not Mapped Properly and Plan Identification=" + planIdentification;
+								}
+								
 							
-							} else{
-								fw.append("Request executed Successfully... \r\n");
+							} catch (JSONException e) {
+								fw.append("JSON Exeception throwing. StockTrace:" + e.getMessage() + " \r\n");
+								ReceiveMessage = MiddlewareJobConstants.FAILURE + e.getMessage();
 							}
 							
-							BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
-							String output,output1="";
-
-							while ((output = br.readLine()) != null) {
-								output1 = output1 + output;
-							}*/
-							
-							String encodePassword = new String(encoded);
-							String url = data.getUrl() + "raduser";
-							
-							String output = processRadiusRequests(url, encodePassword, object.toString(), fw);
-							
-							if(output.equalsIgnoreCase("UnauthorizedException") || output.equalsIgnoreCase("ResourceNotFoundException")){
-								return;
-							}else if(output.equalsIgnoreCase(MiddlewareJobConstants.RADUSER_OUTPUT)){
-								ReceiveMessage = "Success";
-							}else{
-								ReceiveMessage = MiddlewareJobConstants.FAILURE + output;
-							}
-							
-							fw.append("Output from Server: " + output + " \r\n");
-							System.out.println(output);
 
 						}else {
-							fw.append("Request Type is:"+ entitlementsData.getRequestType());
-							fw.append("Unknown Request Type for Server (or) This Request Type is Not Handle in Radius Job");
-							ReceiveMessage = MiddlewareJobConstants.FAILURE + "Unknown Request Type for Server";
+							try{
+								fw.append("Request Type is:"+ entitlementsData.getRequestType());
+								fw.append("Unknown Request Type for Server (or) This Request Type is Not Handle in Radius Job");
+								ReceiveMessage = MiddlewareJobConstants.FAILURE + "Unknown Request Type for Server";
+							
+							} catch (Exception e) {
+								fw.append("Exeception throwing. StockTrace:" + e.getMessage() + " \r\n");
+								ReceiveMessage = MiddlewareJobConstants.FAILURE + e.getMessage();
+							}
+							
 						}
 						
+						// Updating the Response and status in b_process_request.
 						JsonObject object = new JsonObject();
 						object.addProperty("prdetailsId", entitlementsData.getPrdetailsId());
 						object.addProperty("receivedStatus", new Long(1));
@@ -810,8 +769,6 @@ public void processNotify() {
 								entityName, entitlementsData.getId(), null, null, null, null, null, null, 
 								null, null, null,null);
 						CommandProcessingResult result = this.entitlementWritePlatformService.create(comm);
-						
-						System.out.println(result.resourceId() + " \r\n");
 						fw.append("Result From the EntitlementApi is:" + result.resourceId() + " \r\n");
 					}
 					fw.append("Radius Job is Completed..." + ThreadLocalContextUtil.getTenant().getTenantIdentifier() + " /r/n");
@@ -826,10 +783,9 @@ public void processNotify() {
 			}
 
 		} catch (DataIntegrityViolationException exception) {
-
-		} catch (Exception exception) {
-			System.out.println(exception.getMessage());
-
+			System.out.println("catching the DataIntegrityViolationException, StockTrace: " + exception.getMessage());
+		} catch (IOException e) {
+			System.out.println("catching the IOException, StockTrace: " + e.getMessage());
 		}
 	}
 
