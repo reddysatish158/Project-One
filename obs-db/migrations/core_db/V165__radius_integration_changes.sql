@@ -7,6 +7,10 @@ update job_parameters set param_value='hugoadmin' where param_name='Password';
 update job_parameters set param_value='http://v241.streamingmedia.is:8556/' where param_name='URL';
 SET SQL_SAFE_UPDATES = 1;
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> obsplatform-2.03
 Drop procedure IF EXISTS paymentDates; 
 DELIMITER //
 create procedure paymentDates() 

@@ -10,10 +10,8 @@ import org.mifosplatform.infrastructure.configuration.domain.EnumDomainService;
 import org.mifosplatform.infrastructure.configuration.domain.EnumDomainServiceRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
-import org.mifosplatform.infrastructure.core.domain.MifosPlatformTenant;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.core.service.DataSourcePerTenantService;
-import org.mifosplatform.infrastructure.core.service.ThreadLocalContextUtil;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.infrastructure.security.service.TenantDetailsService;
 import org.mifosplatform.organisation.ippool.domain.IpPoolManagementDetail;
@@ -27,12 +25,9 @@ import org.mifosplatform.portfolio.order.domain.OrderAddons;
 import org.mifosplatform.portfolio.order.domain.OrderAddonsRepository;
 import org.mifosplatform.portfolio.order.domain.OrderRepository;
 import org.mifosplatform.portfolio.order.domain.StatusTypeEnum;
-import org.mifosplatform.portfolio.order.domain.UserActionStatusTypeEnum;
 import org.mifosplatform.portfolio.order.service.OrderReadPlatformService;
 import org.mifosplatform.portfolio.plan.domain.Plan;
 import org.mifosplatform.portfolio.plan.domain.PlanRepository;
-import org.mifosplatform.provisioning.preparerequest.data.PrepareRequestData;
-import org.mifosplatform.provisioning.preparerequest.domain.PrepareRequest;
 import org.mifosplatform.provisioning.preparerequest.domain.PrepareRequsetRepository;
 import org.mifosplatform.provisioning.preparerequest.service.PrepareRequestReadplatformService;
 import org.mifosplatform.provisioning.processrequest.domain.ProcessRequest;
@@ -49,7 +44,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,7 +63,6 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 	  private final OrderRepository orderRepository;
 	  private final ClientRepository clientRepository;
 	  private final OrderReadPlatformService orderReadPlatformService;
-	  private final PrepareRequsetRepository prepareRequsetRepository;
 	  private final ProcessRequestRepository processRequestRepository;
 	  private final DataSourcePerTenantService dataSourcePerTenantService;
 	  private final EventOrderRepository eventOrderRepository;
@@ -78,6 +71,7 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 	  private final EnumDomainServiceRepository enumDomainServiceRepository;
 	  private final ServiceParametersRepository serviceParametersRepository;
 	  private final OrderAddonsRepository orderAddonsRepository;
+
 
 	  
 	  
@@ -90,6 +84,7 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 	    		final ActiondetailsWritePlatformService actiondetailsWritePlatformService,final PlatformSecurityContext context,final EventMasterRepository eventMasterRepository,
 	    		final EnumDomainServiceRepository enumDomainServiceRepository,final EventOrderRepository eventOrderRepository,final ServiceParametersRepository parametersRepository,
 	    		final IpPoolManagementJpaRepository ipPoolManagementJpaRepository,final OrderAddonsRepository orderAddonsRepository) {
+
 	    	
 	    	    this.context = context;
 	    	    this.planRepository=planRepository;
@@ -100,11 +95,10 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 	    	    this.actiondetailsWritePlatformService=actiondetailsWritePlatformService;
 	    	    this.orderAddonsRepository=orderAddonsRepository;
 	    	    this.orderRepository=orderRepository;
+         	    this.clientRepository=clientRepository;
 	    	    this.serviceParametersRepository=parametersRepository;
-	    	    this.prepareRequsetRepository=prepareRequsetRepository;
 	    	    this.processRequestRepository=processRequestRepository;
 	    	    this.orderReadPlatformService=orderReadPlatformService;
-	    	    this.clientRepository=clientRepository;
 	    	    this.eventOrderRepository=eventOrderRepository;
 	    	    this.tenantDetailsService = tenantDetailsService;
 	    	    this.eventMasterRepository=eventMasterRepository;
@@ -112,7 +106,7 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 	             
 	    }
 
-	    @Transactional
+/*	    @Transactional
 	    @Override
 		public void ProcessingRequestDetails() {
 	        
@@ -140,7 +134,7 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 			        ThreadLocalContextUtil.setTenant(tenant);
 			        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSourcePerTenantService.retrieveDataSource());
 	    		}
-			}
+			}*/
 
 		@Override
 		public void notifyProcessingDetails(ProcessRequest detailsData,char status) {
@@ -160,7 +154,7 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 						switch(detailsData.getRequestType()){
  						   
 							case ProvisioningApiConstants.REQUEST_ACTIVATION :
-								
+
 								order.setStatus(OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.ACTIVE).getId());
 								client.setStatus(ClientStatus.ACTIVE.getValue());
 								this.orderRepository.saveAndFlush(order);
@@ -276,11 +270,17 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 								order.setStatus(enumDomainService.getEnumId());
 								this.orderRepository.saveAndFlush(order);
 							}else{
-								order.setStatus(OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.ACTIVE).getId());
+								
+								if(order != null){
+									order.setStatus(OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.ACTIVE).getId());
+									this.orderRepository.saveAndFlush(order);
+								}
 								client.setStatus(ClientStatus.ACTIVE.getValue());
 								this.clientRepository.saveAndFlush(client);
+<<<<<<< HEAD
 								this.orderRepository.saveAndFlush(order);
 							}	*/
+
 						//	this.orderRepository.saveAndFlush(order);
 							this.clientRepository.saveAndFlush(client);
 							detailsData.setNotify();
