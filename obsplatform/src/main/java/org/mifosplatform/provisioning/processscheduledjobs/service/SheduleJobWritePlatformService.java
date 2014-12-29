@@ -25,6 +25,7 @@ public interface SheduleJobWritePlatformService {
 	
 	void reportStatmentPdf();
     
+	void processExportData();
 
 
 	
