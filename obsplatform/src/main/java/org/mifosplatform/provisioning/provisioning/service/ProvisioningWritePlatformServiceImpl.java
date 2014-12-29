@@ -322,8 +322,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 
 	@Override
 	public CommandProcessingResult postOrderDetailsForProvisioning(final Order order,final String planName,final String requestType, 
-			final Long prepareId,final String groupname,final String serialNo,final Long orderId,final String provisioningSys,
-			final String configpropertyData) {
+			final Long prepareId,final String groupname,final String serialNo,final Long orderId,final String provisioningSys) {
 
 	try {
 		Long commandProcessId=null;
@@ -364,7 +363,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 			}else{
 				PrepareRequestData prepareRequestData=new  PrepareRequestData(Long.valueOf(0),order.getClientId(), orderId, requestType, hardwareAssociation.getSerialNo(),
 						 null, provisioningSys, planName, String.valueOf(plan.isHardwareReq()));
-			CommandProcessingResult commandProcessingResult =this.prepareRequestReadplatformService.processingClientDetails(prepareRequestData, configpropertyData);
+			CommandProcessingResult commandProcessingResult =this.prepareRequestReadplatformService.processingClientDetails(prepareRequestData);
 			commandProcessId=commandProcessingResult.resourceId();
 			}
 			return new CommandProcessingResult(commandProcessId);

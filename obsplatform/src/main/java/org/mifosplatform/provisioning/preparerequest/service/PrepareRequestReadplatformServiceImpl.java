@@ -141,7 +141,7 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 			}
 
  @Override
- public CommandProcessingResult processingClientDetails(PrepareRequestData requestData,String configProp) {
+ public CommandProcessingResult processingClientDetails(PrepareRequestData requestData) {
 	
 	 PrepareRequest prepareRequest=this.prepareRequsetRepository.findOne(requestData.getRequestId());
 	 try{
@@ -202,7 +202,7 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 
 		 JSONArray newServiceArray = new JSONArray();
 		 if(requestData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.DEVICE_SWAP.toString())){
-			 AllocationDetailsData allocationDetailsData=this.allocationReadPlatformService.getDisconnectedHardwareItemDetails(requestData.getOrderId(),requestData.getClientId(),configProp);
+			 AllocationDetailsData allocationDetailsData=this.allocationReadPlatformService.getDisconnectedHardwareItemDetails(requestData.getOrderId(),requestData.getClientId());
 			 jsonObject.put("clientId", order.getClientId());
 			 jsonObject.put("OldHWId", allocationDetailsData.getSerialNo());
 			 jsonObject.put("NewHWId", HardWareId);

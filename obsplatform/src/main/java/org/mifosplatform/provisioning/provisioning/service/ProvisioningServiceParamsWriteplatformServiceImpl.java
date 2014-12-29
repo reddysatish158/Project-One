@@ -6,6 +6,8 @@ import net.sf.json.JSONObject;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
+import org.mifosplatform.finance.paymentsgateway.domain.PaymentGatewayConfiguration;
+import org.mifosplatform.finance.paymentsgateway.domain.PaymentGatewayConfigurationRepository;
 import org.mifosplatform.infrastructure.configuration.domain.Configuration;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
@@ -61,21 +63,16 @@ public class ProvisioningServiceParamsWriteplatformServiceImpl implements
 	private final ItemDetailsRepository inventoryItemDetailsRepository;
 	private final IpPoolManagementReadPlatformService ipPoolManagementReadPlatformService;
 	private final ConfigurationRepository globalConfigurationRepository;
+	private final PaymentGatewayConfigurationRepository paymentGatewayConfigurationRepository;
 
 	@Autowired
-	public ProvisioningServiceParamsWriteplatformServiceImpl(
-			final PlatformSecurityContext securityContext,
-			final FromJsonHelper fromJsonHelper,
-			final ServiceParametersRepository parametersRepository,
-			final PrepareRequsetRepository prepareRequsetRepository,
-			final ProcessRequestRepository processRequestRepository,
-			final OrderRepository orderRepository,
-			final ItemDetailsRepository detailsRepository,
-			final IpPoolManagementJpaRepository ipPoolManagementJpaRepository,
-			final ServiceMasterRepository masterRepository,
-			final IpPoolManagementReadPlatformService ipPoolManagementReadPlatformService,
-			final ClientRepository clientRepository,
-			final ConfigurationRepository globalConfigurationRepository) {
+	public ProvisioningServiceParamsWriteplatformServiceImpl(final PlatformSecurityContext securityContext,final FromJsonHelper fromJsonHelper,
+			final ServiceParametersRepository parametersRepository,final PrepareRequsetRepository prepareRequsetRepository,
+			final ProcessRequestRepository processRequestRepository,final OrderRepository orderRepository,
+			final ItemDetailsRepository detailsRepository,final IpPoolManagementJpaRepository ipPoolManagementJpaRepository,
+			final ServiceMasterRepository masterRepository,final IpPoolManagementReadPlatformService ipPoolManagementReadPlatformService,
+			final ClientRepository clientRepository,final ConfigurationRepository globalConfigurationRepository,
+			final PaymentGatewayConfigurationRepository paymentGatewayConfigurationRepository) {
 
 		this.context = securityContext;
 		this.orderRepository = orderRepository;
@@ -87,6 +84,7 @@ public class ProvisioningServiceParamsWriteplatformServiceImpl implements
 		this.prepareRequsetRepository = prepareRequsetRepository;
 		this.processRequestRepository = processRequestRepository;
 		this.ipPoolManagementJpaRepository = ipPoolManagementJpaRepository;
+		this.paymentGatewayConfigurationRepository=paymentGatewayConfigurationRepository;
 		this.ipPoolManagementReadPlatformService = ipPoolManagementReadPlatformService;
 		this.globalConfigurationRepository = globalConfigurationRepository;
 	}
@@ -147,7 +145,7 @@ public class ProvisioningServiceParamsWriteplatformServiceImpl implements
 									String ipData = ipAddress + "/" + subnet;
 									IpGeneration ipGeneration = new IpGeneration(ipData, this.ipPoolManagementReadPlatformService);
 									// ipAddressArray=this.ipGeneration.getInfo().getAllAddresses(ipData);//
-									Configuration configuration = globalConfigurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_PAYPAL_CHECK);
+									PaymentGatewayConfiguration configuration = paymentGatewayConfigurationRepository.findOneByName(ConfigurationConstants.PAYMENTGATEWAY_IS_PAYPAL_CHECK);
 									ipGeneration.setInclusiveHostCount(configuration.getValue().equalsIgnoreCase("true"));
 									ipAddressArray = ipGeneration.getInfo().getsubnetAddresses();
 

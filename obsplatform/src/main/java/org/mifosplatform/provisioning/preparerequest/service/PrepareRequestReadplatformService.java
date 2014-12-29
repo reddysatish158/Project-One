@@ -10,7 +10,7 @@ public interface PrepareRequestReadplatformService {
 	
 	List<Long> retrieveRequestClientOrderDetails(Long clientId);
 	
-	CommandProcessingResult processingClientDetails(PrepareRequestData requestData, String configProp);
+	CommandProcessingResult processingClientDetails(PrepareRequestData requestData);
 	
 	List<Long> getPrepareRequestDetails(Long id);
 	
