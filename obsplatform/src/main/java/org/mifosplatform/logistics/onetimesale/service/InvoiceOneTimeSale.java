@@ -155,7 +155,7 @@ public CommandProcessingResult invoiceOneTimeSale(final Long clientId, final One
 	// Dicount Percent calculation
 	public BigDecimal calculateDiscountPercentage(final BigDecimal discountRate,final BigDecimal chargePrice){
 		
-		return chargePrice.multiply(discountRate.divide(new BigDecimal(100)));
+		return chargePrice.multiply(discountRate.divide(new BigDecimal(100))).setScale(Integer.parseInt(this.generateBill.roundingDecimal()), RoundingMode.HALF_UP);
 	}
 	
 	// Discount Flat calculation
@@ -164,7 +164,7 @@ public CommandProcessingResult invoiceOneTimeSale(final Long clientId, final One
 		BigDecimal discountFlat=BigDecimal.ZERO;
 		//check for chargeprice zero and discountrate greater than zero
 		if(chargePrice.compareTo(BigDecimal.ZERO) == 1 ){
-			discountFlat=chargePrice.subtract(discountRate).setScale(2,RoundingMode.HALF_UP);
+			discountFlat=chargePrice.subtract(discountRate).setScale(Integer.parseInt(this.generateBill.roundingDecimal()),RoundingMode.HALF_UP);
 		}
 		return discountFlat;
 	}
