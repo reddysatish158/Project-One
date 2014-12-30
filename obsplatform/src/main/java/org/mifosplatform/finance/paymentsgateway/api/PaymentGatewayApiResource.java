@@ -516,18 +516,19 @@ public class PaymentGatewayApiResource {
 				}
 				
 			} else {
-				paymentStatus = "Payment Failed, Please Contact to Your Service Provider.  ";
+				paymentStatus = " Payment Failed, Please Contact to Your Service Provider.  ";
 			}
 			
-			String htmlData = "<a href=\""+returnUrl+"\"><strong>"+ paymentStatus + "</Strong> Click On Me</a>";
+			String htmlData = "<a href=\""+returnUrl+"\"> Click On Me. </a>" + "<strong>"+ paymentStatus + "</Strong>";
 			
 			return htmlData;
 
 		} 
 	   catch(Exception e){
+		   
 		   String paymentStatus = "Payment Failed, Please Contact to Your Service Provider.  ";
-		   String htmlData = "<a href=\""+returnUrl+"\"><strong>"+ paymentStatus + "</Strong> Click On Me</a>";
-		   return htmlData;
+		   String htmlData = "<a href=\""+returnUrl+"\"> Click On Me </a>" + "<strong>"+ paymentStatus + "</Strong>";
+		   return htmlData;   
 	   }
 	 }
 }
