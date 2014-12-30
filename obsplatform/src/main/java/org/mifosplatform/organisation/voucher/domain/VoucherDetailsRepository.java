@@ -13,7 +13,8 @@ import org.springframework.data.repository.query.Param;
 public interface VoucherDetailsRepository extends JpaRepository<VoucherDetails, Long>,
 		JpaSpecificationExecutor<VoucherDetails> {
 	
-	@Query("from VoucherDetails voucherDetails where voucherDetails.pinNo =:pinNumber and voucherDetails.clientId is null")
+	//and voucherDetails.clientId is null
+	@Query("from VoucherDetails voucherDetails where voucherDetails.pinNo =:pinNumber")
 	VoucherDetails findOneByPinNumber(@Param("pinNumber") String pinNumber);
 	
 
