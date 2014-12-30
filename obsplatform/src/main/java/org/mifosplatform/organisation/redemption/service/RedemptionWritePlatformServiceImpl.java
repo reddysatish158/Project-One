@@ -13,6 +13,7 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
+import org.mifosplatform.organisation.redemption.exception.PinNumberAlreadyUsedException;
 import org.mifosplatform.organisation.redemption.exception.PinNumberNotFoundException;
 import org.mifosplatform.organisation.redemption.serialization.RedemptionCommandFromApiJsonDeserializer;
 import org.mifosplatform.organisation.voucher.domain.Voucher;
@@ -159,8 +160,12 @@ public class RedemptionWritePlatformServiceImpl implements
 	private VoucherDetails retrieveRandomDetailsByPinNo(String pinNumber) {
 
 		final VoucherDetails voucherDetails = this.voucherDetailsRepository.findOneByPinNumber(pinNumber);
+		
 		if (voucherDetails == null) {
 			throw new PinNumberNotFoundException(pinNumber);
+			
+		}else if (voucherDetails.getClientId()!=null || voucherDetails.getStatus().equalsIgnoreCase("USED")) {
+			throw new PinNumberAlreadyUsedException(pinNumber);
 		}
 		return voucherDetails;
 	}
