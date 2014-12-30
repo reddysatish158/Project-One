@@ -56,6 +56,7 @@ public class RedemptionWritePlatformServiceImpl implements
 	private final static String PRODUCE_PINTYPE = "PRODUCT";
 	private final static int RECONNECT_ORDER_STATUS = 3;
 	private final static int RENEWAL_ORDER_STATUS = 1;
+	private final static String USED = "USED";
 	
 	@Autowired
 	public RedemptionWritePlatformServiceImpl(final PlatformSecurityContext context,final VoucherDetailsRepository voucherDetailsRepository,
@@ -142,6 +143,8 @@ public class RedemptionWritePlatformServiceImpl implements
 			}
 			  
 			voucherDetails.setClientId(clientId);
+			voucherDetails.setStatus(USED);
+			
 			this.voucherDetailsRepository.save(voucherDetails);
 			 
 			return new CommandProcessingResult(clientId);

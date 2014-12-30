@@ -33,6 +33,9 @@ public class VoucherDetails extends AbstractPersistable<Long> {
 	@Column(name = "client_id", nullable = true)
 	private Long clientId;
 	
+	@Column(name = "status")
+	private String status;
+	
 	/**
 	 * Default/Zero-Parameterized Constructor
 	 */
@@ -57,6 +60,7 @@ public class VoucherDetails extends AbstractPersistable<Long> {
 		this.pinNo = voucherpin;
 		this.serialNo = serialNo;
 		this.voucher = voucher;
+		this.status = "NEW";
 	}
 
 	public String getPinNo() {
@@ -89,6 +93,14 @@ public class VoucherDetails extends AbstractPersistable<Long> {
 
 	public void setVoucher(Voucher voucher) {
 		this.voucher = voucher;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}	
 	
 	

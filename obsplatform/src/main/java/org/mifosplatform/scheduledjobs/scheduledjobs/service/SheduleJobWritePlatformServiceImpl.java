@@ -652,48 +652,49 @@ public void processMiddleware() {
 					}
 					
 					ReceiveMessage = "";
-
-					if (entitlementsData.getRequestType().equalsIgnoreCase(MiddlewareJobConstants.Client_Activation)) {
+					ClientEntitlementData clientdata = this.entitlementReadPlatformService.getClientData(clientId);
+					
+					if(clientdata == null || clientdata.getSelfcareUsername() == null || 
+							!clientdata.getSelfcareUsername().equalsIgnoreCase("")){
 						
+						String output = "Selfcare Not Created with this ClientId: " + clientId + " Properly.";
+						fw.append(output + " \r\n");
+						ReceiveMessage = MiddlewareJobConstants.FAILURE + output;
+						
+					} else if (entitlementsData.getRequestType().equalsIgnoreCase(MiddlewareJobConstants.Client_Activation)) {
+		
 						try {
-							ClientEntitlementData clientdata = this.entitlementReadPlatformService.getClientData(clientId);
+							JSONObject object = new JSONObject();	
+							object.put("username", clientdata.getSelfcareUsername());					
+							object.put("attribute", "Cleartext-Password");							
+							object.put("op", ":=");							
+							object.put("value", clientdata.getSelfcarePassword());
+
+							String encodePassword = new String(encoded);
+							String url = data.getUrl() + "radcheck";
+							String output = processRadiusRequests(url, encodePassword, object.toString(), fw);
 							
-							if(clientdata != null && clientdata.getSelfcareUsername() != null 
-									&& !clientdata.getSelfcareUsername().equalsIgnoreCase("")){
+							if (output.equalsIgnoreCase("UnauthorizedException")
+										|| output.equalsIgnoreCase("ResourceNotFoundException")) {
+									
+								return;	
 							
-								JSONObject object = new JSONObject();
-								
-								object.put("username", clientdata.getSelfcareUsername());
-								object.put("attribute", "Cleartext-Password");
-								object.put("op", ":=");
-								object.put("value", clientdata.getSelfcarePassword());
-								
-								String encodePassword = new String(encoded);
-								String url = data.getUrl() + "radcheck";
-								
-								String output = processRadiusRequests(url, encodePassword, object.toString(), fw);
-								
-								if(output.equalsIgnoreCase("UnauthorizedException") || output.equalsIgnoreCase("ResourceNotFoundException")){
-									return;
-								}else if(output.contains(MiddlewareJobConstants.RADCHECK_OUTPUT)){
-									ReceiveMessage = "Success";
-								}else{
-									ReceiveMessage = MiddlewareJobConstants.FAILURE + output;
-								}
-								
-								fw.append("Output from Server: " + output + " \r\n");
+							} else if (output.contains(MiddlewareJobConstants.RADCHECK_OUTPUT)) {	
+								ReceiveMessage = "Success";
 							
-							}else{
-								String output = "Selfcare Not Created with this ClientId: " + clientId + " Properly.";
-								fw.append(output + " \r\n");
+							} else {
 								ReceiveMessage = MiddlewareJobConstants.FAILURE + output;
 							}
-								
-						} catch (JSONException e) {
-							fw.append("JSON Exeception throwing. StockTrace:" + e.getMessage() + " \r\n");
-							ReceiveMessage = MiddlewareJobConstants.FAILURE + e.getMessage();
+							
+							fw.append("Output from Server: " + output + " \r\n");
+
+							
+						} catch (JSONException e) {		
+							
+							fw.append("JSON Exeception throwing. StockTrace:" + e.getMessage() + " \r\n");	
+							ReceiveMessage = MiddlewareJobConstants.FAILURE + e.getMessage();			
 						}
-						
+							
 					} else if (entitlementsData.getRequestType().equalsIgnoreCase(MiddlewareJobConstants.Activation)) {
 						
 						try {
@@ -704,7 +705,7 @@ public void processMiddleware() {
 							if(planIdentification != null && !planIdentification.equalsIgnoreCase("")){
 								
 								JSONObject object = new JSONObject();
-								object.put("username", entitlementsData.getFirstName());
+								object.put("username", clientdata.getSelfcareUsername());
 								object.put("groupname", planIdentification);
 								object.put("priority", Long.valueOf(1));
 								
