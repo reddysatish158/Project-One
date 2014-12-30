@@ -33,6 +33,8 @@ public interface ProvisioningWritePlatformService {
 
 	List<ProvisionAdapter> gettingLogInformation(String apiRequestBodyAsJson);
 
+	CommandProcessingResult postDetailsForProvisioning(Long clientId,String requestType, String provisioningSystem, String hardwareId);
+
 
 
 }

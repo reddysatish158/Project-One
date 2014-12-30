@@ -152,7 +152,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
           //  extraCriteria = " and (" + sqlSearch + ")";
             
         	extraCriteria = " and ( display_name like '%" + sqlSearch + "%' OR c.account_no like '%"+sqlSearch+"%' OR g.group_name like '%"+sqlSearch+"%' "
-        			+ " OR IFNULL(( Select min(serial_no) from b_allocation ba where c.id=ba.client_id),'No Hardware') LIKE '%"+sqlSearch+"%' )";
+        			+ " OR IFNULL(( Select min(serial_no) from b_allocation ba where c.id=ba.client_id and ba. is_deleted = 'N'),'No Hardware') LIKE '%"+sqlSearch+"%' )";
             
         }
 

@@ -41,7 +41,7 @@ public class SmartSearchReadplatformServiceImpl implements SmartSearchReadplatfo
             return " p.id AS id, p.payment_date AS paymentDate,p.client_id as clientId,p.amount_paid as amount," +
             		" p.receipt_no as receiptNo,c.display_name as clientName,mc.code_value as paymodeType  " +
             		"FROM b_payments p, m_client c, m_code_value mc WHERE  p.client_id=c.id and p.paymode_id=mc.id ";
-        }
+       }
 
         @Override
         public SmartSearchData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {

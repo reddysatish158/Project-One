@@ -6,7 +6,7 @@ import org.mifosplatform.provisioning.processrequest.domain.ProcessRequest;
 
 public interface ProcessRequestWriteplatformService {
 
-	void ProcessingRequestDetails();
+//	void ProcessingRequestDetails();
 
     CommandProcessingResult addProcessRequest(JsonCommand command);
 

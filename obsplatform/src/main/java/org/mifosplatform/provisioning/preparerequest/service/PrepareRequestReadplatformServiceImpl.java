@@ -235,15 +235,16 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 			 
 			 List<ServiceMapping> provisionServiceDetails=this.provisionServiceDetailsRepository.findOneByServiceId(orderLine.getServiceId());
 			 	ServiceMaster service=this.serviceMasterRepository.findOne(orderLine.getServiceId());
-		
-			 	
+
 				 JSONObject subjson = new JSONObject();
 				 subjson.put("serviceName", service.getServiceCode());
 				 subjson.put("serviceIdentification", provisionServiceDetails.get(0).getServiceIdentification());
 				 subjson.put("serviceType", service.getServiceType());
 				 newServiceArray.add(subjson.toString());	 
+
 			 
 		  }
+
 		 }
 
 		 jsonObject.put("services", new Gson().toJson(newServiceArray));

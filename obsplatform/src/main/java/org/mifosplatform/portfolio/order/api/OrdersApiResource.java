@@ -190,6 +190,7 @@ public class OrdersApiResource {
 	 final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 	 return this.toApiJsonSerializer.serialize(result);
 	 }
+
 	 
 	@PUT
 	@Path("{orderId}")
@@ -409,5 +410,5 @@ public class OrdersApiResource {
 		
 	}
 	
-	
+
 }

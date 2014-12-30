@@ -66,7 +66,7 @@ public class EventMasterReadPlatformServiceImpl implements
 	public List<EventMasterData> retrieveEventMasterDataForEventOrders() {
 		try {
 			final EventMasterMapper eventMasterMapper = new EventMasterMapper();
-			final String sql = "SELECT " + eventMasterMapper.eventMasterSchema() + " where evnt.status=1 and evnt.event_end_date > now() or evnt.event_end_date is null";
+			final String sql = "SELECT " + eventMasterMapper.eventMasterSchema() + " where  evnt.event_end_date > now() or evnt.event_end_date is null";
 			return jdbcTemplate.query(sql, eventMasterMapper, new Object[] {});
 		} catch (EmptyResultDataAccessException e) {
 			return null;
