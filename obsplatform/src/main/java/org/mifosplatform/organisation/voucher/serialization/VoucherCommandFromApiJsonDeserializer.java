@@ -32,10 +32,10 @@ public class VoucherCommandFromApiJsonDeserializer {
 	 * The parameters supported for this command.
 	 */
 	private final Set<String> supportedParameters = new HashSet<String>(
-			Arrays.asList("id", "batchName", "batchDescription", "length",
+			Arrays.asList("id", "batchName", "length",
 					"beginWith", "pinCategory", "pinType", "quantity",
 					"serialNo", "expiryDate", "dateFormat", "pinValue",
-					"pinNO", "locale", "pinExtention"));
+					"pinNO", "locale", "pinExtention","officeId"));
 	
 	private final FromJsonHelper fromApiJsonHelper;
 
@@ -61,16 +61,9 @@ public class VoucherCommandFromApiJsonDeserializer {
 
 		final JsonElement element = fromApiJsonHelper.parse(json);
 
-		final String batchName = fromApiJsonHelper.extractStringNamed(
-				"batchName", element);
-		baseDataValidator.reset().parameter("batchName").value(batchName)
-				.notBlank();
+		final String batchName = fromApiJsonHelper.extractStringNamed("batchName", element);
+		baseDataValidator.reset().parameter("batchName").value(batchName).notBlank();
 
-		final String batchDescription = fromApiJsonHelper.extractStringNamed(
-				"batchDescription", element);
-		baseDataValidator.reset().parameter("batchDescription")
-				.value(batchDescription).notBlank();
-		
 		final BigDecimal length1 = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("length", element);
 	    baseDataValidator.reset().parameter("length").value(length1).notNull();
 	    
@@ -134,6 +127,9 @@ public class VoucherCommandFromApiJsonDeserializer {
 				baseDataValidator.reset().parameter("pinValue").value(pinValue1.longValue()).inMinMaxRange(1, 1000000000);
 			}
 		}
+		
+		final Long officeId = fromApiJsonHelper.extractLongNamed("officeId", element);
+        baseDataValidator.reset().parameter("officeId").value(officeId).notNull().integerGreaterThanZero();
 
 		throwExceptionIfValidationWarningsExist(dataValidationErrors);
 	}

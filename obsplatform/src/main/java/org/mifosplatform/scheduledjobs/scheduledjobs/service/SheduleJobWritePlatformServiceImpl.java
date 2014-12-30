@@ -654,74 +654,71 @@ public void processNotify() {
 					fw.append("UserName of Radius:" + data.getUsername() + " \r\n");
 					fw.append("password of Radius: ************** \r\n");
 					fw.append("url of Radius:" + data.getUrl() + " \r\n");
-
+					
 					for (EntitlementsData entitlementsData : entitlementDataForProcessings) {
-						
 						
 						fw.append("EntitlementsData id=" + entitlementsData.getId() + " ,clientId="
 								+ entitlementsData.getClientId() + " ,HardwareId=" + entitlementsData.getHardwareId()
 								+ " ,RequestType=" + entitlementsData.getRequestType() + "\r\n");
 						
 						Long clientId = entitlementsData.getClientId();
-						
-						if(clientId == null || clientId==0){
-							throw new ClientNotFoundException(clientId);
-						}
+					
+					
+						if(clientId == null || clientId==0){throw new ClientNotFoundException(clientId);}
 						
 						ReceiveMessage = "";
+						ClientEntitlementData clientdata = this.entitlementReadPlatformService.getClientData(clientId);
+						
+						if(clientdata == null || clientdata.getSelfcareUsername() == null || 
+								!clientdata.getSelfcareUsername().equalsIgnoreCase("")){
+							
+							String output = "Selfcare Not Created with this ClientId: " + clientId + " Properly.";
+							fw.append(output + " \r\n");
+							ReceiveMessage = MiddlewareJobConstants.FAILURE + output;
+							
+						} else if (entitlementsData.getRequestType().equalsIgnoreCase(MiddlewareJobConstants.Client_Activation)) {
+			
+							try {
+								JSONObject object = new JSONObject();	
+								object.put("username", clientdata.getSelfcareUsername());					
+								object.put("attribute", "Cleartext-Password");							
+								object.put("op", ":=");							
+								object.put("value", clientdata.getSelfcarePassword());
 
-						if (entitlementsData.getRequestType().equalsIgnoreCase(MiddlewareJobConstants.Client_Activation)) {
-							
-							try {
-								ClientEntitlementData clientdata = this.entitlementReadPlatformService.getClientData(clientId);
+								String encodePassword = new String(encoded);
+								String url = data.getUrl() + "radcheck";
+								String output = processRadiusRequests(url, encodePassword, object.toString(), fw);
 								
-								if(clientdata != null && clientdata.getSelfcareUsername() != null 
-										&& !clientdata.getSelfcareUsername().equalsIgnoreCase("")){
+								if (output.equalsIgnoreCase("UnauthorizedException")
+											|| output.equalsIgnoreCase("ResourceNotFoundException")) {
+										
+									return;	
 								
-									JSONObject object = new JSONObject();
-									
-									object.put("username", clientdata.getSelfcareUsername());
-									object.put("attribute", "Cleartext-Password");
-									object.put("op", ":=");
-									object.put("value", clientdata.getSelfcarePassword());
-									
-									String encodePassword = new String(encoded);
-									String url = data.getUrl() + "radcheck";
-									
-									String output = processRadiusRequests(url, encodePassword, object.toString(), fw);
-									
-									if(output.equalsIgnoreCase("UnauthorizedException") || output.equalsIgnoreCase("ResourceNotFoundException")){
-										return;
-									}else if(output.contains(MiddlewareJobConstants.RADCHECK_OUTPUT)){
-										ReceiveMessage = "Success";
-									}else{
-										ReceiveMessage = MiddlewareJobConstants.FAILURE + output;
-									}
-									
-									fw.append("Output from Server: " + output + " \r\n");
+								} else if (output.contains(MiddlewareJobConstants.RADCHECK_OUTPUT)) {	
+									ReceiveMessage = "Success";
 								
-								}else{
-									String output = "Selfcare Not Created with this ClientId: " + clientId + " Properly.";
-									fw.append(output + " \r\n");
+								} else {
 									ReceiveMessage = MiddlewareJobConstants.FAILURE + output;
-								}	
+								}
+								fw.append("Output from Server: " + output + " \r\n");
 								
-							} catch (JSONException e) {
-								fw.append("JSON Exeception throwing. StockTrace:" + e.getMessage() + " \r\n");
-								ReceiveMessage = MiddlewareJobConstants.FAILURE + e.getMessage();
+							} catch (JSONException e) {		
+								
+								fw.append("JSON Exeception throwing. StockTrace:" + e.getMessage() + " \r\n");	
+								ReceiveMessage = MiddlewareJobConstants.FAILURE + e.getMessage();			
 							}
-									
-						} else if (entitlementsData.getRequestType().equalsIgnoreCase(MiddlewareJobConstants.Activation)) {
 							
+						} else if (entitlementsData.getRequestType().equalsIgnoreCase(MiddlewareJobConstants.Activation)) {
+
 							try {
-								
 								JSONObject jsonObject = new JSONObject(entitlementsData.getProduct());
 								String planIdentification = jsonObject.getString("planIdentification");
 								
+									
 								if(planIdentification != null && !planIdentification.equalsIgnoreCase("")){
 									
 									JSONObject object = new JSONObject();
-									object.put("username", entitlementsData.getFirstName());
+									object.put("username", clientdata.getSelfcareUsername());
 									object.put("groupname", planIdentification);
 									object.put("priority", Long.valueOf(1));
 									
@@ -739,33 +736,38 @@ public void processNotify() {
 									}
 									
 									fw.append("Output from Server: " + output + " \r\n");
-								
+
 								}else{
+										
 									fw.append("Plan Identification should Not Mapped Properly, Plan Identification=" + planIdentification + " \r\n");
 									ReceiveMessage = MiddlewareJobConstants.FAILURE + "Plan Identification " +
 											" should Not Mapped Properly and Plan Identification=" + planIdentification;
 								}
-								
 							
+						
 							} catch (JSONException e) {
+								
 								fw.append("JSON Exeception throwing. StockTrace:" + e.getMessage() + " \r\n");
 								ReceiveMessage = MiddlewareJobConstants.FAILURE + e.getMessage();
 							}
-							
+						
 
+					
 						}else {
+							
 							try{
-								fw.append("Request Type is:"+ entitlementsData.getRequestType());
+								fw.append("Request Type is:"+ entitlementsData.getRequestType());					
 								fw.append("Unknown Request Type for Server (or) This Request Type is Not Handle in Radius Job");
 								ReceiveMessage = MiddlewareJobConstants.FAILURE + "Unknown Request Type for Server";
-							
+								
 							} catch (Exception e) {
+								
 								fw.append("Exeception throwing. StockTrace:" + e.getMessage() + " \r\n");
 								ReceiveMessage = MiddlewareJobConstants.FAILURE + e.getMessage();
-							}
-							
-						}
 						
+							}
+						}
+					
 						// Updating the Response and status in b_process_request.
 						JsonObject object = new JsonObject();
 						object.addProperty("prdetailsId", entitlementsData.getPrdetailsId());
@@ -780,23 +782,30 @@ public void processNotify() {
 								null, null, null,null);
 						CommandProcessingResult result = this.entitlementWritePlatformService.create(comm);
 						fw.append("Result From the EntitlementApi is:" + result.resourceId() + " \r\n");
+						
 					}
-					fw.append("Radius Job is Completed..." + ThreadLocalContextUtil.getTenant().getTenantIdentifier() + " /r/n");
+				
+					fw.append("Radius Job is Completed..." + ThreadLocalContextUtil.getTenant().getTenantIdentifier() + " /r/n");				
 					fw.flush();
 					fw.close();
-
+							
 				} else {
 					System.out.println("Radius data is Empty...");
 				}
 				httpClient.getConnectionManager().shutdown();
 				System.out.println("Radius Job is Completed...");
 			}
-
+			
 		} catch (DataIntegrityViolationException exception) {
 			System.out.println("catching the DataIntegrityViolationException, StockTrace: " + exception.getMessage());
+	
 		} catch (IOException e) {
 			System.out.println("catching the IOException, StockTrace: " + e.getMessage());
+	
+		} catch (Exception exception) {
+			System.out.println(exception.getMessage());
 		}
+	
 	}
 
 @Override
