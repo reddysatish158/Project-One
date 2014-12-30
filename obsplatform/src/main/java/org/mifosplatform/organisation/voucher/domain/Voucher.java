@@ -11,7 +11,8 @@ import javax.persistence.UniqueConstraint;
 
 import org.joda.time.LocalDate;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
-import org.springframework.data.jpa.domain.AbstractPersistable;
+import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
+import org.mifosplatform.useradministration.domain.AppUser;
 
 /**
  * Entity class, Used to Store the Voucher Group/Batch details from b_pin_master table.
@@ -22,15 +23,12 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @SuppressWarnings("serial")
 @Entity
 @Table(name = "b_pin_master", uniqueConstraints = @UniqueConstraint(name = "batch_name", columnNames = { "batch_name" }))
-public class Voucher extends  AbstractPersistable<Long>  {
+public class Voucher extends AbstractAuditableCustom<AppUser, Long>  {
 	
 	
 	@Column(name = "batch_name", nullable = false)
 	private String batchName;
 	
-	@Column(name = "batch_description", nullable = false)
-	private String batchDescription;
-
 	@Column(name = "length", nullable = false)
 	private Long length;
 
@@ -58,6 +56,9 @@ public class Voucher extends  AbstractPersistable<Long>  {
 	@Column(name = "is_processed")
 	private char isProcessed;
 	
+	@Column(name = "office_id", nullable = false)
+	private Long officeId;
+	
 	/*@LazyCollection(LazyCollectionOption.FALSE)
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "randomGenerator", orphanRemoval = true)
 	private List<RandomGeneratorDetails> randomGeneratorDetails = new ArrayList<RandomGeneratorDetails>();*/
@@ -69,14 +70,12 @@ public class Voucher extends  AbstractPersistable<Long>  {
 		super();
 	}
 
-	public Voucher(final String batchName, final String batchDescription,
-			final Long length, final String beginWith,
+	public Voucher(final String batchName, final Long length, final String beginWith,
 			final String pinCategory, final Long quantity, final Long serialNo,
 			final String pinType, final String pinValue, final Date date) {
 
 		super();
 		this.batchName = batchName;
-		this.batchDescription = batchDescription;
 		this.length = length;
 		this.beginWith = beginWith;
 		this.pinCategory = pinCategory;
@@ -97,7 +96,6 @@ public class Voucher extends  AbstractPersistable<Long>  {
 	 */
 	public static Voucher fromJson(final JsonCommand command) throws ParseException {
 		  	final String batchName = command.stringValueOfParameterNamed("batchName");
-		    final String batchDescription = command.stringValueOfParameterNamed("batchDescription");
 		    final BigDecimal length = command.bigDecimalValueOfParameterNamed("length");
 		    final String beginWith = command.stringValueOfParameterNamed("beginWith");
 		    final String pinCategory = command.stringValueOfParameterNamed("pinCategory");
@@ -107,18 +105,12 @@ public class Voucher extends  AbstractPersistable<Long>  {
 		    final Long pinVal = command.longValueOfParameterNamed("pinValue");
 		    final LocalDate expiryDate = command.localDateValueOfParameterNamed("expiryDate");
 		    final String pinValue=String.valueOf(pinVal);
-		    return new Voucher(batchName,batchDescription,length.longValue(),beginWith,pinCategory,quantity.longValue(),serialNo.longValue(),pinType,pinValue,expiryDate.toDate());
+		    return new Voucher(batchName,length.longValue(),beginWith,pinCategory,quantity.longValue(),serialNo.longValue(),pinType,pinValue,expiryDate.toDate());
 	}
 
 	public String getBatchName() {
 		return batchName;
 	}
-
-
-	public String getBatchDescription() {
-		return batchDescription;
-	}
-
 
 	public Long getLength() {
 		return length;
@@ -168,5 +160,15 @@ public class Voucher extends  AbstractPersistable<Long>  {
 	public void setIsProcessed(char isProcessed) {
 		this.isProcessed = isProcessed;
 	}
+
+	public Long getOfficeId() {
+		return officeId;
+	}
+
+	public void setOfficeId(Long officeId) {
+		this.officeId = officeId;
+	}
+	
+	
 
 }

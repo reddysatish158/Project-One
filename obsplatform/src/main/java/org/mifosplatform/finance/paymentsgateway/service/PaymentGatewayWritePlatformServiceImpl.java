@@ -29,10 +29,8 @@ import org.mifosplatform.finance.paymentsgateway.domain.PaymentGatewayConfigurat
 import org.mifosplatform.finance.paymentsgateway.domain.PaymentGatewayConfigurationRepository;
 import org.mifosplatform.finance.paymentsgateway.domain.PaymentGatewayRepository;
 import org.mifosplatform.finance.paymentsgateway.serialization.PaymentGatewayCommandFromApiJsonDeserializer;
-import org.mifosplatform.infrastructure.configuration.domain.Configuration;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
-import org.mifosplatform.infrastructure.configuration.exception.ConfigurationPropertyNotFoundException;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -132,7 +130,7 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 
 				if (clientId != null && clientId>0) {
 		
-					Long paymodeId = this.paymodeReadPlatformService.getOnlinePaymode();
+					Long paymodeId = this.paymodeReadPlatformService.getOnlinePaymode("M-pesa");
 					if (paymodeId == null) {
 						paymodeId = Long.valueOf(83);
 					}
@@ -196,7 +194,7 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 			Long clientId = this.readPlatformService.retrieveClientIdForProvisioning(serialNumberId);
 
 			if (clientId != null && clientId>0) {
-				Long paymodeId = this.paymodeReadPlatformService.getOnlinePaymode();
+				Long paymodeId = this.paymodeReadPlatformService.getOnlinePaymode("M-pesa");
 				if (paymodeId == null) {
 					paymodeId = Long.valueOf(83);
 				}
@@ -525,13 +523,17 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 		try {
 			PaymentGateway paymentGateway = this.paymentGatewayRepository.findOne(id);
 			
-			Configuration configuration = configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_ONLINEPAYMODE);
+			/*Configuration configuration = configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_ONLINEPAYMODE);
 
 			if (configuration == null || configuration.getValue() == null || configuration.getValue() == "") {
 				throw new ConfigurationPropertyNotFoundException(ConfigurationConstants.CONFIG_PROPERTY_ONLINEPAYMODE);
+			}*/
+			
+			Long paymodeId = this.paymodeReadPlatformService.getOnlinePaymode("Online Payment");
+			if (paymodeId == null) {
+				paymodeId = Long.valueOf(83);
 			}
-
-			Long value = Long.parseLong(configuration.getValue());
+			
 			final BigDecimal totalAmount = new BigDecimal(amount);
 			
 			final String formattedDate = new SimpleDateFormat("dd MMMM yyyy").format(new Date());
@@ -544,7 +546,7 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 			object.addProperty("isChequeSelected", "no");
 			object.addProperty("receiptNo", txnId);
 			object.addProperty("remarks", "Payment Done");
-			object.addProperty("paymentCode", value);
+			object.addProperty("paymentCode", paymodeId);
 			
 			final CommandWrapper commandRequest = new CommandWrapperBuilder().createPayment(clientId).withJson(object.toString()).build();
 			CommandProcessingResult result = this.writePlatformService.logCommandSource(commandRequest);	
