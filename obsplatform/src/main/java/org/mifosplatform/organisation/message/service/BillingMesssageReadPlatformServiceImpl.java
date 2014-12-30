@@ -13,7 +13,6 @@ import java.util.List;
 
 import org.joda.time.LocalDate;
 import org.mifosplatform.cms.media.domain.MediaTypeEnumaration;
-import org.mifosplatform.infrastructure.configuration.domain.Configuration;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.data.MediaEnumoptionData;
@@ -28,7 +27,7 @@ import org.mifosplatform.organisation.message.domain.BillingMessage;
 import org.mifosplatform.organisation.message.domain.BillingMessageRepository;
 import org.mifosplatform.organisation.message.domain.BillingMessageTemplate;
 import org.mifosplatform.organisation.message.domain.BillingMessageTemplateRepository;
-
+import org.mifosplatform.portfolio.client.exception.ClientNotFoundException;
 import org.mifosplatform.portfolio.order.domain.UserActionStatusTypeEnum;
 import org.mifosplatform.provisioning.processrequest.domain.ProcessRequest;
 import org.mifosplatform.provisioning.processrequest.domain.ProcessRequestDetails;
@@ -72,6 +71,7 @@ public class BillingMesssageReadPlatformServiceImpl implements
 			final BillingMessageTemplateRepository messageTemplateRepository,
 			final ConfigurationRepository globalConfigurationRepository,
 			final ProvisioningCommandRepository provisioningCommandRepository) {
+
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 		this.messageDataRepository = messageDataRepository;
 		this.processRequestRepository = processRequestRepository;
@@ -227,10 +227,10 @@ public class BillingMesssageReadPlatformServiceImpl implements
 			
 		} catch (EmptyResultDataAccessException e) {
 			fw.append("provisioningSerialNo is= " + hardwareId + " Failed. Exception Reason is: " + e.getMessage() + " .\r\n");
-			return null;
+			throw new ClientNotFoundException("client Not found with this hardwareId :"+hardwareId, hardwareId);
 		} catch (Exception e) {
 			fw.append("provisioningSerialNo is= " + hardwareId + " Failed. Exception Reason is: " + e.getMessage() + " .\r\n");
-			return null;
+			throw new ClientNotFoundException(e.getMessage(), hardwareId);
 		}
 
 	}
