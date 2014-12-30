@@ -1012,9 +1012,9 @@ public void reportStatmentPdf() {
 				 MapSqlParameterSource parameterSource = new MapSqlParameterSource();
 					simpleJdbcCall.setProcedureName("p_int_fa");//p --> procedure int --> integration fa --> financial account s/w
 					if (data.isDynamic().equalsIgnoreCase("Y")) {
-					     parameterSource.addValue("p_todt", new LocalDate().toDate(), Types.DATE);
+					     parameterSource.addValue("p_todt", new LocalDate().toString(), Types.DATE);
 					   } else {
-						   parameterSource.addValue("p_todt", data.getProcessDate().toDate(), Types.DATE);		
+						   parameterSource.addValue("p_todt", data.getProcessDate().toString(), Types.DATE);		
 					 }
 					Map<String, Object> output = simpleJdbcCall.execute(parameterSource);
 					if(output.isEmpty()){
