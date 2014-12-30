@@ -423,7 +423,7 @@ public class PaymentGatewayApiResource {
 			 @FormParam("address_name") final String name,@FormParam("payer_email") final String payerEmail,
 			 @FormParam("custom") final String customData, @FormParam("mc_currency") final String currency,
 			 @FormParam("receiver_email") final String receiverEmail, @FormParam("payer_status") final String payerStatus){
-		 //add "clientId" as supported parameter in create order validation. 
+		 
 		try {
 			 //in customData you should get the Parameters are clientId,locale,plancode,paytermcode,contractPeriod,returnUrl.
 			
@@ -463,29 +463,37 @@ public class PaymentGatewayApiResource {
 			
 			String Result = resultJsonObject.getString("Result");
 			
+			String paymentStatus = null;
+			
 			if(Result.equalsIgnoreCase("SUCCESS")){
-				/*{"billAlign":false,"isNewplan":true,"locale":"en",
-					"dateFormat":"dd MMMM yyyy","start_date":"18 December 2014",
-					"paytermCode":"Monthly","contractPeriod":5,"planCode":22}*/
 				
-				jsonCustomData.put("billAlign", false);
-				jsonCustomData.put("isNewplan", true);
-				jsonCustomData.put("dateFormat", dateFormat);
-				jsonCustomData.put("start_date", date);
-				jsonCustomData.remove("clientId");
-				jsonCustomData.remove("returnUrl");
-				
-				
-				CommandWrapper commandRequest = new CommandWrapperBuilder().createOrder(clientId).withJson(jsonCustomData.toString()).build();
-				CommandProcessingResult resultOrder = this.writePlatformService.logCommandSource(commandRequest);
+				if(jsonCustomData.has("paytermCode") && jsonCustomData.has("planCode")
+						&& jsonCustomData.has("contractPeriod")) {
+					
+					jsonCustomData.put("billAlign", false);
+					jsonCustomData.put("isNewplan", true);
+					jsonCustomData.put("dateFormat", dateFormat);
+					jsonCustomData.put("start_date", date);
+					jsonCustomData.remove("clientId");
+					jsonCustomData.remove("returnUrl");
 
-				if (resultOrder == null) {
-					throw new PlatformDataIntegrityException("error.msg.client.order.creation",
-							"Book Order Failed for ClientId:" + clientId, "Book Order Failed");
+					CommandWrapper commandRequest = new CommandWrapperBuilder().createOrder(clientId).withJson(jsonCustomData.toString()).build();
+					CommandProcessingResult resultOrder = this.writePlatformService.logCommandSource(commandRequest);
+
+					if (resultOrder == null) {
+						paymentStatus = "Payment Done and Plan Booking Failed, Please Contact to Your Service Provider.";
+					}
+					paymentStatus = "Payment Done and Plan Booked Successfully. ";
+				
+				}else {
+					paymentStatus = "Payment Done Successfully.";
 				}
+				
+			} else {
+				paymentStatus = "Payment Failed, Please Contact to Your Service Provider.  ";
 			}
 			
-			String htmlData = "<a href=\""+returnUrl+"\"> Click On Me</a>";
+			String htmlData = "<a href=\""+returnUrl+"\"><strong>"+ paymentStatus + "</Strong> Click On Me</a>";
 			
 			return htmlData;
 
