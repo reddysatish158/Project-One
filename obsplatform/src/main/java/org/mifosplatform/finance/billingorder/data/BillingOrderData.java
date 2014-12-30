@@ -37,8 +37,6 @@ public class BillingOrderData {
 		
 	}
 
-
-
 	public BillingOrderData(final Long clientOrderId,final Long OderPriceId,Long planId,final Long clientId,final Date startDate,
 			final Date nextBillableDate,final Date endDate,final String billingFrequency,
 			final String chargeCode,final String chargeType,final Integer chargeDuration,
