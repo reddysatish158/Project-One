@@ -634,7 +634,7 @@ public void processNotify() {
 				
 				if (!entitlementDataForProcessings.isEmpty()) {
 					
-					String path = FileUtils.generateLogFileDirectory() + JobName.Middleware.toString() + File.separator
+					String path = FileUtils.generateLogFileDirectory() + JobName.RADIUS.toString() + File.separator
 							+ "radius_" + new LocalDate().toString().replace("-", "") + "_" + dateTime + ".log";
 					
 					File fileHandler = new File(path.trim());
