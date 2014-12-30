@@ -1,6 +1,6 @@
 package org.mifosplatform.infrastructure.jobs.service;
 
-public class MiddlewareJobConstants {
+public class RadiusJobConstants {
 
 	 public static final String Activation = "ACTIVATION";
 	 public static final String ReConnection = "RECONNECTION";
@@ -13,6 +13,7 @@ public class MiddlewareJobConstants {
 	 
 	 public static final String RADCHECK_OUTPUT = "User added to database with ID:";
 	 public static final String FAILURE = "failure : ";
-	 public static final String RADUSER_OUTPUT = "User is created";
+	 public static final String RADUSER_CREATE_OUTPUT = "User is created";
+	 public static final String RADUSER_DELETE_OUTPUT = "the record is deleted";
 	 
 }

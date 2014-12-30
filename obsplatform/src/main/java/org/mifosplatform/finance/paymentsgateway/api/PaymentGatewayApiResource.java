@@ -424,6 +424,8 @@ public class PaymentGatewayApiResource {
 			 @FormParam("custom") final String customData, @FormParam("mc_currency") final String currency,
 			 @FormParam("receiver_email") final String receiverEmail, @FormParam("payer_status") final String payerStatus){
 		 
+		String returnUrl = null;
+		
 		try {
 			 //in customData you should get the Parameters are clientId,locale,plancode,paytermcode,contractPeriod,returnUrl.
 			
@@ -435,7 +437,7 @@ public class PaymentGatewayApiResource {
 
 			final String date = daformat.format(paymentDate);
 			
-			final String returnUrl = jsonCustomData.getString("returnUrl");
+			returnUrl = jsonCustomData.getString("returnUrl");
 			
 			final Long clientId = jsonCustomData.getLong("clientId");
 
@@ -499,7 +501,9 @@ public class PaymentGatewayApiResource {
 
 		} 
 	   catch(Exception e){
-	    return e.getMessage();
+		   String paymentStatus = "Payment Failed, Please Contact to Your Service Provider.  ";
+		   String htmlData = "<a href=\""+returnUrl+"\"><strong>"+ paymentStatus + "</Strong> Click On Me</a>";
+		   return htmlData;
 	   }
 	 }
 }

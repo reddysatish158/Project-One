@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
 import java.sql.Types;
 import java.util.Collection;
 import java.util.HashMap;
@@ -16,6 +15,7 @@ import java.util.Map;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -26,7 +26,6 @@ import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.mifosplatform.billing.selfcare.exception.SelfCareIdNotFoundException;
 import org.mifosplatform.crm.ticketmaster.api.TicketMasterApiResource;
 import org.mifosplatform.crm.ticketmaster.service.TicketMasterReadPlatformService;
 import org.mifosplatform.finance.billingmaster.api.BillingMasterApiResourse;
@@ -47,7 +46,7 @@ import org.mifosplatform.infrastructure.core.service.ThreadLocalContextUtil;
 import org.mifosplatform.infrastructure.dataqueries.service.ReadReportingService;
 import org.mifosplatform.infrastructure.jobs.annotation.CronTarget;
 import org.mifosplatform.infrastructure.jobs.service.JobName;
-import org.mifosplatform.infrastructure.jobs.service.MiddlewareJobConstants;
+import org.mifosplatform.infrastructure.jobs.service.RadiusJobConstants;
 import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
 import org.mifosplatform.organisation.mcodevalues.service.MCodeReadPlatformService;
 import org.mifosplatform.organisation.message.data.BillingMessageDataForProcessing;
@@ -674,9 +673,9 @@ public void processNotify() {
 							
 							String output = "Selfcare Not Created with this ClientId: " + clientId + " Properly.";
 							fw.append(output + " \r\n");
-							ReceiveMessage = MiddlewareJobConstants.FAILURE + output;
+							ReceiveMessage = RadiusJobConstants.FAILURE + output;
 							
-						} else if (entitlementsData.getRequestType().equalsIgnoreCase(MiddlewareJobConstants.Client_Activation)) {
+						} else if (entitlementsData.getRequestType().equalsIgnoreCase(RadiusJobConstants.Client_Activation)) {
 			
 							try {
 								JSONObject object = new JSONObject();	
@@ -694,21 +693,21 @@ public void processNotify() {
 										
 									return;	
 								
-								} else if (output.contains(MiddlewareJobConstants.RADCHECK_OUTPUT)) {	
+								} else if (output.contains(RadiusJobConstants.RADCHECK_OUTPUT)) {	
 									ReceiveMessage = "Success";
 								
 								} else {
-									ReceiveMessage = MiddlewareJobConstants.FAILURE + output;
+									ReceiveMessage = RadiusJobConstants.FAILURE + output;
 								}
 								fw.append("Output from Server: " + output + " \r\n");
 								
 							} catch (JSONException e) {		
 								
 								fw.append("JSON Exeception throwing. StockTrace:" + e.getMessage() + " \r\n");	
-								ReceiveMessage = MiddlewareJobConstants.FAILURE + e.getMessage();			
+								ReceiveMessage = RadiusJobConstants.FAILURE + e.getMessage();			
 							}
 							
-						} else if (entitlementsData.getRequestType().equalsIgnoreCase(MiddlewareJobConstants.Activation)) {
+						} else if (entitlementsData.getRequestType().equalsIgnoreCase(RadiusJobConstants.Activation)) {
 
 							try {
 								JSONObject jsonObject = new JSONObject(entitlementsData.getProduct());
@@ -729,10 +728,10 @@ public void processNotify() {
 									
 									if(output.equalsIgnoreCase("UnauthorizedException") || output.equalsIgnoreCase("ResourceNotFoundException")){
 										return;
-									}else if(output.equalsIgnoreCase(MiddlewareJobConstants.RADUSER_OUTPUT)){
+									}else if(output.equalsIgnoreCase(RadiusJobConstants.RADUSER_CREATE_OUTPUT)){
 										ReceiveMessage = "Success";
 									}else{
-										ReceiveMessage = MiddlewareJobConstants.FAILURE + output;
+										ReceiveMessage = RadiusJobConstants.FAILURE + output;
 									}
 									
 									fw.append("Output from Server: " + output + " \r\n");
@@ -740,7 +739,7 @@ public void processNotify() {
 								}else{
 										
 									fw.append("Plan Identification should Not Mapped Properly, Plan Identification=" + planIdentification + " \r\n");
-									ReceiveMessage = MiddlewareJobConstants.FAILURE + "Plan Identification " +
+									ReceiveMessage = RadiusJobConstants.FAILURE + "Plan Identification " +
 											" should Not Mapped Properly and Plan Identification=" + planIdentification;
 								}
 							
@@ -748,22 +747,83 @@ public void processNotify() {
 							} catch (JSONException e) {
 								
 								fw.append("JSON Exeception throwing. StockTrace:" + e.getMessage() + " \r\n");
-								ReceiveMessage = MiddlewareJobConstants.FAILURE + e.getMessage();
+								ReceiveMessage = RadiusJobConstants.FAILURE + e.getMessage();
 							}
 						
 
 					
-						}else {
+						} else if (entitlementsData.getRequestType().equalsIgnoreCase(RadiusJobConstants.DisConnection)) {
+
+							try {
+								String userName = clientdata.getSelfcareUsername();
+								String url = data.getUrl() + "raduser/" + userName;
+								fw.append("Request Send to :" + url + "\r\n");
+								
+								HttpDelete deleteRequest = new HttpDelete(url);
+								deleteRequest.setHeader("Authorization", "Basic " + new String(encoded));
+								deleteRequest.setHeader("Content-Type", "application/json");
+								
+								HttpResponse response = httpClient.execute(deleteRequest);
+								
+								if (response.getStatusLine().getStatusCode() == 404) {
+									System.out.println("ResourceNotFoundException : HTTP error code : "
+													+ response.getStatusLine().getStatusCode());
+									fw.append("ResourceNotFoundException : HTTP error code : " 		
+											+ response.getStatusLine().getStatusCode() + ", Request url:" + url + "is not Found. \r\n");
+									
+									return;
+
+								} else if (response.getStatusLine().getStatusCode() == 401) {
+									System.out.println(" Unauthorized Exception : HTTP error code : "
+													+ response.getStatusLine().getStatusCode());
+									fw.append(" Unauthorized Exception : HTTP error code : "
+											+ response.getStatusLine().getStatusCode()
+											+ " , The UserName or Password you entered is incorrect." + "\r\n");
+									
+									return; 
+
+								} else if (response.getStatusLine().getStatusCode() != 200) {
+									System.out.println("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
+									fw.append("Failed : HTTP error code : " + response.getStatusLine().getStatusCode() + " \r\n");
+								} else{
+									fw.append("Request executed Successfully... \r\n");
+								}
+								
+								BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
+								String output,output1="";
+								
+								while ((output = br.readLine()) != null) {
+									output1 = output1 + output;
+								}
+								
+								System.out.println(output1);
+								
+								if (output1.equalsIgnoreCase(RadiusJobConstants.RADUSER_DELETE_OUTPUT)) {
+									ReceiveMessage = "Success";
+								} else {
+									ReceiveMessage = RadiusJobConstants.FAILURE + output;
+								}
+
+								fw.append("Output from Server: " + output + " \r\n");
+								br.close();
+
+							} catch (Exception e) {
+								
+								fw.append("Exeception throwing. StockTrace:" + e.getMessage() + " \r\n");
+								ReceiveMessage = RadiusJobConstants.FAILURE + e.getMessage();
+							}
+						
+						} else {
 							
 							try{
 								fw.append("Request Type is:"+ entitlementsData.getRequestType());					
 								fw.append("Unknown Request Type for Server (or) This Request Type is Not Handle in Radius Job");
-								ReceiveMessage = MiddlewareJobConstants.FAILURE + "Unknown Request Type for Server";
+								ReceiveMessage = RadiusJobConstants.FAILURE + "Unknown Request Type for Server";
 								
 							} catch (Exception e) {
 								
 								fw.append("Exeception throwing. StockTrace:" + e.getMessage() + " \r\n");
-								ReceiveMessage = MiddlewareJobConstants.FAILURE + e.getMessage();
+								ReceiveMessage = RadiusJobConstants.FAILURE + e.getMessage();
 						
 							}
 						}

@@ -13,7 +13,6 @@ import java.util.List;
 
 import org.joda.time.LocalDate;
 import org.mifosplatform.cms.media.domain.MediaTypeEnumaration;
-import org.mifosplatform.infrastructure.configuration.domain.Configuration;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.data.MediaEnumoptionData;
@@ -28,7 +27,6 @@ import org.mifosplatform.organisation.message.domain.BillingMessage;
 import org.mifosplatform.organisation.message.domain.BillingMessageRepository;
 import org.mifosplatform.organisation.message.domain.BillingMessageTemplate;
 import org.mifosplatform.organisation.message.domain.BillingMessageTemplateRepository;
-
 import org.mifosplatform.portfolio.client.exception.ClientNotFoundException;
 import org.mifosplatform.portfolio.order.domain.UserActionStatusTypeEnum;
 import org.mifosplatform.provisioning.processrequest.domain.ProcessRequest;
