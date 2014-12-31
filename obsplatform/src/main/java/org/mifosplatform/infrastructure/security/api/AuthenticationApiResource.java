@@ -79,7 +79,7 @@ public class AuthenticationApiResource {
              * Calls When Session is New One
              * @author rakesh
              * */
-            if (req.getSession().isNew()) { 
+            if (req.getSession().isNew() && !username.equalsIgnoreCase("selfcare")) { 
         	    LoginHistory loginHistory=new LoginHistory(ipAddress,null,session,new Date(),null,username,"ACTIVE");
         		this.loginHistoryRepository.save(loginHistory);
         		Long loginHistoryId=loginHistory.getId();

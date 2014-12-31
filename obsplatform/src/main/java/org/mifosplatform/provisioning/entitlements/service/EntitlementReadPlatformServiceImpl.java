@@ -119,8 +119,7 @@ public class EntitlementReadPlatformServiceImpl implements
 			String password = rs.getString("password");
 			String selfcareUsername = rs.getString("selfcareUsername");
 		    String selfcarePassword = rs.getString("selfcarePassword");
-		    
-		    return new ClientEntitlementData(emailId, fullName, login, password, selfcareUsername, selfcarePassword);
+			return new ClientEntitlementData(emailId, fullName, login, password, selfcareUsername, selfcarePassword);
 		
 		}
 		

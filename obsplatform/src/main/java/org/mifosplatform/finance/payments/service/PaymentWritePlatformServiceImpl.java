@@ -27,6 +27,8 @@ import org.mifosplatform.finance.payments.domain.PaypalEnquireyRepository;
 import org.mifosplatform.finance.payments.exception.PaymentDetailsNotFoundException;
 import org.mifosplatform.finance.payments.exception.ReceiptNoDuplicateException;
 import org.mifosplatform.finance.payments.serialization.PaymentCommandFromApiJsonDeserializer;
+import org.mifosplatform.finance.paymentsgateway.domain.PaymentGatewayConfiguration;
+import org.mifosplatform.finance.paymentsgateway.domain.PaymentGatewayConfigurationRepository;
 import org.mifosplatform.infrastructure.configuration.domain.Configuration;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
@@ -65,11 +67,11 @@ public class PaymentWritePlatformServiceImpl implements PaymentWritePlatformServ
 	private final FromJsonHelper fromApiJsonHelper;
 	private final PaymentRepository paymentRepository;
 	private final InvoiceRepository invoiceRepository;
-	private final UpdateClientBalance updateClientBalance;
 	private final ClientBalanceRepository clientBalanceRepository;
 	private final ChequePaymentRepository chequePaymentRepository;
 	private final PaypalEnquireyRepository paypalEnquireyRepository;
 	private final ConfigurationRepository globalConfigurationRepository;
+	private final PaymentGatewayConfigurationRepository paymentGatewayConfigurationRepository;
 	private final PaymentCommandFromApiJsonDeserializer fromApiJsonDeserializer;
 	private final ActionDetailsReadPlatformService actionDetailsReadPlatformService; 
 	private final ActiondetailsWritePlatformService actiondetailsWritePlatformService;
@@ -78,15 +80,15 @@ public class PaymentWritePlatformServiceImpl implements PaymentWritePlatformServ
 	public PaymentWritePlatformServiceImpl(final PlatformSecurityContext context,final PaymentRepository paymentRepository,
 			final PaymentCommandFromApiJsonDeserializer fromApiJsonDeserializer,final ClientBalanceRepository clientBalanceRepository,
 			final ChequePaymentRepository chequePaymentRepository,final ActionDetailsReadPlatformService actionDetailsReadPlatformService,
-			final UpdateClientBalance updateClientBalance,final ActiondetailsWritePlatformService actiondetailsWritePlatformService,
-			final InvoiceRepository invoiceRepository,final ConfigurationRepository globalConfigurationRepository,
-			final PaypalEnquireyRepository paypalEnquireyRepository,final FromJsonHelper fromApiJsonHelper) {
+			final ActiondetailsWritePlatformService actiondetailsWritePlatformService,final InvoiceRepository invoiceRepository,
+			final ConfigurationRepository globalConfigurationRepository,final PaypalEnquireyRepository paypalEnquireyRepository,
+			final FromJsonHelper fromApiJsonHelper,final PaymentGatewayConfigurationRepository paymentGatewayConfigurationRepository) {
 		
 		this.context = context;
 		this.fromApiJsonHelper=fromApiJsonHelper;
 		this.invoiceRepository=invoiceRepository;
+		this.paymentGatewayConfigurationRepository=paymentGatewayConfigurationRepository;
 		this.paymentRepository = paymentRepository;
-		this.updateClientBalance= updateClientBalance;
 		this.clientBalanceRepository=clientBalanceRepository;
 		this.chequePaymentRepository=chequePaymentRepository;
 		this.fromApiJsonDeserializer = fromApiJsonDeserializer;
@@ -326,7 +328,7 @@ public class PaymentWritePlatformServiceImpl implements PaymentWritePlatformServ
 				prop.load(is);
 				final PaypalEnquirey paypalEnquirey = this.paypalEnquireyRepository.findOne(paypalEnquireyId);
 				com.paypal.api.payments.Payment.initConfig(prop);
-				final Configuration paypalGlobalData = this.globalConfigurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_PAYPAL_CHECK);
+				final PaymentGatewayConfiguration paypalGlobalData = this.paymentGatewayConfigurationRepository.findOneByName(ConfigurationConstants.PAYMENTGATEWAY_IS_PAYPAL_CHECK);
 				final JSONObject object = new JSONObject(paypalGlobalData.getValue());
 				final String paypalClientId = object.getString("clientId");
 				final String paypalsecretCode = object.getString("secretCode");

@@ -95,7 +95,6 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
     public Page<ClientData> retrieveAll(final SearchParameters searchParameters) {
 
         final AppUser currentUser = context.authenticatedUser();
-    //    final Configuration configurationRepository=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);
         final ClientMapper clientMapper = new ClientMapper();
         final String hierarchy = currentUser.getOffice().getHierarchy();
         
@@ -204,7 +203,6 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
         	final AppUser currentUser = context.authenticatedUser();
         	final String hierarchy = currentUser.getOffice().getHierarchy();
         	final String hierarchySearchString = hierarchy + "%";
-            //final Configuration configurationRepository=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);
             final ClientMapper clientMapper = new ClientMapper();
             final String sql = "select " + clientMapper.schema() + " where o.hierarchy like ? and c.id = ? and a.address_key='PRIMARY' group by c.id";
             final ClientData clientData = this.jdbcTemplate.queryForObject(sql,clientMapper,new Object[] { hierarchySearchString, clientId });

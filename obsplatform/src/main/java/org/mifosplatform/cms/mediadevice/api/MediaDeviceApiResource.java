@@ -22,6 +22,8 @@ import org.mifosplatform.cms.mediadevice.service.MediaDeviceReadPlatformService;
 import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
+import org.mifosplatform.finance.paymentsgateway.domain.PaymentGatewayConfiguration;
+import org.mifosplatform.finance.paymentsgateway.domain.PaymentGatewayConfigurationRepository;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.Configuration;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
@@ -40,22 +42,25 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("singleton")
 public class MediaDeviceApiResource {
+	
 	private  final Set<String> RESPONSE_DATA_PARAMETERS=new HashSet<String>(Arrays.asList("deviceId","clientId","clientType","balanceAmount","balanceCheck"));
 	private  final Set<String> RESPONSE_DATA_PARAMETERS_FOR_PLAN=new HashSet<String>(Arrays.asList("id","planCode","planDescription"));
     private final String resourceNameForPermissions = "MEDIADEVICE";
-	  private final PlatformSecurityContext context;
-	    private final DefaultToApiJsonSerializer<MediaDeviceData> toApiJsonSerializer;
-	    private final DefaultToApiJsonSerializer<PlanData> toApiJsonSerializerForPlanData;
-	    private final ApiRequestParameterHelper apiRequestParameterHelper;
-	    private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
-	    private final MediaDeviceReadPlatformService mediaDeviceReadPlatformService;
-	    private final ConfigurationRepository configurationRepository;
-		
+    private final PlatformSecurityContext context;
+    private final DefaultToApiJsonSerializer<MediaDeviceData> toApiJsonSerializer;
+    private final DefaultToApiJsonSerializer<PlanData> toApiJsonSerializerForPlanData;
+    private final ApiRequestParameterHelper apiRequestParameterHelper;
+    private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
+    private final MediaDeviceReadPlatformService mediaDeviceReadPlatformService;
+    private final ConfigurationRepository configurationRepository;
+    private final PaymentGatewayConfigurationRepository paymentGatewayConfigurationRepository;
+    
 		 @Autowired
 	    public MediaDeviceApiResource(final PlatformSecurityContext context,final ConfigurationRepository configurationRepository, 
 	   final DefaultToApiJsonSerializer<MediaDeviceData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper,
 	   final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,final MediaDeviceReadPlatformService mediaDeviceReadPlatformService,
-	   final DefaultToApiJsonSerializer<PlanData> toApiJsonSerializerForPlanData,final ConfigurationRepository globalConfigurationRepository){
+	   final DefaultToApiJsonSerializer<PlanData> toApiJsonSerializerForPlanData,final ConfigurationRepository globalConfigurationRepository,
+	   final PaymentGatewayConfigurationRepository paymentGatewayConfigurationRepository){
 		        
 			 this.context = context;
 		        this.toApiJsonSerializer = toApiJsonSerializer;
@@ -63,6 +68,7 @@ public class MediaDeviceApiResource {
 		        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
 		        this.mediaDeviceReadPlatformService=mediaDeviceReadPlatformService;
 		        this.toApiJsonSerializerForPlanData = toApiJsonSerializerForPlanData;
+		        this.paymentGatewayConfigurationRepository=paymentGatewayConfigurationRepository;
 		        this.configurationRepository=configurationRepository;
 		    }	
 
@@ -79,9 +85,9 @@ public class MediaDeviceApiResource {
 				throw new NoMediaDeviceFoundException();
 			}
 	
-			 Configuration paypalConfigData=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_PAYPAL_CHECK);
+			 PaymentGatewayConfiguration paypalConfigData=this.paymentGatewayConfigurationRepository.findOneByName(ConfigurationConstants.PAYMENTGATEWAY_IS_PAYPAL_CHECK);
 			 datas.setPaypalConfigData(paypalConfigData);
-			 Configuration paypalConfigDataForIos=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_PAYPAL_CHECK_IOS);
+			 PaymentGatewayConfiguration paypalConfigDataForIos=this.paymentGatewayConfigurationRepository.findOneByName(ConfigurationConstants.PAYMENTGATEWAY_IS_PAYPAL_CHECK_IOS);
 			 datas.setPaypalConfigDataForIos(paypalConfigDataForIos);
 			 Configuration configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_BALANCE_CHECK);
 			 datas.setBalanceCheck(configurationProperty.isEnabled());
@@ -157,9 +163,9 @@ public class MediaDeviceApiResource {
 			if(datas == null){
 				throw new NoMediaDeviceFoundException();
 			}
-			Configuration paypalConfigData=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_PAYPAL_CHECK);
+			PaymentGatewayConfiguration paypalConfigData=this.paymentGatewayConfigurationRepository.findOneByName(ConfigurationConstants.PAYMENTGATEWAY_IS_PAYPAL_CHECK);
 			datas.setPaypalConfigData(paypalConfigData);
-			Configuration paypalConfigDataForIos=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_PAYPAL_CHECK_IOS);
+			PaymentGatewayConfiguration paypalConfigDataForIos=this.paymentGatewayConfigurationRepository.findOneByName(ConfigurationConstants.PAYMENTGATEWAY_IS_PAYPAL_CHECK_IOS);
 			datas.setPaypalConfigDataForIos(paypalConfigDataForIos);
 			Configuration configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_BALANCE_CHECK);
 			datas.setBalanceCheck(configurationProperty.isEnabled());

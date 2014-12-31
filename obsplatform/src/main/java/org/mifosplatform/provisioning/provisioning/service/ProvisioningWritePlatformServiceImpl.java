@@ -324,6 +324,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 	public CommandProcessingResult postOrderDetailsForProvisioning(final Order order,final String planName,final String requestType, 
 			final Long prepareId,final String groupname,final String serialNo,final Long orderId,final String provisioningSys,Long addonId) {
 
+
 	try {
 		Long commandProcessId=null;
 		HardwareAssociation hardwareAssociation = this.associationRepository.findOneByOrderId(order.getId());
@@ -365,6 +366,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 			
 			PrepareRequestData prepareRequestData=new  PrepareRequestData(Long.valueOf(0),order.getClientId(), orderId, requestType, hardwareAssociation.getSerialNo(),
 						 null, provisioningSys, planName, String.valueOf(plan.isHardwareReq()),addonId);
+
 			CommandProcessingResult commandProcessingResult =this.prepareRequestReadplatformService.processingClientDetails(prepareRequestData);
 			commandProcessId=commandProcessingResult.resourceId();
 		}

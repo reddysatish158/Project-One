@@ -177,6 +177,7 @@ public CommandProcessingResult doHardWareSwapping(final Long entityId,final Json
 					
 				CommandProcessingResult commandProcessingResult=	this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order,plan.getPlanCode(),UserActionStatusTypeEnum.DEVICE_SWAP.toString(),
 							Long.valueOf(0),null,serialNo,order.getId(),plan.getProvisionSystem(),null);
+
 				resouceId=commandProcessingResult.resourceId();
 			//	}
 			}

@@ -231,6 +231,7 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 			 
 			 	}
 		  
+
 		 for(OrderLine orderLine:orderLineData){
 			 
 			 List<ServiceMapping> provisionServiceDetails=this.provisionServiceDetailsRepository.findOneByServiceId(orderLine.getServiceId());

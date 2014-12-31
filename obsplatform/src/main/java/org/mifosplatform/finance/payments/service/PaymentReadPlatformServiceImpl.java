@@ -20,8 +20,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 @Service
-public class PaymentReadPlatformServiceImpl implements
-		PaymentReadPlatformService {
+public class PaymentReadPlatformServiceImpl implements PaymentReadPlatformService {
 
 	private final JdbcTemplate jdbcTemplate;
 	private final PlatformSecurityContext context;
@@ -107,11 +106,11 @@ private class PaymentsMapper implements RowMapper<PaymentData>{
 
 @Transactional
 @Override
-public Long getOnlinePaymode() {
+public Long getOnlinePaymode(String paymodeId) {
 	try{
 		    context.authenticatedUser();
 		    final Mapper mapper = new Mapper();
-		    final String sql = "select id from m_code_value where code_value LIKE 'M-pesa'";
+		    final String sql = "select id from m_code_value where code_value  LIKE '" + paymodeId + "'";
 			return this.jdbcTemplate.queryForObject(sql, mapper, new Object[] {});
 			
 	}catch (final EmptyResultDataAccessException e) {
