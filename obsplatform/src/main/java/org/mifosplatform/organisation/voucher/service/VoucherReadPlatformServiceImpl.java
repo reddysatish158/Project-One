@@ -120,7 +120,7 @@ public class VoucherReadPlatformServiceImpl implements
 			RowMapper<VoucherData> {
 
 		public String schema() {
-			return "m.id as id, m.batch_name as batchName,m.batch_description as batchDescription,m.length as length,"
+			return "m.id as id, m.batch_name as batchName, m.office_id as officeId, m.length as length,"
 					+ "m.begin_with as beginWith,m.pin_category as pinCategory,m.quantity as quantity,"
 					+ "m.serial_no as serialNo,m.pin_type as pinType,m.pin_value as pinValue,m.expiry_date as expiryDate, "
 					+ "case m.pin_type when 'VALUE' then p.plan_code=null when 'PRODUCT' then p.plan_code end as planCode, "
@@ -135,7 +135,7 @@ public class VoucherReadPlatformServiceImpl implements
 
 			Long id = rs.getLong("id");
 			String batchName = rs.getString("batchName");
-			String batchDescription = rs.getString("batchDescription");
+			Long officeId = rs.getLong("officeId");
 			Long length = rs.getLong("length");
 			String pinCategory = rs.getString("pinCategory");
 			String pinType = rs.getString("pinType");
@@ -147,7 +147,7 @@ public class VoucherReadPlatformServiceImpl implements
 			String planCode = rs.getString("planCode");
 			String isProcessed = rs.getString("isProcessed");
 
-			return new VoucherData(batchName, batchDescription, length,
+			return new VoucherData(batchName, officeId, length,
 					pinCategory, pinType, quantity, serial, expiryDate,
 					beginWith, pinValue, id, planCode, isProcessed);
 
@@ -194,7 +194,7 @@ public class VoucherReadPlatformServiceImpl implements
 			public void write(final OutputStream out) {
 				try {
 
-					final String sql = "SELECT pm.id AS batchId, pd.serial_no AS serialNum, pd.pin_no AS hiddenNum FROM b_pin_master pm, b_pin_details pd"
+					final String sql = "SELECT pm.id AS batchId, pd.serial_no AS serialNum, pd.pin_no AS hiddenNum, pd.client_id as clientId, pd.status FROM b_pin_master pm, b_pin_details pd"
 							+ " WHERE pd.pin_id = pm.id AND pm.id ="
 							+ batchId
 							+ " order by serialNum desc ";

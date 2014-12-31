@@ -1,10 +1,12 @@
 package org.mifosplatform.organisation.voucher.data;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 import org.joda.time.LocalDate;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
+import org.mifosplatform.organisation.office.data.OfficeData;
 
 /**
  * The class <code>VoucherData</code> is a Bean class, contains only getter and setter methods to store and retrieve data.
@@ -16,7 +18,7 @@ public class VoucherData {
 	
 	private Long id;
 	private String batchName;
-	private String batchDescription;
+	private Long officeId;
 	private Long length;
 	private String pinCategory;
 	private String pinType;
@@ -29,16 +31,17 @@ public class VoucherData {
 	private List<EnumOptionData> pinTypeData;
 	private String isProcessed;
 	private String planCode;
+	private Collection<OfficeData> offices;
 
 	
-	public VoucherData(final String batchName, final String batchDescription1,
+	public VoucherData(final String batchName, final Long officeId,
 			final Long length, final String pinCategory, final String pinType, final Long quantity,
 			final String serial, final Date expiryDate, final String beginWith,
 			final String pinValue, final Long id, final String planCode, final String isProcessed) {
 
 		// TODO Auto-generated constructor stub
 		this.batchName=batchName;
-		this.batchDescription=batchDescription1;
+		this.officeId=officeId;
 		this.length=length;
 		this.pinCategory=pinCategory;
 		this.pinType=pinType;
@@ -66,12 +69,15 @@ public class VoucherData {
 	 *  
 	 * @param pinTypeData
 	 * 			value containg the List of VoucherPin types. Like VALUE and PRODUCT
+	 * @param offices 
 	 */
 	public VoucherData(final List<EnumOptionData> pinCategoryData,
-			final List<EnumOptionData> pinTypeData) {
+			final List<EnumOptionData> pinTypeData, Collection<OfficeData> offices) {
 		
 		this.pinCategoryData=pinCategoryData;
 		this.pinTypeData=pinTypeData;
+		this.offices = offices;
+		
 	}
 
 	public List<EnumOptionData> getPinCategoryData() {
@@ -117,14 +123,6 @@ public class VoucherData {
 
 	public void setBatchName(String batchName) {
 		this.batchName = batchName;
-	}
-
-	public String getBatchDescription() {
-		return batchDescription;
-	}
-
-	public void setBatchDescription(String batchDescription) {
-		this.batchDescription = batchDescription;
 	}
 
 	public Long getLength() {
@@ -177,6 +175,14 @@ public class VoucherData {
 
 	public void setPlanCode(String planCode) {
 		this.planCode = planCode;
+	}
+
+	public Long getOfficeId() {
+		return officeId;
+	}
+
+	public Collection<OfficeData> getOffices() {
+		return offices;
 	}
 
 	

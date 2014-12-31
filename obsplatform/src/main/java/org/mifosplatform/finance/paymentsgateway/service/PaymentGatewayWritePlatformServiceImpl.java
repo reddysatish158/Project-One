@@ -123,6 +123,7 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 				if (clientId != null && clientId>0) {
 		
 					Long paymodeId = this.paymodeReadPlatformService.getOnlinePaymode("Online Payment");
+
 					if (paymodeId == null) {
 						paymodeId = Long.valueOf(83);
 					}
@@ -516,11 +517,16 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 		try {
 			PaymentGateway paymentGateway = this.paymentGatewayRepository.findOne(id);
 			
-			Long paymodeId = this.paymodeReadPlatformService.getOnlinePaymode("Online Payment");
-			   if (paymodeId == null) {
-			    paymodeId = Long.valueOf(83);
-			   }
+			/*Configuration configuration = configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_ONLINEPAYMODE);
 
+			if (configuration == null || configuration.getValue() == null || configuration.getValue() == "") {
+				throw new ConfigurationPropertyNotFoundException(ConfigurationConstants.CONFIG_PROPERTY_ONLINEPAYMODE);
+			}*/
+			
+			Long paymodeId = this.paymodeReadPlatformService.getOnlinePaymode("Online Payment");
+			if (paymodeId == null) {
+				paymodeId = Long.valueOf(83);
+			}
 			
 			final BigDecimal totalAmount = new BigDecimal(amount);
 			
