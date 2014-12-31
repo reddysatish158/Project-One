@@ -238,7 +238,7 @@ public void processRequest() {
 			   LocalTime date=new LocalTime(zone);
 	           String dateTime=date.getHourOfDay()+"_"+date.getMinuteOfHour()+"_"+date.getSecondOfMinute();
 	           String path=FileUtils.generateLogFileDirectory()+JobName.REQUESTOR.toString()+ File.separator +"Requester_"+new LocalDate().toString().replace("-","")+"_"+dateTime+".log";
-	           Configuration globalConfiguration=this.globalConfigurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);
+	         
 	           File fileHandler = new File(path.trim());
 	           fileHandler.createNewFile();
 	           FileWriter fw = new FileWriter(fileHandler);
@@ -251,7 +251,7 @@ public void processRequest() {
 	           					+requestData.getOrderId()+" ,HardwareId="+requestData.getHardwareId()+" ,planName="+requestData.getPlanName()+
 	           					" ,Provisiong system="+requestData.getProvisioningSystem()+"\r\n");
 	           			
-	           			this.prepareRequestReadplatformService.processingClientDetails(requestData,globalConfiguration.getValue());
+	           			this.prepareRequestReadplatformService.processingClientDetails(requestData);
 	           		}
 	           		
 	           		fw.append(" Requestor Job is Completed...."+ ThreadLocalContextUtil.getTenant().getTenantIdentifier()+"\r\n");
@@ -316,8 +316,10 @@ public void processSimulator() {
 				jsonobject.put("locale", "en");
 				jsonobject.put("dateFormat", "dd MMMM yyyy");
 				jsonobject.put("ticketTime"," "+new LocalTime().toString(formatter2));
+				if(order != null){
 				jsonobject.put("description","ClientId"+processRequest.getClientId()+" Order No:"+order.getOrderNo()+" Request Type:"+processRequest.getRequestType()
 						+" Generated at:"+new LocalTime().toString(formatter2));
+				}
 							jsonobject.put("ticketDate",formatter1.print(new LocalDate()));
 				jsonobject.put("sourceOfTicket","Phone");
 				jsonobject.put("assignedTo", userId);

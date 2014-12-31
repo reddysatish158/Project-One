@@ -14,6 +14,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.mifosplatform.infrastructure.jobs.service.JobName;
+import org.mifosplatform.portfolio.order.exceptions.OrderNotFoundException;
+import org.mifosplatform.portfolio.order.exceptions.RadiusDetailsNotFoundException;
 import org.mifosplatform.provisioning.processscheduledjobs.service.SheduleJobReadPlatformService;
 import org.mifosplatform.scheduledjobs.scheduledjobs.data.JobParameterData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +41,9 @@ public class RadiusReadPlatformServiceImp implements RadiusReadPlatformService {
 
 		try {
 			JobParameterData data = this.sheduleJobReadPlatformService.getJobParameters(JobName.RADIUS.toString());
+			if(data == null){
+				throw new RadiusDetailsNotFoundException();
+			}
 			String url = data.getUrl() + "nas";
 			String credentials = data.getUsername().trim() + ":" + data.getPassword().trim();
 			byte[] encoded = Base64.encodeBase64(credentials.getBytes());
@@ -61,6 +66,9 @@ public class RadiusReadPlatformServiceImp implements RadiusReadPlatformService {
 
 		try {
 			JobParameterData data = this.sheduleJobReadPlatformService.getJobParameters(JobName.RADIUS.toString());
+			if(data == null){
+				throw new RadiusDetailsNotFoundException();
+			}
 			String url = data.getUrl() + "nas/"+nasId;
 			String credentials = data.getUsername().trim() + ":" + data.getPassword().trim();
 			byte[] encoded = Base64.encodeBase64(credentials.getBytes());
@@ -82,6 +90,9 @@ public class RadiusReadPlatformServiceImp implements RadiusReadPlatformService {
 		
 		try {
 			JobParameterData data = this.sheduleJobReadPlatformService.getJobParameters(JobName.RADIUS.toString());
+			if(data == null){
+				throw new RadiusDetailsNotFoundException();
+			}
 			String url = data.getUrl() + "nas";
 			String credentials = data.getUsername().trim() + ":" + data.getPassword().trim();
 			byte[] encoded = Base64.encodeBase64(credentials.getBytes());
@@ -103,6 +114,10 @@ public class RadiusReadPlatformServiceImp implements RadiusReadPlatformService {
 
 		try {
 			JobParameterData data = this.sheduleJobReadPlatformService.getJobParameters(JobName.RADIUS.toString());
+			
+			if(data == null){
+				throw new RadiusDetailsNotFoundException();
+			}
 			String url = data.getUrl() + "nas/"+nasId;
 			String credentials = data.getUsername().trim() + ":" + data.getPassword().trim();
 			byte[] encoded = Base64.encodeBase64(credentials.getBytes());
@@ -124,6 +139,9 @@ public class RadiusReadPlatformServiceImp implements RadiusReadPlatformService {
 
 		try {
 			JobParameterData data = this.sheduleJobReadPlatformService.getJobParameters(JobName.RADIUS.toString());
+			if(data == null){
+				throw new RadiusDetailsNotFoundException();
+			}
 			String url ="";
 			if(attribute!=null){
 				url= data.getUrl() + "radservice?attribute="+attribute;
@@ -150,6 +168,9 @@ public class RadiusReadPlatformServiceImp implements RadiusReadPlatformService {
 		
 		try {
 			JobParameterData data = this.sheduleJobReadPlatformService.getJobParameters(JobName.RADIUS.toString());
+			if(data == null){
+				throw new RadiusDetailsNotFoundException();
+			}
 			String url = data.getUrl() + "radservice";
 			String credentials = data.getUsername().trim() + ":" + data.getPassword().trim();
 			byte[] encoded = Base64.encodeBase64(credentials.getBytes());
@@ -171,6 +192,10 @@ public class RadiusReadPlatformServiceImp implements RadiusReadPlatformService {
 
 		try {
 			JobParameterData data = this.sheduleJobReadPlatformService.getJobParameters(JobName.RADIUS.toString());
+			
+			if(data == null){
+				throw new RadiusDetailsNotFoundException();
+			}
 			String url = data.getUrl() + "radservice/"+radServiceId;
 			String credentials = data.getUsername().trim() + ":" + data.getPassword().trim();
 			byte[] encoded = Base64.encodeBase64(credentials.getBytes());
@@ -192,6 +217,9 @@ public class RadiusReadPlatformServiceImp implements RadiusReadPlatformService {
 
 		try {
 			JobParameterData data = this.sheduleJobReadPlatformService.getJobParameters(JobName.RADIUS.toString());
+			if(data == null){
+				throw new RadiusDetailsNotFoundException();
+			}
 			String url = data.getUrl() + "radservice/"+radServiceId;
 			String credentials = data.getUsername().trim() + ":" + data.getPassword().trim();
 			byte[] encoded = Base64.encodeBase64(credentials.getBytes());

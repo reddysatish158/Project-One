@@ -42,8 +42,6 @@ public class OrderData {
 	private String orderNo;
 	private OrderData orderData;
 	private String provisioningSys;
-	private boolean ispaymentEnable;
-	private Collection<MCodeData> paymodes;
 	private List<OrderLineData> orderServices;
 	private List<OrderDiscountData> orderDiscountDatas;
 	private LocalDate invoiceTilldate;
@@ -116,10 +114,9 @@ public class OrderData {
        
 	}
 
-	public OrderData(final Collection<MCodeData> disconnectDetails, final List<SubscriptionData> subscriptionDatas, final boolean isEnabled) {
+	public OrderData(final Collection<MCodeData> disconnectDetails, final List<SubscriptionData> subscriptionDatas) {
 		this.disconnectDetails = disconnectDetails;
 		this.subscriptiondata = subscriptionDatas;
-		this.ispaymentEnable = isEnabled;
 	}
 
 	public OrderData(Long clientId, List<OrderData> clientOrders) {
@@ -150,6 +147,10 @@ public class OrderData {
 	public OrderData(Long planId,Long planStatus) {
 		this.planStatus = planStatus;
 		this.pdid = planId;
+	}
+
+	public OrderData(Collection<MCodeData> disconnectDetails) {
+		this.disconnectDetails=disconnectDetails;
 	}
 
 	public Long getPlanStatus() {
@@ -233,13 +234,8 @@ public class OrderData {
 		return provisioningSys;
 	}
 
-	public boolean isIspaymentEnable() {
-		return ispaymentEnable;
-	}
 
-	public Collection<MCodeData> getPaymodes() {
-		return paymodes;
-	}
+
 
 	public List<OrderLineData> getOrderServices() {
 		return orderServices;
@@ -340,9 +336,6 @@ public class OrderData {
 		
 	}
 
-	public void setPaymodeData(Collection<MCodeData> data) {
-		this.paymodes = data;
-		
-	}
+	
 
 }

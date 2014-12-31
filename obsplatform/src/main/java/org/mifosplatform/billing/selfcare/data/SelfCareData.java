@@ -6,6 +6,7 @@ import org.mifosplatform.crm.ticketmaster.data.TicketMasterData;
 import org.mifosplatform.finance.clientbalance.data.ClientBalanceData;
 import org.mifosplatform.finance.financialtransaction.data.FinancialTransactionsData;
 import org.mifosplatform.finance.payments.data.PaymentData;
+import org.mifosplatform.finance.paymentsgateway.domain.PaymentGatewayConfiguration;
 import org.mifosplatform.infrastructure.configuration.domain.Configuration;
 import org.mifosplatform.organisation.address.data.AddressData;
 import org.mifosplatform.portfolio.client.data.ClientData;
@@ -28,9 +29,9 @@ private Long clientId;
 	private List<FinancialTransactionsData> statementsData;
 	private List<PaymentData> paymentsData;
 	private List<TicketMasterData> ticketMastersData;
-	private Configuration paypalConfigData;
+	private PaymentGatewayConfiguration paypalConfigData;
 	private String authPin;
-	private Configuration paypalConfigDataForIos;
+	private PaymentGatewayConfiguration paypalConfigDataForIos;
 	private Long loginHistoryId; 
 
 	public SelfCareData(Long clientId, String email) {
@@ -136,17 +137,17 @@ private Long clientId;
 
 
 
-	public Configuration getPaypalConfigData() {
+	public PaymentGatewayConfiguration getPaypalConfigData() {
 		return paypalConfigData;
 	}
 
 
 
-	public void setPaypalConfigData(Configuration paypalConfigData) {
+	public void setPaypalConfigData(PaymentGatewayConfiguration paypalConfigData) {
 		this.paypalConfigData = paypalConfigData;
 	}
 
-	public void setPaypalConfigDataForIos(Configuration paypalConfigDataForIos) {
+	public void setPaypalConfigDataForIos(PaymentGatewayConfiguration paypalConfigDataForIos) {
 		this.paypalConfigDataForIos =paypalConfigDataForIos;
 		
 	}

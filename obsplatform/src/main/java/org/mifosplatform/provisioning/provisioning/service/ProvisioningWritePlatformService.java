@@ -23,7 +23,7 @@ public interface ProvisioningWritePlatformService {
 	void updateHardwareDetails(Long clientId, String serialNumber,String oldSerialnumber, String provSerilaNum, String oldHardware);
 
 	CommandProcessingResult postOrderDetailsForProvisioning(Order order, String planName,String reqType, Long prepareId, String groupName, String serialNo,
-			Long orderId,String provisioningSys, String configdata);
+			Long orderId,String provisioningSys);
 
 	CommandProcessingResult updateIpDetails(Long entityId, JsonCommand command);
 
