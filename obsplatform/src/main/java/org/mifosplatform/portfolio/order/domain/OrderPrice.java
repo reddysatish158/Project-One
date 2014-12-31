@@ -7,11 +7,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -23,11 +20,10 @@ import org.mifosplatform.useradministration.domain.AppUser;
 @Table(name = "b_order_price")
 public class OrderPrice extends AbstractAuditableCustom<AppUser, Long> {
 
-	/*@Id
-	@GeneratedValue
-	@Column(name = "id")
-	private Long id;*/
-	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	@Column(name = "service_id")
 	private Long serviceId;
@@ -261,6 +257,7 @@ public class OrderPrice extends AbstractAuditableCustom<AppUser, Long> {
 		   this.billEndDate=null;
 		}
 		
+
 	}
 
 

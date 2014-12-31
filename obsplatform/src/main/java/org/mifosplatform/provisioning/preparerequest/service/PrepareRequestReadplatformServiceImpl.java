@@ -205,7 +205,6 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 		 }
 
 		 JSONArray newServiceArray = new JSONArray();
-
 		 if(requestType.equalsIgnoreCase(UserActionStatusTypeEnum.ADDON_ACTIVATION.toString())){
 			 
 			 List<OrderAddons> orderAddons=this.orderAddonsRepository.findAddonsByOrderId(requestData.getOrderId());

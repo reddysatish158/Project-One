@@ -21,4 +21,5 @@ public interface PaymentReadPlatformService {
 	
 	Long getOnlinePaymode(String paymentMode);
 
+
 }

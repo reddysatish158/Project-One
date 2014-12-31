@@ -172,8 +172,8 @@ public class OrderWritePlatformServiceImpl implements OrderWritePlatformService 
 		this.orderAssembler=orderAssembler;
 		this.eventValidationReadPlatformService=eventValidationReadPlatformService;
 		this.priceRepository=priceRepository;
+		this.provisionServiceDetailsRepository=provisionServiceDetailsRepository;
 		this.planRepository = planRepository;
-		this.provisionServiceDetailsRepository =provisionServiceDetailsRepository;
 		this.orderRepository = orderRepository;
 		this.clientRepository=clientRepository;
 		this.codeValueRepository=codeRepository;
@@ -442,7 +442,7 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 	  }
 	  LocalDate renewalEndDate=this.orderAssembler.calculateEndDate(newStartdate,contractDetails.getSubscriptionType(),contractDetails.getUnits());
 	  orderDetails.setEndDate(renewalEndDate);
-	 
+
 	  for(OrderPrice orderprice:orderPrices){
 		  if(plan.isPrepaid() == 'Y'){
 			  ServiceMaster service=this.serviceMasterRepository.findOne(orderprice.getServiceId()); 
@@ -458,8 +458,7 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 				}
 		  	}
 		  orderprice.setDatesOnOrderStatus(newStartdate,renewalEndDate,orderDetails.getUserAction());//setBillEndDate(renewalEndDate);
-	//	  this.OrderPriceRepository.save(orderprice);
-		
+
 	  }
 	
 	  orderDetails.setContractPeriod(contractDetails.getId());
@@ -603,6 +602,7 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 					
 					 CommandProcessingResult commandProcessingResult=this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order,plan.getPlanCode(),requstStatus,
 		    				 Long.valueOf(0),null,null,order.getId(),plan.getProvisionSystem(),null);
+
 		    		 resourceId=commandProcessingResult.resourceId();
 					
 					/*final AllocationDetailsData detailsData = this.allocationReadPlatformService.getTheHardwareItemDetails(command.entityId());

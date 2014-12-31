@@ -31,7 +31,6 @@ import org.mifosplatform.organisation.ippool.domain.IpPoolManagementJpaRepositor
 import org.mifosplatform.organisation.ippool.exception.IpNotAvailableException;
 import org.mifosplatform.portfolio.association.domain.HardwareAssociation;
 import org.mifosplatform.portfolio.association.exception.PairingNotExistException;
-import org.mifosplatform.portfolio.client.domain.Client;
 import org.mifosplatform.portfolio.order.domain.HardwareAssociationRepository;
 import org.mifosplatform.portfolio.order.domain.Order;
 import org.mifosplatform.portfolio.order.domain.OrderLine;
@@ -344,6 +343,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 				}
 			}
 
+
 		   ProcessRequest processRequest = new ProcessRequest(prepareId, order.getClientId(), order.getId(),
 				   ProvisioningApiConstants.PROV_PACKETSPAN, requestType, 'N', 'N');
 		  List<OrderLine> orderLines = order.getServices();
@@ -361,10 +361,10 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 		  }
 		  this.processRequestRepository.save(processRequest);
 		  commandProcessId=processRequest.getId();
-		  
-		}else{
-			
-			PrepareRequestData prepareRequestData=new  PrepareRequestData(Long.valueOf(0),order.getClientId(), orderId, requestType, hardwareAssociation.getSerialNo(),
+
+
+			}else{
+				PrepareRequestData prepareRequestData=new  PrepareRequestData(Long.valueOf(0),order.getClientId(), orderId, requestType, hardwareAssociation.getSerialNo(),
 						 null, provisioningSys, planName, String.valueOf(plan.isHardwareReq()),addonId);
 
 			CommandProcessingResult commandProcessingResult =this.prepareRequestReadplatformService.processingClientDetails(prepareRequestData);

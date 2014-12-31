@@ -115,6 +115,7 @@ public class ServiceMapping extends AbstractPersistable<Long> {
 		
 		final String serviceParamName = "serviceId";
 		if (command.isChangeInLongParameterNamed(serviceParamName,this.serviceId)) {
+
 			final Long newValue = command.longValueOfParameterNamed(serviceParamName);
 			actualChanges.put(serviceParamName, newValue);
 			this.serviceId = newValue;
@@ -130,6 +131,7 @@ public class ServiceMapping extends AbstractPersistable<Long> {
 
 		final String statusParamName = "status";
 		if (command.isChangeInStringParameterNamed(statusParamName, this.status)) {
+
 			final String newValue = command.stringValueOfParameterNamed(statusParamName);
 			actualChanges.put(statusParamName, newValue);
 			this.status = StringUtils.defaultIfEmpty(newValue, null);

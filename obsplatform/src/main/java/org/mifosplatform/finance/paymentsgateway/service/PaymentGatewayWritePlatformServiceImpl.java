@@ -30,6 +30,7 @@ import org.mifosplatform.finance.paymentsgateway.domain.PaymentGatewayConfigurat
 import org.mifosplatform.finance.paymentsgateway.domain.PaymentGatewayRepository;
 import org.mifosplatform.finance.paymentsgateway.serialization.PaymentGatewayCommandFromApiJsonDeserializer;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -122,7 +123,8 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 
 				if (clientId != null && clientId>0) {
 		
-					Long paymodeId = this.paymodeReadPlatformService.getOnlinePaymode("Online Payment");
+
+					Long paymodeId = this.paymodeReadPlatformService.getOnlinePaymode("M-pesa");
 					if (paymodeId == null) {
 						paymodeId = Long.valueOf(83);
 					}
@@ -516,11 +518,17 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 		try {
 			PaymentGateway paymentGateway = this.paymentGatewayRepository.findOne(id);
 			
-			Long paymodeId = this.paymodeReadPlatformService.getOnlinePaymode("Online Payment");
-			   if (paymodeId == null) {
-			    paymodeId = Long.valueOf(83);
-			   }
 
+			/*Configuration configuration = configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_ONLINEPAYMODE);
+
+			if (configuration == null || configuration.getValue() == null || configuration.getValue() == "") {
+				throw new ConfigurationPropertyNotFoundException(ConfigurationConstants.CONFIG_PROPERTY_ONLINEPAYMODE);
+			}*/
+			
+			Long paymodeId = this.paymodeReadPlatformService.getOnlinePaymode("Online Payment");
+			if (paymodeId == null) {
+				paymodeId = Long.valueOf(83);
+			}
 			
 			final BigDecimal totalAmount = new BigDecimal(amount);
 			

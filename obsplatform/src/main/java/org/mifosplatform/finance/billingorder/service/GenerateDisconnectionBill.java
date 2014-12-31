@@ -115,6 +115,7 @@ public class GenerateDisconnectionBill {
 		  
 		   if(discountMasterData !=null){	
 
+
            if(discountMasterData.getDiscountRate() !=null&& (billingOrderData.getBillStartDate().after(discountMasterData.getDiscountStartDate().toDate())
         		   ||billingOrderData.getBillStartDate().compareTo(discountMasterData.getDiscountStartDate().toDate())==0)){
 
@@ -126,6 +127,7 @@ public class GenerateDisconnectionBill {
               }
            }
 		   }
+
 
 			
 			this.startDate = disconnectionDate;
@@ -215,6 +217,7 @@ public class GenerateDisconnectionBill {
 			
 
 		  if(discountMasterData!=null){
+
 	       if(discountMasterData.getDiscountRate() !=null && (billingOrderData.getBillStartDate().after(discountMasterData.getDiscountStartDate().toDate())
 	        		   ||billingOrderData.getBillStartDate().compareTo(discountMasterData.getDiscountStartDate().toDate())==0)){
 
@@ -227,6 +230,7 @@ public class GenerateDisconnectionBill {
 		           }
 
 		  }
+
 			this.startDate = disconnectionDate;
 			this.endDate = new LocalDate(billingOrderData.getInvoiceTillDate());
 			invoiceTillDate = new LocalDate(billingOrderData.getInvoiceTillDate());

@@ -110,7 +110,7 @@ public Long getOnlinePaymode(String paymodeId) {
 	try{
 		    context.authenticatedUser();
 		    final Mapper mapper = new Mapper();
-		    final String sql = "select id from m_code_value where code_value  LIKE '" + paymodeId + "'";
+		    final String sql = "select id from m_code_value where code_value LIKE '" + paymodeId + "'";
 			return this.jdbcTemplate.queryForObject(sql, mapper, new Object[] {});
 			
 	}catch (final EmptyResultDataAccessException e) {

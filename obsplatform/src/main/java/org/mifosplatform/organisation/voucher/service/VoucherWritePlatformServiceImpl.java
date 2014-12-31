@@ -7,6 +7,9 @@ import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
+import org.mifosplatform.organisation.office.domain.Office;
+import org.mifosplatform.organisation.office.domain.OfficeRepository;
+import org.mifosplatform.organisation.office.exception.OfficeNotFoundException;
 import org.mifosplatform.organisation.voucher.domain.Voucher;
 import org.mifosplatform.organisation.voucher.domain.VoucherDetails;
 import org.mifosplatform.organisation.voucher.domain.VoucherDetailsRepository;
@@ -46,6 +49,7 @@ public class VoucherWritePlatformServiceImpl implements
 	private final VoucherDetailsRepository randomGeneratorDetailsRepository;
 	private final VoucherCommandFromApiJsonDeserializer fromApiJsonDeserializer;
 	private final VoucherReadPlatformService randomGeneratorReadPlatformService;
+	private final OfficeRepository officeRepository;
 	
 	@Autowired
 	public VoucherWritePlatformServiceImpl(
@@ -53,13 +57,15 @@ public class VoucherWritePlatformServiceImpl implements
 			final VoucherRepository randomGeneratorRepository,
 			final VoucherReadPlatformService randomGeneratorReadPlatformService,
 			final VoucherCommandFromApiJsonDeserializer fromApiJsonDeserializer,
-			final VoucherDetailsRepository randomGeneratorDetailsRepository) {
+			final VoucherDetailsRepository randomGeneratorDetailsRepository,
+			final OfficeRepository officeRepository) {
 		
 		this.context = context;
 		this.randomGeneratorRepository = randomGeneratorRepository;
 		this.fromApiJsonDeserializer = fromApiJsonDeserializer;
 		this.randomGeneratorReadPlatformService = randomGeneratorReadPlatformService;
 		this.randomGeneratorDetailsRepository=randomGeneratorDetailsRepository;
+		this.officeRepository = officeRepository;
 
 	}
 
@@ -71,6 +77,11 @@ public class VoucherWritePlatformServiceImpl implements
 			context.authenticatedUser();
 			this.fromApiJsonDeserializer.validateForCreate(command.json());
 			
+			final Long officeId = command.longValueOfParameterNamed("officeId");
+            final Office clientOffice = this.officeRepository.findOne(officeId);
+
+            if (clientOffice == null) { throw new OfficeNotFoundException(officeId); }
+			
 			final Long length = command.bigDecimalValueOfParameterNamed("length").longValue();
 			final String beginWith = command.stringValueOfParameterNamed("beginWith");
 			final int bwLength = beginWith.trim().length();
@@ -81,6 +92,8 @@ public class VoucherWritePlatformServiceImpl implements
 			}
 				
 			Voucher voucherpin = Voucher.fromJson(command);
+			voucherpin.setOfficeId(officeId);
+			
 			this.randomGeneratorRepository.save(voucherpin);	
 			return new CommandProcessingResult(voucherpin.getId());
 
