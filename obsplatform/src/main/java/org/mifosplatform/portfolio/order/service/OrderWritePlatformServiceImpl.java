@@ -236,7 +236,6 @@ try{
 	Configuration configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IMPLICIT_ASSOCIATION);
 	
 	if(configurationProperty.isEnabled()){
-		configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);
 		
 		if(plan.isHardwareReq() == 'Y'){
 			List<AllocationDetailsData> allocationDetailsDatas=this.allocationReadPlatformService.retrieveHardWareDetailsByItemCode(clientId,plan.getPlanCode());
@@ -625,6 +624,7 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 				  			}
 				  	}
 				this.processRequestRepository.save(processRequest);*/
+
 				this.orderRepository.save(order);
 				final OrderHistory orderHistory = new OrderHistory(order.getId(),new LocalDate(), new LocalDate(), resourceId,
 						requstStatus, getUserId(),null);
@@ -695,6 +695,7 @@ public CommandProcessingResult changePlan(JsonCommand command, Long entityId) {
 			if(!plan.getProvisionSystem().equalsIgnoreCase("None")){
 				CommandProcessingResult processingResult=this.provisioningWritePlatformService.postOrderDetailsForProvisioning(newOrder, plan.getCode(),
 						UserActionStatusTypeEnum.CHANGE_PLAN.toString(),new Long(0), null, null,newOrder.getId(),plan.getProvisionSystem(),null);
+
 				processResuiltId=processingResult.commandId();
 			}
 		     
@@ -910,6 +911,7 @@ public CommandProcessingResult scheduleOrderCreation(Long clientId,JsonCommand c
 				orderStatus = OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.PENDING).getId();
 				CommandProcessingResult processingResult =this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order, plan.getCode(), 
 						UserActionStatusTypeEnum.TERMINATION.toString(),resourceId, null, null,order.getId(),plan.getProvisionSystem(),null);
+
 				resourceId=processingResult.resourceId();
 			}
 			order.setStatus(orderStatus);
@@ -952,6 +954,7 @@ public CommandProcessingResult scheduleOrderCreation(Long clientId,JsonCommand c
 				    	
 				    			CommandProcessingResult commandProcessingResult=this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order, plan.getCode(), UserActionStatusTypeEnum.SUSPENTATION.toString(), 
 										resourceId, null, null,order.getId(),plan.getProvisionSystem(),null);
+
 				    			resourceId =commandProcessingResult.resourceId();
 				    	  //}
 				    		  

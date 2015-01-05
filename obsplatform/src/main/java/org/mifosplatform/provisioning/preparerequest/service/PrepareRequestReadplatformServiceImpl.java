@@ -205,6 +205,13 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 		 }
 
 		 JSONArray newServiceArray = new JSONArray();
+
+		 if(requestData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.DEVICE_SWAP.toString())){
+			 AllocationDetailsData allocationDetailsData=this.allocationReadPlatformService.getDisconnectedHardwareItemDetails(requestData.getOrderId(),requestData.getClientId());
+			 jsonObject.put("clientId", order.getClientId());
+			 jsonObject.put("OldHWId", allocationDetailsData.getSerialNo());
+			 jsonObject.put("NewHWId", HardWareId);
+		 }
 		 
 		 if(requestType.equalsIgnoreCase(UserActionStatusTypeEnum.ADDON_ACTIVATION.toString())){
 			 
@@ -222,14 +229,6 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 			 }
 			 
 		 }else{
-			 
-			 if(requestData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.DEVICE_SWAP.toString())){
-				 AllocationDetailsData allocationDetailsData=this.allocationReadPlatformService.getDisconnectedHardwareItemDetails(requestData.getOrderId(),requestData.getClientId());
-				 jsonObject.put("clientId", order.getClientId());
-				 jsonObject.put("OldHWId", allocationDetailsData.getSerialNo());
-				 jsonObject.put("NewHWId", HardWareId);
-			 
-			 	}
 		  
 		 for(OrderLine orderLine:orderLineData){
 			 
@@ -262,13 +261,15 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 			 prepareRequest.setStatus(status);
 			 this.prepareRequsetRepository.save(prepareRequest);
 		 }
+		
 	 }
 	/* if(requestData.getProvisioningSystem().equalsIgnoreCase("None")){
 		 order.setStatus(new Long(1));
 		 this.orderRepository.save(order);
 	 }*/
 	 return new CommandProcessingResult(processResultId);	
- }catch(Exception exception){
+ 
+	 }catch(Exception exception){
 	 if(prepareRequest != null){
 		 prepareRequest.setIsProvisioning('F');
 		 prepareRequest.setStatus("Failed");

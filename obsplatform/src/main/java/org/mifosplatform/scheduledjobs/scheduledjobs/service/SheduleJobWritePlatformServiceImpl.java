@@ -234,6 +234,7 @@ public void processRequest() {
 			   LocalTime date=new LocalTime(zone);
 	           String dateTime=date.getHourOfDay()+"_"+date.getMinuteOfHour()+"_"+date.getSecondOfMinute();
 	           String path=FileUtils.generateLogFileDirectory()+JobName.REQUESTOR.toString()+ File.separator +"Requester_"+new LocalDate().toString().replace("-","")+"_"+dateTime+".log";
+
 	           File fileHandler = new File(path.trim());
 	           fileHandler.createNewFile();
 	           FileWriter fw = new FileWriter(fileHandler);
@@ -311,8 +312,10 @@ public void processSimulator() {
 				jsonobject.put("locale", "en");
 				jsonobject.put("dateFormat", "dd MMMM yyyy");
 				jsonobject.put("ticketTime"," "+new LocalTime().toString(formatter2));
+				if(order != null){
 				jsonobject.put("description","ClientId"+processRequest.getClientId()+" Order No:"+order.getOrderNo()+" Request Type:"+processRequest.getRequestType()
 						+" Generated at:"+new LocalTime().toString(formatter2));
+				}
 							jsonobject.put("ticketDate",formatter1.print(new LocalDate()));
 				jsonobject.put("sourceOfTicket","Phone");
 				jsonobject.put("assignedTo", userId);
@@ -702,7 +705,8 @@ public void processNotify() {
 								ReceiveMessage = RadiusJobConstants.FAILURE + e.getMessage();			
 							}
 							
-						} else if (entitlementsData.getRequestType().equalsIgnoreCase(RadiusJobConstants.Activation)) {
+						} else if (entitlementsData.getRequestType().equalsIgnoreCase(RadiusJobConstants.Activation) || 
+								entitlementsData.getRequestType().equalsIgnoreCase(RadiusJobConstants.ReConnection)) {
 
 							try {
 								JSONObject jsonObject = new JSONObject(entitlementsData.getProduct());

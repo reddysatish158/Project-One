@@ -15,6 +15,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.joda.time.LocalDate;
 import org.mifosplatform.billing.selfcare.domain.SelfCare;
+import org.mifosplatform.finance.paymentsgateway.domain.PaymentGatewayConfiguration;
 import org.mifosplatform.infrastructure.codes.data.CodeValueData;
 import org.mifosplatform.infrastructure.configuration.domain.Configuration;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
@@ -72,8 +73,9 @@ final public class ClientData implements Comparable<ClientData> {
 	private final String categoryType;
 	private AddressData addressTemplateData;
     private final List<String> hardwareDetails;
-    private Configuration configurationProperty;
-    private Configuration configurationPropertyforIos;
+    private PaymentGatewayConfiguration configurationProperty;
+    private Configuration loginConfigurationProperty;
+    private PaymentGatewayConfiguration configurationPropertyforIos;
 	private  final String currency;
 
 	private final Collection<GroupData> groupNameDatas;
@@ -297,15 +299,15 @@ final public class ClientData implements Comparable<ClientData> {
 		
 	}
 
-	public Configuration getConfigurationProperty() {
+	public PaymentGatewayConfiguration getConfigurationProperty() {
 		return configurationProperty;
 	}
 
-	public void setConfigurationProperty(Configuration configurationProperty) {
-		this.configurationProperty = configurationProperty;
+	public void setConfigurationProperty(PaymentGatewayConfiguration paypalconfigurationProperty) {
+		this.configurationProperty = paypalconfigurationProperty;
 	}
-	public void setConfigurationPropertyForIos(Configuration configurationPropertyforIos) {
-		this.setConfigurationPropertyforIos(configurationPropertyforIos);
+	public void setConfigurationPropertyForIos(PaymentGatewayConfiguration paypalconfigurationPropertyForIos) {
+		this.setConfigurationPropertyforIos(paypalconfigurationPropertyForIos);
 	}
 
 	public void setBalanceCheck(boolean isEnabled) {
@@ -345,13 +347,13 @@ final public class ClientData implements Comparable<ClientData> {
 		this.addressTemplateData = addressTemplateData;
 	}
 
-	public Configuration getConfigurationPropertyforIos() {
+	public PaymentGatewayConfiguration getConfigurationPropertyforIos() {
 		return configurationPropertyforIos;
 	}
 
 	public void setConfigurationPropertyforIos(
-			Configuration configurationPropertyforIos) {
-		this.configurationPropertyforIos = configurationPropertyforIos;
+			PaymentGatewayConfiguration paypalconfigurationPropertyForIos) {
+		this.configurationPropertyforIos = paypalconfigurationPropertyForIos;
 	}
 
 	public Collection<CodeValueData> getClosureReasons() {
@@ -364,6 +366,11 @@ final public class ClientData implements Comparable<ClientData> {
 
 	public void setBalanceCheck(Boolean balanceCheck) {
 		this.balanceCheck = balanceCheck;
+	}
+
+	public void setConfigurationProperty(Configuration configurationProperty) {
+		this.loginConfigurationProperty=configurationProperty;
+		
 	}
 	
 	
