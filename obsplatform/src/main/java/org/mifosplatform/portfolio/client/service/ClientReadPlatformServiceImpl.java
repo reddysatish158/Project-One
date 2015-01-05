@@ -95,7 +95,6 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
     public Page<ClientData> retrieveAll(final SearchParameters searchParameters) {
 
         final AppUser currentUser = context.authenticatedUser();
-        
         final ClientMapper clientMapper = new ClientMapper();
         final String hierarchy = currentUser.getOffice().getHierarchy();
         

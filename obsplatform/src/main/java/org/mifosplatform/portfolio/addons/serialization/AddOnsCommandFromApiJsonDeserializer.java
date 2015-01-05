@@ -49,6 +49,7 @@ public final class AddOnsCommandFromApiJsonDeserializer {
         final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("addons");
         final JsonElement element = fromApiJsonHelper.parse(json);
+
         
         final Long planId = fromApiJsonHelper.extractLongNamed("planId", element);
         baseDataValidator.reset().parameter("planId").value(planId).notNull();

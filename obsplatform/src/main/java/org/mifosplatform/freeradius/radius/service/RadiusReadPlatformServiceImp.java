@@ -36,11 +36,13 @@ public class RadiusReadPlatformServiceImp implements RadiusReadPlatformService {
 		
 	}
 	
+	@SuppressWarnings("unused")
 	@Override
 	public String retrieveAllNasDetails() {
 
 		try {
 			JobParameterData data = this.sheduleJobReadPlatformService.getJobParameters(JobName.RADIUS.toString());
+
 			if(data == null){
 				throw new RadiusDetailsNotFoundException();
 			}
@@ -62,11 +64,13 @@ public class RadiusReadPlatformServiceImp implements RadiusReadPlatformService {
 	}
 	
 	
+	@SuppressWarnings("unused")
 	@Override
 	public String retrieveNasDetail(final Long nasId) {
 
 		try {
 			JobParameterData data = this.sheduleJobReadPlatformService.getJobParameters(JobName.RADIUS.toString());
+
 
 			if(data == null){
 				throw new RadiusDetailsNotFoundException();
@@ -118,6 +122,7 @@ public class RadiusReadPlatformServiceImp implements RadiusReadPlatformService {
 
 		try {
 			JobParameterData data = this.sheduleJobReadPlatformService.getJobParameters(JobName.RADIUS.toString());
+
 			
 			if(data == null){
 				throw new RadiusDetailsNotFoundException();
@@ -144,7 +149,6 @@ public class RadiusReadPlatformServiceImp implements RadiusReadPlatformService {
 
 		try {
 			JobParameterData data = this.sheduleJobReadPlatformService.getJobParameters(JobName.RADIUS.toString());
-
 			if(data == null){
 				throw new RadiusDetailsNotFoundException();
 			}
@@ -200,7 +204,6 @@ public class RadiusReadPlatformServiceImp implements RadiusReadPlatformService {
 
 		try {
 			JobParameterData data = this.sheduleJobReadPlatformService.getJobParameters(JobName.RADIUS.toString());
-			
 			if(data == null){
 				throw new RadiusDetailsNotFoundException();
 			}

@@ -11,7 +11,6 @@ public class ProvisioningApiConstants {
 	//Request Status	
 	public static final String REQUEST_TERMINATE="TERMINATE";
 	public static final String REQUEST_ACTIVATION_VOD="ACTIVATION_VOD";
-
 	public static final String REQUEST_ACTIVATION="ACTIVATION";
 	public static final String REQUEST_DISCONNECTION ="DISCONNECTION";
 	public static final String REQUEST_RECONNECTION ="RECONNECTION";
@@ -23,7 +22,6 @@ public class ProvisioningApiConstants {
 	public static final String REQUEST_ADDON_ACTIVATION="ADDON_ACTIVATION";
 	public static final String REQUEST_CLIENT_ACTIVATION="CLIENT ACTIVATION";
 	public static final String REQUEST_RELEASE_DEVICE="RELEASE DEVICE";
-
 	
 	//Json Data
 	public static final String PROV_DATA_CLIENTID="clientId";

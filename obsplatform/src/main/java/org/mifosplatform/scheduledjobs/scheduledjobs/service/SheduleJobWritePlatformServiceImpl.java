@@ -234,7 +234,6 @@ public void processRequest() {
 			   LocalTime date=new LocalTime(zone);
 	           String dateTime=date.getHourOfDay()+"_"+date.getMinuteOfHour()+"_"+date.getSecondOfMinute();
 	           String path=FileUtils.generateLogFileDirectory()+JobName.REQUESTOR.toString()+ File.separator +"Requester_"+new LocalDate().toString().replace("-","")+"_"+dateTime+".log";
-
 	           File fileHandler = new File(path.trim());
 	           fileHandler.createNewFile();
 	           FileWriter fw = new FileWriter(fileHandler);
@@ -864,6 +863,7 @@ public void processNotify() {
 		} catch (Exception exception) {
 			System.out.println(exception.getMessage());
 		}
+
 	
 	}
 

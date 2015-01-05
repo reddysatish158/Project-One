@@ -143,6 +143,11 @@ public class EventMaster extends AbstractPersistable<Long> {
 	}
 	
 	
+	
+	public String getEventCategory() {
+		return eventCategory;
+	}
+
 	/**
 	 * @return the eventName
 	 */

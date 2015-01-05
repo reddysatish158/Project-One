@@ -242,18 +242,22 @@ public class OrderPrice extends AbstractAuditableCustom<AppUser, Long> {
 
 	public void setDatesOnOrderStatus(LocalDate newStartdate,LocalDate renewalEndDate, String orderstatus) {
 		
-		if(this.orders.getStatus().equals(Long.valueOf(3))){//Renewal After AutoExpired orders
-		  if(newStartdate!=null){
-		  this.billStartDate=newStartdate.toDate();
-		  this.nextBillableDay=null;
-		  this.invoiceTillDate=null;
-		 }
-	  }
+		if(this.orders.getStatus().equals(Long.valueOf(3))){
+			
+			if(newStartdate!=null){
+				this.billStartDate=newStartdate.toDate();
+				}
+				this.nextBillableDay=null;
+				this.invoiceTillDate=null;
+		}
+		
 		if(renewalEndDate!=null){
 			this.billEndDate=renewalEndDate.toDate();
 		}else{
-			this.billEndDate=null;
+		   this.billEndDate=null;
 		}
+		
+
 	}
 
 

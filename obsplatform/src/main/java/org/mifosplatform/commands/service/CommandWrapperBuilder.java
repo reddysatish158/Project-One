@@ -2551,6 +2551,7 @@ public CommandWrapperBuilder OnlinePaymentGateway() {
 	return this;
 }
 
+
 public CommandWrapperBuilder createOrderAddons(Long orderId) {
 	
 	this.actionName="CREATE";
@@ -2588,6 +2589,7 @@ public CommandWrapperBuilder linkUpAccount() {
 	this.entityName = "LINKUPACCOUNT";
 	this.href = "/linkupaccount/template";
 	return this;
+
 }
 
 }

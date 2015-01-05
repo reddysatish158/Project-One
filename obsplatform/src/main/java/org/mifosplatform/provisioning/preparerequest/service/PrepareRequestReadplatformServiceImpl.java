@@ -230,6 +230,7 @@ public class PrepareRequestReadplatformServiceImpl  implements PrepareRequestRea
 			 
 		 }else{
 		  
+
 		 for(OrderLine orderLine:orderLineData){
 			 
 			 List<ServiceMapping> provisionServiceDetails=this.provisionServiceDetailsRepository.findOneByServiceId(orderLine.getServiceId());

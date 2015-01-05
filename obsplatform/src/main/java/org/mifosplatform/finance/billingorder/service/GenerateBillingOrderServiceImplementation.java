@@ -153,7 +153,6 @@ public class GenerateBillingOrderServiceImplementation implements GenerateBillin
 			BigDecimal discountAmount = BigDecimal.ZERO;
 			BigDecimal netChargeAmount = billingOrderCommand.getPrice();
 
-
 			DiscountMaster discountMaster = null;
 			String discountCode="None";
 			
@@ -161,10 +160,11 @@ public class GenerateBillingOrderServiceImplementation implements GenerateBillin
 			if (billingOrderCommand.getDiscountMasterData() != null) {
 				discountAmount = billingOrderCommand.getDiscountMasterData().getDiscountAmount();
 				discountMaster = this.discountMasterRepository.findOne(billingOrderCommand.getDiscountMasterData().getId());
-				discountCode = discountMaster.getDiscountCode(); 
+				 discountCode = discountMaster.getDiscountCode(); 
 			    netChargeAmount = billingOrderCommand.getPrice().subtract(discountAmount);
 
 			}
+			
 
 			List<InvoiceTaxCommand> invoiceTaxCommands = billingOrderCommand.getListOfTax();
 

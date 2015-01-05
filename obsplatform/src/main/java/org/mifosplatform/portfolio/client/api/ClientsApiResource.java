@@ -116,6 +116,7 @@ public class ClientsApiResource {
     }
 
     private ClientData handleAddressTemplateData(final ClientData clientData) {
+    	
     	 final List<String> countryData = this.addressReadPlatformService.retrieveCountryDetails();
          final List<String> statesData = this.addressReadPlatformService.retrieveStateDetails();
          final List<String> citiesData = this.addressReadPlatformService.retrieveCityDetails();
