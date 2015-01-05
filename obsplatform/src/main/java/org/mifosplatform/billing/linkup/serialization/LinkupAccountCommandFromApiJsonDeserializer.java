@@ -24,7 +24,7 @@ import com.google.gson.reflect.TypeToken;
 @Component
 public class LinkupAccountCommandFromApiJsonDeserializer {
 
-private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("userName","returnUrl"));
+private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("userName","returnUrl","deviceId"));
 
     private final FromJsonHelper fromApiJsonHelper;
 

@@ -83,11 +83,11 @@ public class OwnedHardwareWritePlatformServiceImp implements OwnedHardwareWriteP
 		this.context.authenticatedUser();
 		this.apiJsonDeserializer.validateForCreate(command.json());
 	
-		boolean isCheck=this.checkforClientActiveDevices(clientId);
+		/*//boolean isCheck=this.checkforClientActiveDevices(clientId);
 	
 		if(!isCheck){
 			throw new ActiveDeviceExceedException(clientId);
-		}
+		}*/
 		
 		ownedHardware = OwnedHardware.fromJson(command,clientId);
 		List<String> inventorySerialNumbers = inventoryItemDetailsReadPlatformService.retriveSerialNumbers();
@@ -105,9 +105,6 @@ public class OwnedHardwareWritePlatformServiceImp implements OwnedHardwareWriteP
 		
 		if(configurationProperty.isEnabled()){
 			
-			configurationProperty=this.globalConfigurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);
-			
-			//if(configurationProperty.getValue().equalsIgnoreCase(ConfigurationConstants.CONFIR_PROPERTY_OWN)){
 			
 		           List<HardwareAssociationData> allocationDetailsDatas=this.associationReadplatformService.retrieveClientAllocatedPlan(ownedHardware.getClientId(),ownedHardware.getItemType());
 		    
@@ -116,14 +113,7 @@ public class OwnedHardwareWritePlatformServiceImp implements OwnedHardwareWriteP
 		    						allocationDetailsDatas.get(0).getPlanId(),ownedHardware.getSerialNumber(),allocationDetailsDatas.get(0).getorderId(),"OWNED");
 		       }
 		    }
-		//}
-		/*GlobalConfigurationProperty balanceCheckconfigurationProperty=this.globalConfigurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_BALANCE_CHECK);
-        ClientData clientData = this.clientReadPlatformService.retrieveOne(clientId);
-
-        String balanceCheck="N";
-        if(configurationProperty.isEnabled()){
-        	balanceCheck="Y";
-        }*/
+		
 		return new CommandProcessingResultBuilder().withEntityId(ownedHardware.getId()).withClientId(clientId).build();
 		
 	}catch(DataIntegrityViolationException dve){
@@ -136,10 +126,9 @@ public class OwnedHardwareWritePlatformServiceImp implements OwnedHardwareWriteP
 	
 
 	
-	private boolean checkforClientActiveDevices(Long clientId) {
+	/*private boolean checkforClientActiveDevices(Long clientId) {
 		
 		boolean isCheck=true;
-		Configuration configurationProperty=this.globalConfigurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_ACTIVE_DEVICES);
 		
 		if(configurationProperty.isEnabled()){
 			int clientDevices=this.ownedHardwareReadPlatformService.retrieveClientActiveDevices(clientId);
@@ -149,7 +138,7 @@ public class OwnedHardwareWritePlatformServiceImp implements OwnedHardwareWriteP
 			}
 		}
 		   return isCheck; 
-	}
+	}*/
 
 
 	private void handleDataIntegrityIssues(final JsonCommand command, final DataIntegrityViolationException dve) {

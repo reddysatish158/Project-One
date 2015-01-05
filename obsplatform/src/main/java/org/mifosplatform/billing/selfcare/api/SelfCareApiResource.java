@@ -36,6 +36,8 @@ import org.mifosplatform.finance.clientbalance.service.ClientBalanceReadPlatform
 import org.mifosplatform.finance.financialtransaction.data.FinancialTransactionsData;
 import org.mifosplatform.finance.payments.data.PaymentData;
 import org.mifosplatform.finance.payments.service.PaymentReadPlatformService;
+import org.mifosplatform.finance.paymentsgateway.domain.PaymentGatewayConfiguration;
+import org.mifosplatform.finance.paymentsgateway.domain.PaymentGatewayConfigurationRepository;
 import org.mifosplatform.infrastructure.configuration.domain.Configuration;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
@@ -78,6 +80,7 @@ public class SelfCareApiResource {
 	private final SelfCareRepository selfCareRepository;
 	private final LoginHistoryReadPlatformService loginHistoryReadPlatformService;
 	private final LoginHistoryRepository loginHistoryRepository;
+	private final PaymentGatewayConfigurationRepository paymentGatewayConfigurationRepository;
 
 	@Autowired
 	public SelfCareApiResource(final PlatformSecurityContext context,final SelfCareRepository selfCareRepository,
@@ -87,7 +90,7 @@ public class SelfCareApiResource {
 			final ClientBalanceReadPlatformService balanceReadPlatformService, final ClientReadPlatformService clientReadPlatformService, 
 			final OrderReadPlatformService  orderReadPlatformService, final BillMasterReadPlatformService billMasterReadPlatformService,
 			final TicketMasterReadPlatformService ticketMasterReadPlatformService,final ConfigurationRepository configurationRepository,
-			final LoginHistoryReadPlatformService loginHistoryReadPlatformService) {
+			final LoginHistoryReadPlatformService loginHistoryReadPlatformService,final PaymentGatewayConfigurationRepository gatewayConfigurationRepository) {
 		
 				this.context = context;
 				this.commandsSourceWritePlatformService = commandSourceWritePlatformService;
@@ -95,6 +98,7 @@ public class SelfCareApiResource {
 				this.selfCareReadPlatformService = selfCareReadPlatformService;
 				this.paymentReadPlatformService = paymentReadPlatformService;
 				this.addressReadPlatformService = addressReadPlatformService;
+				this.paymentGatewayConfigurationRepository=gatewayConfigurationRepository;
 				this.clientBalanceReadPlatformService = balanceReadPlatformService;
 				this.clientReadPlatformService = clientReadPlatformService;
 				this.orderReadPlatformService = orderReadPlatformService;
@@ -156,7 +160,7 @@ public class SelfCareApiResource {
         	  SelfCareData careData = new SelfCareData();
         	  Long clientId = selfcare.getClientId();
         	  //adding Is_paypal Global Data by Ashok
-            Configuration paypalConfigData=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_PAYPAL_CHECK);
+            PaymentGatewayConfiguration paypalConfigData=this.paymentGatewayConfigurationRepository.findOneByName(ConfigurationConstants.PAYMENTGATEWAY_IS_PAYPAL_CHECK);
             careData.setPaypalConfigData(paypalConfigData);
      
           Configuration viewers=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_ACTIVE_VIEWERS);
@@ -184,11 +188,11 @@ public class SelfCareApiResource {
         String sessionId=request.getSession().getId();
         Long loginHistoryId=null;
         careData.setClientId(clientId);
-        if(request.getSession().isNew()){
+       // if(request.getSession().isNew()){
         	LoginHistory loginHistory=new LoginHistory(ipAddress, serialNo, sessionId, new Date(),null , username,"ACTIVE");
         	this.loginHistoryRepository.save(loginHistory);
         	loginHistoryId=loginHistory.getId();
-        }
+        //}
         ClientData clientsData = this.clientReadPlatformService.retrieveOne(clientId);
         ClientBalanceData balanceData = this.clientBalanceReadPlatformService.retrieveBalance(clientId);
         List<AddressData> addressData = this.addressReadPlatformService.retrieveAddressDetailsBy(clientId);
@@ -201,7 +205,7 @@ public class SelfCareApiResource {
         Configuration balanceCheck=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_BALANCE_CHECK);
         clientsData.setBalanceCheck(balanceCheck.isEnabled());
         
-        Configuration paypalConfigDataForIos=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_PAYPAL_CHECK_IOS);
+        PaymentGatewayConfiguration paypalConfigDataForIos=this.paymentGatewayConfigurationRepository.findOneByName(ConfigurationConstants.PAYMENTGATEWAY_IS_PAYPAL_CHECK);
         careData.setPaypalConfigDataForIos(paypalConfigDataForIos);
         return this.toApiJsonSerializerForItem.serialize(careData);
         }else{

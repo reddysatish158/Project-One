@@ -25,6 +25,7 @@ public interface ProvisioningWritePlatformService {
 	CommandProcessingResult postOrderDetailsForProvisioning(Order order, String planName,String reqType, Long prepareId, String groupName, String serialNo,
 			Long orderId,String provisioningSys,Long addonId);
 
+
 	CommandProcessingResult updateIpDetails(Long entityId, JsonCommand command);
 
 	CommandProcessingResult confirmProvisioningDetails(Long entityId);

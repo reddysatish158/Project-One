@@ -30,7 +30,6 @@ import org.mifosplatform.finance.paymentsgateway.domain.PaymentGatewayConfigurat
 import org.mifosplatform.finance.paymentsgateway.domain.PaymentGatewayRepository;
 import org.mifosplatform.finance.paymentsgateway.serialization.PaymentGatewayCommandFromApiJsonDeserializer;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
-import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -67,7 +66,6 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 	    private final PaymentWritePlatformService paymentWritePlatformService;
 	    private final PaymentReadPlatformService paymodeReadPlatformService;
 	    private final PaymentGatewayReadPlatformService paymentGatewayReadPlatformService;
-	    private final ConfigurationRepository configurationRepository;
 	    private final PortfolioCommandSourceWritePlatformService writePlatformService;
 	    private final PaymentGatewayConfigurationRepository paymentGatewayConfigurationRepository;
 	    private final BillingMessageTemplateRepository billingMessageTemplateRepository;
@@ -76,19 +74,14 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 	   
 	   
 	    @Autowired
-	    public PaymentGatewayWritePlatformServiceImpl(final PlatformSecurityContext context,
-	    	    final PaymentGatewayRepository paymentGatewayRepository,final FromJsonHelper fromApiJsonHelper,
-	    		final PaymentGatewayCommandFromApiJsonDeserializer paymentGatewayCommandFromApiJsonDeserializer,
-	    		final PaymentGatewayReadPlatformService readPlatformService,
-	    		final PaymentWritePlatformService paymentWritePlatformService,
-	    		final PaymentReadPlatformService paymodeReadPlatformService,
-	    		final PaymentGatewayReadPlatformService paymentGatewayReadPlatformService,
-	    		final ConfigurationRepository configurationRepository,
-	    		final PortfolioCommandSourceWritePlatformService writePlatformService,
-	    		final PaymentGatewayConfigurationRepository paymentGatewayConfigurationRepository,
-	    		final BillingMessageTemplateRepository billingMessageTemplateRepository,
-	    		final BillingMessageRepository messageDataRepository,
+	    public PaymentGatewayWritePlatformServiceImpl(final PlatformSecurityContext context,final PaymentGatewayRepository paymentGatewayRepository,
+	    		final FromJsonHelper fromApiJsonHelper,final PaymentGatewayCommandFromApiJsonDeserializer paymentGatewayCommandFromApiJsonDeserializer,
+	    		final PaymentGatewayReadPlatformService readPlatformService,final PaymentWritePlatformService paymentWritePlatformService,
+	    		final PaymentReadPlatformService paymodeReadPlatformService,final PaymentGatewayReadPlatformService paymentGatewayReadPlatformService,
+	    		final PortfolioCommandSourceWritePlatformService writePlatformService,final PaymentGatewayConfigurationRepository paymentGatewayConfigurationRepository,
+	    		final BillingMessageTemplateRepository billingMessageTemplateRepository,final BillingMessageRepository messageDataRepository,
 	    		final ClientRepository clientRepository)
+	    	
 	    {
 	    	this.context=context;
 	    	this.paymentGatewayRepository=paymentGatewayRepository;
@@ -98,7 +91,6 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 	    	this.paymentWritePlatformService=paymentWritePlatformService;
 	    	this.paymodeReadPlatformService=paymodeReadPlatformService;
 	    	this.paymentGatewayReadPlatformService=paymentGatewayReadPlatformService;
-	    	this.configurationRepository = configurationRepository;
 	    	this.writePlatformService = writePlatformService;
 	    	this.paymentGatewayConfigurationRepository = paymentGatewayConfigurationRepository;
 	    	this.billingMessageTemplateRepository = billingMessageTemplateRepository;
@@ -130,10 +122,12 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 
 				if (clientId != null && clientId>0) {
 		
-					Long paymodeId = this.paymodeReadPlatformService.getOnlinePaymode("M-pesa");
+					Long paymodeId = this.paymodeReadPlatformService.getOnlinePaymode("Online Payment");
+
 					if (paymodeId == null) {
 						paymodeId = Long.valueOf(83);
 					}
+					
 					String remarks = "customerName: " + details + " ,PhoneNo:"+ phoneNo + " ,Biller account Name : " + source;
 					SimpleDateFormat daformat = new SimpleDateFormat("dd MMMM yyyy");
 					String paymentdate = daformat.format(date);
@@ -555,7 +549,9 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 				paymentGateway.setObsId(result.getClientId());
 				paymentGateway.setPaymentId(result.resourceId().toString());
 				paymentGateway.setStatus("Success");
+				paymentGateway.setRemarks("Payment Successfully completed..");
 				paymentGateway.setAuto(false);
+				
 				withChanges.put("Result", "SUCCESS");
 				withChanges.put("Description", "Transaction Successfully Completed");
 				withChanges.put("Amount", amount);
@@ -583,6 +579,20 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 			
 			withChanges.put("Result", "FAILURE");
 			withChanges.put("Description", "Transaction Already Exist with This Id : " + txnId);
+			withChanges.put("Amount", amount);
+			withChanges.put("ObsPaymentId", "");
+			withChanges.put("TransactionId", txnId);
+			this.paymentGatewayRepository.save(paymentGateway);
+			return withChanges.toString();
+		
+		} catch (Exception e){
+			
+			PaymentGateway paymentGateway = this.paymentGatewayRepository.findOne(id);
+			paymentGateway.setStatus("Failure");
+			paymentGateway.setRemarks(e.getMessage());
+			
+			withChanges.put("Result", "FAILURE");
+			withChanges.put("Description", e.getMessage());
 			withChanges.put("Amount", amount);
 			withChanges.put("ObsPaymentId", "");
 			withChanges.put("TransactionId", txnId);

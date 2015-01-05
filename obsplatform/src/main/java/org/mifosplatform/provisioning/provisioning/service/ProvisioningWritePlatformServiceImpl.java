@@ -323,6 +323,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 	public CommandProcessingResult postOrderDetailsForProvisioning(final Order order,final String planName,final String requestType, 
 			final Long prepareId,final String groupname,final String serialNo,final Long orderId,final String provisioningSys,Long addonId) {
 
+
 	try {
 		Long commandProcessId=null;
 		HardwareAssociation hardwareAssociation = this.associationRepository.findOneByOrderId(order.getId());

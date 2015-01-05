@@ -12,6 +12,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -230,5 +231,21 @@ public class VoucherPinApiResource {
 		
 		return this.toApiJsonSerializer.serialize(result);
 	}
+	
+	@GET
+	@Path("verify")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String retrieveVoucherPinDetails(@QueryParam("pinNumber") final String pinNumber, @Context final UriInfo uriInfo) {
+		
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		
+		List<VoucherData> voucherData = this.readPlatformService.retrivePinDetails(pinNumber);
+		
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		
+		return this.toApiJsonSerializer.serialize(settings, voucherData, RESPONSE_PARAMETERS);
+	}
+	
 
 }
