@@ -11,7 +11,6 @@ import org.mifosplatform.infrastructure.security.service.TenantDetailsService;
 import org.mifosplatform.scheduledjobs.scheduledjobs.data.JobParameterData;
 import org.mifosplatform.scheduledjobs.scheduledjobs.data.ScheduleJobData;
 import org.mifosplatform.scheduledjobs.scheduledjobs.domain.JobParameters;
-import org.mifosplatform.scheduledjobs.scheduledjobs.domain.ScheduledJobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,21 +18,18 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 @Service
-public class SheduleJobReadPlatformServiceImpl implements
-		SheduleJobReadPlatformService {
+public class SheduleJobReadPlatformServiceImpl implements SheduleJobReadPlatformService {
 	private final TenantDetailsService tenantDetailsService;
 	private final DataSourcePerTenantService dataSourcePerTenantService;
-	private final ScheduledJobRepository scheduledJobDetailRepository;
 
-	@Autowired
-	public SheduleJobReadPlatformServiceImpl(
-			final DataSourcePerTenantService dataSourcePerTenantService,
-			final ScheduledJobRepository scheduledJobDetailRepository,
+@Autowired
+public SheduleJobReadPlatformServiceImpl(final DataSourcePerTenantService dataSourcePerTenantService,
 			final TenantDetailsService tenantDetailsService) {
-		this.dataSourcePerTenantService = dataSourcePerTenantService;
-		this.tenantDetailsService = tenantDetailsService;
-		this.scheduledJobDetailRepository = scheduledJobDetailRepository;
-	}
+		
+	this.dataSourcePerTenantService = dataSourcePerTenantService;
+	this.tenantDetailsService = tenantDetailsService;
+
+}
 
 	private static final class SheduleJobMapper implements
 			RowMapper<ScheduleJobData> {
@@ -43,8 +39,7 @@ public class SheduleJobReadPlatformServiceImpl implements
 		}
 
 		@Override
-		public ScheduleJobData mapRow(final ResultSet rs,
-				@SuppressWarnings("unused") final int rowNum)
+		public ScheduleJobData mapRow(final ResultSet rs,@SuppressWarnings("unused") final int rowNum)
 				throws SQLException {
 			final Long id = rs.getLong("id");
 			final String batchName = rs.getString("reportName");
