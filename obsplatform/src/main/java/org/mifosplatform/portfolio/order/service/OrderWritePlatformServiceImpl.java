@@ -383,7 +383,6 @@ try{
 				
 				CommandProcessingResult processingResult=this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order, plan.getPlanCode(), UserActionStatusTypeEnum.DISCONNECTION.toString(),
 						processingResultId, null, null, order.getId(),plan.getProvisionSystem(),null);
-
 				processingResultId = processingResult.commandId();
 				
 			}
@@ -475,7 +474,6 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 		    	// }else{
 		    		 CommandProcessingResult commandProcessingResult=this.provisioningWritePlatformService.postOrderDetailsForProvisioning(orderDetails,plan.getPlanCode(),requestStatusForProv,
 		    				 Long.valueOf(0),null,null,orderDetails.getId(),plan.getProvisionSystem(),null);
-
 		    		 resourceId=commandProcessingResult.resourceId();
 		    	// }
 		     }
@@ -552,7 +550,6 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 			order.setStatus(OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.PENDING).getId());
 			CommandProcessingResult processingResult =this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order,plan.getPlanCode(), requstStatus,
 					Long.valueOf(0),null,null,order.getId(),plan.getProvisionSystem(),null);
-
 			processingResultId=processingResult.commandId();
 		
 		}
@@ -1002,7 +999,6 @@ public CommandProcessingResult scheduleOrderCreation(Long clientId,JsonCommand c
 		    	order.setStatus(pendingId);
 				CommandProcessingResult commandProcessingResult=this.provisioningWritePlatformService.postOrderDetailsForProvisioning(order, plan.getCode(), UserActionStatusTypeEnum.REACTIVATION.toString(), 
 									resourceId, null, null, order.getId(),plan.getProvisionSystem(),null);
-
 				resourceId=commandProcessingResult.resourceId();
 		 
 		 }else{

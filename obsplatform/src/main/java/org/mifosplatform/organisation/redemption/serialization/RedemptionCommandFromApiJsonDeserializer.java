@@ -29,7 +29,7 @@ public final class RedemptionCommandFromApiJsonDeserializer {
     /**
      * The parameters supported for this command.
      */
-    private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("clientId","pinNumber"));
+    private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("clientId","pinNumber","Amount"));
     private final FromJsonHelper fromApiJsonHelper;
 
     @Autowired

@@ -366,7 +366,6 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 			}else{
 				PrepareRequestData prepareRequestData=new  PrepareRequestData(Long.valueOf(0),order.getClientId(), orderId, requestType, hardwareAssociation.getSerialNo(),
 						 null, provisioningSys, planName, String.valueOf(plan.isHardwareReq()),addonId);
-
 			CommandProcessingResult commandProcessingResult =this.prepareRequestReadplatformService.processingClientDetails(prepareRequestData);
 			commandProcessId=commandProcessingResult.resourceId();
 		}

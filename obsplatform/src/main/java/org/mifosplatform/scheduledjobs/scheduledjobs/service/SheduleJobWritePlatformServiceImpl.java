@@ -704,7 +704,8 @@ public void processNotify() {
 								ReceiveMessage = RadiusJobConstants.FAILURE + e.getMessage();			
 							}
 							
-						} else if (entitlementsData.getRequestType().equalsIgnoreCase(RadiusJobConstants.Activation)) {
+						} else if (entitlementsData.getRequestType().equalsIgnoreCase(RadiusJobConstants.Activation) || 
+								entitlementsData.getRequestType().equalsIgnoreCase(RadiusJobConstants.ReConnection)) {
 
 							try {
 								JSONObject jsonObject = new JSONObject(entitlementsData.getProduct());
