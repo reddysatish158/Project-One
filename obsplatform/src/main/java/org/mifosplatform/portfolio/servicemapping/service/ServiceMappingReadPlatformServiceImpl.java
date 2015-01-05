@@ -175,7 +175,8 @@ public class ServiceMappingReadPlatformServiceImpl implements
 
 		try {
 			ServiceMappingDataByIdRowMapper mapper = new ServiceMappingDataByIdRowMapper();
-			String sql = "SELECT s.id as serviceId,s.service_code as serviceCode,ifnull(sp.category,'all') as category,sp.sub_category as subcategory," +
+
+			String sql = "SELECT s.id as serviceId,s.service_code as serviceCode,ifnull(sp.category,'Others') as category,sp.sub_category as subcategory," +
 					" sp.image as image,sp.service_identification as serviceIdentification,s.status as status,sp.provision_system as provisionSystem ," +
 					" sp.sort_by as sortBy FROM b_service s left join b_prov_service_details sp on s.id = sp.service_id where s.is_deleted = 'N' "; 
 			

@@ -28,6 +28,8 @@ import org.mifosplatform.billing.selfcare.service.SelfCareRepository;
 import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
+import org.mifosplatform.finance.paymentsgateway.domain.PaymentGatewayConfiguration;
+import org.mifosplatform.finance.paymentsgateway.domain.PaymentGatewayConfigurationRepository;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.Configuration;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
@@ -67,6 +69,7 @@ public class ClientsApiResource {
     private final AddressReadPlatformService addressReadPlatformService;
     private final AllocationReadPlatformService allocationReadPlatformService;
     private final ConfigurationRepository configurationRepository;
+    private final PaymentGatewayConfigurationRepository paymentGatewayConfigurationRepository;
     private final SelfCareRepository selfCareRepository;
 
     @Autowired
@@ -74,9 +77,11 @@ public class ClientsApiResource {
             final OfficeReadPlatformService officeReadPlatformService, final ToApiJsonSerializer<ClientData> toApiJsonSerializer,
             final ApiRequestParameterHelper apiRequestParameterHelper,final AddressReadPlatformService addressReadPlatformService,
             final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,final AllocationReadPlatformService allocationReadPlatformService,
-            final ConfigurationRepository configurationRepository, 
+            final ConfigurationRepository configurationRepository, final PaymentGatewayConfigurationRepository gatewayConfigurationRepository,
             final SelfCareRepository selfCareRepository) {
-        this.context = context;
+        
+    	this.context = context;
+    	this.paymentGatewayConfigurationRepository=gatewayConfigurationRepository;
         this.clientReadPlatformService = readPlatformService;
         this.officeReadPlatformService = officeReadPlatformService;
         this.toApiJsonSerializer = toApiJsonSerializer;
@@ -111,6 +116,7 @@ public class ClientsApiResource {
     }
 
     private ClientData handleAddressTemplateData(final ClientData clientData) {
+    	
     	 final List<String> countryData = this.addressReadPlatformService.retrieveCountryDetails();
          final List<String> statesData = this.addressReadPlatformService.retrieveStateDetails();
          final List<String> citiesData = this.addressReadPlatformService.retrieveCityDetails();
@@ -163,6 +169,7 @@ public class ClientsApiResource {
             final Collection<GroupData> groupDatas = this.clientReadPlatformService.retrieveGroupData();
             final List<String> allocationDetailsDatas=this.allocationReadPlatformService.retrieveHardWareDetails(clientId);
             clientData = ClientData.templateOnTop(clientData, allowedOffices,categoryDatas,groupDatas,allocationDetailsDatas,null);
+     
         }else{
         	final List<String> allocationDetailsDatas=this.allocationReadPlatformService.retrieveHardWareDetails(clientId);
              clientData = ClientData.templateOnTop(clientData, null,null,null,allocationDetailsDatas,balanceCheck);
@@ -171,9 +178,9 @@ public class ClientsApiResource {
         
         final SelfCare selfcare = this.selfCareRepository.findOneByClientId(clientId);
         clientData.setSelfcare(selfcare);
-        final Configuration paypalconfigurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_PAYPAL_CHECK);
+        final PaymentGatewayConfiguration paypalconfigurationProperty=this.paymentGatewayConfigurationRepository.findOneByName(ConfigurationConstants.PAYMENTGATEWAY_IS_PAYPAL_CHECK);
         clientData.setConfigurationProperty(paypalconfigurationProperty);
-        final Configuration paypalconfigurationPropertyForIos=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IS_PAYPAL_CHECK_IOS);
+        final PaymentGatewayConfiguration paypalconfigurationPropertyForIos=this.paymentGatewayConfigurationRepository.findOneByName(ConfigurationConstants.PAYMENTGATEWAY_IS_PAYPAL_CHECK_IOS);
         clientData.setConfigurationPropertyForIos(paypalconfigurationPropertyForIos);
         
         return this.toApiJsonSerializer.serialize(settings, clientData, ClientApiConstants.CLIENT_RESPONSE_DATA_PARAMETERS);

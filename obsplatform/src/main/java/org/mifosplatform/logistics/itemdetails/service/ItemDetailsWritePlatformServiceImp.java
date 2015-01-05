@@ -261,9 +261,6 @@ public class ItemDetailsWritePlatformServiceImp implements ItemDetailsWritePlatf
 						Configuration configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_IMPLICIT_ASSOCIATION);
 						
 						if(configurationProperty.isEnabled()){
-							configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_DEVICE_AGREMENT_TYPE);
-							
-							//if(configurationProperty.getValue().equalsIgnoreCase(ConfigurationConstants.CONFIR_PROPERTY_SALE)){
 								ItemMaster itemMaster=this.itemRepository.findOne(inventoryItemDetails.getItemMasterId());
 								List<HardwareAssociationData> allocationDetailsDatas=this.associationReadplatformService.retrieveClientAllocatedPlan(oneTimeSale.getClientId(),itemMaster.getItemCode());						    		   
 								if(!allocationDetailsDatas.isEmpty()){
@@ -272,7 +269,6 @@ public class ItemDetailsWritePlatformServiceImp implements ItemDetailsWritePlatf
 											allocationDetailsDatas.get(0).getPlanId(),inventoryItemDetails.getSerialNumber(),
 											allocationDetailsDatas.get(0).getorderId(),"ALLOT");
 						    		   }	
-								//	}	
 						    	}	
 					}
 					return new CommandProcessingResult(entityId,clientId);

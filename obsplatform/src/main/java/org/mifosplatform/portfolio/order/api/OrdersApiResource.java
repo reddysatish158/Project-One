@@ -181,15 +181,16 @@ public class OrdersApiResource {
 	        return this.toApiJsonSerializer.serialize(settings, orderDetailsData, RESPONSE_DATA_PARAMETERS);
 	    }
 
-	 @PUT
-	 @Path("{orderId}/orderprice")
-	 @Consumes({ MediaType.APPLICATION_JSON })
-	 @Produces({ MediaType.APPLICATION_JSON })
-	 public String updateOrderPrice(@PathParam("orderId") final Long orderId,final String apiRequestBodyAsJson) {
-	 final CommandWrapper commandRequest = new CommandWrapperBuilder().updateOrderPrice(orderId).withJson(apiRequestBodyAsJson).build();
-	 final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-	 return this.toApiJsonSerializer.serialize(result);
-	 }
+	 	@PUT
+		@Path("{orderId}/orderprice")
+		@Consumes({ MediaType.APPLICATION_JSON })
+		@Produces({ MediaType.APPLICATION_JSON })
+		public String updateOrderPrice(@PathParam("orderId") final Long orderId,final String apiRequestBodyAsJson) {
+		 final CommandWrapper commandRequest = new CommandWrapperBuilder().updateOrderPrice(orderId).withJson(apiRequestBodyAsJson).build();
+		 final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+		  return this.toApiJsonSerializer.serialize(result);
+
+		}
 
 	 
 	@PUT
@@ -209,8 +210,6 @@ public class OrdersApiResource {
     public String retrieveRenewalOrderDetails(@QueryParam("orderId")final Long orderId,@QueryParam("planType")final String planType, @Context final UriInfo uriInfo) {
         context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
     	List<SubscriptionData> contractPeriods=this.planReadPlatformService.retrieveSubscriptionData(orderId,planType);
-    	Configuration configurationProperty=this.configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_AUTO_RENEWAL);
-    	
     	for(int i=0;i<contractPeriods.size();i++){
     		if(contractPeriods.get(i).getContractdata().equalsIgnoreCase("Perpetual")){
     			contractPeriods.remove(contractPeriods.get(i));
@@ -218,11 +217,7 @@ public class OrdersApiResource {
     		}
     		
     	}
-    	OrderData orderData=new OrderData(null,contractPeriods,configurationProperty.isEnabled());
-    	if(configurationProperty.isEnabled()){
-    		Collection<MCodeData> data = this.mCodeReadPlatformService.getCodeValue("Payment Mode");
-    		orderData.setPaymodeData(data);
-    	}
+    	OrderData orderData=new OrderData(null,contractPeriods);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, orderData, RESPONSE_DATA_PARAMETERS);
     }
@@ -246,7 +241,7 @@ public class OrdersApiResource {
 	 public String retrieveOrderDisconnectDetails(@Context final UriInfo uriInfo) {
 		 context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
 	     final Collection<MCodeData> disconnectDetails = this.mCodeReadPlatformService.getCodeValue("Disconnect Reason");
-	     OrderData orderData = new OrderData(disconnectDetails, null, false);
+	     OrderData orderData = new OrderData(disconnectDetails);
 	     final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 	     return this.toApiJsonSerializer.serialize(settings, orderData, RESPONSE_DATA_PARAMETERS);
 	 }
@@ -409,6 +404,5 @@ public class OrdersApiResource {
 		return this.toApiJsonSerializer.serialize(result);
 		
 	}
-	
 
 }

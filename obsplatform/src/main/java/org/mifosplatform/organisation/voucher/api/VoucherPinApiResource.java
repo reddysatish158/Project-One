@@ -1,6 +1,7 @@
 package org.mifosplatform.organisation.voucher.api;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -11,6 +12,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -27,6 +29,8 @@ import org.mifosplatform.infrastructure.core.data.EnumOptionData;
 import org.mifosplatform.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.mifosplatform.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
+import org.mifosplatform.organisation.office.data.OfficeData;
+import org.mifosplatform.organisation.office.service.OfficeReadPlatformService;
 import org.mifosplatform.organisation.voucher.data.VoucherData;
 import org.mifosplatform.organisation.voucher.service.VoucherReadPlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +77,7 @@ public class VoucherPinApiResource {
 	private DefaultToApiJsonSerializer<VoucherData> toApiJsonSerializer;
 	private ApiRequestParameterHelper apiRequestParameterHelper;
 	private PortfolioCommandSourceWritePlatformService writePlatformService;
+	private final OfficeReadPlatformService officeReadPlatformService;
 
 	@Autowired
 	public VoucherPinApiResource(
@@ -80,13 +85,15 @@ public class VoucherPinApiResource {
 			final VoucherReadPlatformService readPlatformService,
 			final DefaultToApiJsonSerializer<VoucherData> toApiJsonSerializer,
 			final ApiRequestParameterHelper apiRequestParameterHelper,
-			final PortfolioCommandSourceWritePlatformService writePlatformService) {
+			final PortfolioCommandSourceWritePlatformService writePlatformService,
+			final OfficeReadPlatformService officeReadPlatformService) {
 
 		this.context = context;
 		this.readPlatformService = readPlatformService;
 		this.toApiJsonSerializer = toApiJsonSerializer;
 		this.apiRequestParameterHelper = apiRequestParameterHelper;
 		this.writePlatformService = writePlatformService;
+		this.officeReadPlatformService = officeReadPlatformService;
 
 	}
 
@@ -136,7 +143,9 @@ public class VoucherPinApiResource {
 		
 		final List<EnumOptionData> pinTypeData = this.readPlatformService.pinType();	
 		
-		final VoucherData voucherData = new VoucherData(pinCategoryData, pinTypeData);
+		final Collection<OfficeData> offices = this.officeReadPlatformService.retrieveAllOffices();
+		
+		final VoucherData voucherData = new VoucherData(pinCategoryData, pinTypeData, offices);
 		
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 		
@@ -222,5 +231,21 @@ public class VoucherPinApiResource {
 		
 		return this.toApiJsonSerializer.serialize(result);
 	}
+	
+	@GET
+	@Path("verify")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String retrieveVoucherPinDetails(@QueryParam("pinNumber") final String pinNumber, @Context final UriInfo uriInfo) {
+		
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		
+		List<VoucherData> voucherData = this.readPlatformService.retrivePinDetails(pinNumber);
+		
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		
+		return this.toApiJsonSerializer.serialize(settings, voucherData, RESPONSE_PARAMETERS);
+	}
+	
 
 }

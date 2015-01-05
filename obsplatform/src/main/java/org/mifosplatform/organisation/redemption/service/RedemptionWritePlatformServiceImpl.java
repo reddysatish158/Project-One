@@ -7,12 +7,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import org.mifosplatform.cms.journalvoucher.domain.JournalVoucher;
+import org.mifosplatform.cms.journalvoucher.domain.JournalvoucherRepository;
 import org.mifosplatform.finance.adjustment.service.AdjustmentWritePlatformService;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
+import org.mifosplatform.organisation.redemption.exception.PinNumberAlreadyUsedException;
 import org.mifosplatform.organisation.redemption.exception.PinNumberNotFoundException;
 import org.mifosplatform.organisation.redemption.serialization.RedemptionCommandFromApiJsonDeserializer;
 import org.mifosplatform.organisation.voucher.domain.Voucher;
@@ -50,18 +53,19 @@ public class RedemptionWritePlatformServiceImpl implements
 	private final RedemptionCommandFromApiJsonDeserializer fromApiJsonDeserializer;
 	private final ContractPeriodReadPlatformService contractPeriodReadPlatformService;
 	private final OrderRepository orderRepository;
-	private final static String DATEFORMAT = "dd MMMM yyyy";
-	private final String simpleDateFormat = new SimpleDateFormat(DATEFORMAT).format(new Date());
+	private final JournalvoucherRepository journalvoucherRepository;
 	private final static String VALUE_PINTYPE = "VALUE";
 	private final static String PRODUCE_PINTYPE = "PRODUCT";
 	private final static int RECONNECT_ORDER_STATUS = 3;
 	private final static int RENEWAL_ORDER_STATUS = 1;
+	private final static String USED = "USED";
 	
 	@Autowired
 	public RedemptionWritePlatformServiceImpl(final PlatformSecurityContext context,final VoucherDetailsRepository voucherDetailsRepository,
 		final ClientRepository clientRepository,final AdjustmentWritePlatformService adjustmentWritePlatformService,final FromJsonHelper fromJsonHelper,
 		final OrderWritePlatformService orderWritePlatformService,final ContractPeriodReadPlatformService contractPeriodReadPlatformService,
-		final RedemptionReadPlatformService redemptionReadPlatformService,final OrderRepository orderRepository,final RedemptionCommandFromApiJsonDeserializer apiJsonDeserializer) {
+		final RedemptionReadPlatformService redemptionReadPlatformService,final OrderRepository orderRepository,
+		final RedemptionCommandFromApiJsonDeserializer apiJsonDeserializer,final JournalvoucherRepository journalvoucherRepository) {
 		
 		this.context = context;
 		this.fromJsonHelper = fromJsonHelper;
@@ -72,6 +76,7 @@ public class RedemptionWritePlatformServiceImpl implements
 		this.redemptionReadPlatformService=redemptionReadPlatformService;
 		this.adjustmentWritePlatformService = adjustmentWritePlatformService;
 		this.voucherDetailsRepository = voucherDetailsRepository;
+		this.journalvoucherRepository=journalvoucherRepository;
 		this.contractPeriodReadPlatformService = contractPeriodReadPlatformService;
 		
 	}
@@ -82,7 +87,9 @@ public class RedemptionWritePlatformServiceImpl implements
 	@Transactional
 	@Override
 	public CommandProcessingResult createRedemption(final JsonCommand command) {
+	
 		try {
+			 final String simpleDateFormat = new SimpleDateFormat("dd MMMM yyyy").format(new Date());
 			context.authenticatedUser();
 			this.fromApiJsonDeserializer.validateForCreate(command.json());
 			final Long clientId = command.longValueOfParameterNamed("clientId");
@@ -100,10 +107,19 @@ public class RedemptionWritePlatformServiceImpl implements
 				final JsonObject json = new JsonObject();
 				json.addProperty("adjustment_type", "CREDIT");json.addProperty("adjustment_code", 123);
 				json.addProperty("amount_paid",pinValue);json.addProperty("Remarks", "Adjustment Post By Redemption");
-				json.addProperty("locale", "en");json.addProperty("dateFormat",DATEFORMAT);
+				json.addProperty("locale", "en");
+				json.addProperty("dateFormat","dd MMMM yyyy");
 				json.addProperty("adjustment_date", simpleDateFormat);
 				final JsonCommand commd = new JsonCommand(null, json.toString(), json, fromJsonHelper, null, clientId, null, null, clientId, null, null, null, null, null, null,null);
-				this.adjustmentWritePlatformService.createAdjustments(commd);
+				
+				CommandProcessingResult commandProcessingResult=this.adjustmentWritePlatformService.createAdjustments(commd);
+				
+				  JournalVoucher journalVoucher=new JournalVoucher(voucher.getOfficeId(),new Date(),"Redemption",null,
+						  pinValue.doubleValue(),Long.valueOf(0));
+					this.journalvoucherRepository.save(journalVoucher);
+					
+					journalVoucher=new JournalVoucher(commandProcessingResult.resourceId(),new Date(),"Redemption",pinValue.doubleValue(),null,clientId);
+						this.journalvoucherRepository.save(journalVoucher);
 			}
 			 
 			if(pinType.equalsIgnoreCase(PRODUCE_PINTYPE) && pinTypeValue != null){
@@ -118,8 +134,10 @@ public class RedemptionWritePlatformServiceImpl implements
 					json.addProperty("billAlign", false);json.addProperty("planCode", planId);
 					json.addProperty("contractPeriod", subscriptionDatas.get(0).getId());
 					json.addProperty("isNewplan", true);
-					json.addProperty("paytermCode", "Monthly");json.addProperty("locale", "en");
-					json.addProperty("dateFormat",DATEFORMAT); json.addProperty("start_date", simpleDateFormat);
+					json.addProperty("paytermCode", "Monthly");
+					json.addProperty("locale", "en");
+					json.addProperty("dateFormat","dd MMMM yyyy"); 
+					json.addProperty("start_date", simpleDateFormat);
 					final JsonCommand commd = new JsonCommand(null, json.toString(), json, fromJsonHelper, null,clientId, null, null, null, null, null, null, null, null, null,null);
 					this.orderWritePlatformService.createOrder(clientId, commd);
 				 
@@ -142,6 +160,8 @@ public class RedemptionWritePlatformServiceImpl implements
 			}
 			  
 			voucherDetails.setClientId(clientId);
+			voucherDetails.setStatus(USED);
+			
 			this.voucherDetailsRepository.save(voucherDetails);
 			 
 			return new CommandProcessingResult(clientId);
@@ -156,8 +176,12 @@ public class RedemptionWritePlatformServiceImpl implements
 	private VoucherDetails retrieveRandomDetailsByPinNo(String pinNumber) {
 
 		final VoucherDetails voucherDetails = this.voucherDetailsRepository.findOneByPinNumber(pinNumber);
+		
 		if (voucherDetails == null) {
 			throw new PinNumberNotFoundException(pinNumber);
+			
+		}else if (voucherDetails.getClientId()!=null || voucherDetails.getStatus().equalsIgnoreCase("USED")) {
+			throw new PinNumberAlreadyUsedException(pinNumber);
 		}
 		return voucherDetails;
 	}

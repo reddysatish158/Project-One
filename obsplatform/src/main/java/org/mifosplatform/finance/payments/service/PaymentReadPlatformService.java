@@ -19,6 +19,7 @@ public interface PaymentReadPlatformService {
 
 	List<PaymentData> retrivePaymentsData(Long clientId);
 	
-	Long getOnlinePaymode();
+	Long getOnlinePaymode(String paymentMode);
+
 
 }

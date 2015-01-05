@@ -13,7 +13,6 @@ import java.util.List;
 
 import org.joda.time.LocalDate;
 import org.mifosplatform.cms.media.domain.MediaTypeEnumaration;
-import org.mifosplatform.infrastructure.configuration.domain.Configuration;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.data.MediaEnumoptionData;
@@ -28,11 +27,13 @@ import org.mifosplatform.organisation.message.domain.BillingMessage;
 import org.mifosplatform.organisation.message.domain.BillingMessageRepository;
 import org.mifosplatform.organisation.message.domain.BillingMessageTemplate;
 import org.mifosplatform.organisation.message.domain.BillingMessageTemplateRepository;
-
+import org.mifosplatform.portfolio.client.exception.ClientNotFoundException;
 import org.mifosplatform.portfolio.order.domain.UserActionStatusTypeEnum;
 import org.mifosplatform.provisioning.processrequest.domain.ProcessRequest;
 import org.mifosplatform.provisioning.processrequest.domain.ProcessRequestDetails;
 import org.mifosplatform.provisioning.processrequest.domain.ProcessRequestRepository;
+import org.mifosplatform.provisioning.provisioning.domain.ProvisioningCommand;
+import org.mifosplatform.provisioning.provisioning.domain.ProvisioningCommandRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -59,6 +60,7 @@ public class BillingMesssageReadPlatformServiceImpl implements
 	private static BillingMesssageReadPlatformService billingMesssageReadPlatformService;
 	private static FileWriter fw;
 	private static ConfigurationRepository globalConfigurationRepository;
+	private static ProvisioningCommandRepository provisioningCommandRepository;
 
 	@SuppressWarnings("static-access")
 	@Autowired
@@ -67,12 +69,15 @@ public class BillingMesssageReadPlatformServiceImpl implements
 			final BillingMessageRepository messageDataRepository,
 			final ProcessRequestRepository processRequestRepository,
 			final BillingMessageTemplateRepository messageTemplateRepository,
-			final ConfigurationRepository globalConfigurationRepository) {
+			final ConfigurationRepository globalConfigurationRepository,
+			final ProvisioningCommandRepository provisioningCommandRepository) {
+
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 		this.messageDataRepository = messageDataRepository;
 		this.processRequestRepository = processRequestRepository;
 		this.messageTemplateRepository = messageTemplateRepository;
 		this.globalConfigurationRepository = globalConfigurationRepository;
+		this.provisioningCommandRepository = provisioningCommandRepository;
 	}
 
 	// for message params
@@ -222,10 +227,10 @@ public class BillingMesssageReadPlatformServiceImpl implements
 			
 		} catch (EmptyResultDataAccessException e) {
 			fw.append("provisioningSerialNo is= " + hardwareId + " Failed. Exception Reason is: " + e.getMessage() + " .\r\n");
-			return null;
+			throw new ClientNotFoundException("client Not found with this hardwareId :"+hardwareId, hardwareId);
 		} catch (Exception e) {
 			fw.append("provisioningSerialNo is= " + hardwareId + " Failed. Exception Reason is: " + e.getMessage() + " .\r\n");
-			return null;
+			throw new ClientNotFoundException(e.getMessage(), hardwareId);
 		}
 
 	}
@@ -339,11 +344,12 @@ public class BillingMesssageReadPlatformServiceImpl implements
 			if (messgeType == 'O') {
 				String requstStatus = UserActionStatusTypeEnum.MESSAGE.toString();
 				Long clientId = billingMesssageReadPlatformService.retrieveClientId(columndata.get(0).toString());
-				Configuration configuration = globalConfigurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_OSD_PROVISIONING_SYSTEM);
 				
-				if (clientId != null && configuration != null) {
+				ProvisioningCommand provisioningCommand = provisioningCommandRepository.findByCommandName(ConfigurationConstants.OSM_COMMAND);
+				
+				if (clientId != null && provisioningCommand != null) {
 					Long id = Long.valueOf(0);
-					ProcessRequest processRequest = new ProcessRequest(id, clientId, id, configuration.getValue(), requstStatus, 'N', 'N');
+					ProcessRequest processRequest = new ProcessRequest(id, clientId, id, provisioningCommand.getProvisioningSystem(), requstStatus, 'N', 'N');
 					processRequest.setNotify();
 					
 					ProcessRequestDetails processRequestDetails = new ProcessRequestDetails(
@@ -353,6 +359,7 @@ public class BillingMesssageReadPlatformServiceImpl implements
 					processRequestRepository.save(processRequest);
 				} else {
 					fw.append("rowNo:" + currentRow + " failed . \r\n");
+					System.out.println("Provisioning System Not Configured with 'OSM' in Provision Command");
 				}
 
 			}

@@ -25,6 +25,7 @@ import org.mifosplatform.portfolio.order.domain.OrderAddons;
 import org.mifosplatform.portfolio.order.domain.OrderAddonsRepository;
 import org.mifosplatform.portfolio.order.domain.OrderRepository;
 import org.mifosplatform.portfolio.order.domain.StatusTypeEnum;
+import org.mifosplatform.portfolio.order.domain.UserActionStatusTypeEnum;
 import org.mifosplatform.portfolio.order.service.OrderReadPlatformService;
 import org.mifosplatform.portfolio.plan.domain.Plan;
 import org.mifosplatform.portfolio.plan.domain.PlanRepository;
@@ -72,7 +73,6 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 	  private final ServiceParametersRepository serviceParametersRepository;
 	  private final OrderAddonsRepository orderAddonsRepository;
 
-
 	  
 	  
 
@@ -95,7 +95,7 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 	    	    this.actiondetailsWritePlatformService=actiondetailsWritePlatformService;
 	    	    this.orderAddonsRepository=orderAddonsRepository;
 	    	    this.orderRepository=orderRepository;
-         	    this.clientRepository=clientRepository;
+	    	    this.clientRepository=clientRepository;
 	    	    this.serviceParametersRepository=parametersRepository;
 	    	    this.processRequestRepository=processRequestRepository;
 	    	    this.orderReadPlatformService=orderReadPlatformService;
@@ -103,6 +103,7 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 	    	    this.tenantDetailsService = tenantDetailsService;
 	    	    this.eventMasterRepository=eventMasterRepository;
 	    	    this.enumDomainServiceRepository=enumDomainServiceRepository;
+
 	             
 	    }
 
@@ -154,6 +155,15 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 						switch(detailsData.getRequestType()){
  						   
 							case ProvisioningApiConstants.REQUEST_ACTIVATION :
+						
+							if (detailsData.getOrderId() != null && detailsData.getOrderId() > 0) {
+								order = this.orderRepository.findOne(detailsData.getOrderId());
+								plan = this.planRepository.findOne(order.getPlanId());
+							}
+							
+							 client=this.clientRepository.findOne(detailsData.getClientId());
+							
+							if(detailsData.getRequestType().equalsIgnoreCase(UserActionStatusTypeEnum.ACTIVATION.toString())){
 
 								order.setStatus(OrderStatusEnumaration.OrderStatusType(StatusTypeEnum.ACTIVE).getId());
 								client.setStatus(ClientStatus.ACTIVE.getValue());
@@ -162,6 +172,7 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 								if(actionDetaislDatas.size() != 0){
 										this.actiondetailsWritePlatformService.AddNewActions(actionDetaislDatas,order.getClientId(), order.getId().toString(),null);
 								}
+							}
 								
 								break;
 								
@@ -279,8 +290,12 @@ public class ProcessRequestWriteplatformServiceImpl implements ProcessRequestWri
 								this.clientRepository.saveAndFlush(client);
 <<<<<<< HEAD
 								this.orderRepository.saveAndFlush(order);
-							}	*/
-
+<<<<<<< HEAD
+							}	
+								
+							}	
+							}	
+*/
 						//	this.orderRepository.saveAndFlush(order);
 							this.clientRepository.saveAndFlush(client);
 							detailsData.setNotify();

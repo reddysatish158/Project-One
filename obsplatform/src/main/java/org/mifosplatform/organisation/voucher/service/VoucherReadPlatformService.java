@@ -26,4 +26,6 @@ public interface VoucherReadPlatformService {
 
 	StreamingOutput retrieveVocherDetailsCsv(Long batchId);
 
+	List<VoucherData> retrivePinDetails(String pinNumber);
+
 }
