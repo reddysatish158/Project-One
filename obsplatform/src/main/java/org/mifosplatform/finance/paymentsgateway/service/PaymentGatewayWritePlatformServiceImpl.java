@@ -549,7 +549,9 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 				paymentGateway.setObsId(result.getClientId());
 				paymentGateway.setPaymentId(result.resourceId().toString());
 				paymentGateway.setStatus("Success");
+				paymentGateway.setRemarks("Payment Successfully completed..");
 				paymentGateway.setAuto(false);
+				
 				withChanges.put("Result", "SUCCESS");
 				withChanges.put("Description", "Transaction Successfully Completed");
 				withChanges.put("Amount", amount);
@@ -577,6 +579,20 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 			
 			withChanges.put("Result", "FAILURE");
 			withChanges.put("Description", "Transaction Already Exist with This Id : " + txnId);
+			withChanges.put("Amount", amount);
+			withChanges.put("ObsPaymentId", "");
+			withChanges.put("TransactionId", txnId);
+			this.paymentGatewayRepository.save(paymentGateway);
+			return withChanges.toString();
+		
+		} catch (Exception e){
+			
+			PaymentGateway paymentGateway = this.paymentGatewayRepository.findOne(id);
+			paymentGateway.setStatus("Failure");
+			paymentGateway.setRemarks(e.getMessage());
+			
+			withChanges.put("Result", "FAILURE");
+			withChanges.put("Description", e.getMessage());
 			withChanges.put("Amount", amount);
 			withChanges.put("ObsPaymentId", "");
 			withChanges.put("TransactionId", txnId);
