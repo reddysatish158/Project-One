@@ -269,6 +269,42 @@ public class VoucherReadPlatformServiceImpl implements
 		return writer;
 	}
 
+	@Override
+	public List<VoucherData> retrivePinDetails(String pinNumber) {
+
+		try {
+			context.authenticatedUser();
+			String sql;
+			PinMapper mapper = new PinMapper();
+			sql = "SELECT  " + mapper.schema();
+
+			return this.jdbcTemplate.query(sql, mapper, new Object[] {pinNumber});
+			
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+
+	}
+	
+	private static final class PinMapper implements RowMapper<VoucherData> {
+
+		public String schema() {
+			return " pm.pin_type as pinType, pm.pin_value as pinValue, pm.expiry_date as expiryDate " +
+					" from b_pin_master pm, b_pin_details pd where pd.pin_id = pm.id and pd.pin_no=?";
+
+		}
+
+		@Override
+		public VoucherData mapRow(final ResultSet rs, final int rowNum)
+				throws SQLException {
+			String pinValue = rs.getString("pinValue");
+			Date expiryDate = rs.getDate("expiryDate");
+			String pinType = rs.getString("pinType");
+
+			return new VoucherData(pinType,pinValue,expiryDate);
+		}
+	}
+
 }
 
 

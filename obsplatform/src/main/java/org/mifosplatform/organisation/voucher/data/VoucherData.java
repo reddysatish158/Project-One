@@ -80,6 +80,14 @@ public class VoucherData {
 		
 	}
 
+	public VoucherData(String pinType, String pinValue, Date expiryDate) {
+		
+		this.pinType = pinType;
+		this.pinValue = pinValue;
+		this.expiryDate = new LocalDate(expiryDate);
+		
+	}
+
 	public List<EnumOptionData> getPinCategoryData() {
 		return pinCategoryData;
 	}
