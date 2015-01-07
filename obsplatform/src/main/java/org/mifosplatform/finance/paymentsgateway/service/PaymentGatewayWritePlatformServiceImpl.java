@@ -14,6 +14,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -417,6 +424,108 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 	       
 		}
 		
+		// For Neteller Payment Gateway
+		private String netellerProcessing(String configValue, JsonCommand command) throws JSONException, ClientProtocolException, IOException, ParseException {
+			
+			JSONObject pgConfigJsonObj = new JSONObject(configValue);
+			String url = pgConfigJsonObj.getString("url");
+			String netellerClientId = pgConfigJsonObj.getString("clientId");
+			String secretCode = pgConfigJsonObj.getString("secretCode");
+			
+			String transactionId = command.stringValueOfParameterNamed("transactionId");
+			String value = command.stringValueOfParameterNamed("value");
+			String currency = command.stringValueOfParameterNamed("currency");
+			BigDecimal amount = command.bigDecimalValueOfParameterNamed("total_amount");
+			String verificationCode = command.stringValueOfParameterNamed("verificationCode");
+			Long clientId = command.longValueOfParameterNamed("clientId");
+			
+			String credentials = netellerClientId.trim() + ":" + secretCode.trim();
+			byte[] encoded = Base64.encodeBase64(credentials.getBytes());
+			String encodePassword = new String(encoded);
+			String tokenGenerateURL = url + ConfigurationConstants.NETELLER_ACCESS_TOKEN;
+			
+			String tokenOutput = processPostNetellerRequests(tokenGenerateURL, encodePassword, "", ConfigurationConstants.NETELLER_BASIC);
+			
+			String validatingOutput = validatingNetellerOutput(tokenOutput);
+			
+			if(validatingOutput.equalsIgnoreCase("SUCCESS")){
+				
+				JSONObject obj = new JSONObject(tokenOutput);
+				
+				String token = obj.getString("accessToken");
+				String tokenType = obj.getString("tokenType");
+				
+				JSONObject transactionObject = new JSONObject();
+				JSONObject paymentMethodObject = new JSONObject();
+				
+				BigDecimal totalAmount = amount.multiply(new BigDecimal(100));
+				
+				JSONObject paymentObject = new JSONObject();
+				
+				paymentMethodObject.put("type", ConfigurationConstants.NETELLER_PAYMENTGATEWAY);
+				paymentMethodObject.put("value", value);	 // test member emailId
+				
+				transactionObject.put("merchantRefId", transactionId);
+				transactionObject.put("amount", totalAmount);      // amount to payment
+				transactionObject.put("currency", currency);     // test member currency
+				
+				paymentObject.put("paymentMethod", paymentMethodObject);
+				paymentObject.put("transaction", transactionObject);
+				paymentObject.put("verificationCode", verificationCode);  // test member secureId
+		       			
+				String netellerPaymentURL = url + ConfigurationConstants.NETELLER_PAYMENT;
+				
+				String paymentOutput = processPostNetellerRequests(netellerPaymentURL, token, paymentObject.toString(), tokenType);
+				
+				String validatingPaymentOutput = validatingNetellerOutput(paymentOutput);
+				
+				if(validatingPaymentOutput.equalsIgnoreCase("SUCCESS")){
+					JSONObject outputProcessing = new JSONObject(paymentOutput).getJSONObject("transaction");
+					
+					String merchantRefId = outputProcessing.getString("merchantRefId").trim();
+					String status = outputProcessing.getString("status");
+					
+					if(merchantRefId.equalsIgnoreCase(transactionId) && status.equalsIgnoreCase("accepted")){
+						String netellerId = outputProcessing.getString("id");
+						
+						String createDate = outputProcessing.getString("createDate");
+						
+						JSONObject otherDataObject = new JSONObject();
+						otherDataObject.put("currency", currency);
+						otherDataObject.put("paymentStatus", status);
+						otherDataObject.put("paymentDate", createDate);
+						otherDataObject.put("Neteller_Id", netellerId);
+						otherDataObject.put("MerchantRefId", transactionId);
+
+						JSONObject returnObject = new JSONObject();
+						returnObject.put("clientId", clientId);
+						returnObject.put("transactionId", netellerId);
+						returnObject.put("total_amount", String.valueOf(amount));
+						returnObject.put("source", ConfigurationConstants.NETELLER_PAYMENTGATEWAY);
+						returnObject.put("otherData", otherDataObject);
+						returnObject.put("device", "");
+						returnObject.put("currency", currency);
+						returnObject.put("status", "SUCCESS");		
+						
+						return returnObject.toString(); 
+						
+					} else{
+						if(!merchantRefId.equalsIgnoreCase(transactionId)){
+							return "failure : TransactionId=" + transactionId + "and Neteller Id=" + merchantRefId + " Should be equal.";
+						}else{
+							return "failure : Transaction Status="+status;
+						}	
+					}		
+				}else{
+					return validatingPaymentOutput;
+				}
+				
+			}else{
+				return validatingOutput;
+			}
+			
+		}
+
 		private void handleDataIntegrityIssues(final JsonCommand command, final DataIntegrityViolationException dve) {
 			final Throwable realCause = dve.getMostSpecificCause(); 
 			if(realCause.getMessage().contains("receipt_no")){
@@ -438,11 +547,37 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 
 				PaymentGatewayConfiguration pgConfig = this.paymentGatewayConfigurationRepository.findOneByName(ConfigurationConstants.GLOBALPAY_PAYMENTGATEWAY);
 
-				if (pgConfig != null && pgConfig.getValue() != null) {
+				if (pgConfig != null && pgConfig.getValue() != null && pgConfig.isEnabled()) {
 					commandJson = globalPayProcessing(transactionId, pgConfig.getValue());
 				}
 
+			} else if (source.equalsIgnoreCase(ConfigurationConstants.NETELLER_PAYMENTGATEWAY)) {
+				
+				PaymentGatewayConfiguration pgConfig = this.paymentGatewayConfigurationRepository.findOneByName(ConfigurationConstants.NETELLER_PAYMENTGATEWAY);
+
+				if (pgConfig != null && pgConfig.getValue() != null && pgConfig.isEnabled()) {
+					
+					commandJson = netellerProcessing(pgConfig.getValue(),command);
+					
+					if(commandJson.contains("failure :")){
+						Long clientId = command.longValueOfParameterNamed("clientId");
+						BigDecimal amount = command.bigDecimalValueOfParameterNamed("total_amount");
+						String currency = command.stringValueOfParameterNamed("currency");
+						
+						Map<String, Object> withChanges = new HashMap<>();
+						withChanges.put("status", "FAILURE");
+						withChanges.put("error", commandJson);
+						withChanges.put("clientId", clientId);
+						withChanges.put("amount", amount);
+						withChanges.put("transactionId", transactionId);
+						withChanges.put("currency", currency);
+						
+						return new CommandProcessingResultBuilder().with(withChanges).build();
+					}
+				}
+				
 			} else {
+				
 				commandJson = command.json();
 			}
 
@@ -457,8 +592,10 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 			
 		} catch (IOException e) {
 			return new CommandProcessingResult(Long.valueOf(-1));
+		
+		} catch (ParseException e) {
+			return new CommandProcessingResult(Long.valueOf(-1));
 		}
-
 	}
 
 	private CommandProcessingResult processOnlinePayment(String jsonData) throws JSONException {
@@ -517,11 +654,6 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 		
 		try {
 			PaymentGateway paymentGateway = this.paymentGatewayRepository.findOne(id);
-			/*Configuration configuration = configurationRepository.findOneByName(ConfigurationConstants.CONFIG_PROPERTY_ONLINEPAYMODE);
-
-			if (configuration == null || configuration.getValue() == null || configuration.getValue() == "") {
-				throw new ConfigurationPropertyNotFoundException(ConfigurationConstants.CONFIG_PROPERTY_ONLINEPAYMODE);
-			}*/
 			
 			Long paymodeId = this.paymodeReadPlatformService.getOnlinePaymode("Online Payment");
 			if (paymodeId == null) {
@@ -633,4 +765,66 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 		this.messageDataRepository.save(billingMessage);
 	}
 	
+	private static String processPostNetellerRequests(String url, String encodePassword, String data, 
+			String authenticationType) throws ClientProtocolException, IOException, JSONException {
+		
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpPost postRequest = new HttpPost(url);
+		
+		String authHeader = authenticationType.trim() + " " + encodePassword;
+		StringEntity se = new StringEntity(data.trim());
+		
+		postRequest.setHeader("Authorization", authHeader);
+		postRequest.setHeader("Content-Type", "application/json");
+		postRequest.setEntity(se);
+		
+		HttpResponse response = httpClient.execute(postRequest);
+		
+		BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
+		
+		String output="",output1="";
+
+		if (response.getStatusLine().getStatusCode() == 404) {
+			
+			System.out.println("ResourceNotFoundException : HTTP error code : " + response.getStatusLine().getStatusCode());
+			return "failure : errorCode:404 ResourceNotFoundException";
+
+		} else if (response.getStatusLine().getStatusCode() == 401) {
+			
+			System.out.println(" Unauthorized Exception : HTTP error code : " + response.getStatusLine().getStatusCode());
+			return "failure : errorCode:401 AuthenticationException";
+
+		} else if (response.getStatusLine().getStatusCode() != 200) {
+			
+			System.out.println("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
+			
+			while ((output = br.readLine()) != null) {
+				output1 = output1 + output;
+			}
+			JSONObject obj = new JSONObject(output1).getJSONObject("error");
+			String message = obj.getString("message");
+			br.close();
+			return "failure : Error Output="+message;
+		
+		} else{
+			
+			while ((output = br.readLine()) != null) {
+				output1 = output1 + output;
+			}
+			
+			br.close();
+			
+			return output1;
+		}
+	}
+	
+	private String validatingNetellerOutput(String tokenOutput) {
+		
+		if(tokenOutput.contains("failure :")){
+			return tokenOutput;
+		}else{
+			return "SUCCESS";
+		}
+		
+	}
 }

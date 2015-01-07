@@ -10,6 +10,7 @@ public class RadiusJobConstants {
 	 public static final String STBChange = "DEVICE_SWAP";
 	 public static final String Terminate = "TERMINATE";
 	 public static final String Client_Activation = "CLIENT ACTIVATION";
+	 public static final String RENEWAL_AE = "RENEWAL_AE";
 	 
 	 public static final String RADCHECK_OUTPUT = "User added to database with ID:";
 	 public static final String FAILURE = "failure : ";
