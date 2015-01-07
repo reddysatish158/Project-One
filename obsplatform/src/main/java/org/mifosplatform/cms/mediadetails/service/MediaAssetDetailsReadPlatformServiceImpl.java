@@ -230,10 +230,10 @@ public class MediaAssetDetailsReadPlatformServiceImpl implements MediaAssetDetai
 		}
 		public String attributeDataSchema() {
 
-			return"b_event_master.id,b_event_master.event_name,b_event_master.event_description,Ifnull(m_code_value.code_value,'ALL') as CUSTOMER_CATEGORY," +
-					" b_event_pricing.opt_type,b_event_pricing.format_type,b_event_pricing.price FROM(b_event_pricing b_event_pricing LEFT OUTER JOIN" +
-					" m_code_value m_code_value ON (b_event_pricing.client_typeid = m_code_value.id) and (m_code_value.code_id = 10)) INNER JOIN" +
-					" b_event_master b_event_master  ON (b_event_pricing.event_id = b_event_master.id) where b_event_master.id=?" +
+			return"b_mod_master.id,b_mod_master.event_name,b_mod_master.event_description,Ifnull(m_code_value.code_value,'ALL') as CUSTOMER_CATEGORY," +
+					" b_mod_pricing.opt_type,b_mod_pricing.format_type,b_mod_pricing.price FROM(b_mod_pricing b_mod_pricing LEFT OUTER JOIN" +
+					" m_code_value m_code_value ON (b_mod_pricing.client_typeid = m_code_value.id) and (m_code_value.code_id = 10)) INNER JOIN" +
+					" b_mod_master b_mod_master  ON (b_mod_pricing.event_id = b_mod_master.id) where b_mod_master.id=?" +
 					" and Ifnull(m_code_value.code_value,'ALL')=?";
 
 

@@ -20,7 +20,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  */
 
 @Entity
-@Table(name = "b_event_detail")
+@Table(name = "b_mod_detail")
 public class EventDetails extends AbstractPersistable<Long> {
 
 	/**

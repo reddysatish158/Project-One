@@ -30,7 +30,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  */
 @ComparableFields(on={"eventName", "eventDescription", "status", "eventStartDate", "eventEndDate", "eventValidity", "eventCategory"})
 @Entity
-@Table(name = "b_event_master")
+@Table(name = "b_mod_master")
 public class EventMaster extends AbstractPersistable<Long> {
 
 	/**

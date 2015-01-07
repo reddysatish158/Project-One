@@ -61,7 +61,7 @@ public class EventOrderReadplatformServieImpl implements EventOrderReadplatformS
 		public String schema() {
 			return "  e.id AS orderid,e.client_id AS clientId,e.event_id AS eventId,e.eventprice_id AS eventpriceId,0 AS movieLink,e.booked_price AS bookedPrice," +
 					" e.charge_code AS chargeCode,e.is_invoiced AS isInvoiced,c.charge_type as chargeType, c.tax_inclusive as  taxInclusive," +
-					" p.discount_id as discountId FROM b_eventorder e, b_charge_codes c,b_event_pricing p  where e.charge_code = c.charge_code " +
+					" p.discount_id as discountId FROM b_modorder e, b_charge_codes c,b_mod_pricing p  where e.charge_code = c.charge_code " +
 					" and p.id=e.eventprice_id and e.is_invoiced = 'N' ";
 
 		}
@@ -113,7 +113,7 @@ public class EventOrderReadplatformServieImpl implements EventOrderReadplatformS
 	@Override
 	public List<EventMasterData> getEvents() {
 		
-		final String sql = "select id as id, event_name as eventName, event_description as eventDescription from b_event_master where status=1";
+		final String sql = "select id as id, event_name as eventName, event_description as eventDescription from b_mod_master where status=1";
 		EventMasterDataMapper rowMapper = new EventMasterDataMapper();
 		return this.jdbcTemplate.query(sql,rowMapper);
 	}
@@ -131,13 +131,13 @@ public class EventOrderReadplatformServieImpl implements EventOrderReadplatformS
 	
 	@Override
 	public BigDecimal retriveEventPrice(String fType, String oType, Long clientId) {
-		final String sql = "select price from b_event_pricing where format_type=? and Opt_type=? and client_typeid=(select category_type from m_client where m_client.id = ?) and is_deleted='n' limit 1";
+		final String sql = "select price from b_mod_pricing where format_type=? and Opt_type=? and client_typeid=(select category_type from m_client where m_client.id = ?) and is_deleted='n' limit 1";
 		return jdbcTemplate.queryForObject(sql, new Object[]{fType,oType,clientId},BigDecimal.class);
 	}
 	
 	@Override
 	public Long getCurrentRow(String fType, String oType, Long clientId){
-		final String sql = "select id from b_event_pricing where format_type=? and Opt_type=? and client_typeid=(select category_type from m_client where m_client.id = ?) and is_deleted='n' limit 1";
+		final String sql = "select id from b_mod_pricing where format_type=? and Opt_type=? and client_typeid=(select category_type from m_client where m_client.id = ?) and is_deleted='n' limit 1";
 		return jdbcTemplate.queryForLong(sql, new Object[]{fType,oType,clientId});
 	}
 	
@@ -160,7 +160,7 @@ public class EventOrderReadplatformServieImpl implements EventOrderReadplatformS
 
 		public String schema() {
 			return " eo.id AS id,eo.event_bookeddate AS bookedDate,em.event_name AS eventName,eo.charge_code AS chargeCode,em.status as status,eo.booked_price AS price" +
-					" FROM b_eventorder eo, b_event_master em WHERE eo.event_id = em.id ";
+					" FROM b_modorder eo, b_mod_master em WHERE eo.event_id = em.id ";
 
 		}
 
