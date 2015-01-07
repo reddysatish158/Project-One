@@ -62,10 +62,10 @@ public class EventPriceReadPlatformServiceImpl implements
 		public String eventPricingSchema() {
 			return " ep.id AS id,em.id AS eventId,em.event_name AS eventName,ep.format_type AS formatType,ep.opt_type AS optType, ep.client_typeid as clientTypeId,"
 				  +" d.discount_description AS discount,ep.price AS price,mc.code_value as clientType,ep.discount_id as discountId " +
-				   " from b_event_pricing ep " +
+				   " from b_mod_pricing ep " +
 				   " inner join m_code_value mc on  ep.client_typeid=mc.id"
 				  +"  inner join b_discount_master d ON d.id = ep.discount_id " +
-				   " inner join b_event_master em ON em.id = ep.event_id";
+				   " inner join b_mod_master em ON em.id = ep.event_id";
 		}
 		@Override
 		public EventPriceData mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {

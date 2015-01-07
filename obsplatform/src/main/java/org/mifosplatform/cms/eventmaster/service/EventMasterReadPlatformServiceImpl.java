@@ -87,7 +87,7 @@ public class EventMasterReadPlatformServiceImpl implements
 	private static final class EventMasterMapper implements RowMapper<EventMasterData> {
 		public String eventMasterSchema() {
 			return " evnt.id as id, evnt.event_name as eventName, evnt.event_description as eventDescription, evnt.status as status, evnt.created_date as createdDate, "
-						+ "evnt.event_category as eventCategory from b_event_master evnt ";
+						+ "evnt.event_category as eventCategory from b_mod_master evnt ";
 		}
 		@Override
 		public EventMasterData mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {
@@ -107,7 +107,7 @@ public class EventMasterReadPlatformServiceImpl implements
 	public EventMasterData retrieveEventMasterDetails(final Integer eventId){
 		final String sql = " select evnt.id as id, evnt.event_name as eventName, evnt.event_description as eventDescription, evnt.status as status, evnt.event_start_date as eventStartDate, " +
 						" evnt.event_end_date as eventEndDate, evnt.event_validity as eventValidity, charge_code as chargeCode, evnt.event_category as eventCategory "
-						+ " from b_event_master evnt "
+						+ " from b_mod_master evnt "
 						+ "where evnt.id='"+eventId+"'";
 		RowMapper<EventMasterData> rowMap = new EventMapper();
 		return this.jdbcTemplate.queryForObject(sql, rowMap, new Object[]{});
@@ -132,7 +132,7 @@ public class EventMasterReadPlatformServiceImpl implements
 	@Override
 	public List<EventDetailsData> retrieveEventDetailsData(final Integer eventId) {
 		final String sql = "Select ed.id as id, ed.event_id as eventId, ed.media_id as mediaId, m.title as title "
-					  +" from b_event_detail ed, b_media_asset m where ed.media_id=m.id and event_id = ?";
+					  +" from b_mod_detail ed, b_media_asset m where ed.media_id=m.id and event_id = ?";
 		
 		final RowMapper<EventDetailsData> rowMap = new EventDetailsMapper();
 		
@@ -143,7 +143,7 @@ public class EventMasterReadPlatformServiceImpl implements
 	public EventDetailsData retrieveEventDetails(final Integer eventId) {
 		final String sql = "Select id as id, event_id as eventId, media_id as mediaId," 
 				 + " event_start_date as eventStartDate, event_end_date as eventEndDate " 
-				 + " from b_event_detail where event_id = ?";
+				 + " from b_mod_detail where event_id = ?";
 		final RowMapper<EventDetailsData> rowMap = new EventDetailsMapper();
 			
 		return this.jdbcTemplate.queryForObject(sql, rowMap, new Object[] {eventId});

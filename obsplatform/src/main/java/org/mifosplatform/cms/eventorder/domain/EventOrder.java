@@ -21,7 +21,7 @@ import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
 import org.mifosplatform.useradministration.domain.AppUser;
 
 @Entity
-@Table(name = "b_eventorder")
+@Table(name = "b_modorder")
 public class EventOrder extends AbstractAuditableCustom<AppUser, Long> {
 	
 	private static final long serialVersionUID = 1L;
