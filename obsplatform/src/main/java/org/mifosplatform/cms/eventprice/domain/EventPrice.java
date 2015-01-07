@@ -22,7 +22,7 @@ import org.mifosplatform.infrastructure.core.api.JsonCommand;
  * @author Rakesh
  */
 @Entity
-@Table(name = "b_event_pricing")
+@Table(name = "b_mod_pricing")
 @ComparableFields(on={"formatType", "optType", "clientType", "discountId", "price"})
 public class EventPrice {
 
