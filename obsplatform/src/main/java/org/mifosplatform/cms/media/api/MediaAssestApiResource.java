@@ -99,8 +99,8 @@ public class MediaAssestApiResource {
         	   
         	  data = this.mediaAssetReadPlatformService.retrievemediaAssetdata(pageNo,clientType);
         	   
-        	  final String queryFOrPages = " SELECT count(0)  FROM b_media_asset m inner join b_event_detail ed on ed.media_id = m.id"
-			                   +" inner join b_event_master em on em.id = ed.event_id  GROUP BY m.id  having  count( ed.media_id) = 1 ";
+        	  final String queryFOrPages = " SELECT count(0)  FROM b_media_asset m inner join b_mod_detail ed on ed.media_id = m.id"
+			                   +" inner join b_mod_master em on em.id = ed.event_id  GROUP BY m.id  having  count( ed.media_id) = 1 ";
          	  noOfPages = this.mediaAssetReadPlatformService.retrieveNoofPages(queryFOrPages);
          	  for(final MediaAssetData assetData:data){
          		  
@@ -113,8 +113,8 @@ public class MediaAssestApiResource {
           else if("RELEASE".equalsIgnoreCase(filterType)){
         	  
 		     data = this.mediaAssetReadPlatformService.retrievemediaAssetdatabyNewRealease(pageNo);
-		     final String query = " SELECT count(0) FROM b_media_asset m INNER JOIN b_event_detail ed ON ed.media_id = m.id"
-		    		 +" INNER JOIN b_event_master em  ON em.id = ed.event_id where m.release_date <= adddate(now(),INTERVAL -3 MONTH)"
+		     final String query = " SELECT count(0) FROM b_media_asset m INNER JOIN b_mod_detail ed ON ed.media_id = m.id"
+		    		 +" INNER JOIN b_mod_master em  ON em.id = ed.event_id where m.release_date <= adddate(now(),INTERVAL -3 MONTH)"
 		    		 +" group by m.id  having count(distinct ed.event_id) >=1 ";
 	          noOfPages=this.mediaAssetReadPlatformService.retrieveNoofPages(query);
 	        // data.add(new MediaAssetData(noOfPages,pageNum));
@@ -123,16 +123,16 @@ public class MediaAssestApiResource {
           else if("RATING".equalsIgnoreCase(filterType)){
         	  
         	  data = this.mediaAssetReadPlatformService.retrievemediaAssetdatabyRating(pageNo);
-        	  final String query = " SELECT count(0) FROM b_media_asset m INNER JOIN b_event_detail ed ON ed.media_id = m.id"
-        			  +" INNER JOIN b_event_master em ON em.id = ed.event_id group by m.id  having count(distinct ed.event_id) >=1 ";
+        	  final String query = " SELECT count(0) FROM b_media_asset m INNER JOIN b_mod_detail ed ON ed.media_id = m.id"
+        			  +" INNER JOIN b_mod_master em ON em.id = ed.event_id group by m.id  having count(distinct ed.event_id) >=1 ";
 	           noOfPages = this.mediaAssetReadPlatformService.retrieveNoofPages(query);
 	          //data.add(new MediaAssetData(noOfPages,pageNum));
           }
           else if("DISCOUNT".equalsIgnoreCase(filterType)){
         	  
         	  data = this.mediaAssetReadPlatformService.retrievemediaAssetdatabyDiscountedMovies(pageNo);
-        	  final String query = " SELECT count(0) FROM b_media_asset m INNER JOIN b_event_detail ed ON ed.media_id = m.id"
-        			  +" INNER JOIN b_event_master em  ON em.id = ed.event_id inner join  b_event_pricing ep on em.id=ep.event_id"
+        	  final String query = " SELECT count(0) FROM b_media_asset m INNER JOIN b_mod_detail ed ON ed.media_id = m.id"
+        			  +" INNER JOIN b_mod_master em  ON em.id = ed.event_id inner join  b_mod_pricing ep on em.id=ep.event_id"
         			  +" where discount_id>=1  group by m.id  having count(distinct ed.event_id) >=1";
 	           noOfPages = this.mediaAssetReadPlatformService.retrieveNoofPages(query);
 	          //data.add(new MediaAssetData(noOfPages,pageNum));
@@ -140,8 +140,8 @@ public class MediaAssestApiResource {
           else if("PROMOTION".equalsIgnoreCase(filterType)){
         	  
         	  data = this.mediaAssetReadPlatformService.retrievemediaAssetdatabyPromotionalMovies(pageNo);
-        	  final String query = " SELECT count(0)  FROM b_media_asset m inner join b_event_detail ed on ed.media_id = m.id"
-	                   +" inner join b_event_master em on em.id = ed.event_id  group by m.id  having count(distinct ed.event_id) >1 ";
+        	  final String query = " SELECT count(0)  FROM b_media_asset m inner join b_mod_detail ed on ed.media_id = m.id"
+	                   +" inner join b_mod_master em on em.id = ed.event_id  group by m.id  having count(distinct ed.event_id) >1 ";
 	           noOfPages = this.mediaAssetReadPlatformService.retrieveNoofPages(query);
 	         // data.add(new MediaAssetData(noOfPages,pageNum));
           } 
@@ -155,16 +155,16 @@ public class MediaAssestApiResource {
           else if("WATCHED".equalsIgnoreCase(filterType)){
         	  
         	  data = this.mediaAssetReadPlatformService.retrievemediaAssetdatabyMostWatchedMovies(pageNo);
-        	  final String query = "SELECT count(0) FROM b_media_asset m inner join b_event_detail ed on m.id=ed.media_id  inner " +
-        	  		" JOIN b_eventorder eo  ON (eo.event_id = ed.event_id)";
+        	  final String query = "SELECT count(0) FROM b_media_asset m inner join b_mod_detail ed on m.id=ed.media_id  inner " +
+        	  		" JOIN b_modorder eo  ON (eo.event_id = ed.event_id)";
         	   noOfPages = this.mediaAssetReadPlatformService.retrieveNoofPages(query);
         	//  data.add(new MediaAssetData(noOfPages,pageNum));
           }         
           else {
         	  
         	  data = this.mediaAssetReadPlatformService.retrievemediaAssetdatabySearching(pageNo,filterType);
-        	  final String query = "SELECT count(0) FROM b_media_asset m inner join b_event_detail ed on m.id=ed.media_id  inner " +
-        	  		" JOIN b_eventorder eo  ON (eo.event_id = ed.event_id)";
+        	  final String query = "SELECT count(0) FROM b_media_asset m inner join b_mod_detail ed on m.id=ed.media_id  inner " +
+        	  		" JOIN b_modorder eo  ON (eo.event_id = ed.event_id)";
         	   noOfPages = this.mediaAssetReadPlatformService.retrieveNoofPages(query);
         	  //data.add(new MediaAssetData(noOfPages,pageNum));
           }
