@@ -180,7 +180,7 @@ private final class SerialNumberForValidation implements RowMapper<String>{
 		  return this.jdbcTemplate.queryForObject(sql,rowMapper,new Object[]{serialNumber});
 		  
 		 }catch(EmptyResultDataAccessException accessException){
-			 throw new PlatformDataIntegrityException("SerialNumber SerialNumber"+serialNumber+" doest not exist.","SerialNumber "+serialNumber+" doest not exist.","serialNumber"+serialNumber);
+			 throw new PlatformDataIntegrityException("SerialNumber "+serialNumber+" doest not exist.","SerialNumber "+serialNumber+" doest not exist.","serialNumber"+serialNumber);
 		}
 	}
 	

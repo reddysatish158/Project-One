@@ -214,7 +214,7 @@ public class OfficeWritePlatformServiceJpaRepositoryImpl implements OfficeWriteP
      * used to restrict modifying operations to office that are either the users
      * office or lower (child) in the office hierarchy
      */
-    private Office validateUserPriviledgeOnOfficeAndRetrieve(final AppUser currentUser, final Long officeId) {
+    public Office validateUserPriviledgeOnOfficeAndRetrieve(final AppUser currentUser, final Long officeId) {
 
         final Long userOfficeId = currentUser.getOffice().getId();
         final Office userOffice = this.officeRepository.findOne(userOfficeId);

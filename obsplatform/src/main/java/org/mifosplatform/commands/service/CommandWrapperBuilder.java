@@ -2592,6 +2592,13 @@ public CommandWrapperBuilder linkUpAccount() {
 
 }
 
+public CommandWrapperBuilder createPartner() {
+	this.actionName = "CREATE";
+	this.entityName = "PARTNER";
+	this.href = "";
+	return this;
+}
+
 }
 
 

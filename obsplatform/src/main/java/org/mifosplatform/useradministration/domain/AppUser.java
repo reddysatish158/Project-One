@@ -461,5 +461,22 @@ public class AppUser extends AbstractPersistable<Long> implements PlatformUser {
 	public boolean isSupeUser() {
 		  return hasAllFunctionsPermission();
 	}
+
+	public static AppUser fromPartner(final Office office, Set<Role> allRoles,
+			final String partnerName, final String loginName, final String password,final String email) {
+	
+        final boolean userEnabled = true;
+        final boolean userAccountNonExpired = true;
+        final boolean userCredentialsNonExpired = true;
+        final boolean userAccountNonLocked = true;
+
+        final Collection<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>();
+        authorities.add(new SimpleGrantedAuthority("DUMMY_ROLE_NOT_USED_OR_PERSISTED_TO_AVOID_EXCEPTION"));
+
+        final User user = new User(loginName, password, userEnabled, userAccountNonExpired, userCredentialsNonExpired, userAccountNonLocked,
+                authorities);
+        
+        return new AppUser(office, user, allRoles, email, partnerName, partnerName);
+	}
     
 }
