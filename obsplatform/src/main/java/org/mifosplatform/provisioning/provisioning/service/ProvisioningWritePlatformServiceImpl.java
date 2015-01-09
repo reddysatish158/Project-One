@@ -326,11 +326,14 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 
 	try {
 		Long commandProcessId=null;
+		String serialNumber = null;
 		HardwareAssociation hardwareAssociation = this.associationRepository.findOneByOrderId(order.getId());
 		Plan plan=this.planRepository.findOne(order.getPlanId());
 		
 		if (hardwareAssociation == null && plan.isHardwareReq() == 'Y') {
 			throw new PairingNotExistException(order.getId());
+		}else if (hardwareAssociation != null) {
+			serialNumber = hardwareAssociation.getSerialNo();
 		}
 		
 		List<ServiceParameters> parameters = this.serviceParametersRepository.findDataByOrderId(orderId);
@@ -338,7 +341,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 			if (!parameters.isEmpty()) {
 				ItemDetails inventoryItemDetails =null;
 					if("ALLOT".equalsIgnoreCase(hardwareAssociation.getAllocationType())){
-					 inventoryItemDetails = this.inventoryItemDetailsRepository.getInventoryItemDetailBySerialNum(hardwareAssociation.getSerialNo());
+					 inventoryItemDetails = this.inventoryItemDetailsRepository.getInventoryItemDetailBySerialNum(serialNumber);
 					 	if (inventoryItemDetails == null) {
 					 		throw new PairingNotExistException(order.getId());
 					 	}
@@ -361,7 +364,7 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 		  commandProcessId=processRequest.getId();
 		
 			}else{
-				PrepareRequestData prepareRequestData=new  PrepareRequestData(Long.valueOf(0),order.getClientId(), orderId, requestType, hardwareAssociation.getSerialNo(),
+				PrepareRequestData prepareRequestData=new  PrepareRequestData(Long.valueOf(0),order.getClientId(), orderId, requestType, serialNumber,
 						 null, provisioningSys, planName, String.valueOf(plan.isHardwareReq()));
 			CommandProcessingResult commandProcessingResult =this.prepareRequestReadplatformService.processingClientDetails(prepareRequestData);
 			commandProcessId=commandProcessingResult.resourceId();

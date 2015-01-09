@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.mifosplatform.infrastructure.configuration.domain.Configuration;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.core.data.ApiParameterError;
 import org.mifosplatform.infrastructure.core.data.DataValidatorBuilder;
@@ -40,7 +39,8 @@ public class PaymentGatewayCommandFromApiJsonDeserializer {
 	
 	private final Set<String> onlinePaymentSupportedParameters = new HashSet<String>(Arrays.asList("total_amount", 
 			"clientId", "emailId", "transactionId", "source", "otherData", "device", "currency","dateFormat","locale",
-			"paytermCode","planCode","contractPeriod","value","verificationCode"));
+			"paytermCode","planCode","contractPeriod","value","verificationCode","screenName",
+			"renewalPeriod", "description"));
 	
     private final FromJsonHelper fromApiJsonHelper;
     
