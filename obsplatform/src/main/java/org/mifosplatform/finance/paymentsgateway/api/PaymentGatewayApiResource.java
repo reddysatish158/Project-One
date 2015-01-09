@@ -29,7 +29,6 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.io.FileUtils;
-import org.hibernate.loader.custom.NonUniqueDiscoveredSqlAliasException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
@@ -513,40 +512,87 @@ public class PaymentGatewayApiResource {
 	   }
 	 }
 	 
-	 public String orderBooking(String jsonObject, String date, Long clientId) throws JSONException{
-		 
-		 final JSONObject jsonCustomData = new JSONObject(jsonObject);
-		 final String dateFormat = "dd MMMM yyyy";
-		 
-		 if(jsonCustomData.has("clientId")){
-			 jsonCustomData.remove("clientId");
-		 }
-		 
-		 if(jsonCustomData.has("returnUrl")){
-			 jsonCustomData.remove("returnUrl");
-		 }
-		 
-		 if(jsonCustomData.has("paytermCode") && jsonCustomData.has("planCode")
-					&& jsonCustomData.has("contractPeriod")) {
-				
-				jsonCustomData.put("billAlign", false);
-				jsonCustomData.put("isNewplan", true);
-				jsonCustomData.put("dateFormat", dateFormat);
-				jsonCustomData.put("start_date", date);
+	public String orderBooking(String jsonObject, String date, Long clientId)
+			throws JSONException {
 
-				CommandWrapper commandRequest = new CommandWrapperBuilder().createOrder(clientId).withJson(jsonCustomData.toString()).build();
-				CommandProcessingResult resultOrder = this.writePlatformService.logCommandSource(commandRequest);
+		final JSONObject jsonCustomData = new JSONObject(jsonObject);
+		final String dateFormat = "dd MMMM yyyy";
+		String screenName = jsonCustomData.getString("screenName");
+		Long orderId = null;
 
-				if (resultOrder == null) {
-					return "failure : Payment Done and Plan Booking Failed";
-				}else{
-					return "Payment Done and Plan Booked Successfully. ";
-				}
+		if (jsonCustomData.has("clientId"))
+			jsonCustomData.remove("clientId");
 
-		 }else {				
-			 return "Payment Done Successfully.";	
-		 }
-	 }
+		if (jsonCustomData.has("returnUrl"))
+			jsonCustomData.remove("returnUrl");
+
+		if (jsonCustomData.has("screenName"))
+			jsonCustomData.remove("screenName");
+		
+		if(jsonCustomData.has("orderId")){
+			jsonCustomData.remove("orderId");
+			orderId = Long.valueOf(jsonCustomData.getString("orderId"));
+		}
+
+		if (screenName.equalsIgnoreCase("vod")) {
+			
+			return "Payment Done Successfully.";
+			
+		} else if (screenName.equalsIgnoreCase("additionalOrders")) {
+
+			jsonCustomData.put("billAlign", false);
+			jsonCustomData.put("isNewplan", true);
+			jsonCustomData.put("dateFormat", dateFormat);
+			jsonCustomData.put("start_date", date);
+
+			CommandWrapper commandRequest = new CommandWrapperBuilder().createOrder(clientId).withJson(jsonCustomData.toString()).build();
+			CommandProcessingResult resultOrder = this.writePlatformService.logCommandSource(commandRequest);
+
+			if (resultOrder == null) {
+				return "failure : Payment Done and Plan Booking Failed";
+			} else {
+				return "Payment Done and Plan Booked Successfully. ";
+			}
+
+		} else if (screenName.equalsIgnoreCase("renewalorder")) {
+			
+			Long renewalOrder = Long.valueOf(jsonCustomData.getString("renewalPeriod"));
+			
+			JSONObject object = new JSONObject();
+			object.put("renewalPeriod", renewalOrder);
+			object.put("description", jsonCustomData.getString("description"));
+
+			final CommandWrapper commandRequest = new CommandWrapperBuilder().renewalOrder(orderId).withJson(object.toString()).build();
+			final CommandProcessingResult resultOrder = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+			
+			if (resultOrder == null) {
+				return "failure : Payment Done and renewal Plan Booking Failed";
+			} else {
+				return "Payment Done and renewal Plan Booked Successfully. ";
+			}
+			
+		} else if (screenName.equalsIgnoreCase("changeorder")) {
+			
+			jsonCustomData.put("billAlign", false);
+			jsonCustomData.put("isNewplan", false);
+			jsonCustomData.put("dateFormat", dateFormat);
+			jsonCustomData.put("start_date", date);
+			jsonCustomData.put("disconnectionDate", date);
+			jsonCustomData.put("disconnectReason", "Not Interested");
+
+			final CommandWrapper commandRequest = new CommandWrapperBuilder().changePlan(orderId).withJson(jsonCustomData.toString()).build();
+			final CommandProcessingResult resultOrder = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+			
+			if (resultOrder == null) {
+				return "failure : Payment Done and renewal Plan Booking Failed";
+			} else {
+				return "Payment Done and renewal Plan Booked Successfully. ";
+			}
+			
+		}else {
+			return "Payment Done Successfully.";
+		}
+	}
 	 
 	 
 	/**
