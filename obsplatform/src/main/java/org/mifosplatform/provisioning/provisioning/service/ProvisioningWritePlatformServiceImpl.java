@@ -326,23 +326,25 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 
 	try {
 		Long commandProcessId=null;
+		String serialNumber = null;
 		HardwareAssociation hardwareAssociation = this.associationRepository.findOneByOrderId(order.getId());
 		Plan plan=this.planRepository.findOne(order.getPlanId());
 		
 		if (hardwareAssociation == null && plan.isHardwareReq() == 'Y') {
 			throw new PairingNotExistException(order.getId());
+		}else if (hardwareAssociation != null) {
+			serialNumber = hardwareAssociation.getSerialNo();
 		}
 		List<ServiceParameters> parameters = this.serviceParametersRepository.findDataByOrderId(orderId);
-		
-		if (!parameters.isEmpty()) {
-			ItemDetails inventoryItemDetails =null;
-			if("ALLOT".equalsIgnoreCase(hardwareAssociation.getAllocationType())){
-				inventoryItemDetails = this.inventoryItemDetailsRepository.getInventoryItemDetailBySerialNum(hardwareAssociation.getSerialNo());
-				if (inventoryItemDetails == null) {
-					throw new PairingNotExistException(order.getId());
-				}
+			
+		if (!parameters.isEmpty()) {	
+			ItemDetails inventoryItemDetails =null;	
+			if("ALLOT".equalsIgnoreCase(hardwareAssociation.getAllocationType())){	
+				inventoryItemDetails = this.inventoryItemDetailsRepository.getInventoryItemDetailBySerialNum(serialNumber);	 
+				if (inventoryItemDetails == null) { 
+					throw new PairingNotExistException(order.getId());		 
+				}	
 			}
-
 
 		   ProcessRequest processRequest = new ProcessRequest(prepareId, order.getClientId(), order.getId(),
 				   ProvisioningApiConstants.PROV_PACKETSPAN, requestType, 'N', 'N');
@@ -364,8 +366,9 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 
 
 			}else{
-				PrepareRequestData prepareRequestData=new  PrepareRequestData(Long.valueOf(0),order.getClientId(), orderId, requestType, hardwareAssociation.getSerialNo(),
+				PrepareRequestData prepareRequestData=new  PrepareRequestData(Long.valueOf(0),order.getClientId(), orderId, requestType, serialNumber,
 						 null, provisioningSys, planName, String.valueOf(plan.isHardwareReq()),addonId);
+
 			CommandProcessingResult commandProcessingResult =this.prepareRequestReadplatformService.processingClientDetails(prepareRequestData);
 			commandProcessId=commandProcessingResult.resourceId();
 		}
