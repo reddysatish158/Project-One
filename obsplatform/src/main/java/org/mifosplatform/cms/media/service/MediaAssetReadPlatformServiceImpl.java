@@ -99,13 +99,13 @@ public class MediaAssetReadPlatformServiceImpl implements MediaAssetReadPlatform
 		public String mediaAssestDataSchemaforWatchedMovies() {
 
 			return "  m.id AS mediaId,m.title AS title,m.image AS image, m.rating AS rating,'W' as assetTag,m.release_date,ed.event_Id as eventId, COUNT(eo.id) FROM b_media_asset m"
-				+" inner join b_event_detail ed on m.id=ed.media_id  inner JOIN b_eventorder eo    ON (eo.event_id = ed.event_id)  ORDER BY 6 DESC LIMIT ?, 10";
+				+" inner join b_mod_detail ed on m.id=ed.media_id  inner JOIN b_modorder eo    ON (eo.event_id = ed.event_id)  ORDER BY 6 DESC LIMIT ?, 10";
 		}
 		
 		public String mediaAssestDataSchemaforPromotionalMovies() {
 
-			return " ed.event_id,ma.id AS mediaId,ma.title AS title,ma.image AS image, ed.event_Id as eventId,ma.rating AS rating,? as assetTag FROM b_media_asset ma inner join b_event_detail ed"
-				+"  on ed.media_id = ma.id  Where ed.event_id in (Select event_id  from b_event_master em  inner join b_event_detail ed on em.id=ed.event_id"
+			return " ed.event_id,ma.id AS mediaId,ma.title AS title,ma.image AS image, ed.event_Id as eventId,ma.rating AS rating,? as assetTag FROM b_media_asset ma inner join b_mod_detail ed"
+				+"  on ed.media_id = ma.id  Where ed.event_id in (Select event_id  from b_mod_master em  inner join b_mod_detail ed on em.id=ed.event_id"
 				+"  group by ed.event_id  having count(ed.event_id)>1) LIMIT ?, 10";
 		}*/
 	}

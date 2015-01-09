@@ -14,7 +14,7 @@ import org.mifosplatform.cms.eventmaster.domain.EventDetails;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 @Entity
-@Table(name = "b_eventorder_details")
+@Table(name = "b_modorder_details")
 public class EventOrderdetials extends AbstractPersistable<Long> {
 
 	
