@@ -14,6 +14,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Set;
 
 import javax.ws.rs.Consumes;
@@ -81,28 +83,101 @@ public class ConfigurationApiResource {
     @GET
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public String retrieveAllConfigurations(@Context final UriInfo uriInfo) {
+    public String retrieveAllConfigurations(@Context final UriInfo uriInfo) throws JSONException {
 
       //  context.authenticatedUser().validateHasReadPermission(RESOURCENAMEFORPERMISSIONS);
 
         final ConfigurationData configurationData = this.readPlatformService.retrieveGlobalConfiguration();
-        String defaultConfiguration = "{\"payment\":\"false\", \"IPTV\":\"false\", " +
-        								"\"IsClientIndividual\":\"false\", \"deviceAgrementType\":\"SALE\", " +
-        								"\"SubscriptionPayment\":\"false\",\"nationalId\":\"false\"}";
-        String readDatas;
+        
+       // String defaultConfiguration = "";
+        
+        /**	{\"payment\":\"false\",\"IPTV\":\"false\"," +
+			"\"IsClientIndividual\":\"false\",\"deviceAgrementType\":\"SALE\"," +
+			"\"SubscriptionPayment\":\"false\",\"nationalId\":\"false\"," +
+			"\"clientListing\":{\"userName\":\"false\", \"group/parentId\":\"false\"," +
+			"\"password\":\"false\",\"externalId\":\"false\",\"customerCategory\":\"false\"}}
+         */        
+        JSONObject defaultOne = new JSONObject();
+		JSONObject defaultOneForClientList = new JSONObject();
+		/*********  Preparing 'defaultOne' JSONObject ******/
+        defaultOne.put("payment", "false");
+		defaultOne.put("IPTV", "false");
+		defaultOne.put("IsClientIndividual", "false");
+		defaultOne.put("deviceAgrementType", "false");
+		defaultOne.put("SubscriptionPayment", "false");
+		defaultOne.put("nationalId", "false");
+		
+		/*********  Preparing 'defaultOneForClientList' JSONObject ******/
+		defaultOneForClientList.put("userName", "false");
+		defaultOneForClientList.put("group/parentId", "false");
+		defaultOneForClientList.put("password", "false");
+		defaultOneForClientList.put("externalId", "false");
+		defaultOneForClientList.put("customerCategory", "false");
+		
+		/*********  Adding 'defaultOneForClientList' to 'defaultOne' JSONObject ******/
+		defaultOne.put("clientListing", defaultOneForClientList);
+		
+        String readDatas;  /****** Reding data from file ******/
         File fileForPath = new File(CONFIGURATION_PATH_LOCATION);
         if(!fileForPath.isDirectory()){
         	fileForPath.mkdir();
         }
         File fileForLocation = new File(CONFIGURATION_FILE_LOCATION);
         if (!fileForLocation.isFile()) {
-        	writeFileData(CONFIGURATION_FILE_LOCATION, defaultConfiguration);
-        }else if(defaultConfiguration.split(",").length != readFileData(fileForLocation).split(",").length){
+        	writeFileData(CONFIGURATION_FILE_LOCATION, defaultOne.toString());
+        }else if(defaultOne.toString().split(",").length != readFileData(fileForLocation).split(",").length){
+        	
+        	/** 	readOne && defaultOne  we can set readOne(preparing that element)
+        			!readOne && defaultOne we can set defaultOne(preparing that element)
+        			readOne && !defaultOne  here we no need to prepare(we dont set if defaultOne has not consists element)
+        	*/
+        	
         	readDatas = readFileData(fileForLocation);
-        	for(int i = readDatas.split(",").length; i < defaultConfiguration.split(",").length; i++ ){
+        	
+    		JSONObject readOne = new JSONObject(readDatas);
+    		
+    		JSONObject prepareOne = new JSONObject();
+    		JSONObject prepareOneForClientList = new JSONObject();
+    		
+        	for(int i=0;i<defaultOne.length();i++){
+        		LinkedList<String> listForDefaultOne = iteratorOperation(defaultOne);
+    			if(listForDefaultOne.get(i).equalsIgnoreCase("clientListing") && readOne.has(listForDefaultOne.get(i))){
+    				
+    				JSONObject insidedefaultOneObj = new JSONObject(defaultOne.getString(listForDefaultOne.get(i)));
+    				JSONObject insidereadobj = new JSONObject(readOne.getString(listForDefaultOne.get(i)));
+    				
+    				LinkedList<String> listForDefaultOneClientList = iteratorOperation(insidedefaultOneObj);
+    				System.out.println("In listing: "+insidedefaultOneObj.length());
+    				
+    				for(int j=0; j<insidedefaultOneObj.length(); j++){
+    					if(insidereadobj.has(listForDefaultOneClientList.get(j))){
+    						prepareOneForClientList.put(listForDefaultOneClientList.get(j), insidereadobj.getString(listForDefaultOneClientList.get(j)));
+    						prepareOne.put(listForDefaultOne.get(i), prepareOneForClientList);
+    					}else{
+    						prepareOneForClientList.put(listForDefaultOneClientList.get(j), insidedefaultOneObj.getString(listForDefaultOneClientList.get(j)));
+    						prepareOne.put(listForDefaultOne.get(i), prepareOneForClientList);
+    					}
+    				}
+    				
+    			}else if(listForDefaultOne.get(i).equalsIgnoreCase("clientListing") && !readOne.has(listForDefaultOne.get(i))){
+    				
+    				JSONObject insidedefaultOneObj1 = new JSONObject(defaultOne.getString(listForDefaultOne.get(i)));
+    				LinkedList<String> listForDefaultOneClientList1 = iteratorOperation(insidedefaultOneObj1);
+    				for(int k=0; k<insidedefaultOneObj1.length(); k++){
+    					prepareOneForClientList.put(listForDefaultOneClientList1.get(k), insidedefaultOneObj1.getString(listForDefaultOneClientList1.get(k)));
+    					prepareOne.put(listForDefaultOne.get(i), prepareOneForClientList);
+    				}
+    			}else if(readOne.has(listForDefaultOne.get(i)) && defaultOne.has(listForDefaultOne.get(i))){
+    				prepareOne.put(listForDefaultOne.get(i), readOne.getString(listForDefaultOne.get(i)));
+    			}else if(!readOne.has(listForDefaultOne.get(i)) && defaultOne.has(listForDefaultOne.get(i))){
+    				prepareOne.put(listForDefaultOne.get(i), defaultOne.getString(listForDefaultOne.get(i)));
+    			}
+    		}
+        	/*for(int i = readDatas.split(",").length; i < defaultConfiguration.split(",").length; i++ ){
         		readDatas = readDatas.split("}")[0] + "," + defaultConfiguration.split(",")[i];
         	}
-        	writeFileData(CONFIGURATION_FILE_LOCATION, readDatas);
+        	writeFileData(CONFIGURATION_FILE_LOCATION, readDatas);*/
+        	writeFileData(CONFIGURATION_FILE_LOCATION, prepareOne.toString());
         }
         String returnData = readFileData(fileForLocation);
         configurationData.setClientConfiguration(returnData);
@@ -197,5 +272,15 @@ public class ConfigurationApiResource {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+    }
+    private LinkedList<String> iteratorOperation(JSONObject object){
+    	
+    	Iterator iterator = object.keys();
+		
+		LinkedList<String> list = new LinkedList<String>();
+		while(iterator.hasNext()){
+			list.push(iterator.next().toString());
+		}
+		return list;
     }
 }
