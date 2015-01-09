@@ -27,9 +27,12 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * @author hugo
+ *
+ */
 @Service
-public class PartnersWritePlatformServiceImp implements
-		PartnersWritePlatformService {
+public class PartnersWritePlatformServiceImp implements PartnersWritePlatformService {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(PartnersWritePlatformServiceImp.class);
 	private final PlatformSecurityContext context;
@@ -136,14 +139,11 @@ public class PartnersWritePlatformServiceImp implements
 	}
 	
 
-	private void handleDataIntegrityIssues(final JsonCommand command,
-			final DataIntegrityViolationException dve) {
+	private void handleDataIntegrityIssues(final JsonCommand command,final DataIntegrityViolationException dve) {
 
 		final Throwable realCause = dve.getMostSpecificCause();
 		LOGGER.error(dve.getMessage(), dve);
-		throw new PlatformDataIntegrityException(
-				"error.msg.could.unknown.data.integrity.issue",
-				"Unknown data integrity issue with resource: "
-						+ realCause.getMessage());
+		throw new PlatformDataIntegrityException("error.msg.could.unknown.data.integrity.issue",
+				"Unknown data integrity issue with resource: " + realCause.getMessage());
 	}
 }

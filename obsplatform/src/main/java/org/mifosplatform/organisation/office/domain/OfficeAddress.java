@@ -39,7 +39,7 @@ public class OfficeAddress extends AbstractPersistable<Long> {
 	@Column(name = "phone_number")
 	private String phone;
 
-	@Column(name = "email")
+	@Column(name = "email_id")
 	private String email;
 
 	@Column(name = "zip")

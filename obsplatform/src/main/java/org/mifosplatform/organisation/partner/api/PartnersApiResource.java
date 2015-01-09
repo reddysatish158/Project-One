@@ -39,6 +39,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author hugo
+ *
+ */
 @Path("/partners")
 @Component
 @Scope("singleton")
@@ -125,6 +129,10 @@ public class PartnersApiResource {
 	
 	
 
+    /**
+     * @param uriInfo
+     * @return all partners data
+     */
     @GET
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
