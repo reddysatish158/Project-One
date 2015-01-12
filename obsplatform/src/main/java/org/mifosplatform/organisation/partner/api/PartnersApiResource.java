@@ -10,6 +10,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -142,6 +143,23 @@ public class PartnersApiResource {
         final Collection<PartnersData> partners = this.readPlatformService.retrieveAllPartners();
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, partners, RESPONSE_DATA_PARAMETERS);
+    }
+    
+    
+    /**
+     * @param uriInfo
+     * @return single partner details
+     */
+    @GET
+    @Path("{partnerId}")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String retrievePartner(@PathParam("partnerId") final Long partnerId,@Context final UriInfo uriInfo) {
+
+        context.authenticatedUser().validateHasReadPermission(resorceNameForPermission);
+        final PartnersData partner = this.readPlatformService.retrieveSinglePartnerDetails(partnerId);
+        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+        return this.toApiJsonSerializer.serialize(settings, partner, RESPONSE_DATA_PARAMETERS);
     }
 
 }

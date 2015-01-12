@@ -1200,7 +1200,14 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
             	throw new UnsupportedCommandException(wrapper.commandName());
 		     }
            	
-           }
+           }else if(wrapper.isPartnerAgreement()){
+           	if(wrapper.isCreate()){
+          		 handler = applicationContext.getBean("createPartnerAgreementCommandHandler",NewCommandSourceHandler.class);
+          	}else {
+           	throw new UnsupportedCommandException(wrapper.commandName());
+		     }
+          	
+          }
 	       return handler;
 	}
 }

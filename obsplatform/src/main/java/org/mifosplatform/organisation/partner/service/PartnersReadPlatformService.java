@@ -8,5 +8,7 @@ public interface PartnersReadPlatformService {
 
 	Collection<PartnersData> retrieveAllPartners();
 
+	PartnersData retrieveSinglePartnerDetails(Long partnerId);
+
 
 }

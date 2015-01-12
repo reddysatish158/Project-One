@@ -1240,4 +1240,9 @@ public class CommandWrapper {
 		public boolean isPartner() {
 			return this.entityName.equalsIgnoreCase("PARTNER");
 		}
+
+		public boolean isPartnerAgreement() {
+			
+			return this.entityName.equalsIgnoreCase("PARTNERAGREEMENT");
+		}
 }

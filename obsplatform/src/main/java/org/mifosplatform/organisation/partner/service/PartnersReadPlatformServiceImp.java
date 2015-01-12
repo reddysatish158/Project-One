@@ -38,7 +38,7 @@ public class PartnersReadPlatformServiceImp implements PartnersReadPlatformServi
 
 		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
 
-	} catch (EmptyResultDataAccessException accessException) {
+	} catch (final EmptyResultDataAccessException accessException) {
 		return null;
 	}
 
@@ -49,16 +49,17 @@ private static final class PartnerMapper implements RowMapper<PartnersData> {
 		public String schema() {
 			return " a.id as infoId,a.partner_name as partnerName,a.partner_currency as currency,mc.code_value as partnerType,"
 					+ "o.id as officeId,o.parent_id as parentId,o.external_id AS externalId,o.opening_date AS openingDate,parent.id AS parentId,"
-					+ "parent.name AS parentName,c.code_value as officeType from m_office o left join m_office AS parent ON parent.id = o.parent_id "
-					+ " inner join b_office_additional_info a ON o.id=a.office_id left join m_code_value c ON c.id = o.office_type "
-					+ " left join m_code_value mc on mc.id = a.partner_type";
+					+ "parent.name AS parentName,c.code_value as officeType,  ad.address_name as addressName, ad.city as city, ad.state as state,"
+					+ "ad.country as country,ad.email_id as email,ad.phone_number as phoneNumber from m_office o left join m_office AS parent "
+					+ "on parent.id = o.parent_id inner join b_office_additional_info a ON o.id=a.office_id  inner join b_office_address ad " 
+				    + "on o.id = ad.office_id left join m_code_value c on c.id = o.office_type left join m_code_value mc on mc.id = a.partner_type";
 		}
 
 	@Override
 	public PartnersData mapRow(final ResultSet rs,final int rowNum) throws SQLException {
 
 		
-	final Long additionalinfoId = rs.getLong("infoId");
+	final Long id = rs.getLong("infoId");
 	final Long officeId = rs.getLong("officeId");
 	final String partnerName = rs.getString("partnerName");
 	final String partnerType = rs.getString("partnerType");
@@ -68,10 +69,30 @@ private static final class PartnerMapper implements RowMapper<PartnersData> {
 	final String parentName = rs.getString("parentName");
 	final String officeType = rs.getString("officeType");
 	final LocalDate openingDate = JdbcSupport.getLocalDate(rs, "openingDate");
+	final String addressName =rs.getString("addressName");
+	final String city =rs.getString("city");
+	final String state =rs.getString("state");
+	final String country =rs.getString("country");
+	final String email =rs.getString("email");
+	final String phoneNumber =rs.getString("phoneNumber");
 	
-	return new PartnersData(officeId,additionalinfoId,partnerName,partnerType,currency,parentId,parentName,officeType,openingDate);
+	return new PartnersData(officeId,id,partnerName,partnerType,currency,parentId,parentName,
+			     officeType,openingDate,addressName,city,state,country,email,phoneNumber);
 	
 
+	}
+}
+
+@Override
+public PartnersData retrieveSinglePartnerDetails(final Long partnerId) {
+	
+	try{
+		context.authenticatedUser();
+		final PartnerMapper mapper=new PartnerMapper();
+		final String sql="select " + mapper.schema() + " where a.id= ?";
+		return this.jdbcTemplate.queryForObject(sql, mapper,new Object[]{partnerId});
+	}catch (final EmptyResultDataAccessException accessException) {
+		return null;
 	}
 }
 
