@@ -299,7 +299,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             final String entryType=rs.getString("entryType");
             return ClientData.instance(accountNo,groupName, status, officeId, officeName, id, firstname, middlename, lastname, fullname, displayName,
                     externalId, activationDate, imageKey,categoryType,email,phone,homePhoneNumber, null, null,null, null,null,null, null,null,currency,taxExemption,
-                    entryType,null);
+                    entryType,null,null,null,null);
         }
     }
 
@@ -316,6 +316,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             builder.append(" c.firstname as firstname, c.middlename as middlename, c.lastname as lastname,c.is_indororp as entryType, ");
             builder.append(" c.fullname as fullname, c.display_name as displayName,mc.code_value as categoryType, ");
             builder.append(" c.email as email,c.phone as phone,c.home_phone_number as homePhoneNumber,c.activation_date as activationDate, c.image_key as imagekey,c.exempt_tax as taxExemption, ");
+            builder.append(" c.parent_id as parentId,cu.username as userName,cu.password as clientpassword, ");
             builder.append(" a.address_no as addrNo,a.street as street,a.city as city,a.state as state,a.country as country, ");
             builder.append(" a.zip as zipcode,b.balance_amount as balanceAmount,b.wallet_amount as walletAmount,bc.currency as currency,");
             builder.append(" coalesce(min(ba.serial_no),min(oh.serial_number),'No Device') HW_Serial ");
@@ -328,6 +329,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             builder.append(" left outer join b_country_currency bc on  bc.country = a.country ");
             builder.append(" left outer join b_allocation ba on (c.id = ba.client_id AND ba.is_deleted = 'N')");
             builder.append(" left outer join b_owned_hardware oh on (c.id=oh.client_id  AND oh.is_deleted = 'N')");
+            builder.append(" left outer join b_clientuser cu on cu.client_id = c.id ");
             this.schema = builder.toString();
         }
 
@@ -372,11 +374,14 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             final String currency=rs.getString("currency");
             final String taxExemption=rs.getString("taxExemption");
             final String entryType=rs.getString("entryType");
+            final String userName = rs.getString("userName");
+            final String clientpassword = rs.getString("clientpassword");
+            final String parentId = rs.getString("parentId");
            
 
             return ClientData.instance(accountNo,groupName, status, officeId, officeName, id, firstname, middlename, lastname, fullname, displayName,
                     externalId, activationDate, imageKey,categoryType,email,phone,homePhoneNumber, addressNo, street, city, state, country, zipcode,
-                    clientBalance,hwSerial,currency,taxExemption,entryType,walletAmount);
+                    clientBalance,hwSerial,currency,taxExemption,entryType,walletAmount,userName,clientpassword,parentId);
         }
     }
 
