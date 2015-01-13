@@ -38,18 +38,18 @@ public class AgreementDetails extends AbstractAuditableCustom<AppUser, Long> {
 	private String shareType;
 
 	@Column(name = "status")
-	private String status;
+	private Integer status;
 
 	public AgreementDetails() {
 
 	}
 
-	public AgreementDetails(final Long source, final String shareType, final BigDecimal shareAmount, final String status) {
+	public AgreementDetails(final Long source, final String shareType, final BigDecimal shareAmount, final Long status) {
 		
 		this.sourceType = source;
 		this.shareType = shareType;
 		this.shareAmount =shareAmount;
-		this.status = status;
+		this.status = Integer.valueOf(status.toString());
 		
 	}
 
@@ -69,7 +69,7 @@ public class AgreementDetails extends AbstractAuditableCustom<AppUser, Long> {
 		return shareType;
 	}
 
-	public String getStatus() {
+	public Integer getStatus() {
 		return status;
 	}
 
@@ -86,7 +86,7 @@ public class AgreementDetails extends AbstractAuditableCustom<AppUser, Long> {
 		this.shareType = shareType;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(Integer status) {
 		this.status = status;
 	}
 	

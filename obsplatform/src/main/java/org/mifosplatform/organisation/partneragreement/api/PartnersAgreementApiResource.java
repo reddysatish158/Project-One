@@ -28,6 +28,7 @@ import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext
 import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
 import org.mifosplatform.organisation.mcodevalues.service.MCodeReadPlatformService;
 import org.mifosplatform.organisation.partneragreement.data.AgreementData;
+import org.mifosplatform.organisation.partneragreement.service.PartnersAgreementReadPlatformService;
 import org.mifosplatform.portfolio.plan.service.PlanReadPlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -44,7 +45,7 @@ public class PartnersAgreementApiResource {
 
 	private final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<String>(Arrays.asList(""));
 	private final String resorceNameForPermission = "PARTNERSAGREEMENT";
-	public static final String SOURCE_TYPE = "Source Type";
+	public static final String SOURCE_TYPE = "Source Category";
 	public static final String AGREEMENT_TYPE = "Agreement Type";
 
 	private final PlatformSecurityContext context;
@@ -53,6 +54,7 @@ public class PartnersAgreementApiResource {
 	private final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService;
 	private final MCodeReadPlatformService mCodeReadPlatformService;
 	private final PlanReadPlatformService planReadPlatformService;
+	private final PartnersAgreementReadPlatformService agreementReadPlatformService;
 
 	@Autowired
 	public PartnersAgreementApiResource(final PlatformSecurityContext context,
@@ -60,7 +62,8 @@ public class PartnersAgreementApiResource {
 			final ApiRequestParameterHelper apiRequestParameterHelper,
 			final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService,
 			final MCodeReadPlatformService mCodeReadPlatformService,
-			final PlanReadPlatformService planReadPlatformService) {
+			final PlanReadPlatformService planReadPlatformService,
+			final PartnersAgreementReadPlatformService agreementReadPlatformService) {
 
 		this.context = context;
 		this.toApiJsonSerializer = toApiJsonSerializer;
@@ -68,6 +71,7 @@ public class PartnersAgreementApiResource {
 		this.commandSourceWritePlatformService = commandSourceWritePlatformService;
 		this.mCodeReadPlatformService = mCodeReadPlatformService;
 		this.planReadPlatformService = planReadPlatformService;
+		this.agreementReadPlatformService = agreementReadPlatformService;
 
 	}
 
@@ -111,5 +115,17 @@ public class PartnersAgreementApiResource {
 		final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 	}
+	
+	  @GET
+	    @Path("{partnerId}")
+	    @Consumes({ MediaType.APPLICATION_JSON })
+	    @Produces({ MediaType.APPLICATION_JSON })
+	    public String retrievePartnerAgreementData(@PathParam("partnerId") final Long partnerId,@Context final UriInfo uriInfo) {
+
+	        context.authenticatedUser().validateHasReadPermission(resorceNameForPermission);
+	        final List<AgreementData> agreementData = this.agreementReadPlatformService.retrieveAgreementData(partnerId);
+	        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+	        return this.toApiJsonSerializer.serialize(settings, agreementData, RESPONSE_DATA_PARAMETERS);
+	    }
 
 }

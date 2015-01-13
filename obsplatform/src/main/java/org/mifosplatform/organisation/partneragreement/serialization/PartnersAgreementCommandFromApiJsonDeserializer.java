@@ -29,7 +29,8 @@ public class PartnersAgreementCommandFromApiJsonDeserializer {
 	/*
 	 * The parameters supported for this command.
 	 */
-	private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("agreementStatus", "shareType", "shareAmount","sourceType","startDate","endDate","sourceData"));
+	private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("agreementStatus", "shareType", "shareAmount","sourceType","startDate",
+			                                               "endDate","sourceData","status","locale","dateFormat"));
 	private final FromJsonHelper fromApiJsonHelper;
 
 	@Autowired
@@ -65,33 +66,32 @@ public class PartnersAgreementCommandFromApiJsonDeserializer {
 		baseDataValidator.reset().parameter("endDate").value(endDate).notBlank();
 
 		final JsonArray partnerAgreementDataArray = fromApiJsonHelper.extractJsonArrayNamed("sourceData", element);
+		int DataSize = partnerAgreementDataArray.size();
+		baseDataValidator.reset().parameter("sourceData").value(DataSize).integerGreaterThanZero();
 
 		if (partnerAgreementDataArray != null && partnerAgreementDataArray.size() > 0) {
 			String[] paramsDataArrayAttributes = null;
 			paramsDataArrayAttributes = new String[partnerAgreementDataArray.size()];
-			int DataSize = partnerAgreementDataArray.size();
-			baseDataValidator.reset().parameter(null).value(DataSize).integerGreaterThanZero();
 
 			for (int i = 0; i < partnerAgreementDataArray.size(); i++) {
 
 				paramsDataArrayAttributes[i] = partnerAgreementDataArray.get(i).toString();
 			}
 
-			for (String singleSourceData : paramsDataArrayAttributes) {
+			for (JsonElement jsonElement : partnerAgreementDataArray) {
 
-				final JsonElement elements = fromApiJsonHelper.parse(singleSourceData);
 
-				final Long source = fromApiJsonHelper.extractLongNamed("source", elements);
+				final Long source = fromApiJsonHelper.extractLongNamed("source", jsonElement);
 				baseDataValidator.reset().parameter("source").value(source).notBlank();
 
-				final String shareType = fromApiJsonHelper.extractStringNamed("shareType", element);
+				final String shareType = fromApiJsonHelper.extractStringNamed("shareType", jsonElement);
 				baseDataValidator.reset().parameter("shareType").value(shareType).notBlank().notExceedingLengthOf(20);
 
-				final BigDecimal shareAmount = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("shareAmount",element);
+				final BigDecimal shareAmount = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("shareAmount",jsonElement);
 				baseDataValidator.reset().parameter("shareAmount").value(shareAmount).notBlank();
 
-				final String status = fromApiJsonHelper.extractStringNamed("status", element);
-				baseDataValidator.reset().parameter("status").value(status).notBlank().notExceedingLengthOf(20);
+				final Long status = fromApiJsonHelper.extractLongNamed("status", jsonElement);
+				baseDataValidator.reset().parameter("status").value(status).notBlank();
 
 				throwExceptionIfValidationWarningsExist(dataValidationErrors);
 			}

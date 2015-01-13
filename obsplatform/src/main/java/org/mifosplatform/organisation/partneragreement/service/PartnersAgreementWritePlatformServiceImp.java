@@ -30,16 +30,18 @@ public class PartnersAgreementWritePlatformServiceImp implements PartnersAgreeme
 	private final FromJsonHelper fromApiJsonHelper;
 	private final PartnersAgreementCommandFromApiJsonDeserializer apiJsonDeserializer;
 	private final AgreementRepository agreementRepository;
+	private final PartnersAgreementReadPlatformService agreementReadPlatformService;
 	
 	
 	@Autowired
 	public PartnersAgreementWritePlatformServiceImp(final PlatformSecurityContext context,final FromJsonHelper fromApiJsonHelper,
-			final PartnersAgreementCommandFromApiJsonDeserializer apiJsonDeserializer,
-			final AgreementRepository agreementRepository) {
+			final PartnersAgreementCommandFromApiJsonDeserializer apiJsonDeserializer,final AgreementRepository agreementRepository,
+			final PartnersAgreementReadPlatformService agreementReadPlatformService) {
 		this.context = context;
 		this.apiJsonDeserializer = apiJsonDeserializer;
 		this.fromApiJsonHelper = fromApiJsonHelper;
 		this.agreementRepository = agreementRepository;
+		this.agreementReadPlatformService = agreementReadPlatformService;
 
 	}
 
@@ -53,21 +55,78 @@ public class PartnersAgreementWritePlatformServiceImp implements PartnersAgreeme
 			
 			Agreement agreement=Agreement.fromJosn(command);
 			
+			final Long agreementId=this.agreementReadPlatformService.checkPartnerAgreementId(agreement.getPartnerId());
 			final JsonArray partnerAgreementArray = command.arrayOfParameterNamed("sourceData").getAsJsonArray();
+				
+			if(agreementId !=null){
+				
+				Agreement existsAgreement=this.agreementRepository.findOne(agreementId);
+				
+				//agreement status
+				if(existsAgreement.getAgreementStatus() == null && agreement.getAgreementStatus() == null){
+	      			 
+	        	}else if(existsAgreement.getAgreementStatus() == null && agreement.getAgreementStatus() != null){
+	        		existsAgreement.setAgreementStatus(agreement.getAgreementStatus());
+	   		 	}else if(!existsAgreement.getAgreementStatus().equals(agreement.getAgreementStatus()) ){
+	   		 	     existsAgreement.setAgreementStatus(agreement.getAgreementStatus());		    		
+	   		 	}
+				
+				//startDate
+				if(existsAgreement.getStartDate() == null && existsAgreement.getStartDate() == null){
+	    			 
+	        	}else if(existsAgreement.getStartDate() == null && existsAgreement.getStartDate() != null){
+	        		  existsAgreement.setStartDate(agreement.getStartDate());
+	   		 	}else if(!existsAgreement.getStartDate().equals(agreement.getStartDate()) ){
+	   		 	      existsAgreement.setStartDate(agreement.getStartDate());		    		
+	   		 	}
+	        	//endDate
+	        	if(existsAgreement.getEndDate() == null && agreement.getEndDate() == null){
+	   			 
+	        	}else if(existsAgreement.getEndDate() == null && agreement.getEndDate() != null){
+	        		  existsAgreement.setEndDate(agreement.getEndDate());
+	   		 	}else if(!existsAgreement.getEndDate().equals(agreement.getEndDate()) ){
+	   		 	     existsAgreement.setEndDate(agreement.getEndDate());		    		
+	   		 	}
+				
+				if(existsAgreement.getIsDeleted()=='N'&& agreement.getIsDeleted()=='N'){
+	        		
+	        	}else if((existsAgreement.getIsDeleted()=='Y')&&(agreement.getIsDeleted()=='N')){
+	        		
+	        		existsAgreement.setIsDeleted(agreement.getIsDeleted());
+	        	}
+				
+				for(int i=0; i<partnerAgreementArray.size();i++){ 
+					
+					final JsonElement element = fromApiJsonHelper.parse(partnerAgreementArray.get(i).toString());
+					final Long source = fromApiJsonHelper.extractLongNamed("source", element);
+					final String shareType = fromApiJsonHelper.extractStringNamed("shareType", element);
+					final BigDecimal shareAmount = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("shareAmount",element);
+					final Long status = fromApiJsonHelper.extractLongNamed("status", element);
+					AgreementDetails details=new AgreementDetails(source,shareType,shareAmount,status);
+					existsAgreement.addAgreementDetails(details);
+				}
+				this.agreementRepository.save(existsAgreement);
+				
+				return new CommandProcessingResultBuilder().withCommandId(command.commandId())
+                        .withEntityId(existsAgreement.getId()).build();
+				
+			}else{
 			
-		    for(int i=0; i<partnerAgreementArray.size();i++){ 
-		    	
-		    	 final JsonElement element = fromApiJsonHelper.parse(partnerAgreementArray.get(i).toString());
-			     final Long source = fromApiJsonHelper.extractLongNamed("source", element);
-			     final String shareType = fromApiJsonHelper.extractStringNamed("shareType", element);
-			 	 final BigDecimal shareAmount = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("shareAmount",element);
-			 	 final String status = fromApiJsonHelper.extractStringNamed("status", element);
-			 	 AgreementDetails details=new AgreementDetails(source,shareType,shareAmount,status);
-			     agreement.addAgreementDetails(details);
-		    }
+			for(int i=0; i<partnerAgreementArray.size();i++){ 
+				
+				final JsonElement element = fromApiJsonHelper.parse(partnerAgreementArray.get(i).toString());
+				final Long source = fromApiJsonHelper.extractLongNamed("source", element);
+				final String shareType = fromApiJsonHelper.extractStringNamed("shareType", element);
+				final BigDecimal shareAmount = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("shareAmount",element);
+				final Long status = fromApiJsonHelper.extractLongNamed("status", element);
+				AgreementDetails details=new AgreementDetails(source,shareType,shareAmount,status);
+				agreement.addAgreementDetails(details);
+			}
 			this.agreementRepository.save(agreement);
+		
 			return new CommandProcessingResultBuilder().withCommandId(command.commandId())
 			                          .withEntityId(agreement.getId()).build();
+		  }
 		}catch (DataIntegrityViolationException dve) {
 			handleCodeDataIntegrityIssues(command, dve);
 			return new CommandProcessingResult(Long.valueOf(-1));
@@ -78,6 +137,11 @@ public class PartnersAgreementWritePlatformServiceImp implements PartnersAgreeme
 	private void handleCodeDataIntegrityIssues(final JsonCommand command,final DataIntegrityViolationException dve) {
 		final Throwable realCause = dve.getMostSpecificCause();
 		LOGGER.error(dve.getMessage(), dve);
+		
+		if(dve.getMostSpecificCause().getMessage().contains("b_agreement_dtl_ai_ps_mc_uniquekey")){
+			 throw new PlatformDataIntegrityException("error.msg.agreement.duplicate.source.data.entry.issue","A Agreement with sourceCategory " +
+			 		"already exists","sourceType");
+		}
 		throw new PlatformDataIntegrityException("error.msg.could.unknown.data.integrity.issue",
 				"Unknown data integrity issue with resource: "+ realCause.getMessage());
 

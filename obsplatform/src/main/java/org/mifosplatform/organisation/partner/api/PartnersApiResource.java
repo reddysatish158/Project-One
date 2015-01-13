@@ -158,6 +158,7 @@ public class PartnersApiResource {
 
         context.authenticatedUser().validateHasReadPermission(resorceNameForPermission);
         final PartnersData partner = this.readPlatformService.retrieveSinglePartnerDetails(partnerId);
+        //final List<AgreementData> agreementData = this.readPlatformService.retrieveAgreementData(partnerId);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, partner, RESPONSE_DATA_PARAMETERS);
     }

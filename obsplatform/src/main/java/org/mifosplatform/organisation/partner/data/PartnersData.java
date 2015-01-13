@@ -8,6 +8,7 @@ import org.mifosplatform.infrastructure.codes.data.CodeValueData;
 import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
 import org.mifosplatform.organisation.monetary.data.ApplicationCurrencyConfigurationData;
 import org.mifosplatform.organisation.office.data.OfficeData;
+import org.mifosplatform.organisation.partneragreement.data.AgreementData;
 
 public class PartnersData {
     
@@ -21,7 +22,7 @@ public class PartnersData {
 	private String parentName;
 	private String officeType;
 	private LocalDate openingDate;
-	private String addressName;
+	private String loginName;
 	private String city; 
 	private String state; 
 	private String country; 
@@ -34,6 +35,7 @@ public class PartnersData {
 	private Collection<CodeValueData> officeTypes;
 	private ApplicationCurrencyConfigurationData currencyData;
 	private Collection<OfficeData> allowedParents;
+	private List<AgreementData> agreementData;
 	
 	
 	public PartnersData(Collection<MCodeData> partnerTypes, List<String> countryData, List<String> statesData,
@@ -53,7 +55,7 @@ public class PartnersData {
 
 	public PartnersData(final Long officeId, final Long additionalinfoId,final String partnerName, final String partnerType, 
 			final String currency,final Long parentId, final String parentName, final String officeType,
-			final LocalDate openingDate, final String addressName,final String city, final String state, 
+			final LocalDate openingDate, final String loginName,final String city, final String state, 
 			final String country, final String email, final String phoneNumber) {
 		
 	this.officeId = officeId;
@@ -65,7 +67,7 @@ public class PartnersData {
 	this.parentName =parentName;
 	this.officeType =officeType;
 	this.openingDate = openingDate;
-	this.addressName = addressName;
+	this.loginName = loginName;
 	this.city = city;
 	this.state = state;
 	this.country =country;
@@ -115,8 +117,8 @@ public class PartnersData {
 		return openingDate;
 	}
 	
-	public String getAddressName() {
-		return addressName;
+	public String getLoginName() {
+		return loginName;
 	}
 
 	public String getCity() {
@@ -166,6 +168,14 @@ public class PartnersData {
 
 	public Collection<CodeValueData> getOfficeTypes() {
 		return officeTypes;
+	}
+
+	public List<AgreementData> getAgreementData() {
+		return agreementData;
+	}
+
+	public void setAgreementData(List<AgreementData> agreementData) {
+		this.agreementData = agreementData;
 	}
 
 }

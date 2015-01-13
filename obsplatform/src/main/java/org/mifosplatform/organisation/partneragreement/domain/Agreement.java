@@ -67,6 +67,7 @@ public class Agreement extends AbstractAuditableCustom<AppUser, Long> {
 		this.agreementStatus =agreementStatus;
 		this.startDate = startDate.toDate();
 		this.endDate =endDate.toDate();
+		this.isDeleted = 'N';
 	}
 
 	public Long getPartnerId() {
