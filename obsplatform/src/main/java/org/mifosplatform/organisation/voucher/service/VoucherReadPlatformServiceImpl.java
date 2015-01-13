@@ -11,8 +11,12 @@ import java.util.List;
 
 import javax.ws.rs.core.StreamingOutput;
 
+import org.mifosplatform.crm.clientprospect.service.SearchSqlQuery;
+import org.mifosplatform.crm.ticketmaster.data.ClientTicketData;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
+import org.mifosplatform.infrastructure.core.service.Page;
+import org.mifosplatform.infrastructure.core.service.PaginationHelper;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
 import org.mifosplatform.infrastructure.dataqueries.data.GenericResultsetData;
 import org.mifosplatform.infrastructure.dataqueries.data.ResultsetColumnHeaderData;
@@ -40,6 +44,7 @@ public class VoucherReadPlatformServiceImpl implements
 	private final JdbcTemplate jdbcTemplate;
 	private final PlatformSecurityContext context;
 	private final GenericDataService genericDataService;
+	private final PaginationHelper<VoucherData> paginationHelper = new PaginationHelper<VoucherData>();
 
 	@Autowired
 	public VoucherReadPlatformServiceImpl(
@@ -102,15 +107,44 @@ public class VoucherReadPlatformServiceImpl implements
 	}
 
 	@Override
-	public List<VoucherData> getAllData() {
+	public Page<VoucherData> getAllData(SearchSqlQuery searchVoucher, String statusType, String batchName, String pinType) {
 		try {
 
 			context.authenticatedUser();
-			String sql;
 			retrieveRandomMapper mapper = new retrieveRandomMapper();
-			sql = "SELECT  " + mapper.schema();
+			StringBuilder sqlBuilder = new StringBuilder(200);
+			sqlBuilder.append("SELECT ");
+			sqlBuilder.append(mapper.schema());
+			sqlBuilder.append(" where pm.id IS NOT NULL ");
+			String sqlSearch = searchVoucher.getSqlSearch();
+	        String extraCriteria = "";
+		    if (sqlSearch != null) {
+		    	sqlSearch = sqlSearch.trim();
+		    	extraCriteria = " and (pd.pin_no like '%"+sqlSearch+"%' OR" 
+		    			+ " pd.client_id like '%"+sqlSearch+"%' OR"
+		    			+ " pd.serial_no like '%"+sqlSearch+"%' )";
+		    }
+		    if(statusType != null){
+		    	extraCriteria =" and (pd.status ='"+statusType+"') ";
+		    }
+		    if(batchName != null){
+		    	extraCriteria =" and (pm.batch_name ='"+batchName+"') ";
+		    }
+		    if(pinType != null){
+		    	extraCriteria =" and (pm.pin_type ='"+pinType+"') ";
+		    }
+		    sqlBuilder.append(extraCriteria);
+		    
+			if (searchVoucher.isLimited()) {
+				sqlBuilder.append(" limit ").append(searchVoucher.getLimit());
+		    }
 
-			return this.jdbcTemplate.query(sql, mapper, new Object[] {});
+		    if (searchVoucher.isOffset()) {
+		        sqlBuilder.append(" offset ").append(searchVoucher.getOffset());
+		    }
+		    
+			return this.paginationHelper.fetchPage(this.jdbcTemplate, "SELECT FOUND_ROWS()", sqlBuilder.toString(),
+		            new Object[] {}, mapper);
 		} catch (EmptyResultDataAccessException e) {
 			return null;
 		}
@@ -120,12 +154,16 @@ public class VoucherReadPlatformServiceImpl implements
 			RowMapper<VoucherData> {
 
 		public String schema() {
-			return "m.id as id, m.batch_name as batchName, m.office_id as officeId, m.length as length,"
+			/*return "m.id as id, m.batch_name as batchName, m.office_id as officeId, m.length as length,"
 					+ "m.begin_with as beginWith,m.pin_category as pinCategory,m.quantity as quantity,"
 					+ "m.serial_no as serialNo,m.pin_type as pinType,m.pin_value as pinValue,m.expiry_date as expiryDate, "
 					+ "case m.pin_type when 'VALUE' then p.plan_code=null when 'PRODUCT' then p.plan_code end as planCode, "
 					+ "m.is_processed as isProcessed from b_pin_master m  "
-					+ "left join b_plan_master p on m.pin_value=p.id";
+					+ "left join b_plan_master p on m.pin_value=p.id";*/
+				return " pd.id, pm.batch_name AS batchName, pm.pin_type AS pinType, pm.office_id as officeId,"+
+						"pm.pin_value AS pinValue, pm.pin_category as pinCategory, pd.serial_no as serialNo," +
+						"pd.pin_no as pinNo, pd.status as status, pd.client_id as clientId, pm.expiry_date as expiryDate "+
+						"FROM b_pin_master pm left join b_pin_details pd on pd.pin_id = pm.id ";
 
 		}
 
@@ -136,20 +174,23 @@ public class VoucherReadPlatformServiceImpl implements
 			Long id = rs.getLong("id");
 			String batchName = rs.getString("batchName");
 			Long officeId = rs.getLong("officeId");
-			Long length = rs.getLong("length");
+			//Long length = rs.getLong("length");
 			String pinCategory = rs.getString("pinCategory");
 			String pinType = rs.getString("pinType");
-			Long quantity = rs.getLong("quantity");
+			//Long quantity = rs.getLong("quantity");
 			String serial = rs.getString("serialNo");
 			Date expiryDate = rs.getDate("expiryDate");
-			String beginWith = rs.getString("beginWith");
+			//String beginWith = rs.getString("beginWith");
 			String pinValue = rs.getString("pinValue");
-			String planCode = rs.getString("planCode");
-			String isProcessed = rs.getString("isProcessed");
+			//String planCode = rs.getString("planCode");
+			//String isProcessed = rs.getString("isProcessed");
+			String pinNo = rs.getString("pinNo");
+			String status = rs.getString("status");
+			Long clientId = rs.getLong("clientId");
 
-			return new VoucherData(batchName, officeId, length,
-					pinCategory, pinType, quantity, serial, expiryDate,
-					beginWith, pinValue, id, planCode, isProcessed);
+			return new VoucherData(batchName, officeId, null,
+					pinCategory, pinType, null, serial, expiryDate,
+					null, pinValue, id, null, null, pinNo, status, clientId);
 
 		}
 	}
@@ -302,6 +343,40 @@ public class VoucherReadPlatformServiceImpl implements
 			String pinType = rs.getString("pinType");
 
 			return new VoucherData(pinType,pinValue,expiryDate);
+		}
+	}
+
+	@Override
+	public List<VoucherData> retriveBatchTemplateData(Boolean isProcessed) {
+		try {
+
+			context.authenticatedUser();
+			String sql="";
+			BatchTemplateMapper mapper = new BatchTemplateMapper();
+			if(isProcessed){
+				sql = "SELECT "+ mapper.schema()+ " where bpm.is_processed='Y'";
+			}else{
+				sql = "SELECT "+ mapper.schema()+ " where bpm.is_processed='N'";
+			}
+			return this.jdbcTemplate.query(sql, mapper, new Object[] {});
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+	}
+	
+	private static final class BatchTemplateMapper implements RowMapper<VoucherData> {
+
+		public String schema() {
+			return " bpm.id as id, bpm.batch_name as batchName from b_pin_master bpm ";
+
+		}
+
+		@Override
+		public VoucherData mapRow(final ResultSet rs, final int rowNum)
+				throws SQLException {
+			Long id = rs.getLong("id");
+			String batchName = rs.getString("batchName");
+			return new VoucherData(id,batchName);
 		}
 	}
 
