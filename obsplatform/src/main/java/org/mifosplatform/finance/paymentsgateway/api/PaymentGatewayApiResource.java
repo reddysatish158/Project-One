@@ -383,9 +383,9 @@ public class PaymentGatewayApiResource {
 			
 			Map<String, Object> output = result.getChanges();
 			
+			String status = String.valueOf(output.get("status"));
 			String client = String.valueOf(output.get("clientId"));
 			String txnId = String.valueOf(output.get("txnId"));
-			Long pgId = Long.valueOf(String.valueOf(output.get("pgId")));
 			String amount = String.valueOf(output.get("amount"));
 			String currency = String.valueOf(output.get("currency"));
 			
@@ -397,18 +397,38 @@ public class PaymentGatewayApiResource {
 			
 			Long clientId = Long.valueOf(client);
 			
-			String OutputData = this.paymentGatewayWritePlatformService.payment(clientId, pgId, txnId, amount);
 			
-			JSONObject object = new JSONObject(OutputData);
-			
-			this.paymentGatewayWritePlatformService.emailSending(clientId, object.getString("Result"), object.getString("Description"), txnId, totalAmount);
-			
-			return object.toString();
+			if(status.equalsIgnoreCase("FAILURE")){
 				
-		}catch(JSONException e){
-			
-			return null;
-		}		
+				String error = String.valueOf(output.get("error"));
+				
+				JSONObject object = new JSONObject();
+				object.put("Result", "FAILURE");
+				object.put("Description", error);
+				object.put("Amount", totalAmount);
+				object.put("ObsPaymentId", "");
+				object.put("TransactionId", txnId);
+				
+				this.paymentGatewayWritePlatformService.emailSending(clientId, status, error, txnId, totalAmount);
+				
+				return object.toString();
+	
+			}else{
+				Long pgId = Long.valueOf(String.valueOf(output.get("pgId")));
+				String OutputData = this.paymentGatewayWritePlatformService.payment(clientId, pgId, txnId, amount);
+				
+				JSONObject object = new JSONObject(OutputData);
+				
+				this.paymentGatewayWritePlatformService.emailSending(clientId, object.getString("Result"), object.getString("Description"), txnId, totalAmount);
+				
+				return object.toString();
+			}
+		
+				
+		} catch (JSONException e) {
+			String output = "{\"Result\":\"FAILURE\", \"Description\":\"JSONException = \""    + e.getMessage() + "}";
+			return output;
+		}	
 	}
 	
 	/**
@@ -464,35 +484,19 @@ public class PaymentGatewayApiResource {
 			JSONObject resultJsonObject = new JSONObject(data);
 			
 			String Result = resultJsonObject.getString("Result");
+			String Description = resultJsonObject.getString("Description");
+			
 			
 			String paymentStatus = null;
 			
 			if(Result.equalsIgnoreCase("SUCCESS")){
 				
-				if(jsonCustomData.has("paytermCode") && jsonCustomData.has("planCode")
-						&& jsonCustomData.has("contractPeriod")) {
-					
-					jsonCustomData.put("billAlign", false);
-					jsonCustomData.put("isNewplan", true);
-					jsonCustomData.put("dateFormat", dateFormat);
-					jsonCustomData.put("start_date", date);
-					jsonCustomData.remove("clientId");
-					jsonCustomData.remove("returnUrl");
-
-					CommandWrapper commandRequest = new CommandWrapperBuilder().createOrder(clientId).withJson(jsonCustomData.toString()).build();
-					CommandProcessingResult resultOrder = this.writePlatformService.logCommandSource(commandRequest);
-
-					if (resultOrder == null) {
-						paymentStatus = "Payment Done and Plan Booking Failed, Please Contact to Your Service Provider.";
-					}
-					paymentStatus = "Payment Done and Plan Booked Successfully. ";
-				
-				}else {
-					paymentStatus = "Payment Done Successfully.";
-				}
+				 jsonCustomData.remove("clientId");
+				 jsonCustomData.remove("returnUrl");
+				 paymentStatus = orderBooking(customData, date, clientId);
 				
 			} else {
-				paymentStatus = " Payment Failed, Please Contact to Your Service Provider.  ";
+				paymentStatus = " Payment Failed, Please Contact to Your Service Provider, Reason="+Description;
 			}
 			
 			String htmlData = "<a href=\""+returnUrl+"\"> Click On Me. </a>" + "<strong>"+ paymentStatus + "</Strong>";
@@ -502,10 +506,148 @@ public class PaymentGatewayApiResource {
 		} 
 	   catch(Exception e){
 		   
-		   String paymentStatus = "Payment Failed, Please Contact to Your Service Provider.  ";
+		   String paymentStatus = "Payment Failed, Please Contact to Your Service Provider.  "+ e.getCause().getMessage();
 		   String htmlData = "<a href=\""+returnUrl+"\"> Click On Me </a>" + "<strong>"+ paymentStatus + "</Strong>";
 		   return htmlData;   
 	   }
 	 }
+	 
+	public String orderBooking(String jsonObject, String date, Long clientId)
+			throws JSONException {
+
+		final JSONObject jsonCustomData = new JSONObject(jsonObject);
+		final String dateFormat = "dd MMMM yyyy";
+		String screenName = jsonCustomData.getString("screenName");
+		Long orderId = null;
+
+		if (jsonCustomData.has("clientId"))
+			jsonCustomData.remove("clientId");
+
+		if (jsonCustomData.has("returnUrl"))
+			jsonCustomData.remove("returnUrl");
+
+		if (jsonCustomData.has("screenName"))
+			jsonCustomData.remove("screenName");
+		
+		if(jsonCustomData.has("orderId")){
+			jsonCustomData.remove("orderId");
+			orderId = Long.valueOf(jsonCustomData.getString("orderId"));
+		}
+
+		if (screenName.equalsIgnoreCase("vod")) {
+			
+			return "Payment Done Successfully.";
+			
+		} else if (screenName.equalsIgnoreCase("additionalOrders")) {
+
+			jsonCustomData.put("billAlign", false);
+			jsonCustomData.put("isNewplan", true);
+			jsonCustomData.put("dateFormat", dateFormat);
+			jsonCustomData.put("start_date", date);
+
+			CommandWrapper commandRequest = new CommandWrapperBuilder().createOrder(clientId).withJson(jsonCustomData.toString()).build();
+			CommandProcessingResult resultOrder = this.writePlatformService.logCommandSource(commandRequest);
+
+			if (resultOrder == null) {
+				return "failure : Payment Done and Plan Booking Failed";
+			} else {
+				return "Payment Done and Plan Booked Successfully. ";
+			}
+
+		} else if (screenName.equalsIgnoreCase("renewalorder")) {
+			
+			Long renewalOrder = Long.valueOf(jsonCustomData.getString("renewalPeriod"));
+			
+			JSONObject object = new JSONObject();
+			object.put("renewalPeriod", renewalOrder);
+			object.put("description", jsonCustomData.getString("description"));
+
+			final CommandWrapper commandRequest = new CommandWrapperBuilder().renewalOrder(orderId).withJson(object.toString()).build();
+			final CommandProcessingResult resultOrder = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+			
+			if (resultOrder == null) {
+				return "failure : Payment Done and renewal Plan Booking Failed";
+			} else {
+				return "Payment Done and renewal Plan Booked Successfully. ";
+			}
+			
+		} else if (screenName.equalsIgnoreCase("changeorder")) {
+			
+			jsonCustomData.put("billAlign", false);
+			jsonCustomData.put("isNewplan", false);
+			jsonCustomData.put("dateFormat", dateFormat);
+			jsonCustomData.put("start_date", date);
+			jsonCustomData.put("disconnectionDate", date);
+			jsonCustomData.put("disconnectReason", "Not Interested");
+
+			final CommandWrapper commandRequest = new CommandWrapperBuilder().changePlan(orderId).withJson(jsonCustomData.toString()).build();
+			final CommandProcessingResult resultOrder = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+			
+			if (resultOrder == null) {
+				return "failure : Payment Done and renewal Plan Booking Failed";
+			} else {
+				return "Payment Done and renewal Plan Booked Successfully. ";
+			}
+			
+		}else {
+			return "Payment Done Successfully.";
+		}
+	}
+	 
+	 
+	/**
+	 * This method is using for posting data to create payment using Neteller
+	 */
+	@POST
+	@Path("neteller")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String netellerOnlinePayment(final String apiRequestBodyAsJson) {
+
+		try {
+
+			String data = OnlinePaymentMethod(apiRequestBodyAsJson.toString());
+
+			JSONObject resultJsonObject = new JSONObject(data);
+			
+			JSONObject apiJson = new JSONObject(apiRequestBodyAsJson);
+
+			String Result = resultJsonObject.getString("Result");
+
+			String paymentStatus = null;
+
+			if (Result.equalsIgnoreCase("SUCCESS")) {
+               
+				Long clientId = apiJson.getLong("clientId");
+				SimpleDateFormat daformat = new SimpleDateFormat("dd MMMM yyyy");
+				String date = daformat.format(new Date());
+				
+				apiJson.remove("currency");
+				apiJson.remove("total_amount");
+				apiJson.remove("value");
+				apiJson.remove("source");
+				apiJson.remove("transactionId");
+				apiJson.remove("verificationCode");
+				
+				paymentStatus = orderBooking(apiJson.toString(), date, clientId);
+				
+				if(paymentStatus.equalsIgnoreCase("failure : Payment Done and Plan Booking Failed") || paymentStatus.contains("failure :")){
+					resultJsonObject.remove("Result");
+					resultJsonObject.remove("Description");
+					
+					resultJsonObject.put("Result", "FAILURE");
+					resultJsonObject.put("Description", paymentStatus);
+				}
+			}
+
+			return resultJsonObject.toString();
+
+		} catch (JSONException e) {
+			String output = "{\"Result\":\"FAILURE\", \"Description\":\"JsonException\"" + e.getMessage() + "}";
+			return output;
+		}
+	}
+	 
+	 
 }
 

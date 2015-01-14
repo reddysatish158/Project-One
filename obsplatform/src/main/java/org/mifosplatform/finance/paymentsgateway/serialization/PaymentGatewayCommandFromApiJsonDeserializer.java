@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.core.data.ApiParameterError;
 import org.mifosplatform.infrastructure.core.data.DataValidatorBuilder;
 import org.mifosplatform.infrastructure.core.exception.InvalidJsonException;
@@ -37,7 +38,9 @@ public class PaymentGatewayCommandFromApiJsonDeserializer {
 				"TXNID","COMPANYNAME","STATUS","AMOUNT","MSISDN","TYPE","OBSPAYMENTTYPE"));
 	
 	private final Set<String> onlinePaymentSupportedParameters = new HashSet<String>(Arrays.asList("total_amount", 
-			"clientId", "emailId", "transactionId", "source", "otherData", "device", "currency","dateFormat","locale"));
+			"clientId", "emailId", "transactionId", "source", "otherData", "device", "currency","dateFormat","locale",
+			"paytermCode","planCode","contractPeriod","value","verificationCode","screenName",
+			"renewalPeriod", "description"));
 	
     private final FromJsonHelper fromApiJsonHelper;
     
@@ -104,12 +107,34 @@ public class PaymentGatewayCommandFromApiJsonDeserializer {
 	
 		final String source = fromApiJsonHelper.extractStringNamed("source", element);
 		
-		if(source.equalsIgnoreCase("globalpay")){
+		if(source.equalsIgnoreCase(ConfigurationConstants.GLOBALPAY_PAYMENTGATEWAY)){
 			
 			final String transactionId = fromApiJsonHelper.extractStringNamed("transactionId", element);
 			baseDataValidator.reset().parameter("transactionId").value(transactionId).notBlank().notExceedingLengthOf(30);
 			
-		}else {
+		} else {
+			
+			if (source.equalsIgnoreCase(ConfigurationConstants.NETELLER_PAYMENTGATEWAY)) {		
+				final String verificationCode = fromApiJsonHelper.extractStringNamed("verificationCode", element);
+				baseDataValidator.reset().parameter("verificationCode").value(verificationCode).notNull();
+				
+				if (verificationCode != null && verificationCode.toString().trim().length() < 6) {
+			            StringBuilder validationErrorCode = new StringBuilder("validation.msg.").append("paymentgateway").append(".").append("verificationCode")
+			                    .append(".length.error");
+			         
+			            StringBuilder defaultEnglishMessage = new StringBuilder("The parameter ").append("verificationCode ").append(verificationCode).
+			            append(" is Greater than OR Equal to the minimum size of 6 characters");
+			            
+			            ApiParameterError error = ApiParameterError.parameterError(validationErrorCode.toString(), defaultEnglishMessage.toString(),
+			            		"verificationCode");
+			            dataValidationErrors.add(error);
+			        }
+			      
+			    
+				
+				final String value = fromApiJsonHelper.extractStringNamed("value", element);
+				baseDataValidator.reset().parameter("value").value(value).notBlank().notExceedingLengthOf(100);
+			}
 			
 			final String transactionId = fromApiJsonHelper.extractStringNamed("transactionId", element);
 			baseDataValidator.reset().parameter("transactionId").value(transactionId).notBlank().notExceedingLengthOf(30);

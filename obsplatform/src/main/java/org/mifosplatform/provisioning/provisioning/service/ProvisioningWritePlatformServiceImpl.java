@@ -326,13 +326,13 @@ public class ProvisioningWritePlatformServiceImpl implements ProvisioningWritePl
 
 	try {
 		Long commandProcessId=null;
-		String serialNumber=null;
+		String serialNumber = null;
 		HardwareAssociation hardwareAssociation = this.associationRepository.findOneByOrderId(order.getId());
 		Plan plan=this.planRepository.findOne(order.getPlanId());
 		
 		if (hardwareAssociation == null && plan.isHardwareReq() == 'Y') {
 			throw new PairingNotExistException(order.getId());
-		}else if(hardwareAssociation != null){
+		}else if (hardwareAssociation != null) {
 			serialNumber = hardwareAssociation.getSerialNo();
 		}
 		
