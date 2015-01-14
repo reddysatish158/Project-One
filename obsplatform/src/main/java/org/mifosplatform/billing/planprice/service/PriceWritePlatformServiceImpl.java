@@ -96,15 +96,12 @@ public class PriceWritePlatformServiceImpl implements PriceWritePlatformService 
 			if (changes.containsKey("duration")) {
 				
 				final List<VoucherData> voucherData= this.priceReadPlatformService.retrieveVoucherDatas(priceId);
-				if(voucherData.isEmpty()){
-					this.priceRepository.save(price);
-				}else{
+				if(!voucherData.isEmpty()){
 					throw new AlreadyProcessedException(price.getContractPeriod(),priceId);
 				}
-			}else{
-				if(!changes.isEmpty() && !changes.containsKey("duration"))
-				this.priceRepository.save(price);
 			}
+			if(!changes.isEmpty())
+				this.priceRepository.save(price);
   
 			return new CommandProcessingResultBuilder() //
 			.withCommandId(command.commandId()) //
@@ -133,11 +130,10 @@ public class PriceWritePlatformServiceImpl implements PriceWritePlatformService 
 				 Price price=this.priceRepository.findOne(priceId);
 				 	if(price!= null){
 				 		final List<VoucherData> voucherData= this.priceReadPlatformService.retrieveVoucherDatas(priceId);
-						if(voucherData.isEmpty()){
-							price.delete();	
-						}else{
+						if(!voucherData.isEmpty()){
 							throw new AlreadyProcessedException(price.getContractPeriod(),priceId);
 						}
+						price.delete();	
 				 	}
 			     this.priceRepository.save(price);
 			     return new CommandProcessingResultBuilder().withEntityId(priceId).build();

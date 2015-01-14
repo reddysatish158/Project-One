@@ -4,7 +4,7 @@ create procedure addVoucherPriceId()
 Begin
   IF NOT EXISTS (
      SELECT * FROM information_schema.COLUMNS
-     WHERE COLUMN_NAME = 'location_id'
+     WHERE COLUMN_NAME = 'price_id'
      and TABLE_NAME = 'b_pin_master'
      and TABLE_SCHEMA = DATABASE())THEN
 alter table b_pin_master add column price_id bigint(20) NOT NULL after pin_value;

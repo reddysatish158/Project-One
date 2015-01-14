@@ -6,6 +6,5 @@ import java.util.List;
 public interface RedemptionReadPlatformService {
 	
 	List<Long> retrieveOrdersData(Long clientId,Long planId);
-	Long retrieveContractPeroid(String contractPeriod);
 
 }

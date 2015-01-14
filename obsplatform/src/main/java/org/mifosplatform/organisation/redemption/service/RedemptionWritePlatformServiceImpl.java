@@ -26,6 +26,8 @@ import org.mifosplatform.organisation.voucher.domain.VoucherDetailsRepository;
 import org.mifosplatform.portfolio.client.domain.Client;
 import org.mifosplatform.portfolio.client.domain.ClientRepository;
 import org.mifosplatform.portfolio.client.exception.ClientNotFoundException;
+import org.mifosplatform.portfolio.contract.domain.Contract;
+import org.mifosplatform.portfolio.contract.domain.ContractRepository;
 import org.mifosplatform.portfolio.contract.service.ContractPeriodReadPlatformService;
 import org.mifosplatform.portfolio.order.domain.Order;
 import org.mifosplatform.portfolio.order.domain.OrderRepository;
@@ -61,6 +63,7 @@ public class RedemptionWritePlatformServiceImpl implements
 	private final static int RENEWAL_ORDER_STATUS = 1;
 	private final static String USED = "USED";
 	private final PriceRepository priceRepository;
+	private final ContractRepository contractRepository;
 	
 	@Autowired
 	public RedemptionWritePlatformServiceImpl(final PlatformSecurityContext context,final VoucherDetailsRepository voucherDetailsRepository,
@@ -68,7 +71,7 @@ public class RedemptionWritePlatformServiceImpl implements
 		final OrderWritePlatformService orderWritePlatformService,final ContractPeriodReadPlatformService contractPeriodReadPlatformService,
 		final RedemptionReadPlatformService redemptionReadPlatformService,final OrderRepository orderRepository,
 		final RedemptionCommandFromApiJsonDeserializer apiJsonDeserializer,final JournalvoucherRepository journalvoucherRepository,
-		final PriceRepository priceRepository) {
+		final PriceRepository priceRepository,final ContractRepository contractRepository) {
 		
 		this.context = context;
 		this.fromJsonHelper = fromJsonHelper;
@@ -82,6 +85,7 @@ public class RedemptionWritePlatformServiceImpl implements
 		this.journalvoucherRepository=journalvoucherRepository;
 		this.contractPeriodReadPlatformService = contractPeriodReadPlatformService;
 		this.priceRepository = priceRepository;
+		this.contractRepository = contractRepository;
 		
 	}
 	
@@ -132,17 +136,20 @@ public class RedemptionWritePlatformServiceImpl implements
 				final Long planId = Long.parseLong(pinTypeValue);
 				final List<Long> orderIds=this.redemptionReadPlatformService.retrieveOrdersData(clientId,planId);
 				final Price price  =  this.priceRepository.findOne(priceId);
-				final String contractPeriod = price.getContractPeriod();
-				final String chargeCode = price.getChargeCode();
-				final Long contractId = this.redemptionReadPlatformService.retrieveContractPeroid(contractPeriod);
+				Long contractId = (long) 0;
+				if(price != null){
+					final String contractPeriod = price.getContractPeriod();
+					Contract contract = this.contractRepository.findOneByContractId(contractPeriod);
+					contractId = contract.getId();
+				}
 				final JsonObject json = new JsonObject();
 				
-				if(orderIds.isEmpty()){
+				if(orderIds.isEmpty() && (price != null)){
 					 
 					json.addProperty("billAlign", false);json.addProperty("planCode", planId);
 					json.addProperty("contractPeriod", contractId);
 					json.addProperty("isNewplan", true);
-					json.addProperty("paytermCode", chargeCode);
+					json.addProperty("paytermCode", price.getChargeCode());
 					json.addProperty("locale", "en");
 					json.addProperty("dateFormat","dd MMMM yyyy"); 
 					json.addProperty("start_date", simpleDateFormat);
