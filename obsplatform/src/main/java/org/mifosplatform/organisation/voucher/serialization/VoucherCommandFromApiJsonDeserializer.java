@@ -35,7 +35,7 @@ public class VoucherCommandFromApiJsonDeserializer {
 			Arrays.asList("id", "batchName", "length",
 					"beginWith", "pinCategory", "pinType", "quantity",
 					"serialNo", "expiryDate", "dateFormat", "pinValue",
-					"pinNO", "locale", "pinExtention","officeId"));
+					"pinNO", "locale", "pinExtention","officeId","priceId"));
 	
 	private final FromJsonHelper fromApiJsonHelper;
 
