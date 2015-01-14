@@ -12,6 +12,10 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
+import org.mifosplatform.organisation.redemption.exception.PinNumberNotFoundException;
+import org.mifosplatform.organisation.voucher.data.VoucherData;
+import org.mifosplatform.organisation.voucher.domain.VoucherRepository;
+import org.mifosplatform.organisation.voucher.exception.AlreadyProcessedException;
 import org.mifosplatform.portfolio.plan.data.ServiceData;
 import org.mifosplatform.portfolio.service.serialization.PriceCommandFromApiJsonDeserializer;
 import org.mifosplatform.portfolio.service.service.ServiceMasterWritePlatformServiceImpl;
@@ -33,15 +37,18 @@ public class PriceWritePlatformServiceImpl implements PriceWritePlatformService 
 	 private final PriceReadPlatformService priceReadPlatformService;
 	 private final PriceCommandFromApiJsonDeserializer fromApiJsonDeserializer;
 	 private final PriceRepository priceRepository;
+	 private final VoucherRepository voucherRepository;
 	 
 	@Autowired
 	 public PriceWritePlatformServiceImpl(final PlatformSecurityContext context,final PriceReadPlatformService priceReadPlatformService,
-			 final PriceCommandFromApiJsonDeserializer fromApiJsonDeserializer,final PriceRepository priceRepository)
+			 final PriceCommandFromApiJsonDeserializer fromApiJsonDeserializer,final PriceRepository priceRepository,
+			 final VoucherRepository voucherRepository)
 		{
 			this.context=context;
 			this.priceReadPlatformService=priceReadPlatformService;
 			this.fromApiJsonDeserializer=fromApiJsonDeserializer;
 			this.priceRepository=priceRepository;
+			this.voucherRepository=voucherRepository;
 		}
 	
 	@Override
@@ -86,7 +93,16 @@ public class PriceWritePlatformServiceImpl implements PriceWritePlatformService 
 			this.fromApiJsonDeserializer.validateForCreate(command.json());
 			final Price price = retrievePriceBy(priceId);
 			final  Map<String, Object> changes = price.update(command);
-			if (!changes.isEmpty()) {
+			if (changes.containsKey("duration")) {
+				
+				final List<VoucherData> voucherData= this.priceReadPlatformService.retrieveVoucherDatas(priceId);
+				if(voucherData.isEmpty()){
+					this.priceRepository.save(price);
+				}else{
+					throw new AlreadyProcessedException(price.getContractPeriod(),priceId);
+				}
+			}else{
+				if(!changes.isEmpty() && !changes.containsKey("duration"))
 				this.priceRepository.save(price);
 			}
   
@@ -116,7 +132,12 @@ public class PriceWritePlatformServiceImpl implements PriceWritePlatformService 
 		  try {
 				 Price price=this.priceRepository.findOne(priceId);
 				 	if(price!= null){
-				 		price.delete();	
+				 		final List<VoucherData> voucherData= this.priceReadPlatformService.retrieveVoucherDatas(priceId);
+						if(voucherData.isEmpty()){
+							price.delete();	
+						}else{
+							throw new AlreadyProcessedException(price.getContractPeriod(),priceId);
+						}
 				 	}
 			     this.priceRepository.save(price);
 			     return new CommandProcessingResultBuilder().withEntityId(priceId).build();

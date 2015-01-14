@@ -55,6 +55,32 @@ public class RedemptionReadPlatformServiceImpl implements RedemptionReadPlatform
 		}
 		
 	}
+
+	@Override
+	public Long retrieveContractPeroid(String contractPeriod) {
+		
+		try {
+			this.context.authenticatedUser();
+			final ContractPeriodMapper contractPeriodMapper  = new ContractPeriodMapper();
+			final String sql = "select id as contractId from b_contract_period where contract_period = ?";
+			return this.jdbcTemplate.queryForObject(sql, contractPeriodMapper, new Object[] { contractPeriod });
+			
+		} catch (EmptyResultDataAccessException accessException) {
+			return null;
+		}
+	}
+	
+	private static final class ContractPeriodMapper implements RowMapper<Long>{
+		
+		@Override
+		public Long mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {
+			
+			final Long contractId=resultSet.getLong("contractId");
+			
+			return contractId;
+		}
+		
+	}
 	
 	
 
