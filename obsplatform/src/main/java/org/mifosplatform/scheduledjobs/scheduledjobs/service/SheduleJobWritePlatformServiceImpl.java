@@ -670,8 +670,7 @@ public void processNotify() {
 						ReceiveMessage = "";
 						ClientEntitlementData clientdata = this.entitlementReadPlatformService.getClientData(clientId);
 						
-						if(clientdata == null || clientdata.getSelfcareUsername() == null || 
-								clientdata.getSelfcareUsername().isEmpty()){
+						if(clientdata == null || clientdata.getSelfcareUsername() == null){
 							
 							String output = "Selfcare Not Created with this ClientId: " + clientId + " Properly.";
 							fw.append(output + " \r\n");
@@ -808,7 +807,7 @@ public void processNotify() {
 									ReceiveMessage = RadiusJobConstants.FAILURE + output1;
 								}
 
-								fw.append("Output from Server: " + output + " \r\n");
+								fw.append("Output from Server: " + output1 + " \r\n");
 								br.close();
 
 							} catch (Exception e) {
