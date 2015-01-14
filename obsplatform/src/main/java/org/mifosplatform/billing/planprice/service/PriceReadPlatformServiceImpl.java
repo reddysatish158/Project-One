@@ -11,6 +11,7 @@ import org.mifosplatform.billing.planprice.domain.SavingChargeVaraint;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
+import org.mifosplatform.organisation.voucher.data.VoucherData;
 import org.mifosplatform.portfolio.contract.data.SubscriptionData;
 import org.mifosplatform.portfolio.plan.data.ServiceData;
 import org.mifosplatform.portfolio.pricing.domain.ChargeVariant;
@@ -289,4 +290,27 @@ public class PriceReadPlatformServiceImpl implements PriceReadPlatformService {
 		}
 	}
 
+	@Override
+	public List<VoucherData> retrieveVoucherDatas(Long priceId) {
+		try {
+			this.context.authenticatedUser();
+			VoucherDataMapper voucherDataMapper = new VoucherDataMapper();
+			String sql = "select price_id as priceId from b_pin_master where price_id = ?";
+			return this.jdbcTemplate.query(sql, voucherDataMapper, new Object[] {priceId});
+			
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+	}
+
+	private static final class VoucherDataMapper implements RowMapper<VoucherData> {
+
+		@Override
+		public VoucherData mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {
+			
+			final Long priceId=resultSet.getLong("priceId");
+			
+			return new VoucherData(priceId);
+		}
+	}
 }

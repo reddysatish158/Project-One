@@ -4,7 +4,9 @@ import java.util.List;
 
 import javax.ws.rs.core.StreamingOutput;
 
+import org.mifosplatform.crm.clientprospect.service.SearchSqlQuery;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
+import org.mifosplatform.infrastructure.core.service.Page;
 import org.mifosplatform.organisation.voucher.data.VoucherData;
 
 /**
@@ -16,7 +18,7 @@ public interface VoucherReadPlatformService {
 
 	String retrieveIndividualPin(String pinId);
 	
-	List<VoucherData> getAllData();
+	Page<VoucherData> getAllData(SearchSqlQuery searchTicketMaster, String statusType, String batchName, String pinType);
 
 	List<EnumOptionData> pinCategory();
 
@@ -27,5 +29,10 @@ public interface VoucherReadPlatformService {
 	StreamingOutput retrieveVocherDetailsCsv(Long batchId);
 
 	List<VoucherData> retrivePinDetails(String pinNumber);
+
+	List<VoucherData> retriveBatchTemplateData(Boolean isProcessed);
+	
+	List<VoucherData> retriveAllBatchTemplateData();
+
 
 }
