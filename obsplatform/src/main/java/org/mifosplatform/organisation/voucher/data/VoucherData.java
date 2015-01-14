@@ -32,6 +32,7 @@ public class VoucherData {
 	private String isProcessed;
 	private String planCode;
 	private Collection<OfficeData> offices;
+	private Long priceId;
 	private String pinNo;
 	private String status;
 	private Long clientId;
@@ -98,6 +99,9 @@ public class VoucherData {
 		
 		this.id = id;
 		this.batchName = batchName;
+	}
+	public VoucherData(Long priceId) {
+		this.priceId = priceId;
 	}
 
 	public List<EnumOptionData> getPinCategoryData() {

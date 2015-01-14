@@ -59,6 +59,9 @@ public class Voucher extends AbstractAuditableCustom<AppUser, Long>  {
 	@Column(name = "office_id", nullable = false)
 	private Long officeId;
 	
+	@Column(name = "price_id")
+	private Long priceId;
+	
 	/*@LazyCollection(LazyCollectionOption.FALSE)
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "randomGenerator", orphanRemoval = true)
 	private List<RandomGeneratorDetails> randomGeneratorDetails = new ArrayList<RandomGeneratorDetails>();*/
@@ -72,7 +75,7 @@ public class Voucher extends AbstractAuditableCustom<AppUser, Long>  {
 
 	public Voucher(final String batchName, final Long length, final String beginWith,
 			final String pinCategory, final Long quantity, final Long serialNo,
-			final String pinType, final String pinValue, final Date date) {
+			final String pinType, final String pinValue, final Date date,final Long priceId) {
 
 		super();
 		this.batchName = batchName;
@@ -83,6 +86,7 @@ public class Voucher extends AbstractAuditableCustom<AppUser, Long>  {
 		this.serialNo = serialNo;
 		this.pinType = pinType;
 		this.pinValue = pinValue;
+		this.priceId = priceId;
 		this.expiryDate = date;
 		this.isProcessed = 'N';
 
@@ -104,8 +108,17 @@ public class Voucher extends AbstractAuditableCustom<AppUser, Long>  {
 		    final String pinType = command.stringValueOfParameterNamed("pinType");
 		    final Long pinVal = command.longValueOfParameterNamed("pinValue");
 		    final LocalDate expiryDate = command.localDateValueOfParameterNamed("expiryDate");
+		    final Long priceId = command.longValueOfParameterNamed("priceId");
 		    final String pinValue=String.valueOf(pinVal);
-		    return new Voucher(batchName,length.longValue(),beginWith,pinCategory,quantity.longValue(),serialNo.longValue(),pinType,pinValue,expiryDate.toDate());
+		    return new Voucher(batchName,length.longValue(),beginWith,pinCategory,quantity.longValue(),serialNo.longValue(),pinType,pinValue,expiryDate.toDate(),priceId);
+	}
+
+	public Long getPriceId() {
+		return priceId;
+	}
+
+	public void setPriceId(Long priceId) {
+		this.priceId = priceId;
 	}
 
 	public String getBatchName() {

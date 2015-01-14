@@ -28,4 +28,9 @@ public class AlreadyProcessedException extends AbstractPlatformDomainRuleExcepti
 		// TODO Auto-generated constructor stub
 	}
 
+	public AlreadyProcessedException(final String msg,final Long priceId) {
+		// TODO Auto-generated constructor stub
+		super("error.msg.voucher.no.already.existed.with.thiscontract", " VoucherPins are already generated with this contract '"+msg+"'", msg);
+	}
+
 }

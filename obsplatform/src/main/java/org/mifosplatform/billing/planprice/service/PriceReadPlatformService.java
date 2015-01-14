@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.mifosplatform.billing.planprice.data.PricingData;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
+import org.mifosplatform.organisation.voucher.data.VoucherData;
 import org.mifosplatform.portfolio.contract.data.SubscriptionData;
 import org.mifosplatform.portfolio.plan.data.ServiceData;
 
@@ -26,5 +27,7 @@ public interface PriceReadPlatformService {
 	List<PricingData> retrievePlanAndPriceDetails(String region);
 
 	List<ServiceData> retrievePriceDetails(Long planId, String region);
+	
+	List<VoucherData> retrieveVoucherDatas(Long priceId);
 
 }
