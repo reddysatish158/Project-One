@@ -25,21 +25,24 @@ public class OfficeAdditionalInfo extends AbstractPersistable<Long> {
 	
 	@Column(name = "partner_currency")
 	private String partnerCurrency;
+	
+	@Column(name = "is_collective", nullable = false, length = 100)
+	private char isCollective;
 
 	@OneToOne
 	@JoinColumn(name = "office_id", insertable = true, updatable = true, nullable = true, unique = true)
 	private Office office;
 
-	public OfficeAdditionalInfo() {
-
-	}
 	
-	public OfficeAdditionalInfo(final Office office,final String partnerName, final String partnerType,final String currency ) {
+	
+	public OfficeAdditionalInfo(final Office office,final String partnerName, final String partnerType,final String currency,
+			   final boolean isCollective) {
 		
 		this.office = office;
 		this.partnerName = partnerName;
 		this.partnerType = partnerType;
 		this.partnerCurrency = currency;
+		this.isCollective = isCollective?'Y':'N';
 	}
 
 
@@ -62,6 +65,20 @@ public class OfficeAdditionalInfo extends AbstractPersistable<Long> {
 	public void setOffice(Office office) {
 		this.office = office;
 	}
-	
+
+
+	public boolean getIsCollective() {
+		boolean collective = false;
+		
+		if(this.isCollective == 'Y'){
+			collective = true;		
+		    return collective;
+		
+		}else{
+			return collective;
+		}
+		
+	}
+
 		
 }

@@ -1,5 +1,6 @@
 package org.mifosplatform.organisation.partner.api;
 
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -8,6 +9,7 @@ import java.util.Set;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -22,10 +24,13 @@ import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.mifosplatform.infrastructure.codes.data.CodeValueData;
 import org.mifosplatform.infrastructure.codes.service.CodeValueReadPlatformService;
+import org.mifosplatform.infrastructure.core.api.ApiConstants;
 import org.mifosplatform.infrastructure.core.api.ApiRequestParameterHelper;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
+import org.mifosplatform.infrastructure.core.domain.Base64EncodedImage;
 import org.mifosplatform.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.mifosplatform.infrastructure.core.serialization.ToApiJsonSerializer;
+import org.mifosplatform.infrastructure.core.service.FileUtils;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.organisation.address.service.AddressReadPlatformService;
 import org.mifosplatform.organisation.mcodevalues.data.MCodeData;
@@ -36,9 +41,14 @@ import org.mifosplatform.organisation.office.data.OfficeData;
 import org.mifosplatform.organisation.office.service.OfficeReadPlatformService;
 import org.mifosplatform.organisation.partner.data.PartnersData;
 import org.mifosplatform.organisation.partner.service.PartnersReadPlatformService;
+import org.mifosplatform.organisation.partner.service.PartnersWritePlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.multipart.FormDataBodyPart;
+import com.sun.jersey.multipart.FormDataParam;
 
 /**
  * @author hugo
@@ -64,13 +74,15 @@ public class PartnersApiResource {
    private final OrganisationCurrencyReadPlatformService currencyReadPlatformService;
    private final MCodeReadPlatformService mCodeReadPlatformService;
    private final CodeValueReadPlatformService codeValueReadPlatformService;
+   private final PartnersWritePlatformService partnersWritePlatformService;
 	
   @Autowired	
    public PartnersApiResource(final PlatformSecurityContext context,final ToApiJsonSerializer<PartnersData> toApiJsonSerializer,
 			final ApiRequestParameterHelper apiRequestParameterHelper,final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService,
 			final AddressReadPlatformService addressReadPlatformService,final PartnersReadPlatformService readPlatformService,
 			final OrganisationCurrencyReadPlatformService currencyReadPlatformService, final MCodeReadPlatformService mCodeReadPlatformService,
-			final OfficeReadPlatformService officereadPlatformService,final CodeValueReadPlatformService codeValueReadPlatformService){
+			final OfficeReadPlatformService officereadPlatformService,final CodeValueReadPlatformService codeValueReadPlatformService,
+			final PartnersWritePlatformService partnersWritePlatformService){
 		
             this.context = context;
             this.toApiJsonSerializer = toApiJsonSerializer;
@@ -82,6 +94,7 @@ public class PartnersApiResource {
 	        this.mCodeReadPlatformService = mCodeReadPlatformService;
 	        this.officereadPlatformService = officereadPlatformService;
 	        this.codeValueReadPlatformService = codeValueReadPlatformService;
+	        this.partnersWritePlatformService = partnersWritePlatformService;
 
 	}
   
@@ -162,5 +175,43 @@ public class PartnersApiResource {
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, partner, RESPONSE_DATA_PARAMETERS);
     }
+    
+    
+    /**
+     * Upload images through multi-part form upload
+     */
+	@POST
+	@Path("{partnerId}/images")
+	@Consumes({ MediaType.MULTIPART_FORM_DATA })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String addNewPartnerImage(@PathParam("partnerId") final Long partnerId,@HeaderParam("Content-Length") final Long fileSize,
+			@FormDataParam("file") final InputStream inputStream,@FormDataParam("file") final FormDataContentDisposition fileDetails,
+			@FormDataParam("file") final FormDataBodyPart bodyPart) {
+
+		FileUtils.validateClientImageNotEmpty(fileDetails.getFileName());
+		FileUtils.validateImageMimeType(bodyPart.getMediaType().toString());
+		FileUtils.validateFileSizeWithinPermissibleRange(fileSize,fileDetails.getFileName(),ApiConstants.MAX_FILE_UPLOAD_SIZE_IN_MB);
+
+		final CommandProcessingResult result = this.partnersWritePlatformService.saveOrUpdatePartnerImage(partnerId, fileDetails.getFileName(),inputStream);
+		
+		return this.toApiJsonSerializer.serialize(result);
+	}
+
+	/**
+	 * Upload image as a Data URL (essentially a base64 encoded stream)
+	 */
+	@POST
+	@Path("{partnerId}/images")
+	@Consumes({ MediaType.TEXT_PLAIN, MediaType.TEXT_HTML,
+			MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String addNewPartnerImage(@PathParam("partnerId") final Long partnerId,final String jsonRequestBody) {
+
+		final Base64EncodedImage base64EncodedImage = FileUtils.extractImageFromDataURL(jsonRequestBody);
+
+		final CommandProcessingResult result = this.partnersWritePlatformService.saveOrUpdatePartnerImage(partnerId, base64EncodedImage);
+
+		return this.toApiJsonSerializer.serialize(result);
+	}
 
 }
