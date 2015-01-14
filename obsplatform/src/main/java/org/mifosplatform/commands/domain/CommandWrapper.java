@@ -1236,4 +1236,13 @@ public class CommandWrapper {
 		public boolean isLinkupAccount() {
 			return this.entityName.equalsIgnoreCase("LINKUPACCOUNT");
 		}
+
+		public boolean isPartner() {
+			return this.entityName.equalsIgnoreCase("PARTNER");
+		}
+
+		public boolean isPartnerAgreement() {
+			
+			return this.entityName.equalsIgnoreCase("PARTNERAGREEMENT");
+		}
 }

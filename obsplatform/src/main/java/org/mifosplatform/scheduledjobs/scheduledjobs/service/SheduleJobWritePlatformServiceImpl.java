@@ -1039,19 +1039,16 @@ public void reportStatmentPdf() {
 				fileHandler.createNewFile();
 				FileWriter fw = new FileWriter(fileHandler);
 				FileUtils.BILLING_JOB_PATH = fileHandler.getAbsolutePath();
-				/*DriverManagerDataSource ds=new DriverManagerDataSource();
-			    ds.setUrl(tenant.databaseURL());
-			    ds.setUsername(tenant.getSchemaUsername());
-			    ds.setPassword(tenant.getSchemaPassword());*/
 				fw.append("Processing export data....\r\n");
-			
+			    
+				//procedure calling
 				 SimpleJdbcCall simpleJdbcCall=new SimpleJdbcCall(this.jdbcTemplate);
+				 MapSqlParameterSource parameterSource = new MapSqlParameterSource();
 					simpleJdbcCall.setProcedureName("p_int_fa");//p --> procedure int --> integration fa --> financial account s/w
-					MapSqlParameterSource parameterSource = new MapSqlParameterSource();
 					if (data.isDynamic().equalsIgnoreCase("Y")) {
-					     parameterSource.addValue("p_todt", new LocalDate().toDate(), Types.DATE);
+					     parameterSource.addValue("p_todt", new LocalDate().toString(), Types.DATE);
 					   } else {
-						   parameterSource.addValue("p_todt", data.getProcessDate().toDate(), Types.DATE);		
+						   parameterSource.addValue("p_todt", data.getProcessDate().toString(), Types.DATE);		
 					 }
 					Map<String, Object> output = simpleJdbcCall.execute(parameterSource);
 					if(output.isEmpty()){

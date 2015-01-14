@@ -29,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class SynchronousCommandProcessingService implements CommandProcessingService {
 
-	private PlatformSecurityContext context;
+	private final PlatformSecurityContext context;
 	private final ApplicationContext applicationContext;
 	private final ToApiJsonSerializer<Map<String, Object>> toApiJsonSerializer;
 	private CommandSourceRepository commandSourceRepository;
@@ -42,7 +42,6 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
 			final ToApiJsonSerializer<Map<String, Object>> toApiJsonSerializer,
 			final CommandSourceRepository commandSourceRepository,
 			final ConfigurationDomainService configurationDomainService) {
-		this.context = context;
 		this.context = context;
 		this.applicationContext = applicationContext;
 		this.toApiJsonSerializer = toApiJsonSerializer;
@@ -1190,11 +1189,25 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
             }else if(wrapper.isLinkupAccount()){
             	if(wrapper.isCreate()){
             		 handler = applicationContext.getBean("createLinkupAccountCommandHandler",NewCommandSourceHandler.class);
-            	}
+            	}else {
+                	throw new UnsupportedCommandException(wrapper.commandName());
+   		     }
             	
-            }else {
+            }else if(wrapper.isPartner()){
+            	if(wrapper.isCreate()){
+           		 handler = applicationContext.getBean("createPartnerCommandHandler",NewCommandSourceHandler.class);
+           	}else {
             	throw new UnsupportedCommandException(wrapper.commandName());
 		     }
+           	
+           }else if(wrapper.isPartnerAgreement()){
+           	if(wrapper.isCreate()){
+          		 handler = applicationContext.getBean("createPartnerAgreementCommandHandler",NewCommandSourceHandler.class);
+          	}else {
+           	throw new UnsupportedCommandException(wrapper.commandName());
+		     }
+          	
+          }
 	       return handler;
 	}
 }

@@ -1348,1249 +1348,1290 @@ public class CommandWrapperBuilder {
 		return this;
 	}
 
-public CommandWrapperBuilder createEventOrder(Long clientId ) {
-	this.actionName="CREATE";
-	this.entityName="EVENTORDER";
-	this.entityId=clientId;
-	this.href="eventorder/template";
-	return this;
-}
-
-public CommandWrapperBuilder createMediaAsset() {
-	this.actionName="CREATE";
-	this.entityName="MEDIAASSET";
-	this.entityId=null;
-	this.href="mediaasset/template";
-	return this;
-}
-
-public CommandWrapperBuilder updateOrder(Long orderId) {
-	this.actionName = "UPDATE";
-	this.entityName = "ORDER";
-	this.entityId = orderId;
-	this.href = "order/template";
-	return this;
-}
-
-public CommandWrapperBuilder renewalOrder(Long orderId) {
-	this.actionName="RENEWAL";
-	this.entityName="ORDER";
-	this.entityId=orderId;
-	this.href="order/renewal";
-	return this;
-}
-
-public CommandWrapperBuilder reconnectOrder(final Long orderId) {
-	this.actionName="RECONNECT";
-	this.entityName="ORDER";
-	this.entityId=orderId;
-	this.href="order/reconnect";
-	return this;
-}
-public CommandWrapperBuilder createChargeCode() {
-	this.actionName = "CREATE";
-	this.entityName = "CHARGECODE";
-	this.entityId = null;
-	this.href = "chargecode";
-	return this;	
-}
-public CommandWrapperBuilder createTaxMap(String chargeCode){
-	this.actionName = "CREATE";
-	this.entityName = "TAXMAPPING";
-	this.supportedEntityType=chargeCode;
-	this.href = "taxmap/addtaxmap";
-	return this;
-}
-public CommandWrapperBuilder updateChargeCode(final Long chargeCodeId){
-	this.actionName = "UPDATE";
-	this.entityName = "CHARGECODE";
-	this.entityId = chargeCodeId;
-	this.href = "chargecode/"+chargeCodeId;
-	return this;
-}
-public CommandWrapperBuilder updateTaxMap(final Long taxMapId){
-	this.actionName = "UPDATE";
-	this.entityName = "TAXMAPPING";
-	this.entityId = taxMapId;
-	this.href = "taxmap/"+taxMapId;
-	return this;
-}
-
-public CommandWrapperBuilder createBillingMessage() {
-	this.actionName = "CREATE";
-	this.entityName = "BILLINGMESSAGE";
-	this.entityId = null;
-	this.href = "/billingMessage";
-	return this;
-}
-public CommandWrapperBuilder createMessageData(Long clientId) {
-	this.actionName = "CREATEDATA";
-	this.entityName = "BILLINGMESSAGE";
-	this.entityId = clientId;
-	this.href = "/billingMessage/"+entityId;
-	return this;
-}
-
-public CommandWrapperBuilder updateBillingMessage(Long clientId) {
-	this.actionName = "UPDATE";
-	this.entityName = "BILLINGMESSAGE";
-	this.entityId = clientId;
-	this.href = "/billingMessage/"+entityId;
-	return this;
-}
-public CommandWrapperBuilder createBatch(){
-	this.actionName = "CREATE";
-	this.entityName = "BATCH";
-	this.entityId = null;
-	this.href = "/batchs";
-	return this;
-}
-public CommandWrapperBuilder createSchedule(){
-	this.actionName = "CREATE";
-	this.entityName = "SCHEDULE";
-	this.entityId = null;
-	this.href = "/jobschedules";
-	return this;
-}
-
-public CommandWrapperBuilder deleteBillingMessage(Long messageId) {
-	
-	// TODO Auto-generated method stub
-	this.actionName = "DELETE";
-	this.entityName = "BILLINGMESSAGE";
-	this.entityId = messageId;
-	this.href = "/message/"+entityId;
-	return this;
-}
-
-public CommandWrapperBuilder createProspect() {
-
-	this.actionName = "CREATE";
-	this.entityName = "PROSPECT";
-	this.entityId = null;
-	this.href = "/prospects";
-	return this;
-}
-public CommandWrapperBuilder followUpProspect(final Long prospectId){
-	this.actionName = "FOLLOWUP";
-	this.entityName = "PROSPECT";
-	this.entityId = prospectId;
-	this.href = "/prospects/"+prospectId;
-	return this;
-}
-public CommandWrapperBuilder deleteProspect(final Long deleteProspectId){
-	
-	this.actionName = "DELETE";
-	this.entityName = "PROSPECT";
-	this.entityId = deleteProspectId;
-	this.href = "/prospects/"+deleteProspectId;
-	return this;
-}
-
-
-public CommandWrapperBuilder convertProspectToClient(final Long prospectId){
-
-	this.actionName = "CONVERT";
-	this.entityName = "PROSPECT";
-	this.entityId = prospectId;
-	this.href = "/prospect/converttoclient/"+prospectId;
-	return this;
-}
-
-public CommandWrapperBuilder createOwnedHardware(final Long clientId){
-	this.actionName = "CREATE";
-	this.entityName = "OWNEDHARDWARE";
-	this.entityId = clientId;
-	this.href = "/ownedhardware";
-	return this;
-}
-
-public CommandWrapperBuilder updateOwnedHardware(final Long id){
-	this.actionName = "UPDATE";
-	this.entityName = "OWNEDHARDWARE";
-	this.entityId = id;
-	this.href = "/ownedhardware";
-	return this;
-}
-
-public CommandWrapperBuilder deleteOwnHardware(final Long id){
-	this.actionName = "DELETE";
-	this.entityName = "OWNEDHARDWARE";
-	this.entityId = id;
-	this.href = "/ownedhardware";
-	return this;
-}
-
-public CommandWrapperBuilder createCountryCurrency() {
-	this.actionName = "CREATE";
-	this.entityName = "COUNTRYCURRENCY";
-	this.href = "/countrycurrency";
-	return this;
-} 
-
-public CommandWrapperBuilder createEpg() {
-	
-	this.actionName = "CREATE";
-	this.entityName = "EPGPROGRAMGUIDE";
-	this.entityId = null;
-	this.href = "/epgprogramguide";
-	return this;
-}
-
-public CommandWrapperBuilder updateMediaAsset(Long assetId) {
-	this.actionName="UPDATE";
-	this.entityName="MEDIAASSET";
-	this.entityId=assetId;
-	this.href="assets/"+entityId;
-	return this;
-}
-
-public CommandWrapperBuilder deleteMediaAsset(Long assetId) {
-	this.actionName="DELETE";
-	this.entityName="MEDIAASSET";
-	this.entityId=assetId;
-	this.href="assets/"+entityId;
-	return this;
-}
-
-public CommandWrapperBuilder updateCountryCurrency(Long id) {
-	this.actionName="UPDATE";
-	this.entityName="COUNTRYCURRENCY";
-	this.entityId=id;
-	this.href="countrycurrency/"+entityId;
-	return this;
-}
-
-public CommandWrapperBuilder deleteCountryCurrency(Long id) {
-	this.actionName="DELETE";
-	this.entityName="COUNTRYCURRENCY";
-	this.entityId=id;
-	this.href="countrycurrency/"+entityId;
-	return this;
-}
-
-public CommandWrapperBuilder createRegion() {
-	this.actionName="CREATE";
-	this.entityName="REGION";
-	this.entityId=null;
-	this.href="regions/template";
-	return this;
-}
-
-public CommandWrapperBuilder createSelfCare() {
-	this.actionName = "CREATE";
-	this.entityName = "SELFCARE";
-	this.entityId = null;
-	this.href = "/selfcare";
-	return this;
-}
-
-public CommandWrapperBuilder createSelfCareUDP() {
-	this.actionName = "CREATE";
-	this.entityName = "SELFCAREUDP";
-	this.entityId = null;
-	this.href = "/selfcare";
-	return this;
-}
-
-public CommandWrapperBuilder updateRegion(Long regionId) {
-	this.actionName="UPDATE";
-	this.entityName="REGION";
-	this.entityId=regionId;
-	this.href="regions/"+regionId;
-	return this;
-}
-
-public CommandWrapperBuilder deleteregion(Long regionId) {
-	this.actionName="DELETE";
-	this.entityName="REGION";
-	this.entityId=regionId;
-	this.href="region/"+entityId;
-	return this;
-}
-
-public CommandWrapperBuilder createDiscount() {
-	this.actionName = "CREATE";
-	this.entityName = "DISCOUNT";
-	this.entityId = null;
-	this.href = "/discount";
-	return this;
-}
-public CommandWrapperBuilder updateDiscount(Long discountId) {
-	this.actionName = "UPDATE";
-	this.entityName = "DISCOUNT";
-	this.entityId = discountId;
-	this.href = "/discount";
-	return this;
-}
-public CommandWrapperBuilder deleteDiscount(Long discountId) {
-	this.actionName = "DELETE";
-	this.entityName = "DISCOUNT";
-	this.entityId = discountId;
-	this.href = "/discount";
-	return this;
-}
-
-public CommandWrapperBuilder createMRN(){
-	 this.actionName = "CREATE";
-	 this.entityName = "MRN";
-	 this.entityId = null;
-	 this.href = "/mrndetails";
-	 return this;
+	public CommandWrapperBuilder createEventOrder(Long clientId) {
+		this.actionName = "CREATE";
+		this.entityName = "EVENTORDER";
+		this.entityId = clientId;
+		this.href = "eventorder/template";
+		return this;
 	}
 
-public CommandWrapperBuilder moveMRN() {
-	 this.actionName = "MOVE";
-	 this.entityName = "MRN";
-	 this.entityId = null;
-	 this.href = "/mrndetails/movemrn/"+clientId;
-	 return this;
-	}
-public CommandWrapperBuilder createSupplier() {
-	 this.actionName = "CREATE";
-	 this.entityName = "SUPPLIER";
-	 this.entityId = null;
-	 this.href = "/supplier";
-	 return this;
+	public CommandWrapperBuilder createMediaAsset() {
+		this.actionName = "CREATE";
+		this.entityName = "MEDIAASSET";
+		this.entityId = null;
+		this.href = "mediaasset/template";
+		return this;
 	}
 
-public CommandWrapperBuilder createVoucherGroup() 
-  {
-	 this.actionName = "CREATE";
-	 this.entityName = "VOUCHER"; 
-	 this.href = "/vouchers";
-	 return this;
-	 
-  }
-
-public CommandWrapperBuilder updateJobDetail(final Long jobId) {
-    this.actionName = "UPDATE";
-    this.entityName = "SCHEDULER";
-    this.entityId = jobId;
-    this.href = "/updateJobDetail/" + jobId + "/updateJobDetail";
-    return this;
-}
-
-public CommandWrapperBuilder addNewJob() {
-	this.actionName = "CREATE";
-    this.entityName = "SCHEDULER";
-    this.href = "/job";
-    return this;
-}
-
-public CommandWrapperBuilder deleteJob(Long jobId) {
-	this.actionName = "DELETE";
-    this.entityName = "SCHEDULER";
-    this.entityId=jobId;
-    this.href = "/job/"+jobId;
-    return this;
-}
-
-public CommandWrapperBuilder createEntitlement(Long id) {
-	
-	 this.actionName = "CREATE";
-	 this.entityName = "ENTITLEMENT"; 
-	 this.entityId = id;
-	 this.href = "/entitlements";
-	 return this;
-	
-}
-public CommandWrapperBuilder createEpgXsls(Long i) {
-	
-	this.actionName = "CREATE";
-	this.entityName = "EPGPROGRAMGUIDE";
-	this.entityId = i;
-	this.href = "/epgprogramguide";
-	return this;
-}
-
-public CommandWrapperBuilder updateJobParametersDetail(Long jobId) {
-	     this.actionName = "UPDATE";
-	    this.entityName = "SCHEDULERJOBPARAMETER";
-	    this.entityId = jobId;
-	    this.href = "/job/" + jobId + "/jobparameters";
-	    return this;
-}
-
-public CommandWrapperBuilder createBalance() {
-	    this.actionName = "CREATE";
-	    this.entityName = "BALANCE";
-	    this.href = "/clientBalance";
-	    return this;
-}
-
-public CommandWrapperBuilder updateProspect(Long id) {
-	this.actionName = "UPDATE";
-	this.entityName = "PROSPECT";
-	this.entityId = id;
-	this.href = "/prospects/edit/"+id;
-	return this;
-}
-
-public CommandWrapperBuilder retrackOsdmessage(final Long orderId) {
-	
-	this.actionName="RETRACKOSDMESSAGE";
-	this.entityName="ORDER";
-	this.entityId=orderId;
-	this.href="order/retrackOsdmessage";
-	return this;
-}
-
-public CommandWrapperBuilder updatePlanMapping(Long planMapId) {
-	
-	this.actionName="UPDATE";
-	this.entityName="PLANMAPPING";
-	this.entityId=planMapId;
-	this.href="planmapping/"+planMapId;
-	return this;
-}
-
-public CommandWrapperBuilder createServiceMapping() {
-	 this.actionName = "CREATE";
-	 this.entityName = "SERVICEMAPPING";
-	 this.entityId = null;
-	 this.href = "servicemapping";
-	 return this; 
-	}
-
-public CommandWrapperBuilder updateServiceMapping(Long serviceMapId) {
-	 this.actionName = "UPDATE";
-	 this.entityName = "SERVICEMAPPING";
-	 this.entityId = serviceMapId;
-	 this.href = "servicemapping/"+serviceMapId;
-	 return this; 
-	}
-
-public CommandWrapperBuilder createAssociation(Long clientId) {
-	// TODO Auto-generated method stub
-	this.actionName="CREATE";
-	this.entityName="ASSOCIATION";
-	this.entityId=clientId;
-	this.href="associations/"+clientId;
-	return this;
-}
-
-public CommandWrapperBuilder updateAssociation(Long id) {
-	// TODO Auto-generated method stub
-	this.actionName="UPDATE";
-	this.entityName="ASSOCIATION";
-	this.entityId=id;
-	this.href="associations/"+id+"/update/"+clientId;
-	return this;
-}
-
-public CommandWrapperBuilder createHardwarePlan() {
-	this.actionName = "CREATE";
-	this.entityName = "PLANMAPPING";
-	this.entityId = null;
-	this.href = "/hardwareplans/template";
-	return this;
-}
-
-public CommandWrapperBuilder updateDeAssociation(Long associationId) {
-	
-	this.actionName="DEASSOCIATION";
-	this.entityName="ASSOCIATION";
-	this.entityId=associationId;
-	this.href="associations/deassociations/"+associationId;
-	return this;
-}
-
-public CommandWrapperBuilder createPaymentGateway() {
-	
-	this.actionName = "CREATE";
-	this.entityName = "PAYMENTGATEWAY";
-	this.entityId = null;
-	this.href = "/paymentgateways";
-	return this;
-}
-
-public CommandWrapperBuilder updateEventOrderPrice() {
-	this.actionName="UPDATE";
-	this.entityName="EVENTORDER";
-	this.entityId=clientId;
-	this.href="eventorder";
-	return this;
-}
-public CommandWrapperBuilder hardwareSwapping(Long clientId) {
-	this.actionName = "SWAPPING";
-	this.entityName = "HARDWARESWAPPING";
-	this.entityId = clientId;
-	this.href = "/hardwaremapping/"+clientId;
-	return this;
-}
-
-public CommandWrapperBuilder activateProcess() {
-	this.actionName = "ACTIVATE";
-	this.entityName = "ACTIVATIONPROCESS";
-	this.href = "/clients/template";
-	return this;
-	
-}
-
-public CommandWrapperBuilder provisiongSystem() {
-	this.actionName = "CREATE";
-	this.entityName = "PROVISIONINGSYSTEM";
-	this.href = "/provisionings";
-	return this;
-}
-
-public CommandWrapperBuilder updateprovisiongSystem(Long id) {
-	this.actionName = "UPDATE";
-	this.entityName = "PROVISIONINGSYSTEM";
-	this.entityId = id;
-	this.href = "/provisionings/"+ id ;
-	return this;
-}
-
-public CommandWrapperBuilder deleteProvisiongSystem(Long id) {
-	this.actionName = "DELETE";
-	this.entityName = "PROVISIONINGSYSTEM";
-	this.entityId = id;
-	this.href = "/provisionings/"+ id ;
-	return this;
-}
-
-public CommandWrapperBuilder createUserChat() {
-	
-	this.actionName = "CREATE";
-	this.entityName = "USERCHATMESSAGE";
-	this.entityId = null;
-	this.href = "/userchat/";
-	return this;
-}
-
-public CommandWrapperBuilder createEventActionMapping() {
-	this.actionName = "CREATE";
-	this.entityName = "EVENTACTIONMAP";
-	this.entityId = null;
-	this.href = "/eventactionmapping";
-	return this;
-}
-public CommandWrapperBuilder updateEventActionMapping(Long id) {
-	this.actionName = "UPDATE";
-	this.entityName = "EVENTACTIONMAP";
-	this.entityId = id;
-	this.href = "/eventactionmapping";
-	return this;
-}
-public CommandWrapperBuilder deleteEventActionMapping(Long id) {
-	this.actionName = "DELETE";
-	this.entityName = "EVENTACTIONMAP";
-	this.entityId = id;
-	this.href = "/eventactionmapping";
-	return this;
-}
-
-public CommandWrapperBuilder updatePaymentGateway(Long id) {
-
-	this.actionName = "UPDATE";
-	this.entityName = "PAYMENTGATEWAY";
-	this.entityId = id;
-	this.href = "/paymentgateways/"+this.entityId;
-	return this;
-}
-
-public CommandWrapperBuilder cancelPayment(Long paymentId) {
-	
-	this.actionName = "CANCEL";
-	this.entityName = "PAYMENT";
-	this.entityId = paymentId;
-	this.href = "/payments/cancelpayment"+this.entityId;
-	return this;
-
-}
-
-public CommandWrapperBuilder changePlan(Long orderId) {
-
-
-    this.actionName="CHANGEPLAN";
-    this.entityName="ORDER";
-    this.entityId=orderId;
-    this.href="orders/changePlan"+orderId;
-
-    
-   return this;
-}
-public CommandWrapperBuilder updateInventoryItem(final Long id) {
-	this.actionName = "UPDATE";
-	this.entityName = "INVENTORY";
-	this.entityId = id;
-	this.href = "/itemdetails/template";
-	return this;
-}
-
-public CommandWrapperBuilder deleteInventoryItem(final Long id) {
-	this.actionName = "DELETE";
-	this.entityName = "INVENTORY";
-	this.entityId = id;
-	this.href = "/itemdetails"+id;
-	return this;
-}
-
-public CommandWrapperBuilder createPromotionCode() {
-	this.actionName = "CREATE";
-	this.entityName = "PROMOTIONCODE";
-	this.entityId = null;
-	this.href = "/promotioncode";
-	return this;
-}
-
-public CommandWrapperBuilder applyPromo(Long orderId) {
-	this.actionName = "APPLYPROMO";
-	this.entityName = "ORDER";
-	this.entityId = orderId;
-	this.href = "/orders/applyPromo";
-	return this;
-}
-
-public CommandWrapperBuilder deAllocate(Long id) {
-	this.actionName = "DEALLOCATE";
-	this.entityName = "INVENTORY";
-	this.entityId = id;
-	this.href = "/itemdetails/template";
-	return this;
-}
-
-public CommandWrapperBuilder updatePromotionCode(Long id) {
-	this.actionName = "UPDATE";
-	this.entityName = "PROMOTIONCODE";
-	this.entityId = id;
-	this.href = "/promotioncode";
-	return this;
-}
-
-public CommandWrapperBuilder deletePromotionCode(Long id) {
-	this.actionName = "DELETE";
-	this.entityName = "PROMOTIONCODE";
-	this.entityId = id;
-	this.href = "/promotioncode";
-	return this;
-}
-public CommandWrapperBuilder updateUsermessage(Long meesageId) {
-	
-	this.actionName = "UPDATE";
-	this.entityName = "USERCHATMESSAGE";
-	this.entityId = meesageId;
-	this.href = "/userchats/"+this.entityId;
-	return this;
-}
-
-public CommandWrapperBuilder deleteUserChatmessage(Long meesageId) {
-
-	this.actionName = "DELETE";
-	this.entityName = "USERCHATMESSAGE";
-	this.entityId = meesageId;
-	this.href = "/userchats/"+this.entityId;
-	return this;
-}
-
-public CommandWrapperBuilder createLocation(final String entityType) {
-	this.actionName = "CREATE";
-	this.entityName = "LOCATION";
-	this.supportedEntityType=entityType;
-	this.href = "/address/" + entityType;
-	return this;
-}
-
-public CommandWrapperBuilder updateLocation(final String entityType,Long entityId) {
-	this.actionName = "UPDATE";
-	this.entityName = "LOCATION";
-	this.entityId = entityId;
-	this.supportedEntityType=entityType;
-	this.href = "/address/" + entityType+"/"+entityId;
-	return this;
-}
-
-public CommandWrapperBuilder deleteLocation(final String entityType, Long entityId) {
-	this.actionName = "DELETE";
-	this.entityName = "LOCATION";
-	this.entityId = entityId;
-	this.supportedEntityType=entityType;
-	this.href = "/address/" + entityType+"/"+entityId;
-	return this;
-}
-
-   public CommandWrapperBuilder updateCache() {
-        this.actionName = "UPDATE";
-        this.entityName = "CACHE";
-        this.href = "/cache";
-        return this;
-    }
-
-public CommandWrapperBuilder createCreditDistribution(Long clientId) {
-	this.actionName = "CREATE";
-    this.entityName = "CREDITDISTRIBUTION";
-    this.href = "/creditdistribution";
-    return this;
-}
-
-public CommandWrapperBuilder createSchedulingOrder(Long clientId) {
-	this.actionName = "CREATE";
-    this.entityName = "ORDERSCHEDULING";
-    this.entityId=clientId;
-    this.href = "/orders/scheduling"+clientId;
-    return this;
-}
-
-public CommandWrapperBuilder deleteSchedulOrder(Long orderId) {
-	
-	this.actionName = "DELETE";
-    this.entityName = "ORDERSCHEDULING";
-    this.entityId=orderId;
-    this.href = "/orders/scheduling"+clientId;
-    return this;
-}
-
-public CommandWrapperBuilder extensionOrder(Long orderId) {
-	this.actionName = "EXTENSION";
-    this.entityName = "ORDER";
-    this.entityId=orderId;
-    this.href = "/orders/extenstion"+clientId;
-    return this;
-}
-
-
-
-public CommandWrapperBuilder addNewProvisioning(Long clientId) {
-	
-	this.actionName = "ADD";
-    this.entityName = "PROVISIONINGSYSTEM";
-    this.entityId=clientId;
-    this.href = "/provisionings/"+clientId;
-    return this;
-}
-
-public CommandWrapperBuilder createGroupsDetails() {
-	this.actionName = "CREATE";
-	this.entityName = "GROUPSDETAILS";
-	this.entityId = null;
-	this.href = "/groupsdetails";
-	return this;
-}
-
-
-public CommandWrapperBuilder createIpPoolManagement() {
-	
-	this.actionName = "CREATE";
-    this.entityName = "IPPOOLMANAGEMENT";
-    this.href = "/ippooling";
-	return this;
-
-}
-
-public CommandWrapperBuilder updateprovisiongServiceParams(Long id) {
-
-	this.actionName = "UPDATE";
-    this.entityName = "PROVISIONINGSERVICEPARAMS";
-    this.entityId=id;
-    this.href = "/serviceparams/"+clientId;
-	return this;
-}
-
-public CommandWrapperBuilder createItemSale() {
-	this.actionName = "CREATE";
-    this.entityName = "ITEMSALE";
-    this.href = "/agents/";
-	return this;
-}
-public CommandWrapperBuilder updateprovisiongDetails(Long processrequestId) {
-
-	this.actionName = "UPDATE";
-    this.entityName = "PROVISIONINGDETAILS";
-    this.entityId=processrequestId;
-    this.href = "/provisioning/updateprovisiondetails"+processrequestId;
-    return this;
-}
-
-public CommandWrapperBuilder confirnProvisiongDetails(Long processrequestId) {
-
-	this.actionName = "CONFIRM";
-    this.entityName = "PROVISIONINGDETAILS";
-    this.entityId=processrequestId;
-    this.href = "/provisioning/confirm"+processrequestId;
-    return this;
-}
-
-public CommandWrapperBuilder createSmtpConfiguration() {
-	this.actionName = "CREATE";
-	this.entityName = "SMTPCONFIGURATION";
-	//this.entityId=configId;
-	this.href = "/configurations";
-	return this;
-}
-
-public CommandWrapperBuilder paypalEnquireyPayment(final Long clientId) {
-	this.actionName = "CREATEENQUIREY";
-	this.entityName = "PAYMENT";
-	this.entityId = clientId;
-	this.href = "/payments/paypalEnquirey" + clientId;
-	return this;
-}
-
-public CommandWrapperBuilder updateMediaStatus(String deviceId) {
-	
-	this.actionName = "UPDATE";
-	this.entityName = "MEDIADEVICE";
-	this.supportedEntityType = deviceId;
-	this.href = "/mediadevices/"+deviceId;
-	return this;
-}
-
-
-public CommandWrapperBuilder updateClientStatus(Long clientId) {
-	this.actionName = "UPDATESTATUS";
-	this.entityName = "CLIENT";
-	this.entityId=clientId;
-	this.href = "/clients/"+clientId;
-	return this;
-}
-
-
-public CommandWrapperBuilder createOfficeAdjustment(Long officeId) {
-	this.actionName = "CREATE";
-	this.entityName = "OFFICEADJUSTMENT";
-	this.entityId = officeId;
-	this.href = "/officeadjustments/"+officeId;
-	return this;
-}
-
-public CommandWrapperBuilder createOfficePayment(Long officeId) {
-	this.actionName = "CREATE";
-	this.entityName = "OFFICEPAYMENT";
-	this.entityId = officeId;
-	this.href = "/officepayments/"+officeId;
-	return this;
-}
-public CommandWrapperBuilder createRedemption() {
-	this.actionName = "CREATE";
-	this.entityName = "REDEMPTION";
-	this.entityId = clientId;
-	this.href = "/redemption/"+clientId+"/";
-	return this;
-}
-
-public CommandWrapperBuilder moveItemSale() {
-	 this.actionName = "MOVEITEM";
-	 this.entityName = "MRN";
-	 this.entityId = null;
-	 this.href = "/mrndetails/movemrn/itemsale"+clientId;
-	 return this;
-}
-
-public CommandWrapperBuilder createClientCardDetails(Long clientId) {
-	this.actionName = "CREATE";
-	this.entityName = "CLIENTCARDDETAILS";
-	this.entityId = null;
-	this.clientId = clientId;
-	this.href = "/clients/" + clientId + "/carddetails";
-	return this;
-}
-
-public CommandWrapperBuilder updateCreditCardDetail(Long clientId, Long id,String cardType) {
-	this.actionName = "UPDATE";
-	this.entityName = "CLIENTCARDDETAILS";
-	this.entityId = clientId;
-	this.subentityId = id;
-	this.supportedEntityType=cardType;
-	this.href = "/clients/" + clientId + "/carddetails/"+id+"/"+cardType;
-	return this;
-}
-
-public CommandWrapperBuilder deleteClientCardDetails(Long id, Long clientId) {
-	this.actionName = "DELETE";
-	this.entityName = "CLIENTCARDDETAILS";
-	this.entityId = clientId;
-	this.subentityId = id;
-	this.href = "/clients/" + clientId + "/carddetails/"+id;
-	return this;	
-}
-
-public CommandWrapperBuilder createGroupsDetailsProvision(Long prepareRequestId) {
-	this.actionName = "CREATE";
-	this.entityName = "GROUPSPROVISION";
-	this.entityId = prepareRequestId;
-	this.href = "/provision/"+prepareRequestId;
-	return this;
-}
-
-public CommandWrapperBuilder updateClientTaxExemption(Long clientId) {
-	this.actionName = "UPDATE";
-	this.entityName = "CLIENTTAXEXEMPTION";
-	this.entityId = clientId;
-	this.href = "/taxexemption/" +clientId;
-	return this;
-}
-
-public CommandWrapperBuilder generateVoucherPin(Long batchId) {
-	this.actionName = "PROCESS";
-	this.entityName = "VOUCHER";
-	this.entityId = batchId;
-	this.href = "/vouchers/" + batchId;
-	return this;
-}
-
-public CommandWrapperBuilder updateIpPoolManagement(Long id) {
-	this.actionName = "UPDATE";
-	this.entityName = "IPPOOLMANAGEMENT";
-	this.entityId = id;
-	this.href = "/ippooling/"+id;
-	return this;
-}
-
-
-public CommandWrapperBuilder updateClientBillMode(Long clientId) {
-	this.actionName = "UPDATE";
-	this.entityName = "CLIENTBILLMODE";
-	this.entityId = clientId;
-	this.href = "/billmode/" +clientId;
-	return this;
-}
-
-public CommandWrapperBuilder updateIpStatus(Long id) {
-	this.actionName = "UPDATE";
-	this.entityName = "IPSTATUS";
-	this.entityId=id;
-	this.href = "/ippooling/status";
-	return this;
-}
-
-public CommandWrapperBuilder terminateOrder(Long orderId) {
-	
-	this.actionName = "TERMINATE";
-	this.entityName = "ORDER";
-	this.entityId=orderId;
-	this.href = "/orders/terminate/"+orderId;
-	return this;
-}
-
-public CommandWrapperBuilder createGroupsStatment(Long clientId) {
-	
-	this.actionName = "CREATESTATMENT";
-	this.entityName = "GROUPS";
-	this.entityId = clientId;
-	this.href = "/groups/statment/"+clientId;
-	return this;
-}
-
-public CommandWrapperBuilder createProvisioningPlanMapping() {
-	this.actionName = "CREATE";
-	this.entityName = "PROVISIONINGPLANMAPPING";
-	this.href = "/planmapping";
-	return this;
-}
-
-public CommandWrapperBuilder updateProvisioningPlanMapping(Long planMappingId) {
-	this.actionName = "UPDATE";
-	this.entityName = "PROVISIONINGPLANMAPPING";
-	this.entityId = planMappingId;
-	this.href = "/planmapping/" + planMappingId ;
-	return this;	
-}
-	
-
-public CommandWrapperBuilder createDatatable(final String json) {
-    this.actionName = "CREATE";
-    this.entityName = "DATATABLE";
-    this.href = "/datatables/";
-    this.json = json;
-    return this;
-}
-
-public CommandWrapperBuilder updateDatatable(final String datatable, final String json) {
-    this.actionName = "UPDATE";
-    this.entityName = "DATATABLE";
-    this.href = "/datatables/" + datatable;
-    this.json = json;
-    return this;
-}
-
-public CommandWrapperBuilder deleteDatatable(final String datatable) {
-    this.actionName = "DELETE";
-    this.entityName = "DATATABLE";
-    this.href = "/datatables/" + datatable;
-    return this;
-}
-
-public CommandWrapperBuilder registerDBDatatable(final String datatable, final String apptable) {
-    this.actionName = "REGISTER";
-    this.entityName = "DATATABLE";
-    this.entityId = null;
-    this.href = "/datatables/register/" + datatable + "/" + apptable;
-    return this;
-}
-
- public CommandWrapperBuilder createDatatableEntry(final String datatable, final Long apptableId, final Long datatableId) {
-    this.actionName = "CREATE";
-    commonDatatableSettings(datatable, apptableId, datatableId);
-    return this;
- }
-
- public CommandWrapperBuilder updateDatatable(final String datatable, final Long apptableId, final Long datatableId) {
-    this.actionName = "UPDATE";
-    commonDatatableSettings(datatable, apptableId, datatableId);
-    return this;
- }
-
- public CommandWrapperBuilder deleteDatatable(final String datatable, final Long apptableId, final Long datatableId) {
-    this.actionName = "DELETE";
-    commonDatatableSettings(datatable, apptableId, datatableId);
-    return this;
- }
-
- private void commonDatatableSettings(final String datatable, final Long apptableId, final Long datatableId) {
-
-    this.entityName = datatable;
-    this.entityId = apptableId;
-    this.subentityId = datatableId;
-    if (datatableId == null) {
-        this.href = "/datatables/" + datatable + "/" + apptableId;
-    } else {
-        this.href = "/datatables/" + datatable + "/" + apptableId + "/" + datatableId;
-    }
- }
- 
- public CommandWrapperBuilder updateIpDescription() {
-		
+	public CommandWrapperBuilder updateOrder(Long orderId) {
 		this.actionName = "UPDATE";
-	    this.entityName = "IPDESCRIPTION";
-	    this.href = "/ippooling/description";
+		this.entityName = "ORDER";
+		this.entityId = orderId;
+		this.href = "order/template";
+		return this;
+	}
+
+	public CommandWrapperBuilder renewalOrder(Long orderId) {
+		this.actionName = "RENEWAL";
+		this.entityName = "ORDER";
+		this.entityId = orderId;
+		this.href = "order/renewal";
+		return this;
+	}
+
+	public CommandWrapperBuilder reconnectOrder(final Long orderId) {
+		this.actionName = "RECONNECT";
+		this.entityName = "ORDER";
+		this.entityId = orderId;
+		this.href = "order/reconnect";
+		return this;
+	}
+
+	public CommandWrapperBuilder createChargeCode() {
+		this.actionName = "CREATE";
+		this.entityName = "CHARGECODE";
+		this.entityId = null;
+		this.href = "chargecode";
+		return this;
+	}
+
+	public CommandWrapperBuilder createTaxMap(String chargeCode) {
+		this.actionName = "CREATE";
+		this.entityName = "TAXMAPPING";
+		this.supportedEntityType = chargeCode;
+		this.href = "taxmap/addtaxmap";
+		return this;
+	}
+
+	public CommandWrapperBuilder updateChargeCode(final Long chargeCodeId) {
+		this.actionName = "UPDATE";
+		this.entityName = "CHARGECODE";
+		this.entityId = chargeCodeId;
+		this.href = "chargecode/" + chargeCodeId;
+		return this;
+	}
+
+	public CommandWrapperBuilder updateTaxMap(final Long taxMapId) {
+		this.actionName = "UPDATE";
+		this.entityName = "TAXMAPPING";
+		this.entityId = taxMapId;
+		this.href = "taxmap/" + taxMapId;
+		return this;
+	}
+
+	public CommandWrapperBuilder createBillingMessage() {
+		this.actionName = "CREATE";
+		this.entityName = "BILLINGMESSAGE";
+		this.entityId = null;
+		this.href = "/billingMessage";
+		return this;
+	}
+
+	public CommandWrapperBuilder createMessageData(Long clientId) {
+		this.actionName = "CREATEDATA";
+		this.entityName = "BILLINGMESSAGE";
+		this.entityId = clientId;
+		this.href = "/billingMessage/" + entityId;
+		return this;
+	}
+
+	public CommandWrapperBuilder updateBillingMessage(Long clientId) {
+		this.actionName = "UPDATE";
+		this.entityName = "BILLINGMESSAGE";
+		this.entityId = clientId;
+		this.href = "/billingMessage/" + entityId;
+		return this;
+	}
+
+	public CommandWrapperBuilder createBatch() {
+		this.actionName = "CREATE";
+		this.entityName = "BATCH";
+		this.entityId = null;
+		this.href = "/batchs";
+		return this;
+	}
+
+	public CommandWrapperBuilder createSchedule() {
+		this.actionName = "CREATE";
+		this.entityName = "SCHEDULE";
+		this.entityId = null;
+		this.href = "/jobschedules";
+		return this;
+	}
+
+	public CommandWrapperBuilder deleteBillingMessage(Long messageId) {
+
+		// TODO Auto-generated method stub
+		this.actionName = "DELETE";
+		this.entityName = "BILLINGMESSAGE";
+		this.entityId = messageId;
+		this.href = "/message/" + entityId;
+		return this;
+	}
+
+	public CommandWrapperBuilder createProspect() {
+
+		this.actionName = "CREATE";
+		this.entityName = "PROSPECT";
+		this.entityId = null;
+		this.href = "/prospects";
+		return this;
+	}
+
+	public CommandWrapperBuilder followUpProspect(final Long prospectId) {
+		this.actionName = "FOLLOWUP";
+		this.entityName = "PROSPECT";
+		this.entityId = prospectId;
+		this.href = "/prospects/" + prospectId;
+		return this;
+	}
+
+	public CommandWrapperBuilder deleteProspect(final Long deleteProspectId) {
+
+		this.actionName = "DELETE";
+		this.entityName = "PROSPECT";
+		this.entityId = deleteProspectId;
+		this.href = "/prospects/" + deleteProspectId;
+		return this;
+	}
+
+	public CommandWrapperBuilder convertProspectToClient(final Long prospectId) {
+
+		this.actionName = "CONVERT";
+		this.entityName = "PROSPECT";
+		this.entityId = prospectId;
+		this.href = "/prospect/converttoclient/" + prospectId;
+		return this;
+	}
+
+	public CommandWrapperBuilder createOwnedHardware(final Long clientId) {
+		this.actionName = "CREATE";
+		this.entityName = "OWNEDHARDWARE";
+		this.entityId = clientId;
+		this.href = "/ownedhardware";
+		return this;
+	}
+
+	public CommandWrapperBuilder updateOwnedHardware(final Long id) {
+		this.actionName = "UPDATE";
+		this.entityName = "OWNEDHARDWARE";
+		this.entityId = id;
+		this.href = "/ownedhardware";
+		return this;
+	}
+
+	public CommandWrapperBuilder deleteOwnHardware(final Long id) {
+		this.actionName = "DELETE";
+		this.entityName = "OWNEDHARDWARE";
+		this.entityId = id;
+		this.href = "/ownedhardware";
+		return this;
+	}
+
+	public CommandWrapperBuilder createCountryCurrency() {
+		this.actionName = "CREATE";
+		this.entityName = "COUNTRYCURRENCY";
+		this.href = "/countrycurrency";
+		return this;
+	}
+
+	public CommandWrapperBuilder createEpg() {
+
+		this.actionName = "CREATE";
+		this.entityName = "EPGPROGRAMGUIDE";
+		this.entityId = null;
+		this.href = "/epgprogramguide";
+		return this;
+	}
+
+	public CommandWrapperBuilder updateMediaAsset(Long assetId) {
+		this.actionName = "UPDATE";
+		this.entityName = "MEDIAASSET";
+		this.entityId = assetId;
+		this.href = "assets/" + entityId;
+		return this;
+	}
+
+	public CommandWrapperBuilder deleteMediaAsset(Long assetId) {
+		this.actionName = "DELETE";
+		this.entityName = "MEDIAASSET";
+		this.entityId = assetId;
+		this.href = "assets/" + entityId;
+		return this;
+	}
+
+	public CommandWrapperBuilder updateCountryCurrency(Long id) {
+		this.actionName = "UPDATE";
+		this.entityName = "COUNTRYCURRENCY";
+		this.entityId = id;
+		this.href = "countrycurrency/" + entityId;
+		return this;
+	}
+
+	public CommandWrapperBuilder deleteCountryCurrency(Long id) {
+		this.actionName = "DELETE";
+		this.entityName = "COUNTRYCURRENCY";
+		this.entityId = id;
+		this.href = "countrycurrency/" + entityId;
+		return this;
+	}
+
+	public CommandWrapperBuilder createRegion() {
+		this.actionName = "CREATE";
+		this.entityName = "REGION";
+		this.entityId = null;
+		this.href = "regions/template";
+		return this;
+	}
+
+	public CommandWrapperBuilder createSelfCare() {
+		this.actionName = "CREATE";
+		this.entityName = "SELFCARE";
+		this.entityId = null;
+		this.href = "/selfcare";
+		return this;
+	}
+
+	public CommandWrapperBuilder createSelfCareUDP() {
+		this.actionName = "CREATE";
+		this.entityName = "SELFCAREUDP";
+		this.entityId = null;
+		this.href = "/selfcare";
+		return this;
+	}
+
+	public CommandWrapperBuilder updateRegion(Long regionId) {
+		this.actionName = "UPDATE";
+		this.entityName = "REGION";
+		this.entityId = regionId;
+		this.href = "regions/" + regionId;
+		return this;
+	}
+
+	public CommandWrapperBuilder deleteregion(Long regionId) {
+		this.actionName = "DELETE";
+		this.entityName = "REGION";
+		this.entityId = regionId;
+		this.href = "region/" + entityId;
+		return this;
+	}
+
+	public CommandWrapperBuilder createDiscount() {
+		this.actionName = "CREATE";
+		this.entityName = "DISCOUNT";
+		this.entityId = null;
+		this.href = "/discount";
+		return this;
+	}
+
+	public CommandWrapperBuilder updateDiscount(Long discountId) {
+		this.actionName = "UPDATE";
+		this.entityName = "DISCOUNT";
+		this.entityId = discountId;
+		this.href = "/discount";
+		return this;
+	}
+
+	public CommandWrapperBuilder deleteDiscount(Long discountId) {
+		this.actionName = "DELETE";
+		this.entityName = "DISCOUNT";
+		this.entityId = discountId;
+		this.href = "/discount";
+		return this;
+	}
+
+	public CommandWrapperBuilder createMRN() {
+		this.actionName = "CREATE";
+		this.entityName = "MRN";
+		this.entityId = null;
+		this.href = "/mrndetails";
+		return this;
+	}
+
+	public CommandWrapperBuilder moveMRN() {
+		this.actionName = "MOVE";
+		this.entityName = "MRN";
+		this.entityId = null;
+		this.href = "/mrndetails/movemrn/" + clientId;
+		return this;
+	}
+
+	public CommandWrapperBuilder createSupplier() {
+		this.actionName = "CREATE";
+		this.entityName = "SUPPLIER";
+		this.entityId = null;
+		this.href = "/supplier";
+		return this;
+	}
+
+	public CommandWrapperBuilder createVoucherGroup() {
+		this.actionName = "CREATE";
+		this.entityName = "VOUCHER";
+		this.href = "/vouchers";
 		return this;
 
 	}
 
-public CommandWrapperBuilder updateMediaCrashDetails(Long clientId) {
-	
-	this.actionName = "UPDATECRASH";
-	this.entityName = "MEDIADEVICE";
-	this.entityId = clientId;
-	this.href = "/mediadevices/client/"+clientId;
-	return this;
-}
-public CommandWrapperBuilder createEventValidation() {
-	this.actionName = "CREATE";
-	this.entityName = "EVENTVALIDATION";
-	this.entityId = null;
-	this.href = "/eventvalidation";
-	return this;
-}
-public CommandWrapperBuilder deleteEventValidation(Long id) {
-	this.actionName = "DELETE";
-	this.entityName = "EVENTVALIDATION";
-	this.entityId = id;
-	this.href = "/eventvalidation";
-	return this;
-}
-public CommandWrapperBuilder editGrn(Long id) {
-	this.actionName = "UPDATE";
-	this.entityName = "GRN";
-	this.entityId = id;
-	this.href = "itemdetails/editgrn";
-	return this;
-}
-
-public CommandWrapperBuilder createParentClient(Long clientId) {
-	this.actionName = "CREATE";
-	this.entityName = "PARENTCLIENT";
-	this.entityId = clientId;
-	this.href = "/parentclient/" +clientId;
-	return this;
-  }
-
-public CommandWrapperBuilder deleteChildFromParentClient(Long childId) {
-	this.actionName = "DELETE";
-	this.entityName = "PARENTCLIENT";
-	this.entityId = childId;
-	this.href = "/parentclient/" +childId;
-	return this;
-  
-}
-
-public CommandWrapperBuilder updateIpAddressStatus() {
-	this.actionName = "UPDATEIPSTATUS";
-	this.entityName = "IPPOOLMANAGEMENT";
-	this.href = "itemdetails/editgrn";
-	return this;
+	public CommandWrapperBuilder updateJobDetail(final Long jobId) {
+		this.actionName = "UPDATE";
+		this.entityName = "SCHEDULER";
+		this.entityId = jobId;
+		this.href = "/updateJobDetail/" + jobId + "/updateJobDetail";
+		return this;
 	}
 
-public CommandWrapperBuilder orderSuspend(Long orderId) {
-	
-	this.actionName = "SUSPEND";
-	this.entityName = "ORDER";
-	this.entityId=orderId;
-	this.href = "suspend/"+orderId;
-	return this;
-}
-public CommandWrapperBuilder registerSelfCareRegister() {
-	this.actionName = "REGISTER";
-	this.entityName = "SELFCARE";
-	this.href = "/selfcare/register";
-	return this;
+	public CommandWrapperBuilder addNewJob() {
+		this.actionName = "CREATE";
+		this.entityName = "SCHEDULER";
+		this.href = "/job";
+		return this;
+	}
+
+	public CommandWrapperBuilder deleteJob(Long jobId) {
+		this.actionName = "DELETE";
+		this.entityName = "SCHEDULER";
+		this.entityId = jobId;
+		this.href = "/job/" + jobId;
+		return this;
+	}
+
+	public CommandWrapperBuilder createEntitlement(Long id) {
+
+		this.actionName = "CREATE";
+		this.entityName = "ENTITLEMENT";
+		this.entityId = id;
+		this.href = "/entitlements";
+		return this;
+
+	}
+
+	public CommandWrapperBuilder createEpgXsls(Long i) {
+
+		this.actionName = "CREATE";
+		this.entityName = "EPGPROGRAMGUIDE";
+		this.entityId = i;
+		this.href = "/epgprogramguide";
+		return this;
+	}
+
+	public CommandWrapperBuilder updateJobParametersDetail(Long jobId) {
+		this.actionName = "UPDATE";
+		this.entityName = "SCHEDULERJOBPARAMETER";
+		this.entityId = jobId;
+		this.href = "/job/" + jobId + "/jobparameters";
+		return this;
+	}
+
+	public CommandWrapperBuilder createBalance() {
+		this.actionName = "CREATE";
+		this.entityName = "BALANCE";
+		this.href = "/clientBalance";
+		return this;
+	}
+
+	public CommandWrapperBuilder updateProspect(Long id) {
+		this.actionName = "UPDATE";
+		this.entityName = "PROSPECT";
+		this.entityId = id;
+		this.href = "/prospects/edit/" + id;
+		return this;
+	}
+
+	public CommandWrapperBuilder retrackOsdmessage(final Long orderId) {
+
+		this.actionName = "RETRACKOSDMESSAGE";
+		this.entityName = "ORDER";
+		this.entityId = orderId;
+		this.href = "order/retrackOsdmessage";
+		return this;
+	}
+
+	public CommandWrapperBuilder updatePlanMapping(Long planMapId) {
+
+		this.actionName = "UPDATE";
+		this.entityName = "PLANMAPPING";
+		this.entityId = planMapId;
+		this.href = "planmapping/" + planMapId;
+		return this;
+	}
+
+	public CommandWrapperBuilder createServiceMapping() {
+		this.actionName = "CREATE";
+		this.entityName = "SERVICEMAPPING";
+		this.entityId = null;
+		this.href = "servicemapping";
+		return this;
+	}
+
+	public CommandWrapperBuilder updateServiceMapping(Long serviceMapId) {
+		this.actionName = "UPDATE";
+		this.entityName = "SERVICEMAPPING";
+		this.entityId = serviceMapId;
+		this.href = "servicemapping/" + serviceMapId;
+		return this;
+	}
+
+	public CommandWrapperBuilder createAssociation(Long clientId) {
+		// TODO Auto-generated method stub
+		this.actionName = "CREATE";
+		this.entityName = "ASSOCIATION";
+		this.entityId = clientId;
+		this.href = "associations/" + clientId;
+		return this;
+	}
+
+	public CommandWrapperBuilder updateAssociation(Long id) {
+		// TODO Auto-generated method stub
+		this.actionName = "UPDATE";
+		this.entityName = "ASSOCIATION";
+		this.entityId = id;
+		this.href = "associations/" + id + "/update/" + clientId;
+		return this;
+	}
+
+	public CommandWrapperBuilder createHardwarePlan() {
+		this.actionName = "CREATE";
+		this.entityName = "PLANMAPPING";
+		this.entityId = null;
+		this.href = "/hardwareplans/template";
+		return this;
+	}
+
+	public CommandWrapperBuilder updateDeAssociation(Long associationId) {
+
+		this.actionName = "DEASSOCIATION";
+		this.entityName = "ASSOCIATION";
+		this.entityId = associationId;
+		this.href = "associations/deassociations/" + associationId;
+		return this;
+	}
+
+	public CommandWrapperBuilder createPaymentGateway() {
+
+		this.actionName = "CREATE";
+		this.entityName = "PAYMENTGATEWAY";
+		this.entityId = null;
+		this.href = "/paymentgateways";
+		return this;
+	}
+
+	public CommandWrapperBuilder updateEventOrderPrice() {
+		this.actionName = "UPDATE";
+		this.entityName = "EVENTORDER";
+		this.entityId = clientId;
+		this.href = "eventorder";
+		return this;
+	}
+
+	public CommandWrapperBuilder hardwareSwapping(Long clientId) {
+		this.actionName = "SWAPPING";
+		this.entityName = "HARDWARESWAPPING";
+		this.entityId = clientId;
+		this.href = "/hardwaremapping/" + clientId;
+		return this;
+	}
+
+	public CommandWrapperBuilder activateProcess() {
+		this.actionName = "ACTIVATE";
+		this.entityName = "ACTIVATIONPROCESS";
+		this.href = "/clients/template";
+		return this;
+
+	}
+
+	public CommandWrapperBuilder provisiongSystem() {
+		this.actionName = "CREATE";
+		this.entityName = "PROVISIONINGSYSTEM";
+		this.href = "/provisionings";
+		return this;
+	}
+
+	public CommandWrapperBuilder updateprovisiongSystem(Long id) {
+		this.actionName = "UPDATE";
+		this.entityName = "PROVISIONINGSYSTEM";
+		this.entityId = id;
+		this.href = "/provisionings/" + id;
+		return this;
+	}
+
+	public CommandWrapperBuilder deleteProvisiongSystem(Long id) {
+		this.actionName = "DELETE";
+		this.entityName = "PROVISIONINGSYSTEM";
+		this.entityId = id;
+		this.href = "/provisionings/" + id;
+		return this;
+	}
+
+	public CommandWrapperBuilder createUserChat() {
+
+		this.actionName = "CREATE";
+		this.entityName = "USERCHATMESSAGE";
+		this.entityId = null;
+		this.href = "/userchat/";
+		return this;
+	}
+
+	public CommandWrapperBuilder createEventActionMapping() {
+		this.actionName = "CREATE";
+		this.entityName = "EVENTACTIONMAP";
+		this.entityId = null;
+		this.href = "/eventactionmapping";
+		return this;
+	}
+
+	public CommandWrapperBuilder updateEventActionMapping(Long id) {
+		this.actionName = "UPDATE";
+		this.entityName = "EVENTACTIONMAP";
+		this.entityId = id;
+		this.href = "/eventactionmapping";
+		return this;
+	}
+
+	public CommandWrapperBuilder deleteEventActionMapping(Long id) {
+		this.actionName = "DELETE";
+		this.entityName = "EVENTACTIONMAP";
+		this.entityId = id;
+		this.href = "/eventactionmapping";
+		return this;
+	}
+
+	public CommandWrapperBuilder updatePaymentGateway(Long id) {
+
+		this.actionName = "UPDATE";
+		this.entityName = "PAYMENTGATEWAY";
+		this.entityId = id;
+		this.href = "/paymentgateways/" + this.entityId;
+		return this;
+	}
+
+	public CommandWrapperBuilder cancelPayment(Long paymentId) {
+
+		this.actionName = "CANCEL";
+		this.entityName = "PAYMENT";
+		this.entityId = paymentId;
+		this.href = "/payments/cancelpayment" + this.entityId;
+		return this;
+
+	}
+
+	public CommandWrapperBuilder changePlan(Long orderId) {
+
+		this.actionName = "CHANGEPLAN";
+		this.entityName = "ORDER";
+		this.entityId = orderId;
+		this.href = "orders/changePlan" + orderId;
+
+		return this;
+	}
+
+	public CommandWrapperBuilder updateInventoryItem(final Long id) {
+		this.actionName = "UPDATE";
+		this.entityName = "INVENTORY";
+		this.entityId = id;
+		this.href = "/itemdetails/template";
+		return this;
+	}
+
+	public CommandWrapperBuilder deleteInventoryItem(final Long id) {
+		this.actionName = "DELETE";
+		this.entityName = "INVENTORY";
+		this.entityId = id;
+		this.href = "/itemdetails" + id;
+		return this;
+	}
+
+	public CommandWrapperBuilder createPromotionCode() {
+		this.actionName = "CREATE";
+		this.entityName = "PROMOTIONCODE";
+		this.entityId = null;
+		this.href = "/promotioncode";
+		return this;
+	}
+
+	public CommandWrapperBuilder applyPromo(Long orderId) {
+		this.actionName = "APPLYPROMO";
+		this.entityName = "ORDER";
+		this.entityId = orderId;
+		this.href = "/orders/applyPromo";
+		return this;
+	}
+
+	public CommandWrapperBuilder deAllocate(Long id) {
+		this.actionName = "DEALLOCATE";
+		this.entityName = "INVENTORY";
+		this.entityId = id;
+		this.href = "/itemdetails/template";
+		return this;
+	}
+
+	public CommandWrapperBuilder updatePromotionCode(Long id) {
+		this.actionName = "UPDATE";
+		this.entityName = "PROMOTIONCODE";
+		this.entityId = id;
+		this.href = "/promotioncode";
+		return this;
+	}
+
+	public CommandWrapperBuilder deletePromotionCode(Long id) {
+		this.actionName = "DELETE";
+		this.entityName = "PROMOTIONCODE";
+		this.entityId = id;
+		this.href = "/promotioncode";
+		return this;
+	}
+
+	public CommandWrapperBuilder updateUsermessage(Long meesageId) {
+
+		this.actionName = "UPDATE";
+		this.entityName = "USERCHATMESSAGE";
+		this.entityId = meesageId;
+		this.href = "/userchats/" + this.entityId;
+		return this;
+	}
+
+	public CommandWrapperBuilder deleteUserChatmessage(Long meesageId) {
+
+		this.actionName = "DELETE";
+		this.entityName = "USERCHATMESSAGE";
+		this.entityId = meesageId;
+		this.href = "/userchats/" + this.entityId;
+		return this;
+	}
+
+	public CommandWrapperBuilder createLocation(final String entityType) {
+		this.actionName = "CREATE";
+		this.entityName = "LOCATION";
+		this.supportedEntityType = entityType;
+		this.href = "/address/" + entityType;
+		return this;
+	}
+
+	public CommandWrapperBuilder updateLocation(final String entityType,
+			Long entityId) {
+		this.actionName = "UPDATE";
+		this.entityName = "LOCATION";
+		this.entityId = entityId;
+		this.supportedEntityType = entityType;
+		this.href = "/address/" + entityType + "/" + entityId;
+		return this;
+	}
+
+	public CommandWrapperBuilder deleteLocation(final String entityType,
+			Long entityId) {
+		this.actionName = "DELETE";
+		this.entityName = "LOCATION";
+		this.entityId = entityId;
+		this.supportedEntityType = entityType;
+		this.href = "/address/" + entityType + "/" + entityId;
+		return this;
+	}
+
+	public CommandWrapperBuilder updateCache() {
+		this.actionName = "UPDATE";
+		this.entityName = "CACHE";
+		this.href = "/cache";
+		return this;
+	}
+
+	public CommandWrapperBuilder createCreditDistribution(Long clientId) {
+		this.actionName = "CREATE";
+		this.entityName = "CREDITDISTRIBUTION";
+		this.href = "/creditdistribution";
+		return this;
+	}
+
+	public CommandWrapperBuilder createSchedulingOrder(Long clientId) {
+		this.actionName = "CREATE";
+		this.entityName = "ORDERSCHEDULING";
+		this.entityId = clientId;
+		this.href = "/orders/scheduling" + clientId;
+		return this;
+	}
+
+	public CommandWrapperBuilder deleteSchedulOrder(Long orderId) {
+
+		this.actionName = "DELETE";
+		this.entityName = "ORDERSCHEDULING";
+		this.entityId = orderId;
+		this.href = "/orders/scheduling" + clientId;
+		return this;
+	}
+
+	public CommandWrapperBuilder extensionOrder(Long orderId) {
+		this.actionName = "EXTENSION";
+		this.entityName = "ORDER";
+		this.entityId = orderId;
+		this.href = "/orders/extenstion" + clientId;
+		return this;
+	}
+
+	public CommandWrapperBuilder addNewProvisioning(Long clientId) {
+
+		this.actionName = "ADD";
+		this.entityName = "PROVISIONINGSYSTEM";
+		this.entityId = clientId;
+		this.href = "/provisionings/" + clientId;
+		return this;
+	}
+
+	public CommandWrapperBuilder createGroupsDetails() {
+		this.actionName = "CREATE";
+		this.entityName = "GROUPSDETAILS";
+		this.entityId = null;
+		this.href = "/groupsdetails";
+		return this;
+	}
+
+	public CommandWrapperBuilder createIpPoolManagement() {
+
+		this.actionName = "CREATE";
+		this.entityName = "IPPOOLMANAGEMENT";
+		this.href = "/ippooling";
+		return this;
+
+	}
+
+	public CommandWrapperBuilder updateprovisiongServiceParams(Long id) {
+
+		this.actionName = "UPDATE";
+		this.entityName = "PROVISIONINGSERVICEPARAMS";
+		this.entityId = id;
+		this.href = "/serviceparams/" + clientId;
+		return this;
+	}
+
+	public CommandWrapperBuilder createItemSale() {
+		this.actionName = "CREATE";
+		this.entityName = "ITEMSALE";
+		this.href = "/agents/";
+		return this;
+	}
+
+	public CommandWrapperBuilder updateprovisiongDetails(Long processrequestId) {
+
+		this.actionName = "UPDATE";
+		this.entityName = "PROVISIONINGDETAILS";
+		this.entityId = processrequestId;
+		this.href = "/provisioning/updateprovisiondetails" + processrequestId;
+		return this;
+	}
+
+	public CommandWrapperBuilder confirnProvisiongDetails(Long processrequestId) {
+
+		this.actionName = "CONFIRM";
+		this.entityName = "PROVISIONINGDETAILS";
+		this.entityId = processrequestId;
+		this.href = "/provisioning/confirm" + processrequestId;
+		return this;
+	}
+
+	public CommandWrapperBuilder createSmtpConfiguration() {
+		this.actionName = "CREATE";
+		this.entityName = "SMTPCONFIGURATION";
+		// this.entityId=configId;
+		this.href = "/configurations";
+		return this;
+	}
+
+	public CommandWrapperBuilder paypalEnquireyPayment(final Long clientId) {
+		this.actionName = "CREATEENQUIREY";
+		this.entityName = "PAYMENT";
+		this.entityId = clientId;
+		this.href = "/payments/paypalEnquirey" + clientId;
+		return this;
+	}
+
+	public CommandWrapperBuilder updateMediaStatus(String deviceId) {
+
+		this.actionName = "UPDATE";
+		this.entityName = "MEDIADEVICE";
+		this.supportedEntityType = deviceId;
+		this.href = "/mediadevices/" + deviceId;
+		return this;
+	}
+
+	public CommandWrapperBuilder updateClientStatus(Long clientId) {
+		this.actionName = "UPDATESTATUS";
+		this.entityName = "CLIENT";
+		this.entityId = clientId;
+		this.href = "/clients/" + clientId;
+		return this;
+	}
+
+	public CommandWrapperBuilder createOfficeAdjustment(Long officeId) {
+		this.actionName = "CREATE";
+		this.entityName = "OFFICEADJUSTMENT";
+		this.entityId = officeId;
+		this.href = "/officeadjustments/" + officeId;
+		return this;
+	}
+
+	public CommandWrapperBuilder createOfficePayment(Long officeId) {
+		this.actionName = "CREATE";
+		this.entityName = "OFFICEPAYMENT";
+		this.entityId = officeId;
+		this.href = "/officepayments/" + officeId;
+		return this;
+	}
+
+	public CommandWrapperBuilder createRedemption() {
+		this.actionName = "CREATE";
+		this.entityName = "REDEMPTION";
+		this.entityId = clientId;
+		this.href = "/redemption/" + clientId + "/";
+		return this;
+	}
+
+	public CommandWrapperBuilder moveItemSale() {
+		this.actionName = "MOVEITEM";
+		this.entityName = "MRN";
+		this.entityId = null;
+		this.href = "/mrndetails/movemrn/itemsale" + clientId;
+		return this;
+	}
+
+	public CommandWrapperBuilder createClientCardDetails(Long clientId) {
+		this.actionName = "CREATE";
+		this.entityName = "CLIENTCARDDETAILS";
+		this.entityId = null;
+		this.clientId = clientId;
+		this.href = "/clients/" + clientId + "/carddetails";
+		return this;
+	}
+
+	public CommandWrapperBuilder updateCreditCardDetail(Long clientId, Long id,
+			String cardType) {
+		this.actionName = "UPDATE";
+		this.entityName = "CLIENTCARDDETAILS";
+		this.entityId = clientId;
+		this.subentityId = id;
+		this.supportedEntityType = cardType;
+		this.href = "/clients/" + clientId + "/carddetails/" + id + "/"
+				+ cardType;
+		return this;
+	}
+
+	public CommandWrapperBuilder deleteClientCardDetails(Long id, Long clientId) {
+		this.actionName = "DELETE";
+		this.entityName = "CLIENTCARDDETAILS";
+		this.entityId = clientId;
+		this.subentityId = id;
+		this.href = "/clients/" + clientId + "/carddetails/" + id;
+		return this;
+	}
+
+	public CommandWrapperBuilder createGroupsDetailsProvision(
+			Long prepareRequestId) {
+		this.actionName = "CREATE";
+		this.entityName = "GROUPSPROVISION";
+		this.entityId = prepareRequestId;
+		this.href = "/provision/" + prepareRequestId;
+		return this;
+	}
+
+	public CommandWrapperBuilder updateClientTaxExemption(Long clientId) {
+		this.actionName = "UPDATE";
+		this.entityName = "CLIENTTAXEXEMPTION";
+		this.entityId = clientId;
+		this.href = "/taxexemption/" + clientId;
+		return this;
+	}
+
+	public CommandWrapperBuilder generateVoucherPin(Long batchId) {
+		this.actionName = "PROCESS";
+		this.entityName = "VOUCHER";
+		this.entityId = batchId;
+		this.href = "/vouchers/" + batchId;
+		return this;
+	}
+
+	public CommandWrapperBuilder updateIpPoolManagement(Long id) {
+		this.actionName = "UPDATE";
+		this.entityName = "IPPOOLMANAGEMENT";
+		this.entityId = id;
+		this.href = "/ippooling/" + id;
+		return this;
+	}
+
+	public CommandWrapperBuilder updateClientBillMode(Long clientId) {
+		this.actionName = "UPDATE";
+		this.entityName = "CLIENTBILLMODE";
+		this.entityId = clientId;
+		this.href = "/billmode/" + clientId;
+		return this;
+	}
+
+	public CommandWrapperBuilder updateIpStatus(Long id) {
+		this.actionName = "UPDATE";
+		this.entityName = "IPSTATUS";
+		this.entityId = id;
+		this.href = "/ippooling/status";
+		return this;
+	}
+
+	public CommandWrapperBuilder terminateOrder(Long orderId) {
+
+		this.actionName = "TERMINATE";
+		this.entityName = "ORDER";
+		this.entityId = orderId;
+		this.href = "/orders/terminate/" + orderId;
+		return this;
+	}
+
+	public CommandWrapperBuilder createGroupsStatment(Long clientId) {
+
+		this.actionName = "CREATESTATMENT";
+		this.entityName = "GROUPS";
+		this.entityId = clientId;
+		this.href = "/groups/statment/" + clientId;
+		return this;
 }
 
-public CommandWrapperBuilder SelfCareEmailVerification() {
-	this.actionName = "EMAILVERIFICATION";
-	this.entityName = "SELFCARE";
-	this.href = "/selfcare/register";
-	return this;
-}
+	public CommandWrapperBuilder createProvisioningPlanMapping() {
+		this.actionName = "CREATE";
+		this.entityName = "PROVISIONINGPLANMAPPING";
+		this.href = "/planmapping";
+		return this;
+	}
 
-public CommandWrapperBuilder selfRegistrationProcess() {
-	this.actionName = "SELFREGISTRATION";
-	this.entityName = "ACTIVATE";
-	this.href = "/activationprocess/selfregistration";
-	return this;
-}
+	public CommandWrapperBuilder updateProvisioningPlanMapping(
+			Long planMappingId) {
+		this.actionName = "UPDATE";
+		this.entityName = "PROVISIONINGPLANMAPPING";
+		this.entityId = planMappingId;
+		this.href = "/planmapping/" + planMappingId;
+		return this;
+	}
 
-public CommandWrapperBuilder updateIpDetails(Long orderId) {
-	this.actionName = "UPDATE";
-    this.entityName = "IPDETAILPARAMS";
-    this.entityId=orderId;
-    this.href = "/ipdetails/"+orderId;
-	return this;
-}
+	public CommandWrapperBuilder createDatatable(final String json) {
+		this.actionName = "CREATE";
+		this.entityName = "DATATABLE";
+		this.href = "/datatables/";
+		this.json = json;
+		return this;
+	}
 
-public CommandWrapperBuilder orderReactive(Long orderId) {
-	this.actionName = "REACTIVE";
-	this.entityName = "ORDER";
-	this.entityId = orderId;
-	this.href = "reactive/"+ orderId;
-	return this;
-}
+	public CommandWrapperBuilder updateDatatable(final String datatable,
+			final String json) {
+		this.actionName = "UPDATE";
+		this.entityName = "DATATABLE";
+		this.href = "/datatables/" + datatable;
+		this.json = json;
+		return this;
+	}
 
-public CommandWrapperBuilder createNewSelfCarePassword() {
-	this.actionName = "GENERATENEWPASSWORD";
-	this.entityName = "SELFCARE";
-	this.href = "/selfcare/forgotpassword";
-	return this;
-}
+	public CommandWrapperBuilder deleteDatatable(final String datatable) {
+		this.actionName = "DELETE";
+		this.entityName = "DATATABLE";
+		this.href = "/datatables/" + datatable;
+		return this;
+	}
 
-public CommandWrapperBuilder updateSelfcarePassword() {
-	this.actionName = "UPDATE";
-	this.entityName = "SELFCARE";
-	this.href = "/selfcare/changepassword";
-	return this;
-}
+	public CommandWrapperBuilder registerDBDatatable(final String datatable,
+			final String apptable) {
+		this.actionName = "REGISTER";
+		this.entityName = "DATATABLE";
+		this.entityId = null;
+		this.href = "/datatables/register/" + datatable + "/" + apptable;
+		return this;
+	}
 
-public CommandWrapperBuilder createMediaAssetLocationAttribute(Long assetId) {
-	this.actionName="CREATE";
-	this.entityName="MEDIAASSETLOCATIONATTRIBUTES";
-	this.entityId=assetId;
-	this.href="mediaasset/template";
-	return this;
-}
+	public CommandWrapperBuilder createDatatableEntry(final String datatable,
+			final Long apptableId, final Long datatableId) {
+		this.actionName = "CREATE";
+		commonDatatableSettings(datatable, apptableId, datatableId);
+		return this;
+	}
 
-public CommandWrapperBuilder updateSupplier(Long supplierId) {
-	 this.actionName = "UPDATE";
-	 this.entityName = "SUPPLIER";
-	 this.entityId = supplierId;
-	 this.href = "/supplier";
-	 return this;
-}
+	public CommandWrapperBuilder updateDatatable(final String datatable,
+			final Long apptableId, final Long datatableId) {
+		this.actionName = "UPDATE";
+		commonDatatableSettings(datatable, apptableId, datatableId);
+		return this;
+	}
 
-public CommandWrapperBuilder updateSelfCareUDPassword() {
-	this.actionName = "UPDATE";
-	this.entityName = "SELFCAREUDP";
-	this.href = "/selfcare/resetpassword";
-	return this;
-}
+	public CommandWrapperBuilder deleteDatatable(final String datatable,
+			final Long apptableId, final Long datatableId) {
+		this.actionName = "DELETE";
+		commonDatatableSettings(datatable, apptableId, datatableId);
+		return this;
+	}
 
-public CommandWrapperBuilder forgetSelfCareUDPassword() {
-	this.actionName = "MAIL";
-	this.entityName = "SELFCAREUDP";
-	this.href = "/selfcare/forgotpassword";
-	return this;
-}
+	private void commonDatatableSettings(final String datatable,
+			final Long apptableId, final Long datatableId) {
 
-public CommandWrapperBuilder cancelBill(Long billId) {
-		
-	this.actionName = "DELETE";
-	this.entityName = "BILLMASTER";
-	this.entityId = billId;
-	this.href = "/billmaster/"+billId;
-	return this;
-	
-    }
+		this.entityName = datatable;
+		this.entityId = apptableId;
+		this.subentityId = datatableId;
+		if (datatableId == null) {
+			this.href = "/datatables/" + datatable + "/" + apptableId;
+		} else {
+			this.href = "/datatables/" + datatable + "/" + apptableId + "/"
+					+ datatableId;
+		}
+	}
 
-public CommandWrapperBuilder updateUploadFile(Long uploadFileId) {
-	
-	this.actionName = "PROCESS";
-	this.entityName = "DATAUPLOADS";
-	this.entityId = uploadFileId;
-	this.href = "/dataupload/" +clientId;
-	return this;
-}
+	public CommandWrapperBuilder updateIpDescription() {
 
-public CommandWrapperBuilder activeProvisionActions(Long provisionActionId) {
-	
-	this.actionName = "ACTIVE";
-	this.entityName = "PROVISIONACTIONS";
-	this.entityId = provisionActionId;
-	this.href = "/provisioningactions/" +provisionActionId;
-	return this;
-}
-public CommandWrapperBuilder updatePaymentGatewayConfig(Long configId) {
-	this.actionName = "UPDATE";
-	this.entityName = "PAYMENTGATEWAYCONFIG";
-	this.entityId = configId;
-	this.href = "/paymentgatewayconfigs";
-	return this;
-}
+		this.actionName = "UPDATE";
+		this.entityName = "IPDESCRIPTION";
+		this.href = "/ippooling/description";
+		return this;
 
-public CommandWrapperBuilder createPaymentGatewayConfig() {
-	this.actionName = "CREATE";
-	this.entityName = "PAYMENTGATEWAYCONFIG";
-	this.href = "/paymentgatewayconfigs";
-	return this;
-}
+	}
 
-public CommandWrapperBuilder OnlinePaymentGateway() {
-	this.actionName = "ONLINE";
-	this.entityName = "PAYMENTGATEWAY";
-	this.href = "/paymentgateways/onlinepayment";
-	return this;
-}
+	public CommandWrapperBuilder updateMediaCrashDetails(Long clientId) {
 
+		this.actionName = "UPDATECRASH";
+		this.entityName = "MEDIADEVICE";
+		this.entityId = clientId;
+		this.href = "/mediadevices/client/" + clientId;
+		return this;
+	}
 
-public CommandWrapperBuilder createOrderAddons(Long orderId) {
-	
-	this.actionName="CREATE";
-	this.entityName ="ORDERADDONS";
-	this.entityId=orderId;
-	this.href="/orders/addons/"+orderId;
-	return this;
-}
+	public CommandWrapperBuilder createEventValidation() {
+		this.actionName = "CREATE";
+		this.entityName = "EVENTVALIDATION";
+		this.entityId = null;
+		this.href = "/eventvalidation";
+		return this;
+	}
 
-public CommandWrapperBuilder createAddons() {
-	this.actionName="CREATE";
-	this.entityName ="ADDONS";
-	this.href="/addons/";
-	return this;
-}
+	public CommandWrapperBuilder deleteEventValidation(Long id) {
+		this.actionName = "DELETE";
+		this.entityName = "EVENTVALIDATION";
+		this.entityId = id;
+		this.href = "/eventvalidation";
+		return this;
+	}
 
-public CommandWrapperBuilder updateAddons(Long addonId) {
-	this.actionName="UPDATE";
-	this.entityName ="ADDONS";
-	this.entityId=addonId;
-	this.href="/addons/"+addonId;
-	return this;
-}
+	public CommandWrapperBuilder editGrn(Long id) {
+		this.actionName = "UPDATE";
+		this.entityName = "GRN";
+		this.entityId = id;
+		this.href = "itemdetails/editgrn";
+		return this;
+	}
 
-public CommandWrapperBuilder deleteAddons(Long addonId) {
-	this.actionName="DELETE";
-	this.entityName ="ADDONS";
-	this.entityId=addonId;
-	this.href="/addons/"+addonId;
-	return this;
-}
+	public CommandWrapperBuilder createParentClient(Long clientId) {
+		this.actionName = "CREATE";
+		this.entityName = "PARENTCLIENT";
+		this.entityId = clientId;
+		this.href = "/parentclient/" + clientId;
+		return this;
+	}
 
-public CommandWrapperBuilder linkUpAccount() {
-	this.actionName = "CREATE";
-	this.entityName = "LINKUPACCOUNT";
-	this.href = "/linkupaccount/template";
-	return this;
+	public CommandWrapperBuilder deleteChildFromParentClient(Long childId) {
+		this.actionName = "DELETE";
+		this.entityName = "PARENTCLIENT";
+		this.entityId = childId;
+		this.href = "/parentclient/" + childId;
+		return this;
 
-}
+	}
+
+	public CommandWrapperBuilder updateIpAddressStatus() {
+		this.actionName = "UPDATEIPSTATUS";
+		this.entityName = "IPPOOLMANAGEMENT";
+		this.href = "itemdetails/editgrn";
+		return this;
+	}
+
+	public CommandWrapperBuilder orderSuspend(Long orderId) {
+
+		this.actionName = "SUSPEND";
+		this.entityName = "ORDER";
+		this.entityId = orderId;
+		this.href = "suspend/" + orderId;
+		return this;
+	}
+
+	public CommandWrapperBuilder registerSelfCareRegister() {
+		this.actionName = "REGISTER";
+		this.entityName = "SELFCARE";
+		this.href = "/selfcare/register";
+		return this;
+	}
+
+	public CommandWrapperBuilder SelfCareEmailVerification() {
+		this.actionName = "EMAILVERIFICATION";
+		this.entityName = "SELFCARE";
+		this.href = "/selfcare/register";
+		return this;
+	}
+
+	public CommandWrapperBuilder selfRegistrationProcess() {
+		this.actionName = "SELFREGISTRATION";
+		this.entityName = "ACTIVATE";
+		this.href = "/activationprocess/selfregistration";
+		return this;
+	}
+
+	public CommandWrapperBuilder updateIpDetails(Long orderId) {
+		this.actionName = "UPDATE";
+		this.entityName = "IPDETAILPARAMS";
+		this.entityId = orderId;
+		this.href = "/ipdetails/" + orderId;
+		return this;
+	}
+
+	public CommandWrapperBuilder orderReactive(Long orderId) {
+		this.actionName = "REACTIVE";
+		this.entityName = "ORDER";
+		this.entityId = orderId;
+		this.href = "reactive/" + orderId;
+		return this;
+	}
+
+	public CommandWrapperBuilder createNewSelfCarePassword() {
+		this.actionName = "GENERATENEWPASSWORD";
+		this.entityName = "SELFCARE";
+		this.href = "/selfcare/forgotpassword";
+		return this;
+	}
+
+	public CommandWrapperBuilder updateSelfcarePassword() {
+		this.actionName = "UPDATE";
+		this.entityName = "SELFCARE";
+		this.href = "/selfcare/changepassword";
+		return this;
+	}
+
+	public CommandWrapperBuilder createMediaAssetLocationAttribute(Long assetId) {
+		this.actionName = "CREATE";
+		this.entityName = "MEDIAASSETLOCATIONATTRIBUTES";
+		this.entityId = assetId;
+		this.href = "mediaasset/template";
+		return this;
+	}
+
+	public CommandWrapperBuilder updateSupplier(Long supplierId) {
+		this.actionName = "UPDATE";
+		this.entityName = "SUPPLIER";
+		this.entityId = supplierId;
+		this.href = "/supplier";
+		return this;
+	}
+
+	public CommandWrapperBuilder updateSelfCareUDPassword() {
+		this.actionName = "UPDATE";
+		this.entityName = "SELFCAREUDP";
+		this.href = "/selfcare/resetpassword";
+		return this;
+	}
+
+	public CommandWrapperBuilder forgetSelfCareUDPassword() {
+		this.actionName = "MAIL";
+		this.entityName = "SELFCAREUDP";
+		this.href = "/selfcare/forgotpassword";
+		return this;
+	}
+
+	public CommandWrapperBuilder cancelBill(Long billId) {
+
+		this.actionName = "DELETE";
+		this.entityName = "BILLMASTER";
+		this.entityId = billId;
+		this.href = "/billmaster/" + billId;
+		return this;
+
+	}
+
+	public CommandWrapperBuilder updateUploadFile(Long uploadFileId) {
+
+		this.actionName = "PROCESS";
+		this.entityName = "DATAUPLOADS";
+		this.entityId = uploadFileId;
+		this.href = "/dataupload/" + clientId;
+		return this;
+	}
+
+	public CommandWrapperBuilder activeProvisionActions(Long provisionActionId) {
+
+		this.actionName = "ACTIVE";
+		this.entityName = "PROVISIONACTIONS";
+		this.entityId = provisionActionId;
+		this.href = "/provisioningactions/" + provisionActionId;
+		return this;
+	}
+
+	public CommandWrapperBuilder updatePaymentGatewayConfig(Long configId) {
+		this.actionName = "UPDATE";
+		this.entityName = "PAYMENTGATEWAYCONFIG";
+		this.entityId = configId;
+		this.href = "/paymentgatewayconfigs";
+		return this;
+	}
+
+	public CommandWrapperBuilder createPaymentGatewayConfig() {
+		this.actionName = "CREATE";
+		this.entityName = "PAYMENTGATEWAYCONFIG";
+		this.href = "/paymentgatewayconfigs";
+		return this;
+	}
+
+	public CommandWrapperBuilder OnlinePaymentGateway() {
+		this.actionName = "ONLINE";
+		this.entityName = "PAYMENTGATEWAY";
+		this.href = "/paymentgateways/onlinepayment";
+		return this;
+	}
+
+	public CommandWrapperBuilder createOrderAddons(Long orderId) {
+
+		this.actionName = "CREATE";
+		this.entityName = "ORDERADDONS";
+		this.entityId = orderId;
+		this.href = "/orders/addons/" + orderId;
+		return this;
+	}
+
+	public CommandWrapperBuilder createAddons() {
+		this.actionName = "CREATE";
+		this.entityName = "ADDONS";
+		this.href = "/addons/";
+		return this;
+	}
+
+	public CommandWrapperBuilder updateAddons(Long addonId) {
+		this.actionName = "UPDATE";
+		this.entityName = "ADDONS";
+		this.entityId = addonId;
+		this.href = "/addons/" + addonId;
+		return this;
+	}
+
+	public CommandWrapperBuilder deleteAddons(Long addonId) {
+		this.actionName = "DELETE";
+		this.entityName = "ADDONS";
+		this.entityId = addonId;
+		this.href = "/addons/" + addonId;
+		return this;
+	}
+
+	public CommandWrapperBuilder linkUpAccount() {
+		this.actionName = "CREATE";
+		this.entityName = "LINKUPACCOUNT";
+		this.href = "/linkupaccount/template";
+		return this;
+
+	}
+
+	public CommandWrapperBuilder createPartner() {
+		this.actionName = "CREATE";
+		this.entityName = "PARTNER";
+		this.href = "";
+		return this;
+	}
+
+	public CommandWrapperBuilder createPartnerAgreement(final Long partnerId) {
+		this.actionName = "CREATE";
+		this.entityName = "PARTNERAGREEMENT";
+		this.entityId = partnerId;
+		this.href = "/agreements/" +partnerId;
+		return this;
+	}
 
 }
 

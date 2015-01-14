@@ -11,18 +11,22 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.joda.time.LocalDate;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.organisation.office.exception.CannotUpdateOfficeWithParentOfficeSameAsSelf;
@@ -62,6 +66,16 @@ public class Office extends AbstractPersistable<Long> {
 
     @Column(name = "external_id", length = 100)
     private String externalId;
+    
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@OneToOne(cascade = CascadeType.ALL, mappedBy = "office", orphanRemoval = true)
+	private OfficeAddress officeAddress;
+	
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@OneToOne(cascade = CascadeType.ALL, mappedBy = "office", orphanRemoval = true)
+	private OfficeAdditionalInfo officeAdditionalInfo;
+	
+	
 
     public static Office headOffice(final String name, final LocalDate openingDate, final String externalId) {
         return new Office(null, name, openingDate, externalId,null);
@@ -267,4 +281,30 @@ public class Office extends AbstractPersistable<Long> {
 
         return match;
     }
+
+	public static Office fromPartner(final Office parentOffice,final JsonCommand command) {
+
+		final String name = command.stringValueOfParameterNamed("partnerName");
+		final LocalDate openingDate = new LocalDate();
+		final String externalId = "";
+		final Long officeType = command.longValueOfParameterNamed("officeType");
+		return new Office(parentOffice, name, openingDate, externalId,officeType);
+	}
+
+	
+	public OfficeAddress getOfficeAddress() {
+		return officeAddress;
+	}
+
+	public void setOfficeAddress(OfficeAddress officeAddress) {
+		this.officeAddress = officeAddress;
+	}
+
+	public OfficeAdditionalInfo getOfficeAdditionalInfo() {
+		return officeAdditionalInfo;
+	}
+
+	public void setOfficeAdditionalInfo(OfficeAdditionalInfo officeAdditionalInfo) {
+		this.officeAdditionalInfo = officeAdditionalInfo;
+	}
 }

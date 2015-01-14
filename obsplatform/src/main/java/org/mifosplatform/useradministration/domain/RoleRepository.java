@@ -7,7 +7,12 @@ package org.mifosplatform.useradministration.domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface RoleRepository extends JpaRepository<Role, Long>, JpaSpecificationExecutor<Role> {
-    // no added behaviour
+	
+	@Query("from Role role where role.name =:name")
+	Role findOneByName(@Param("name") String name);
+
 }
