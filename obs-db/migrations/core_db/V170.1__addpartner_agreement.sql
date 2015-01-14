@@ -4,11 +4,15 @@ INSERT IGNORE INTO m_code_value VALUES(null, @id, 'Signed', '0');
 INSERT IGNORE INTO m_code_value VALUES(null, @id, 'Pending', '0');
 
 
-INSERT IGNORE INTO m_code VALUES(null ,'Source Type', '0','Describe the different sources');
-SET @id=(select id from m_code where code_name='Source Type');
+INSERT IGNORE INTO m_code VALUES(null ,'Source Category', '0','Describe the different sources');
+SET @id=(select id from m_code where code_name='Source Category');
 INSERT IGNORE INTO m_code_value VALUES(null, @id, 'Subscriptions', '0');
 INSERT IGNORE INTO m_code_value VALUES(null, @id, 'Hardware', '1');
 INSERT IGNORE INTO m_code_value VALUES(null, @id, 'On-demand', '2');
+
+INSERT IGNORE INTO  m_permission VALUES (null,'organization', 'CREATE_PARTNERAGREEMENT', 'PARTNERAGREEMENT', 'CREATE', 0);
+INSERT IGNORE INTO  m_permission VALUES (null,'organization', 'CREATE_PARTNER', 'PARTNER', 'CREATE', 0);
+
 
 
 CREATE TABLE IF NOT EXISTS `b_agreement` (
