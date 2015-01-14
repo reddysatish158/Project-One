@@ -137,7 +137,7 @@ public class VoucherPinApiResource {
 	@Path("template")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrieveTemplate(@Context final UriInfo uriInfo) {
+	public String retrieveTemplate(@Context final UriInfo uriInfo, @QueryParam("isBatchTemplate") final String isBatchTemplate) {
 
 		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
 		
@@ -148,6 +148,11 @@ public class VoucherPinApiResource {
 		final Collection<OfficeData> offices = this.officeReadPlatformService.retrieveAllOffices();
 		
 		final VoucherData voucherData = new VoucherData(pinCategoryData, pinTypeData, offices);
+		
+		if(isBatchTemplate != null){
+			final List<VoucherData> voucherBatchData = this.readPlatformService.retriveAllBatchTemplateData();
+			voucherData.setVoucherBatchData(voucherBatchData);
+		}
 		
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 		

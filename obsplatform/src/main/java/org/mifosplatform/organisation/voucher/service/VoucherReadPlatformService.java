@@ -31,5 +31,8 @@ public interface VoucherReadPlatformService {
 	List<VoucherData> retrivePinDetails(String pinNumber);
 
 	List<VoucherData> retriveBatchTemplateData(Boolean isProcessed);
+	
+	List<VoucherData> retriveAllBatchTemplateData();
+
 
 }

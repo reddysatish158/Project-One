@@ -35,6 +35,7 @@ public class VoucherData {
 	private String pinNo;
 	private String status;
 	private Long clientId;
+	private List<VoucherData> voucherBatchData;
 
 	public VoucherData(final String batchName, final Long officeId,
 			final Long length, final String pinCategory, final String pinType, final Long quantity,
@@ -202,6 +203,14 @@ public class VoucherData {
 
 	public Collection<OfficeData> getOffices() {
 		return offices;
+	}
+
+	public List<VoucherData> getVoucherBatchData() {
+		return voucherBatchData;
+	}
+
+	public void setVoucherBatchData(List<VoucherData> voucherBatchData) {
+		this.voucherBatchData = voucherBatchData;
 	}
 
 	

@@ -112,27 +112,29 @@ public class VoucherReadPlatformServiceImpl implements
 
 			context.authenticatedUser();
 			retrieveRandomMapper mapper = new retrieveRandomMapper();
-			StringBuilder sqlBuilder = new StringBuilder(200);
+			StringBuilder sqlBuilder = new StringBuilder();
+			
 			sqlBuilder.append("SELECT ");
 			sqlBuilder.append(mapper.schema());
 			sqlBuilder.append(" where pm.id IS NOT NULL ");
 			String sqlSearch = searchVoucher.getSqlSearch();
 	        String extraCriteria = "";
+	        if(batchName != null){
+	        	sqlBuilder.append(" and (pm.batch_name ='"+batchName+"') ");
+		    }
+	        if(pinType != null){
+	        	sqlBuilder.append(" and (pm.pin_type ='"+pinType+"') ");
+		    }
+	        if(statusType != null){
+	        	sqlBuilder.append(" and (pd.status ='"+statusType+"') ");
+		    }
 		    if (sqlSearch != null) {
 		    	sqlSearch = sqlSearch.trim();
 		    	extraCriteria = " and (pd.pin_no like '%"+sqlSearch+"%' OR" 
 		    			+ " pd.client_id like '%"+sqlSearch+"%' OR"
 		    			+ " pd.serial_no like '%"+sqlSearch+"%' )";
 		    }
-		    if(statusType != null){
-		    	extraCriteria =" and (pd.status ='"+statusType+"') ";
-		    }
-		    if(batchName != null){
-		    	extraCriteria =" and (pm.batch_name ='"+batchName+"') ";
-		    }
-		    if(pinType != null){
-		    	extraCriteria =" and (pm.pin_type ='"+pinType+"') ";
-		    }
+		   
 		    sqlBuilder.append(extraCriteria);
 		    
 			if (searchVoucher.isLimited()) {
@@ -377,6 +379,18 @@ public class VoucherReadPlatformServiceImpl implements
 			Long id = rs.getLong("id");
 			String batchName = rs.getString("batchName");
 			return new VoucherData(id,batchName);
+		}
+	}
+
+	@Override
+	public List<VoucherData> retriveAllBatchTemplateData() {
+		try {
+			context.authenticatedUser();
+			BatchTemplateMapper mapper = new BatchTemplateMapper();
+			String sql="SELECT "+ mapper.schema();
+			return this.jdbcTemplate.query(sql, mapper, new Object[] {});
+		} catch (EmptyResultDataAccessException e) {
+			return null;
 		}
 	}
 
