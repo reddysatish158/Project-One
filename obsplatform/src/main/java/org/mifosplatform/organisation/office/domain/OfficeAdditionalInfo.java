@@ -33,7 +33,9 @@ public class OfficeAdditionalInfo extends AbstractPersistable<Long> {
 	@JoinColumn(name = "office_id", insertable = true, updatable = true, nullable = true, unique = true)
 	private Office office;
 
-	
+	public OfficeAdditionalInfo(){
+		
+	}
 	
 	public OfficeAdditionalInfo(final Office office,final String partnerName, final String partnerType,final String currency,
 			   final boolean isCollective) {

@@ -28,8 +28,6 @@ import org.mifosplatform.finance.payments.exception.ReceiptNoDuplicateException;
 import org.mifosplatform.finance.payments.serialization.PaymentCommandFromApiJsonDeserializer;
 import org.mifosplatform.finance.paymentsgateway.domain.PaymentGatewayConfiguration;
 import org.mifosplatform.finance.paymentsgateway.domain.PaymentGatewayConfigurationRepository;
-import org.mifosplatform.infrastructure.codes.domain.CodeValue;
-import org.mifosplatform.infrastructure.codes.domain.CodeValueRepository;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationConstants;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
@@ -38,8 +36,11 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
+import org.mifosplatform.organisation.office.domain.Office;
 import org.mifosplatform.organisation.office.domain.OfficeAdditionalInfo;
 import org.mifosplatform.organisation.office.domain.OfficeAdditionalInfoRepository;
+import org.mifosplatform.organisation.partner.domain.PartnerBalance;
+import org.mifosplatform.organisation.partner.domain.PartnerBalanceRepository;
 import org.mifosplatform.portfolio.client.domain.Client;
 import org.mifosplatform.portfolio.client.domain.ClientRepository;
 import org.mifosplatform.workflow.eventaction.data.ActionDetaislData;
@@ -81,7 +82,7 @@ public class PaymentWritePlatformServiceImpl implements PaymentWritePlatformServ
 	private final ActionDetailsReadPlatformService actionDetailsReadPlatformService; 
 	private final ActiondetailsWritePlatformService actiondetailsWritePlatformService;
 	private final ClientRepository clientRepository;
-	private final CodeValueRepository codeValueRepository;
+	private final PartnerBalanceRepository partnerBalanceRepository;
 	private final OfficeAdditionalInfoRepository infoRepository;
 
 	@Autowired
@@ -91,7 +92,7 @@ public class PaymentWritePlatformServiceImpl implements PaymentWritePlatformServ
 			final ActiondetailsWritePlatformService actiondetailsWritePlatformService,final InvoiceRepository invoiceRepository,
 			final ConfigurationRepository globalConfigurationRepository,final PaypalEnquireyRepository paypalEnquireyRepository,
 			final FromJsonHelper fromApiJsonHelper,final PaymentGatewayConfigurationRepository paymentGatewayConfigurationRepository,
-			final ClientRepository clientRepository,final CodeValueRepository codeValueRepository,
+			final ClientRepository clientRepository,final PartnerBalanceRepository partnerBalanceRepository,
 			final OfficeAdditionalInfoRepository infoRepository) {
 		
 		this.context = context;
@@ -107,7 +108,7 @@ public class PaymentWritePlatformServiceImpl implements PaymentWritePlatformServ
 		this.actionDetailsReadPlatformService=actionDetailsReadPlatformService;
 		this.actiondetailsWritePlatformService=actiondetailsWritePlatformService; 
 		this.clientRepository = clientRepository;
-		this.codeValueRepository = codeValueRepository;
+		this.partnerBalanceRepository = partnerBalanceRepository;
 		this.infoRepository = infoRepository;
 				
 		
@@ -156,13 +157,14 @@ public class PaymentWritePlatformServiceImpl implements PaymentWritePlatformServ
 				}
 				
 				final Client client=this.clientRepository.findOne(payment.getClientId());
-				final CodeValue codeValue=this.codeValueRepository.findOne(client.getOffice().getOfficeType());
-				if(codeValue.label().equalsIgnoreCase("Agent")){
-					final OfficeAdditionalInfo officeAdditionalInfo=this.infoRepository.findoneByoffice(client.getOffice());
+				//final CodeValue codeValue=this.codeValueRepository.findOne(client.getOffice().getOfficeType());
+				final OfficeAdditionalInfo officeAdditionalInfo=this.infoRepository.findoneByoffice(client.getOffice());
+				if(officeAdditionalInfo !=null){
 					if(officeAdditionalInfo.getIsCollective())
 					{
 					System.out.println(officeAdditionalInfo.getIsCollective());
-				}
+					this.updatePartnerBalance(client.getOffice(),payment);
+				   }
 				}
 				return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(payment.getId()).withClientId(command.entityId()).build();
 
@@ -174,6 +176,20 @@ public class PaymentWritePlatformServiceImpl implements PaymentWritePlatformServ
 			}
 		}
 	
+	private void updatePartnerBalance(final Office office,final Payment payment) {
+
+		final String accountType = "PAYMENTS";
+		PartnerBalance partnerBalance = this.partnerBalanceRepository.findOneWithPartnerAccount(office.getId(), accountType);
+		if (partnerBalance != null) {
+			partnerBalance.update(payment.getAmountPaid(), office.getId());
+
+		} else {
+			partnerBalance = PartnerBalance.create(payment.getAmountPaid(), accountType,office.getId());
+		}
+
+		this.partnerBalanceRepository.save(partnerBalance);
+	}
+
 	@Override
 	public CommandProcessingResult cancelPayment(final JsonCommand command,final Long paymentId) {
 		

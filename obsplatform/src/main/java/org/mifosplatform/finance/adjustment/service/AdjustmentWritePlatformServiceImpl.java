@@ -14,6 +14,13 @@ import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
+import org.mifosplatform.organisation.office.domain.Office;
+import org.mifosplatform.organisation.office.domain.OfficeAdditionalInfo;
+import org.mifosplatform.organisation.office.domain.OfficeAdditionalInfoRepository;
+import org.mifosplatform.organisation.partner.domain.PartnerBalance;
+import org.mifosplatform.organisation.partner.domain.PartnerBalanceRepository;
+import org.mifosplatform.portfolio.client.domain.Client;
+import org.mifosplatform.portfolio.client.domain.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -30,12 +37,16 @@ public class AdjustmentWritePlatformServiceImpl implements
 	private final ClientBalanceReadPlatformService clientBalanceReadPlatformService;
 	private final AdjustmentReadPlatformService adjustmentReadPlatformService;
 	private final AdjustmentCommandFromApiJsonDeserializer fromApiJsonDeserializer;
+	private final ClientRepository clientRepository;
+	private final PartnerBalanceRepository partnerBalanceRepository;
+	private final OfficeAdditionalInfoRepository infoRepository;
 
 	@Autowired
 	public AdjustmentWritePlatformServiceImpl(final PlatformSecurityContext context,final AdjustmentRepository adjustmentRepository,
 			final ClientBalanceRepository clientBalanceRepository,final AdjustmentCommandFromApiJsonDeserializer fromApiJsonDeserializer,
 			final UpdateClientBalance updateClientBalance,final ClientBalanceReadPlatformService clientBalanceReadPlatformService,
-			final AdjustmentReadPlatformService adjustmentReadPlatformService) {
+			final AdjustmentReadPlatformService adjustmentReadPlatformService,final ClientRepository clientRepository,
+			final PartnerBalanceRepository partnerBalanceRepository,final OfficeAdditionalInfoRepository infoRepository) {
 		
 		this.context = context;
 		this.adjustmentRepository = adjustmentRepository;
@@ -44,6 +55,9 @@ public class AdjustmentWritePlatformServiceImpl implements
 		this.clientBalanceReadPlatformService = clientBalanceReadPlatformService;
 		this.adjustmentReadPlatformService = adjustmentReadPlatformService;
 		this.fromApiJsonDeserializer = fromApiJsonDeserializer;
+		this.clientRepository = clientRepository;
+		this.partnerBalanceRepository = partnerBalanceRepository;
+		this.infoRepository = infoRepository;
 	}
 
 
@@ -71,6 +85,15 @@ public class AdjustmentWritePlatformServiceImpl implements
 			updateClientBalance.saveClientBalanceEntity(clientBalance);
 
 			this.adjustmentRepository.saveAndFlush(adjustment);
+			
+			final Client client = this.clientRepository.findOne(clientId);
+			final OfficeAdditionalInfo officeAdditionalInfo = this.infoRepository.findoneByoffice(client.getOffice());
+			if (officeAdditionalInfo != null) {
+				if (officeAdditionalInfo.getIsCollective()) {
+					System.out.println(officeAdditionalInfo.getIsCollective());
+					this.updatePartnerBalance(client.getOffice(), adjustment);
+				}
+			}
 			return adjustment.getId();
 		} catch (DataIntegrityViolationException dve) {
 			return Long.valueOf(-1);
@@ -96,6 +119,8 @@ public class AdjustmentWritePlatformServiceImpl implements
 				id = createAdjustment(command.entityId(), command.entityId(),
 						command.entityId(), command);
 			}
+			
+			
 
 			return new CommandProcessingResultBuilder()
 					.withCommandId(command.commandId()).withEntityId(id).withClientId(command.entityId())
@@ -103,5 +128,26 @@ public class AdjustmentWritePlatformServiceImpl implements
 		} catch (DataIntegrityViolationException dve) {
 			return CommandProcessingResult.empty();
 		}
+	}
+	
+	private void updatePartnerBalance(final Office office,final Adjustment adjustment) {
+
+		final String accountType = "ADJUSTMENTS";
+		PartnerBalance partnerBalance = this.partnerBalanceRepository.findOneWithPartnerAccount(office.getId(), accountType);
+		if (partnerBalance != null) {
+			if(adjustment.getAdjustmentType().equalsIgnoreCase("CREDIT")){
+			partnerBalance.update(adjustment.getAmountPaid().negate(), office.getId());
+			}else{
+				partnerBalance.update(adjustment.getAmountPaid(), office.getId());
+			}
+
+		} else {
+		  if(adjustment.getAdjustmentType().equalsIgnoreCase("CREDIT")){
+			partnerBalance = PartnerBalance.create(adjustment.getAmountPaid().negate(), accountType,office.getId());
+		  }else{
+			  partnerBalance = PartnerBalance.create(adjustment.getAmountPaid(), accountType,office.getId());
+		}
+	}
+		this.partnerBalanceRepository.save(partnerBalance);
 	}
 }
