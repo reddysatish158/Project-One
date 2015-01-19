@@ -107,7 +107,7 @@ public class VoucherReadPlatformServiceImpl implements
 	}
 
 	@Override
-	public Page<VoucherData> getAllData(SearchSqlQuery searchVoucher, String statusType, String batchName, String pinType) {
+	public Page<VoucherData> getAllBatchWiseData(SearchSqlQuery searchVoucher, String statusType, String batchName, String pinType) {
 		try {
 
 			context.authenticatedUser();
@@ -393,12 +393,61 @@ public class VoucherReadPlatformServiceImpl implements
 			return null;
 		}
 	}
+	
+	
+	@Override
+	public List<VoucherData> getAllData() {
+		try {
+
+			context.authenticatedUser();
+			String sql;
+			RetrieveAllRandomMapper mapper = new RetrieveAllRandomMapper();
+			sql = "SELECT  " + mapper.schema();
+
+			return this.jdbcTemplate.query(sql, mapper, new Object[] {});
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+	}
+	
+	private static final class RetrieveAllRandomMapper implements
+	RowMapper<VoucherData> {
+
+		public String schema() {
+			
+				return "m.id as id, m.batch_name as batchName, m.office_id as officeId, m.length as length,"
+						+ "m.begin_with as beginWith,m.pin_category as pinCategory,m.quantity as quantity,"
+						+ "m.serial_no as serialNo,m.pin_type as pinType,m.pin_value as pinValue,m.expiry_date as expiryDate, "
+						+ "case m.pin_type when 'VALUE' then p.plan_code=null when 'PRODUCT' then p.plan_code end as planCode, "
+						+ "m.is_processed as isProcessed from b_pin_master m  "
+						+ "left join b_plan_master p on m.pin_value=p.id";
+
+			}
+
+			@Override
+			public VoucherData mapRow(final ResultSet rs, final int rowNum)
+					throws SQLException {
+
+				Long id = rs.getLong("id");
+				String batchName = rs.getString("batchName");
+				Long officeId = rs.getLong("officeId");
+				Long length = rs.getLong("length");
+				String pinCategory = rs.getString("pinCategory");
+				String pinType = rs.getString("pinType");
+				Long quantity = rs.getLong("quantity");
+				String serial = rs.getString("serialNo");
+				Date expiryDate = rs.getDate("expiryDate");
+				String beginWith = rs.getString("beginWith");
+				String pinValue = rs.getString("pinValue");
+				String planCode = rs.getString("planCode");
+				String isProcessed = rs.getString("isProcessed");
+
+				return new VoucherData(batchName, officeId, length,
+						pinCategory, pinType, quantity, serial, expiryDate,
+						beginWith, pinValue, id, planCode, isProcessed, null, null, null);
+
+			}
+	}
+	
 
 }
-
-
-
-
-
-
-
