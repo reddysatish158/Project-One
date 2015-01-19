@@ -20,7 +20,7 @@ import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
 import org.mifosplatform.useradministration.domain.AppUser;
 
 @Entity
-@Table(name = "b_agreement")
+@Table(name = "m_office_agreement")
 public class Agreement extends AbstractAuditableCustom<AppUser, Long> {
 
 	/**
@@ -28,8 +28,11 @@ public class Agreement extends AbstractAuditableCustom<AppUser, Long> {
 		 */
 	private static final long serialVersionUID = 1L;
 
-	@Column(name = "partner_account_id")
+	@Column(name = "partner_id")
 	private Long partnerId;
+	
+	@Column(name = "office_id")
+	private Long officeId;
 
 	@Column(name = "agreement_status")
 	private String agreementStatus;
@@ -52,18 +55,19 @@ public class Agreement extends AbstractAuditableCustom<AppUser, Long> {
 
 	}
 
-	public static Agreement fromJosn(final JsonCommand command) {
+	public static Agreement fromJosn(final JsonCommand command,final Long officeId) {
 		
 		final String agreementStatus=command.stringValueOfParameterNamed("agreementStatus");
 		final LocalDate startDate = command.localDateValueOfParameterNamed("startDate");
 		final LocalDate endDate = command.localDateValueOfParameterNamed("endDate");
 		final Long partnerId = command.entityId();
-		return new Agreement(partnerId,agreementStatus,startDate,endDate);
+		return new Agreement(partnerId,officeId,agreementStatus,startDate,endDate);
 	}
 	
-	public Agreement(final Long partnerId,final String agreementStatus, final LocalDate startDate,final LocalDate endDate) {
+	public Agreement(final Long partnerId,final Long officeId, final String agreementStatus, final LocalDate startDate,final LocalDate endDate) {
 		
 		this.partnerId = partnerId;
+		this.officeId = officeId;
 		this.agreementStatus =agreementStatus;
 		this.startDate = startDate.toDate();
 		this.endDate =endDate.toDate();
@@ -72,6 +76,10 @@ public class Agreement extends AbstractAuditableCustom<AppUser, Long> {
 
 	public Long getPartnerId() {
 		return partnerId;
+	}
+	
+	public Long getOfficeId() {
+		return officeId;
 	}
 
 	public String getAgreementStatus() {
@@ -96,6 +104,10 @@ public class Agreement extends AbstractAuditableCustom<AppUser, Long> {
 
 	public void setPartnerId(Long partnerId) {
 		this.partnerId = partnerId;
+	}
+	
+	public void setOfficeId(Long officeId) {
+		this.officeId = officeId;
 	}
 
 	public void setAgreementStatus(String agreementStatus) {

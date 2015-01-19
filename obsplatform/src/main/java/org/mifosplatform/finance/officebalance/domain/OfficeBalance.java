@@ -6,12 +6,13 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import org.springframework.data.jpa.domain.AbstractPersistable;
+import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
+import org.mifosplatform.useradministration.domain.AppUser;
 
 
 @Entity
 @Table(name = "m_office_balance")
-public class OfficeBalance extends AbstractPersistable<Long> {
+public class OfficeBalance extends AbstractAuditableCustom<AppUser,Long> {
 
 	/**
 	 * 
@@ -54,7 +55,7 @@ public class OfficeBalance extends AbstractPersistable<Long> {
 
 	public void setBalanceAmount(BigDecimal balanceAmount) {
 
-		this.balanceAmount = this.balanceAmount.add(balanceAmount);
+		this.balanceAmount = balanceAmount;
 
 	}
 

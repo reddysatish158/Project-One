@@ -12,6 +12,7 @@ public class AgreementData {
 	
 	private Long id;
 	private String agreementStatus;
+	private Long officeId;
 	private LocalDate startDate;
 	private LocalDate endDate;
 	private String shareType;
@@ -35,11 +36,12 @@ public class AgreementData {
 	}
 
 
-	public AgreementData(Long id, String agreementStatus,  LocalDate startDate,
-			 LocalDate endDate,  String shareType, BigDecimal shareAmount,String source, EnumOptionData status) {
+	public AgreementData(Long id,String agreementStatus, Long officeId, LocalDate startDate,LocalDate endDate,  
+			   String shareType, BigDecimal shareAmount,String source, EnumOptionData status) {
 		
 		this.id=id;
 		this.agreementStatus = agreementStatus;
+		this.officeId = officeId;
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.shareType = shareType;
@@ -51,6 +53,10 @@ public class AgreementData {
 
 	public Long getId() {
 		return id;
+	}
+	
+	public Long getOfficeId() {
+		return officeId;
 	}
 
 	public String getAgreementStatus() {

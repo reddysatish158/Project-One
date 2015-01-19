@@ -11,7 +11,7 @@ import org.mifosplatform.useradministration.domain.AppUser;
 
 
 @Entity
-@Table(name = "b_controlaccount_balance")
+@Table(name = "m_controlaccount_balance")
 public class PartnerBalance extends AbstractAuditableCustom<AppUser,Long> {
 
 	/**

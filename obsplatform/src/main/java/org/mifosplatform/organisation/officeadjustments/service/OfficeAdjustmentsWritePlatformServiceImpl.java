@@ -70,7 +70,7 @@ public class OfficeAdjustmentsWritePlatformServiceImpl implements OfficeAdjustme
 			//check exsists or not
 			final List<OfficeBalanceData> balanceDatas = this.officeAdjustmentsReadPaltformService.retrieveOfficeBalance(command.entityId());
 			OfficeBalance officeBalance = null;
-			if (balanceDatas != null) {
+			if (balanceDatas.size() != 0 ) {
 				officeBalance = this.officeBalanceRepository.findOne(balanceDatas.get(0).getId());
 			}
 			if (officeBalance != null) {

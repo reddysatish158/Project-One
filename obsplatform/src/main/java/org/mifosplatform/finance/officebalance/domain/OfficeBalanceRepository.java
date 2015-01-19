@@ -9,6 +9,6 @@ public interface OfficeBalanceRepository extends JpaRepository<OfficeBalance, Lo
 		JpaSpecificationExecutor<OfficeBalance> {
 
 	@Query("from OfficeBalance officeBalance where officeBalance.officeId =:officeId")
-	OfficeBalance findByOfficeId(@Param("officeId") final Long officeId);
+	OfficeBalance findOneByOfficeId(@Param("officeId") final Long officeId);
 
 }

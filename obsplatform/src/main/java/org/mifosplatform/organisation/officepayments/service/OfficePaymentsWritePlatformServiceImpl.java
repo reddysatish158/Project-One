@@ -58,7 +58,7 @@ public class OfficePaymentsWritePlatformServiceImpl implements OfficePaymentsWri
 			final OfficePayments officePayments = OfficePayments.fromJson(command);
 			this.officePaymentsRepository.save(officePayments);
 			
-			OfficeBalance officeBalance =this.officeBalanceRepository.findByOfficeId(officePayments.getOfficeId());
+			OfficeBalance officeBalance =this.officeBalanceRepository.findOneByOfficeId(officePayments.getOfficeId());
 			
 			if(officeBalance != null){
 				officeBalance.updateBalance("CREDIT",officePayments.getAmountPaid());

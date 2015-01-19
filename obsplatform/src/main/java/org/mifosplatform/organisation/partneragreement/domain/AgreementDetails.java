@@ -15,8 +15,8 @@ import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
 import org.mifosplatform.useradministration.domain.AppUser;
 
 @Entity
-@Table(name = "b_agreement_detail", uniqueConstraints = @UniqueConstraint(columnNames = {
-		"agreement_id", "source" }, name = "b_agreement_dtl_ai_ps_mc_uniquekey"))
+@Table(name = "m_office_agreement_detail", uniqueConstraints = @UniqueConstraint(columnNames = {
+		"agreement_id", "source" }, name = "agreement_dtl_ai_ps_mc_uniquekey"))
 public class AgreementDetails extends AbstractAuditableCustom<AppUser, Long> {
 
 	/**
@@ -31,7 +31,7 @@ public class AgreementDetails extends AbstractAuditableCustom<AppUser, Long> {
 	@Column(name = "source")
 	private Long sourceType;
 
-	@Column(name = "royalty_share")
+	@Column(name = "share_amount")
 	private BigDecimal shareAmount;
 
 	@Column(name = "share_type")
