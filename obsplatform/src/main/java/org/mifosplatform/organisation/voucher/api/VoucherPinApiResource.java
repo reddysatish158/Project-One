@@ -22,12 +22,14 @@ import javax.ws.rs.core.UriInfo;
 import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
+import org.mifosplatform.crm.clientprospect.service.SearchSqlQuery;
 import org.mifosplatform.infrastructure.codes.data.CodeData;
 import org.mifosplatform.infrastructure.core.api.ApiRequestParameterHelper;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
 import org.mifosplatform.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.mifosplatform.infrastructure.core.serialization.DefaultToApiJsonSerializer;
+import org.mifosplatform.infrastructure.core.service.Page;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.organisation.office.data.OfficeData;
 import org.mifosplatform.organisation.office.service.OfficeReadPlatformService;
@@ -135,7 +137,7 @@ public class VoucherPinApiResource {
 	@Path("template")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrieveTemplate(@Context final UriInfo uriInfo) {
+	public String retrieveTemplate(@Context final UriInfo uriInfo, @QueryParam("isBatchTemplate") final String isBatchTemplate) {
 
 		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
 		
@@ -146,6 +148,11 @@ public class VoucherPinApiResource {
 		final Collection<OfficeData> offices = this.officeReadPlatformService.retrieveAllOffices();
 		
 		final VoucherData voucherData = new VoucherData(pinCategoryData, pinTypeData, offices);
+		
+		if(isBatchTemplate != null){
+			final List<VoucherData> voucherBatchData = this.readPlatformService.retriveAllBatchTemplateData();
+			voucherData.setVoucherBatchData(voucherBatchData);
+		}
 		
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 		
@@ -164,15 +171,18 @@ public class VoucherPinApiResource {
 	@GET
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrieveVoucherGroups(@Context final UriInfo uriInfo) {
+	public String retrieveVoucherGroups(@Context final UriInfo uriInfo,@QueryParam("sqlSearch") final String sqlSearch,
+			@QueryParam("limit") final Integer limit, @QueryParam("offset") final Integer offset,
+			@QueryParam("statusType") final String statusType, @QueryParam("batchName") final String batchName, 
+			@QueryParam("pinType") final String pinType) {
 		
 		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		
-		final List<VoucherData> randomGenerator = this.readPlatformService.getAllData();
+		final SearchSqlQuery searchVoucher = SearchSqlQuery.forSearch(sqlSearch, offset,limit );
+		final Page<VoucherData> randomGenerator = this.readPlatformService.getAllData(searchVoucher, statusType, batchName, pinType);
 		
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 		
-		return this.toApiJsonSerializer.serialize(settings, randomGenerator, RESPONSE_PARAMETERS);
+		return this.toApiJsonSerializer.serialize(randomGenerator);
 	}
 	
 	/**
@@ -241,6 +251,21 @@ public class VoucherPinApiResource {
 		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
 		
 		List<VoucherData> voucherData = this.readPlatformService.retrivePinDetails(pinNumber);
+		
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		
+		return this.toApiJsonSerializer.serialize(settings, voucherData, RESPONSE_PARAMETERS);
+	}
+	
+	@GET
+	@Path("batchtemplate")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String retrieveBatchTemplateData(@Context final UriInfo uriInfo,@QueryParam("isProcessed") final Boolean isProcessed) {
+		
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		
+		List<VoucherData> voucherData = this.readPlatformService.retriveBatchTemplateData(isProcessed);
 		
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 		

@@ -450,7 +450,7 @@ public CommandProcessingResult renewalClientOrder(JsonCommand command,Long order
 				}
 		  	}
 		  orderprice.setDatesOnOrderStatus(newStartdate,renewalEndDate,orderDetails.getUserAction());//setBillEndDate(renewalEndDate);
-		  this.OrderPriceRepository.save(orderprice);
+		  //this.OrderPriceRepository.save(orderprice);
 		  orderDetails.setNextBillableDay(null);
 	  }
 	  orderDetails.setContractPeriod(contractDetails.getId());

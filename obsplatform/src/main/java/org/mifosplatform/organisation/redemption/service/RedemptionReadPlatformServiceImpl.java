@@ -36,7 +36,7 @@ public class RedemptionReadPlatformServiceImpl implements RedemptionReadPlatform
 			
 			this.context.authenticatedUser();
 		final OrderMapper mapper = new OrderMapper();
-		final String sql = "select id as orderId from b_orders where client_id = ? and plan_id = ? ";
+		final String sql = "select id as orderId from b_orders where client_id = ? and plan_id = ? and is_deleted = 'N' ";
 		return this.jdbcTemplate.query(sql, mapper, new Object[] { clientId, planId });
 		
 		}catch(EmptyResultDataAccessException accessException){
@@ -55,7 +55,5 @@ public class RedemptionReadPlatformServiceImpl implements RedemptionReadPlatform
 		}
 		
 	}
-	
-	
 
 }
