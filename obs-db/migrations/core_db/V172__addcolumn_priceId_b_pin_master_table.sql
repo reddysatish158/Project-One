@@ -46,3 +46,5 @@ CREATE TABLE IF NOT EXISTS `b_partner_settlement` (
   `net_amount` decimal(22,5) DEFAULT NULL,
     PRIMARY KEY (`id`)
   ) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+
+
