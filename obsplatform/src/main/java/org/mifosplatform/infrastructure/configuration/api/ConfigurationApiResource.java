@@ -106,6 +106,7 @@ public class ConfigurationApiResource {
 		defaultOne.put("deviceAgrementType", "false");
 		defaultOne.put("SubscriptionPayment", "false");
 		defaultOne.put("nationalId", "false");
+		defaultOne.put("date-format", "dd MMMM yyyy");
 		
 		/*********  Preparing 'defaultOneForClientList' JSONObject ******/
 		defaultOneForClientList.put("userName", "false");
