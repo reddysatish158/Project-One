@@ -18,7 +18,7 @@ public interface VoucherReadPlatformService {
 
 	String retrieveIndividualPin(String pinId);
 	
-	Page<VoucherData> getAllData(SearchSqlQuery searchTicketMaster, String statusType, String batchName, String pinType);
+	Page<VoucherData> getAllBatchWiseData(SearchSqlQuery searchTicketMaster, String statusType, String batchName, String pinType);
 
 	List<EnumOptionData> pinCategory();
 
@@ -33,6 +33,8 @@ public interface VoucherReadPlatformService {
 	List<VoucherData> retriveBatchTemplateData(Boolean isProcessed);
 	
 	List<VoucherData> retriveAllBatchTemplateData();
+
+	List<VoucherData> getAllData();
 
 
 }
