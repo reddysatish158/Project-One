@@ -75,7 +75,7 @@ public class PartnerDisbursementApiResource {
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String retrieveVoucherGroups(@Context final UriInfo uriInfo,@QueryParam("sqlSearch") final String sqlSearch,
 			@QueryParam("limit") final Integer limit, @QueryParam("offset") final Integer offset,
-			@QueryParam("souceType") final String sourceType, @QueryParam("partnerType") final String partnerType) {
+			@QueryParam("sourceType") final String sourceType, @QueryParam("partnerType") final String partnerType) {
 		
 		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
 		final SearchSqlQuery search = SearchSqlQuery.forSearch(sqlSearch, offset,limit );
