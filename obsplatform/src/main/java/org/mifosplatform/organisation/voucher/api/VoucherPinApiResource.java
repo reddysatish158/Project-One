@@ -159,15 +159,38 @@ public class VoucherPinApiResource {
 		return this.toApiJsonSerializer.serialize(settings, voucherData, RESPONSE_PARAMETERS);
 	}
 
-	
 	/**
 	 * This method <code>retrieveVoucherGroups</code> 
-	 * used for Retrieving the All Voucherpin Groups/Batch Data.
+	 * used for Retrieving the All Voucherpins Data.
 	 * 
 	 * @param uriInfo
 	 * 			Containing Url information 
 	 * @return
 	 */	
+	@GET
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String retrieveVoucherGroups(@Context final UriInfo uriInfo) {
+		
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		
+		final List<VoucherData> randomGenerator = this.readPlatformService.getAllData();
+		
+		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+		
+		return this.toApiJsonSerializer.serialize(settings, randomGenerator, RESPONSE_PARAMETERS);
+	}
+	
+	
+	/**
+	 * This method <code>retrieveVoucherGroups</code> 
+	 * used for Retrieving the All Voucherpin Groups/Batch wise Data.
+	 * 
+	 * @param uriInfo
+	 * 			Containing Url information 
+	 * @return
+	 */	
+	@Path("batchwise")
 	@GET
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
@@ -178,7 +201,7 @@ public class VoucherPinApiResource {
 		
 		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
 		final SearchSqlQuery searchVoucher = SearchSqlQuery.forSearch(sqlSearch, offset,limit );
-		final Page<VoucherData> randomGenerator = this.readPlatformService.getAllData(searchVoucher, statusType, batchName, pinType);
+		final Page<VoucherData> randomGenerator = this.readPlatformService.getAllBatchWiseData(searchVoucher, statusType, batchName, pinType);
 		
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 		
