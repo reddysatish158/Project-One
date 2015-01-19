@@ -8,6 +8,8 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
+import org.mifosplatform.organisation.office.domain.OfficeAdditionalInfo;
+import org.mifosplatform.organisation.office.domain.OfficeAdditionalInfoRepository;
 import org.mifosplatform.organisation.partner.service.PartnersWritePlatformServiceImp;
 import org.mifosplatform.organisation.partneragreement.domain.Agreement;
 import org.mifosplatform.organisation.partneragreement.domain.AgreementDetails;
@@ -31,17 +33,19 @@ public class PartnersAgreementWritePlatformServiceImp implements PartnersAgreeme
 	private final PartnersAgreementCommandFromApiJsonDeserializer apiJsonDeserializer;
 	private final AgreementRepository agreementRepository;
 	private final PartnersAgreementReadPlatformService agreementReadPlatformService;
+	private final OfficeAdditionalInfoRepository officeAdditionalInfoRepository;
 	
 	
 	@Autowired
 	public PartnersAgreementWritePlatformServiceImp(final PlatformSecurityContext context,final FromJsonHelper fromApiJsonHelper,
 			final PartnersAgreementCommandFromApiJsonDeserializer apiJsonDeserializer,final AgreementRepository agreementRepository,
-			final PartnersAgreementReadPlatformService agreementReadPlatformService) {
+			final PartnersAgreementReadPlatformService agreementReadPlatformService,final OfficeAdditionalInfoRepository officeAdditionalInfoRepository) {
 		this.context = context;
 		this.apiJsonDeserializer = apiJsonDeserializer;
 		this.fromApiJsonHelper = fromApiJsonHelper;
 		this.agreementRepository = agreementRepository;
 		this.agreementReadPlatformService = agreementReadPlatformService;
+		this.officeAdditionalInfoRepository = officeAdditionalInfoRepository;
 
 	}
 
@@ -52,9 +56,8 @@ public class PartnersAgreementWritePlatformServiceImp implements PartnersAgreeme
 		try{
 			this.context.authenticatedUser();
 			this.apiJsonDeserializer.validateForCreate(command.json());
-			
-			Agreement agreement=Agreement.fromJosn(command);
-			
+			final OfficeAdditionalInfo additionalInfo=this.officeAdditionalInfoRepository.findOne(command.entityId());
+			Agreement agreement=Agreement.fromJosn(command,additionalInfo.getOffice().getId());
 			final Long agreementId=this.agreementReadPlatformService.checkPartnerAgreementId(agreement.getPartnerId());
 			final JsonArray partnerAgreementArray = command.arrayOfParameterNamed("sourceData").getAsJsonArray();
 				
@@ -108,7 +111,7 @@ public class PartnersAgreementWritePlatformServiceImp implements PartnersAgreeme
 				this.agreementRepository.save(existsAgreement);
 				
 				return new CommandProcessingResultBuilder().withCommandId(command.commandId())
-                        .withEntityId(existsAgreement.getId()).build();
+                        .withEntityId(existsAgreement.getId()).withOfficeId(agreement.getOfficeId()).build();
 				
 			}else{
 			
@@ -125,7 +128,7 @@ public class PartnersAgreementWritePlatformServiceImp implements PartnersAgreeme
 			this.agreementRepository.save(agreement);
 		
 			return new CommandProcessingResultBuilder().withCommandId(command.commandId())
-			                          .withEntityId(agreement.getId()).build();
+			                          .withEntityId(agreement.getId()).withOfficeId(agreement.getOfficeId()).build();
 		  }
 		}catch (DataIntegrityViolationException dve) {
 			handleCodeDataIntegrityIssues(command, dve);
@@ -138,9 +141,9 @@ public class PartnersAgreementWritePlatformServiceImp implements PartnersAgreeme
 		final Throwable realCause = dve.getMostSpecificCause();
 		LOGGER.error(dve.getMessage(), dve);
 		
-		if(dve.getMostSpecificCause().getMessage().contains("b_agreement_dtl_ai_ps_mc_uniquekey")){
+		if(dve.getMostSpecificCause().getMessage().contains("agreement_dtl_ai_ps_mc_uniquekey")){
 			 throw new PlatformDataIntegrityException("error.msg.agreement.duplicate.source.data.entry.issue","A Agreement with sourceCategory " +
-			 		"already exists","sourceType");
+			 		"already exists","source");
 		}
 		throw new PlatformDataIntegrityException("error.msg.could.unknown.data.integrity.issue",
 				"Unknown data integrity issue with resource: "+ realCause.getMessage());

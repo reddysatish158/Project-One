@@ -80,7 +80,6 @@ public class PartnersWritePlatformServiceImp implements PartnersWritePlatformSer
 			}
 			final Office parentOffice = this.validateUserPriviledgeOnOfficeAndRetrieve(currentUser,parentId);
 			Office office = Office.fromPartner(parentOffice, command);
-			final String partnerName = command.stringValueOfParameterNamed("partnerName");
 			final String partnerType = command.stringValueOfParameterNamed("partnerType");
 			final String loginName = command.stringValueOfParameterNamed("loginName");
 			final String password = command.stringValueOfParameterNamed("password");
@@ -89,7 +88,7 @@ public class PartnersWritePlatformServiceImp implements PartnersWritePlatformSer
 			final String email = command.stringValueOfParameterNamed("email");
 			final boolean isCollective= command.booleanPrimitiveValueOfParameterNamed("isCollective");
 			OfficeAddress address =OfficeAddress.fromJson(command,office);
-			OfficeAdditionalInfo additionalInfo = new OfficeAdditionalInfo(office,partnerName, partnerType,currency,isCollective);
+			OfficeAdditionalInfo additionalInfo = new OfficeAdditionalInfo(office, partnerType,currency,isCollective);
 			office.setOfficeAddress(address);
 			office.setOfficeAdditionalInfo(additionalInfo);
 			this.officeRepository.save(office);
@@ -98,6 +97,7 @@ public class PartnersWritePlatformServiceImp implements PartnersWritePlatformSer
 			
 			//create user
 		    final String roleName = command.stringValueOfParameterNamed("roleName");
+			final String partnerName = command.stringValueOfParameterNamed("partnerName");
 		    final String[]  roles= arrayOfRole(roleName);
 		    JSONObject json = new JSONObject();
 		    json.put("username", loginName);
@@ -157,6 +157,12 @@ public class PartnersWritePlatformServiceImp implements PartnersWritePlatformSer
 
 		final Throwable realCause = dve.getMostSpecificCause();
 		LOGGER.error(dve.getMessage(), dve);
+		if(realCause.getMessage().contains("name_org")) {
+	            final String name = command.stringValueOfParameterNamed("partnerName");
+	            throw new PlatformDataIntegrityException("error.msg.partner.duplicate.name", "Partner with name `" + name + "` already exists",
+	                    "name", name);
+	        }
+		
 		throw new PlatformDataIntegrityException("error.msg.could.unknown.data.integrity.issue",
 				"Unknown data integrity issue with resource: " + realCause.getMessage());
 	}

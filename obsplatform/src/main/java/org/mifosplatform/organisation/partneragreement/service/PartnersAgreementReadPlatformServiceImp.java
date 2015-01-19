@@ -37,7 +37,7 @@ public class PartnersAgreementReadPlatformServiceImp implements PartnersAgreemen
 		
 		try {
 			context.authenticatedUser();
-			final String sql = "select id from b_agreement where partner_account_id=? ";
+			final String sql = "select id from m_office_agreement where partner_id=? ";
 			return jdbcTemplate.queryForLong(sql, new Object[] { partnerAccountId});
 		} catch (final EmptyResultDataAccessException e) {
 			return null;
@@ -51,7 +51,7 @@ public class PartnersAgreementReadPlatformServiceImp implements PartnersAgreemen
 		try {
 			context.authenticatedUser();
 			final AgreementMapper mapper = new AgreementMapper();
-			final String sql = "select " + mapper.schema() + " and a.partner_account_id = ? " ;
+			final String sql = "select " + mapper.schema() + " and a.partner_id = ? " ;
 			return this.jdbcTemplate.query(sql, mapper,new Object[] { partnerId });
 		} catch (final EmptyResultDataAccessException accessException) {
 			return null;
@@ -61,8 +61,8 @@ public class PartnersAgreementReadPlatformServiceImp implements PartnersAgreemen
 	private static final class AgreementMapper implements RowMapper<AgreementData> {
 
 		public String schema() {
-			return " a.id as Id,a.agreement_status as agreementStatus, a.start_date as startDate,a.end_date as endDate,ad.share_type as shareType,ad.royalty_share as shareAmount,"
-					+ "ad.status as status,c.code_value as source from b_agreement a join b_agreement_detail ad ON a.id = ad.agreement_id left join "
+			return " a.id as Id,a.agreement_status as agreementStatus,a.office_id as officeId, a.start_date as startDate,a.end_date as endDate,ad.share_type as shareType,ad.share_amount as shareAmount,"
+					+ "ad.status as status,c.code_value as source from m_office_agreement a join m_office_agreement_detail ad ON a.id = ad.agreement_id left join "
 					+ " m_code_value c ON c.id = ad.source where a.is_deleted='N' ";
 		}
 
@@ -71,6 +71,7 @@ public class PartnersAgreementReadPlatformServiceImp implements PartnersAgreemen
 
 			final Long id = rs.getLong("Id");
 			final String agreementStatus = rs.getString("agreementStatus");
+			final Long officeId = rs.getLong("officeId");
 			final LocalDate startDate = JdbcSupport.getLocalDate(rs,"startDate");
 			final LocalDate endDate = JdbcSupport.getLocalDate(rs,"endDate");
 			final String shareType = rs.getString("shareType");
@@ -79,7 +80,7 @@ public class PartnersAgreementReadPlatformServiceImp implements PartnersAgreemen
 			final Long status = rs.getLong("status");
 			final EnumOptionData enumstatus=OrderStatusEnumaration.OrderStatusType(status.intValue());
 			
-			return new AgreementData(id,agreementStatus,startDate,endDate,shareType,shareAmount,source,enumstatus);
+			return new AgreementData(id,agreementStatus,officeId,startDate,endDate,shareType,shareAmount,source,enumstatus);
 
 		}
 

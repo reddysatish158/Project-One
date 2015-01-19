@@ -1,5 +1,6 @@
 package org.mifosplatform.organisation.partner.service;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -47,13 +48,14 @@ public class PartnersReadPlatformServiceImp implements PartnersReadPlatformServi
 private static final class PartnerMapper implements RowMapper<PartnersData> {
 
 		public String schema() {
-			return " a.id as infoId,a.partner_name as partnerName,a.partner_currency as currency,mc.code_value as partnerType,a.is_collective as isCollective,"
+			return " a.id as infoId,a.partner_currency as currency,mc.code_value as partnerType,a.is_collective as isCollective,o.name as partnerName,"
 					+ "o.id as officeId,o.parent_id as parentId,o.external_id AS externalId,o.opening_date AS openingDate,parent.id AS parentId,"
 					+ "parent.name AS parentName,c.code_value as officeType,  ad.address_name as addressName, ad.city as city, ad.state as state,"
-					+ "ad.country as country,ad.email_id as email,ad.phone_number as phoneNumber,au.username as loginName from m_office o left join m_office AS parent "
-					+ "on parent.id = o.parent_id inner join b_office_additional_info a ON o.id=a.office_id  inner join b_office_address ad " 
-				    + "on o.id = ad.office_id inner join m_appuser au on o.id=au.office_id left join m_code_value c on c.id = o.office_type "
-					+ "left join m_code_value mc on mc.id = a.partner_type";
+					+ "ad.country as country,ad.email_id as email,ad.phone_number as phoneNumber,au.username as loginName,"
+					+ "IFNULL(ob.balance_amount,0) as balanceAmount from m_office o left join m_office AS parent on parent.id = o.parent_id " 
+					+ "inner join m_office_additional_info a ON o.id=a.office_id  inner join b_office_address ad on o.id = ad.office_id "
+					+ "inner join m_appuser au on o.id=au.office_id left join m_office_balance ob ON ob.office_id=o.id "
+					+ "left join m_code_value c on c.id = o.office_type left join m_code_value mc on mc.id = a.partner_type";
 		}
 
 	@Override
@@ -77,9 +79,10 @@ private static final class PartnerMapper implements RowMapper<PartnersData> {
 	final String email =rs.getString("email");
 	final String phoneNumber =rs.getString("phoneNumber");
 	final String isCollective = rs.getString("isCollective");
+	final BigDecimal balanceAmount =rs.getBigDecimal("balanceAmount");
 	
-	return new PartnersData(officeId,id,partnerName,partnerType,currency,parentId,parentName,
-			     officeType,openingDate,loginName,city,state,country,email,phoneNumber,isCollective);
+	return new PartnersData(officeId,id,partnerName,partnerType,currency,parentId,parentName,officeType,
+			     openingDate,loginName,city,state,country,email,phoneNumber,isCollective,balanceAmount);
 	
 
 	}

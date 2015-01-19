@@ -9,16 +9,13 @@ import javax.persistence.Table;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 @Entity
-@Table(name = "b_office_additional_info")
+@Table(name = "m_office_additional_info")
 public class OfficeAdditionalInfo extends AbstractPersistable<Long> {
 
 	/**
 		 * 
 		 */
 	private static final long serialVersionUID = 1L;
-
-	@Column(name = "partner_name")
-	private String partnerName;
 
 	@Column(name = "partner_type")
 	private String partnerType;
@@ -37,19 +34,13 @@ public class OfficeAdditionalInfo extends AbstractPersistable<Long> {
 		
 	}
 	
-	public OfficeAdditionalInfo(final Office office,final String partnerName, final String partnerType,final String currency,
+	public OfficeAdditionalInfo(final Office office, final String partnerType,final String currency,
 			   final boolean isCollective) {
 		
 		this.office = office;
-		this.partnerName = partnerName;
 		this.partnerType = partnerType;
 		this.partnerCurrency = currency;
 		this.isCollective = isCollective?'Y':'N';
-	}
-
-
-	public String getPartnerName() {
-		return partnerName;
 	}
 
 	public String getPartnerType() {
