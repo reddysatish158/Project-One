@@ -7,6 +7,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import org.mifosplatform.billing.chargecode.domain.ChargeCodeMaster;
+import org.mifosplatform.billing.chargecode.domain.ChargeCodeRepository;
 import org.mifosplatform.billing.planprice.domain.Price;
 import org.mifosplatform.billing.planprice.domain.PriceRepository;
 import org.mifosplatform.cms.journalvoucher.domain.JournalVoucher;
@@ -54,8 +56,8 @@ public class RedemptionWritePlatformServiceImpl implements
 	private final OrderWritePlatformService orderWritePlatformService;
 	private final RedemptionReadPlatformService redemptionReadPlatformService;
 	private final RedemptionCommandFromApiJsonDeserializer fromApiJsonDeserializer;
-	private final ContractPeriodReadPlatformService contractPeriodReadPlatformService;
 	private final OrderRepository orderRepository;
+	private final ChargeCodeRepository chargeCodeRepository;
 	private final JournalvoucherRepository journalvoucherRepository;
 	private final static String VALUE_PINTYPE = "VALUE";
 	private final static String PRODUCE_PINTYPE = "PRODUCT";
@@ -68,10 +70,9 @@ public class RedemptionWritePlatformServiceImpl implements
 	@Autowired
 	public RedemptionWritePlatformServiceImpl(final PlatformSecurityContext context,final VoucherDetailsRepository voucherDetailsRepository,
 		final ClientRepository clientRepository,final AdjustmentWritePlatformService adjustmentWritePlatformService,final FromJsonHelper fromJsonHelper,
-		final OrderWritePlatformService orderWritePlatformService,final ContractPeriodReadPlatformService contractPeriodReadPlatformService,
-		final RedemptionReadPlatformService redemptionReadPlatformService,final OrderRepository orderRepository,
+		final OrderWritePlatformService orderWritePlatformService,final RedemptionReadPlatformService redemptionReadPlatformService,final OrderRepository orderRepository,
 		final RedemptionCommandFromApiJsonDeserializer apiJsonDeserializer,final JournalvoucherRepository journalvoucherRepository,
-		final PriceRepository priceRepository,final ContractRepository contractRepository) {
+		final PriceRepository priceRepository,final ContractRepository contractRepository,final ChargeCodeRepository chargeCodeRepository) {
 		
 		this.context = context;
 		this.fromJsonHelper = fromJsonHelper;
@@ -79,11 +80,11 @@ public class RedemptionWritePlatformServiceImpl implements
 		this.clientRepository = clientRepository;
 		this.fromApiJsonDeserializer= apiJsonDeserializer;
 		this.orderWritePlatformService = orderWritePlatformService;
+		this.chargeCodeRepository=chargeCodeRepository;
 		this.redemptionReadPlatformService=redemptionReadPlatformService;
 		this.adjustmentWritePlatformService = adjustmentWritePlatformService;
 		this.voucherDetailsRepository = voucherDetailsRepository;
 		this.journalvoucherRepository=journalvoucherRepository;
-		this.contractPeriodReadPlatformService = contractPeriodReadPlatformService;
 		this.priceRepository = priceRepository;
 		this.contractRepository = contractRepository;
 		
@@ -145,11 +146,11 @@ public class RedemptionWritePlatformServiceImpl implements
 				final JsonObject json = new JsonObject();
 				
 				if(orderIds.isEmpty() && (price != null)){
-					 
+					ChargeCodeMaster  chargeCode = this.chargeCodeRepository.findOneByChargeCode(price.getChargeCode());
 					json.addProperty("billAlign", false);json.addProperty("planCode", planId);
 					json.addProperty("contractPeriod", contractId);
 					json.addProperty("isNewplan", true);
-					json.addProperty("paytermCode", price.getChargeCode());
+					json.addProperty("paytermCode",chargeCode.getBillFrequencyCode());
 					json.addProperty("locale", "en");
 					json.addProperty("dateFormat","dd MMMM yyyy"); 
 					json.addProperty("start_date", simpleDateFormat);
@@ -176,10 +177,11 @@ public class RedemptionWritePlatformServiceImpl implements
 			  
 			voucherDetails.setClientId(clientId);
 			voucherDetails.setStatus(USED);
+			voucherDetails.setSaleDate(new Date());
 			
 			this.voucherDetailsRepository.save(voucherDetails);
 			 
-			return new CommandProcessingResult(clientId);
+			return new CommandProcessingResult(voucherDetails.getId(), clientId);
 		}catch(DataIntegrityViolationException dve){
 			handleCodeDataIntegrityIssues(dve);
 	    	return new CommandProcessingResult(Long.valueOf(-1));

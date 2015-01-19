@@ -32,7 +32,7 @@ import org.mifosplatform.finance.billingmaster.api.BillingMasterApiResourse;
 import org.mifosplatform.finance.billingorder.domain.Invoice;
 import org.mifosplatform.finance.billingorder.exceptions.BillingOrderNoRecordsFoundException;
 import org.mifosplatform.finance.billingorder.service.InvoiceClient;
-import org.mifosplatform.infrastructure.configuration.domain.ConfigurationRepository;
+
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
@@ -124,7 +124,7 @@ public SheduleJobWritePlatformServiceImpl(final InvoiceClient invoiceClient,fina
 	   final BillingMesssageReadPlatformService billingMesssageReadPlatformService,final MessagePlatformEmailService messagePlatformEmailService,
 	   final ScheduleJob scheduleJob,final EntitlementReadPlatformService entitlementReadPlatformService,
 	   final EntitlementWritePlatformService entitlementWritePlatformService,final ReadReportingService readExtraDataAndReportingService,
-	   final OrderRepository orderRepository,final ConfigurationRepository globalConfigurationRepository,final TicketMasterApiResource ticketMasterApiResource, 
+	   final OrderRepository orderRepository,final TicketMasterApiResource ticketMasterApiResource, 
 	   final TicketMasterReadPlatformService ticketMasterReadPlatformService,final MCodeReadPlatformService codeReadPlatformService,
 	   final TenantAwareRoutingDataSource dataSource) {
 
