@@ -27,7 +27,8 @@ public class PartnersCommandFromApiJsonDeserializer {
 	 * The parameters supported for this command.
 	 */
 	private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("partnerType", "partnerName","loginName","password","phone","email",
-			                            "city","state","country","currency","organization","roleName","companyLogo","parentId","officeType"));
+			                            "city","state","country","currency","organization","roleName","companyLogo","parentId","officeType","repeatPassword",
+			                            "isCollective"));
 	private final FromJsonHelper fromApiJsonHelper;
 
 	@Autowired
@@ -62,20 +63,23 @@ public class PartnersCommandFromApiJsonDeserializer {
 		final String password = fromApiJsonHelper.extractStringNamed("password", element);
         baseDataValidator.reset().parameter("password").value(password).notBlank().notExceedingLengthOf(60);
         
+        final String repeatPassword = fromApiJsonHelper.extractStringNamed("repeatPassword", element);
+        baseDataValidator.reset().parameter("repeatPassword").value(repeatPassword).notBlank().notExceedingLengthOf(60);
+        
         final Long partnerType = fromApiJsonHelper.extractLongNamed("partnerType", element);
         baseDataValidator.reset().parameter("partnerType").value(partnerType).notNull().integerGreaterThanZero();
-		
+        
+        final Long parentId = fromApiJsonHelper.extractLongNamed("parentId", element);
+        baseDataValidator.reset().parameter("parentId").value(parentId).notBlank();
+        
+        final String organization = fromApiJsonHelper.extractStringNamed("organization", element);
+        baseDataValidator.reset().parameter("organization").value(organization).notBlank().notExceedingLengthOf(100);
+        
         final String phone = fromApiJsonHelper.extractStringNamed("phone", element);
         baseDataValidator.reset().parameter("phone").value(phone).notBlank().notExceedingLengthOf(30);
         
         final String email = fromApiJsonHelper.extractStringNamed("email", element);
         baseDataValidator.reset().parameter("email").value(email).notBlank();
-        
-        final String organization = fromApiJsonHelper.extractStringNamed("organization", element);
-        baseDataValidator.reset().parameter("organization").value(organization).notBlank().notExceedingLengthOf(100);
-        
-        final Long parentId = fromApiJsonHelper.extractLongNamed("parentId", element);
-        baseDataValidator.reset().parameter("parentId").value(parentId).notBlank();
         
 		final String city = fromApiJsonHelper.extractStringNamed("city", element);
 		baseDataValidator.reset().parameter("city").value(city).notBlank().notExceedingLengthOf(100);

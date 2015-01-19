@@ -28,6 +28,7 @@ public class PartnersData {
 	private String country; 
 	private String email; 
 	private String phoneNumber;
+	private String isCollective;
 	private Collection<MCodeData> partnerTypes;
 	private List<String> countryData;
 	private List<String> statesData;
@@ -56,7 +57,7 @@ public class PartnersData {
 	public PartnersData(final Long officeId, final Long additionalinfoId,final String partnerName, final String partnerType, 
 			final String currency,final Long parentId, final String parentName, final String officeType,
 			final LocalDate openingDate, final String loginName,final String city, final String state, 
-			final String country, final String email, final String phoneNumber) {
+			final String country, final String email, final String phoneNumber,final String isCollective) {
 		
 	this.officeId = officeId;
 	this.id = additionalinfoId;
@@ -73,6 +74,7 @@ public class PartnersData {
 	this.country =country;
 	this.email = email;
 	this.phoneNumber =phoneNumber; 
+	this.isCollective = isCollective;
 	
 	}
 	
@@ -139,6 +141,10 @@ public class PartnersData {
 
 	public String getPhoneNumber() {
 		return phoneNumber;
+	}
+	
+	public String getIsCollective() {
+		return isCollective;
 	}
 
 	public Collection<MCodeData> getPartnerTypes() {

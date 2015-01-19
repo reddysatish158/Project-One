@@ -8,6 +8,13 @@ import org.mifosplatform.finance.billingorder.domain.Invoice;
 import org.mifosplatform.finance.clientbalance.domain.ClientBalance;
 import org.mifosplatform.finance.clientbalance.domain.ClientBalanceRepository;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
+import org.mifosplatform.organisation.office.domain.Office;
+import org.mifosplatform.organisation.office.domain.OfficeAdditionalInfo;
+import org.mifosplatform.organisation.office.domain.OfficeAdditionalInfoRepository;
+import org.mifosplatform.organisation.partner.domain.PartnerBalance;
+import org.mifosplatform.organisation.partner.domain.PartnerBalanceRepository;
+import org.mifosplatform.portfolio.client.domain.Client;
+import org.mifosplatform.portfolio.client.domain.ClientRepository;
 import org.mifosplatform.portfolio.order.domain.Order;
 import org.mifosplatform.portfolio.order.domain.OrderPrice;
 import org.mifosplatform.portfolio.order.domain.OrderRepository;
@@ -20,13 +27,22 @@ public class BillingOrderWritePlatformServiceImplementation implements BillingOr
 
 	private final OrderRepository orderRepository;
 	private final ClientBalanceRepository clientBalanceRepository;
+	private final ClientRepository clientRepository;
+	private final PartnerBalanceRepository partnerBalanceRepository;
+	private final OfficeAdditionalInfoRepository infoRepository;
 	
 	@Autowired
 	public BillingOrderWritePlatformServiceImplementation(final OrderRepository orderRepository,
-			final ClientBalanceRepository clientBalanceRepository){
+			final ClientBalanceRepository clientBalanceRepository,
+			final ClientRepository clientRepository,
+			final PartnerBalanceRepository partnerBalanceRepository,
+			final OfficeAdditionalInfoRepository infoRepository){
 
 		this.orderRepository = orderRepository;
 		this.clientBalanceRepository = clientBalanceRepository;
+		this.clientRepository = clientRepository;
+		this.partnerBalanceRepository = partnerBalanceRepository;
+		this.infoRepository = infoRepository;
 	}
 
 
@@ -86,8 +102,31 @@ public class BillingOrderWritePlatformServiceImplementation implements BillingOr
 			clientBalance = updateClientBalance.calculateCreateClientBalance("DEBIT",invoice.getInvoiceAmount(), clientBalance,invoice.getClientId());
 		}*/
 
-		this.clientBalanceRepository.save(clientBalance);
+		this.clientBalanceRepository.saveAndFlush(clientBalance);
 		
+		final Client client = this.clientRepository.findOne(clientId);
+		final OfficeAdditionalInfo officeAdditionalInfo = this.infoRepository.findoneByoffice(client.getOffice());
+		if (officeAdditionalInfo != null) {
+			if (officeAdditionalInfo.getIsCollective()) {
+				System.out.println(officeAdditionalInfo.getIsCollective());
+				this.updatePartnerBalance(client.getOffice(), invoice);
+			}
+		}
+
+	}
+
+	private void updatePartnerBalance(final Office office,final Invoice invoice) {
+
+		final String accountType = "INVOICE";
+		PartnerBalance partnerBalance = this.partnerBalanceRepository.findOneWithPartnerAccount(office.getId(), accountType);
+		if (partnerBalance != null) {
+			partnerBalance.update(invoice.getInvoiceAmount(), office.getId());
+
+		} else {
+			partnerBalance = PartnerBalance.create(invoice.getInvoiceAmount(), accountType,office.getId());
+		}
+
+		this.partnerBalanceRepository.save(partnerBalance);
 	}
 
 }

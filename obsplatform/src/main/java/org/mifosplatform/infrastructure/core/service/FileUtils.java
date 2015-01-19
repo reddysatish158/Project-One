@@ -253,4 +253,12 @@ public class FileUtils {
 	        return FileUtils.MIFOSX_BASE_DIR + File.separator + ThreadLocalContextUtil.getTenant().getName().replaceAll(" ", "").trim()
 	                + File.separator + "SheduleLogFile"+ File.separator;
 	 }
+	 
+	/**
+	 * Generate directory path for storing new logos of partners
+	 */
+	public static String generatePartnersImageDirectory(final Long resourceId) {
+		return FileUtils.MIFOSX_BASE_DIR+ File.separator + ThreadLocalContextUtil.getTenant().getName().replaceAll(" ", "").trim() + File.separator + "images"
+				+ File.separator + "partnerLogo" + File.separator + resourceId;
+	}
 }

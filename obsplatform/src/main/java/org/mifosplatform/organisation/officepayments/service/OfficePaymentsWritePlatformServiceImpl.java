@@ -1,5 +1,8 @@
 package org.mifosplatform.organisation.officepayments.service;
 
+import java.math.BigDecimal;
+
+
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -7,6 +10,8 @@ import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityExce
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.organisation.officepayments.domain.OfficePayments;
 import org.mifosplatform.organisation.officepayments.domain.OfficePaymentsRepository;
+import org.mifosplatform.finance.officebalance.domain.OfficeBalance;
+import org.mifosplatform.finance.officebalance.domain.OfficeBalanceRepository;
 import org.mifosplatform.organisation.officepayments.serialization.OfficePaymentsCommandFromApiJsonDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,15 +31,18 @@ public class OfficePaymentsWritePlatformServiceImpl implements OfficePaymentsWri
 	private final PlatformSecurityContext context;
 	private final OfficePaymentsRepository officePaymentsRepository;
 	private final OfficePaymentsCommandFromApiJsonDeserializer fromApiJsonDeserializer;
+	private final OfficeBalanceRepository officeBalanceRepository;
 	
 	@Autowired
 	public OfficePaymentsWritePlatformServiceImpl(final PlatformSecurityContext context, 
 				final OfficePaymentsRepository  officePaymentsRepository,
-				final OfficePaymentsCommandFromApiJsonDeserializer fromApiJsonDeserializer){
+				final OfficePaymentsCommandFromApiJsonDeserializer fromApiJsonDeserializer,
+				final OfficeBalanceRepository officeBalanceRepository){
 		
 		this.context = context;
 		this.officePaymentsRepository = officePaymentsRepository;
 		this.fromApiJsonDeserializer = fromApiJsonDeserializer;
+		this.officeBalanceRepository = officeBalanceRepository;
 	}
 
 	/* (non-Javadoc)
@@ -49,11 +57,25 @@ public class OfficePaymentsWritePlatformServiceImpl implements OfficePaymentsWri
 			this.fromApiJsonDeserializer.validateForCreate(command.json());
 			final OfficePayments officePayments = OfficePayments.fromJson(command);
 			this.officePaymentsRepository.save(officePayments);
+			
+			OfficeBalance officeBalance =this.officeBalanceRepository.findByOfficeId(officePayments.getOfficeId());
+			
+			if(officeBalance != null){
+				officeBalance.updateBalance("CREDIT",officePayments.getAmountPaid());
+			
+			}else if(officeBalance == null){
+				
+                    BigDecimal balance=BigDecimal.ZERO.subtract(officePayments.getAmountPaid());
+                    officeBalance =OfficeBalance.create(officePayments.getOfficeId(),balance);
+			}
+			this.officeBalanceRepository.saveAndFlush(officeBalance);
+			
+			
 			return new CommandProcessingResultBuilder().withCommandId(command.commandId())
 					     .withEntityId(officePayments.getId()).withOfficeId(command.entityId()).build();
 		}catch(DataIntegrityViolationException dve) {
 			handleCodeDataIntegrityIssues(command, dve);
-			return null;
+			return new CommandProcessingResult(Long.valueOf(-1));
 		}
 	}
 	

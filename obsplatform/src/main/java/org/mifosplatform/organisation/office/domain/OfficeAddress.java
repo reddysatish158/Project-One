@@ -133,6 +133,12 @@ public class OfficeAddress extends AbstractPersistable<Long> {
 		this.office = office;
 	}
 
+
+	public void setCompanyLogo(final String imageLocation) {
+		
+		this.companyLogo = imageLocation;
+	}
+
 		
 }
 	

@@ -45,9 +45,6 @@ public class AdjustmentReadPlatformServiceImpl implements AdjustmentReadPlatform
 		}
 }
 
-
-
-
 	@Override
 	public List<ClientBalanceData> retrieveAllAdjustments(final Long id){
 		 this.context.authenticatedUser();
@@ -55,8 +52,6 @@ public class AdjustmentReadPlatformServiceImpl implements AdjustmentReadPlatform
 		 final String sql = "select " + mapper.schema()+ " where d.client_id=?";
 		return this.jdbcTemplate.query(sql, mapper, new Object[] {id});
 	}
-
-
 
 
 	@Override
