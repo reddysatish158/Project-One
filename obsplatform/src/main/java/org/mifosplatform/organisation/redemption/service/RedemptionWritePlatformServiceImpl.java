@@ -177,10 +177,11 @@ public class RedemptionWritePlatformServiceImpl implements
 			  
 			voucherDetails.setClientId(clientId);
 			voucherDetails.setStatus(USED);
+			voucherDetails.setSaleDate(new Date());
 			
 			this.voucherDetailsRepository.save(voucherDetails);
 			 
-			return new CommandProcessingResult(clientId);
+			return new CommandProcessingResult(voucherDetails.getId(), clientId);
 		}catch(DataIntegrityViolationException dve){
 			handleCodeDataIntegrityIssues(dve);
 	    	return new CommandProcessingResult(Long.valueOf(-1));

@@ -1,5 +1,7 @@
 package org.mifosplatform.organisation.voucher.domain;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -35,6 +37,9 @@ public class VoucherDetails extends AbstractPersistable<Long> {
 	
 	@Column(name = "status")
 	private String status;
+	
+	@Column(name = "sale_date")
+	private Date saleDate;
 	
 	/**
 	 * Default/Zero-Parameterized Constructor
@@ -101,6 +106,14 @@ public class VoucherDetails extends AbstractPersistable<Long> {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public Date getSaleDate() {
+		return saleDate;
+	}
+
+	public void setSaleDate(Date saleDate) {
+		this.saleDate = saleDate;
 	}	
 	
 	
