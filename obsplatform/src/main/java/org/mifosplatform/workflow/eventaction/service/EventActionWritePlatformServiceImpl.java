@@ -135,6 +135,7 @@ public class EventActionWritePlatformServiceImpl implements ActiondetailsWritePl
 				        	  		   
 				        	  			throw new EmailNotFoundException(new Long(data.getUserId()));
 				        	  		}else{
+				        	  			
 				        	  			BillingMessage billingMessage = new BillingMessage("CREATE TICKET", data.getProblemDescription()+"<br/>"
 				        	  		    +ticketMaster.getDescription()+"\n"+removeUrl, "", actionProcedureData.getEmailId(), actionProcedureData.getEmailId(),
 										"Ticket:"+resourceId, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_STATUS, billingMessageTemplate,
@@ -146,12 +147,15 @@ public class EventActionWritePlatformServiceImpl implements ActiondetailsWritePl
 				        	}else if(detailsData.getEventName().equalsIgnoreCase(EventActionConstants.EVENT_EDIT_TICKET)){
 				        	  		
 				        	    if(!user.getEmail().isEmpty()){
+				        	    	
 				        	  		BillingMessage billingMessage = new BillingMessage("ADD COMMENT", data.getProblemDescription()+"<br/>"
 				        	        +ticketMaster.getDescription()+"<br/>"+"COMMENT: "+data.getLastComment()+"<br/>"+removeUrl, "", user.getEmail(), user.getEmail(),
 									"Ticket:"+resourceId, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_STATUS, billingMessageTemplate,
 									BillingMessageTemplateConstants.MESSAGE_TEMPLATE_MESSAGE_TYPE, null);
 				        	  		this.messageDataRepository.save(billingMessage);
-				        	  	}else{
+				        	  	
+				        	    }else{
+				        	  		
 				        	  		if(actionProcedureData.getEmailId().isEmpty()){
 					        	  			throw new EmailNotFoundException(new Long(data.getUserId()));	
 					        	  	}else{
