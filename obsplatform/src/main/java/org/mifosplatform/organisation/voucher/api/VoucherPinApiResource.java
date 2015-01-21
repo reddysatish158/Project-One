@@ -292,9 +292,9 @@ public class VoucherPinApiResource {
 	@Path("{id}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String deleteVoucherPins(@PathParam("id") final Long id) {
+	public String deleteVoucherPins(@PathParam("id") final Long id, final String apiRequestBodyAsJson) {
 		
-		final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteVoucherPin(id).build();
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteVoucherPin(id).withJson(apiRequestBodyAsJson).build();
 		final CommandProcessingResult result = this.writePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 	}

@@ -291,7 +291,7 @@ public class VoucherWritePlatformServiceImpl implements
 			for (final String id : services) {
 				
 				final VoucherDetails voucherpinDetails = voucherDetailsRetrieveById(Long.valueOf(id));
-				if(voucherpinDetails.getStatus().equalsIgnoreCase("NEW")){
+				if(!voucherpinDetails.getStatus().equalsIgnoreCase("USED")){
 					voucherpinDetails.setStatus(status);
 					this.randomGeneratorDetailsRepository.save(voucherpinDetails);
 				}
@@ -327,7 +327,7 @@ public class VoucherWritePlatformServiceImpl implements
 			
 			for (final String id : services) {
 				final VoucherDetails voucherpinDetails = voucherDetailsRetrieveById(Long.valueOf(id));
-				if(voucherpinDetails.getStatus().equalsIgnoreCase("NEW")){
+				if(!voucherpinDetails.getStatus().equalsIgnoreCase("USED")){
 					voucherpinDetails.setIsDeleted('Y');
 					this.randomGeneratorDetailsRepository.save(voucherpinDetails);
 				}
