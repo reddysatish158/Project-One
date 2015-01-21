@@ -149,11 +149,6 @@ public class VoucherPinApiResource {
 		
 		final VoucherData voucherData = new VoucherData(pinCategoryData, pinTypeData, offices);
 		
-		if(isBatchTemplate != null){
-			final List<VoucherData> voucherBatchData = this.readPlatformService.retriveAllBatchTemplateData();
-			voucherData.setVoucherBatchData(voucherBatchData);
-		}
-		
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 		
 		return this.toApiJsonSerializer.serialize(settings, voucherData, RESPONSE_PARAMETERS);
@@ -190,18 +185,17 @@ public class VoucherPinApiResource {
 	 * 			Containing Url information 
 	 * @return
 	 */	
-	@Path("batchwise")
+	@Path("voucherslist/{id}")
 	@GET
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrieveVoucherGroups(@Context final UriInfo uriInfo,@QueryParam("sqlSearch") final String sqlSearch,
+	public String retrieveVouchersByid(@Context final UriInfo uriInfo,@QueryParam("sqlSearch") final String sqlSearch,
 			@QueryParam("limit") final Integer limit, @QueryParam("offset") final Integer offset,
-			@QueryParam("statusType") final String statusType, @QueryParam("batchName") final String batchName, 
-			@QueryParam("pinType") final String pinType) {
+			@QueryParam("statusType") final String statusType, @PathParam("id") final Long id) {
 		
 		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
 		final SearchSqlQuery searchVoucher = SearchSqlQuery.forSearch(sqlSearch, offset,limit );
-		final Page<VoucherData> randomGenerator = this.readPlatformService.getAllBatchWiseData(searchVoucher, statusType, batchName, pinType);
+		final Page<VoucherData> randomGenerator = this.readPlatformService.getAllVoucherById(searchVoucher, statusType, id);
 		
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 		
@@ -280,20 +274,4 @@ public class VoucherPinApiResource {
 		return this.toApiJsonSerializer.serialize(settings, voucherData, RESPONSE_PARAMETERS);
 	}
 	
-	@GET
-	@Path("batchtemplate")
-	@Consumes({ MediaType.APPLICATION_JSON })
-	@Produces({ MediaType.APPLICATION_JSON })
-	public String retrieveBatchTemplateData(@Context final UriInfo uriInfo,@QueryParam("isProcessed") final Boolean isProcessed) {
-		
-		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-		
-		List<VoucherData> voucherData = this.readPlatformService.retriveBatchTemplateData(isProcessed);
-		
-		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-		
-		return this.toApiJsonSerializer.serialize(settings, voucherData, RESPONSE_PARAMETERS);
-	}
-	
-
 }
