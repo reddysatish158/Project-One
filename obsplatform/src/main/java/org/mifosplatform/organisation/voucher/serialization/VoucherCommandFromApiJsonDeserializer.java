@@ -35,7 +35,7 @@ public class VoucherCommandFromApiJsonDeserializer {
 			Arrays.asList("id", "batchName", "length",
 					"beginWith", "pinCategory", "pinType", "quantity",
 					"serialNo", "expiryDate", "dateFormat", "pinValue",
-					"pinNO", "locale", "pinExtention","officeId","priceId"));
+					"pinNO", "locale", "pinExtention","officeId","priceId","status","voucherIds"));
 	
 	private final FromJsonHelper fromApiJsonHelper;
 
@@ -141,6 +141,33 @@ public class VoucherCommandFromApiJsonDeserializer {
 					"validation.msg.validation.errors.exist",
 					"Validation errors exist.", dataValidationErrors);
 		}
+
+	}
+	
+public void validateForUpdate(final String json, Boolean isUpdateVoucher) {
+		
+		if (StringUtils.isBlank(json)) {
+			throw new InvalidJsonException();
+		}
+
+		final Type typeOfMap = new TypeToken<Map<String, Object>>() {
+		}.getType();
+		
+		fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, supportedParameters);
+
+		final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
+		final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("voucher");
+
+		final JsonElement element = fromApiJsonHelper.parse(json);
+		if(isUpdateVoucher.equals(true)){
+			final String status = fromApiJsonHelper.extractStringNamed("status", element);
+			baseDataValidator.reset().parameter("status").value(status).notBlank();
+		}
+		
+		final String[] voucherIds = fromApiJsonHelper.extractArrayNamed("voucherIds", element);
+        baseDataValidator.reset().parameter("voucherIds").value(voucherIds).arrayNotEmpty();
+
+		throwExceptionIfValidationWarningsExist(dataValidationErrors);
 
 	}
 

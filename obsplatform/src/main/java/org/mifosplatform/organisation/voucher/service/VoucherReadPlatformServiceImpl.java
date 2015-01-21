@@ -116,7 +116,7 @@ public class VoucherReadPlatformServiceImpl implements
 			
 			sqlBuilder.append("SELECT ");
 			sqlBuilder.append(mapper.schema());
-			sqlBuilder.append(" where pm.id IS NOT NULL and pd.pin_id=?");
+			sqlBuilder.append(" where pd.is_deleted='N' and pd.pin_id=?");
 			String sqlSearch = searchVoucher.getSqlSearch();
 	        String extraCriteria = "";
 	        if(statusType != null){
