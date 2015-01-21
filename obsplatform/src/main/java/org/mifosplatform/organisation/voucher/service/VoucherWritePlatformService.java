@@ -6,6 +6,7 @@ import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 /**
  * 
  * @author ashokreddy
+ * @author rakesh
  *
  */
 public interface VoucherWritePlatformService {
@@ -13,6 +14,10 @@ public interface VoucherWritePlatformService {
 	CommandProcessingResult createRandomGenerator(JsonCommand command);
 
 	CommandProcessingResult generateVoucherPinKeys(Long batchId);
+
+	CommandProcessingResult updateUpdateVoucherPins(Long entityId, JsonCommand command);
+
+	CommandProcessingResult deleteUpdateVoucherPins(Long entityId, JsonCommand command);
 	
 
 	

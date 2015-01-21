@@ -7,8 +7,10 @@ import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -49,6 +51,7 @@ import com.google.gson.JsonObject;
  * <p>A <code>VoucherPinApiResource</code> includes methods for 
  * Generating the Vouchers and Downloading the Vouchers List.
  * @author  ashokreddy
+ * @author rakesh
  */
 
 @Path("/vouchers")
@@ -295,5 +298,26 @@ public class VoucherPinApiResource {
 		return this.toApiJsonSerializer.serialize(settings, voucherData, RESPONSE_PARAMETERS);
 	}
 	
+	@PUT
+	@Path("{id}")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String updateVoucherPins(@PathParam("id") final Long id, final String apiRequestBodyAsJson) {
+		
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().updateVoucherPin(id).withJson(apiRequestBodyAsJson).build();
+		final CommandProcessingResult result = this.writePlatformService.logCommandSource(commandRequest);
+		return this.toApiJsonSerializer.serialize(result);
+	}
+
+	@DELETE
+	@Path("{id}")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String deleteVoucherPins(@PathParam("id") final Long id) {
+		
+		final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteVoucherPin(id).build();
+		final CommandProcessingResult result = this.writePlatformService.logCommandSource(commandRequest);
+		return this.toApiJsonSerializer.serialize(result);
+	}
 
 }

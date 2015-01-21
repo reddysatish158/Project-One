@@ -1,11 +1,15 @@
 package org.mifosplatform.organisation.voucher.service;
 
 import java.text.ParseException;
+import java.util.Map;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.json.JSONObject;
+import org.mifosplatform.billing.discountmaster.exception.DiscountMasterNotFoundException;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
+import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.organisation.office.domain.Office;
 import org.mifosplatform.organisation.office.domain.OfficeRepository;
@@ -15,16 +19,23 @@ import org.mifosplatform.organisation.voucher.domain.VoucherDetails;
 import org.mifosplatform.organisation.voucher.domain.VoucherDetailsRepository;
 import org.mifosplatform.organisation.voucher.domain.VoucherRepository;
 import org.mifosplatform.organisation.voucher.exception.AlreadyProcessedException;
+import org.mifosplatform.organisation.voucher.exception.VoucherDetailsNotFoundException;
 import org.mifosplatform.organisation.voucher.exception.VoucherLengthMatchException;
 import org.mifosplatform.organisation.voucher.serialization.VoucherCommandFromApiJsonDeserializer;
+import org.mifosplatform.workflow.eventactionmapping.domain.EventActionMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 /**
  * 
  * @author ashokreddy
+ * @author rakesh
  *
  */
 @Service
@@ -50,6 +61,7 @@ public class VoucherWritePlatformServiceImpl implements
 	private final VoucherCommandFromApiJsonDeserializer fromApiJsonDeserializer;
 	private final VoucherReadPlatformService randomGeneratorReadPlatformService;
 	private final OfficeRepository officeRepository;
+	private final FromJsonHelper fromJsonHelper;
 	
 	@Autowired
 	public VoucherWritePlatformServiceImpl(
@@ -58,7 +70,8 @@ public class VoucherWritePlatformServiceImpl implements
 			final VoucherReadPlatformService randomGeneratorReadPlatformService,
 			final VoucherCommandFromApiJsonDeserializer fromApiJsonDeserializer,
 			final VoucherDetailsRepository randomGeneratorDetailsRepository,
-			final OfficeRepository officeRepository) {
+			final OfficeRepository officeRepository,
+			final FromJsonHelper fromJsonHelper) {
 		
 		this.context = context;
 		this.randomGeneratorRepository = randomGeneratorRepository;
@@ -66,7 +79,7 @@ public class VoucherWritePlatformServiceImpl implements
 		this.randomGeneratorReadPlatformService = randomGeneratorReadPlatformService;
 		this.randomGeneratorDetailsRepository=randomGeneratorDetailsRepository;
 		this.officeRepository = officeRepository;
-
+		this.fromJsonHelper = fromJsonHelper;
 	}
 
 	@Transactional
@@ -262,6 +275,69 @@ public class VoucherWritePlatformServiceImpl implements
 
 		throw new PlatformDataIntegrityException("error.msg.cund.unknown.data.integrity.issue",
 				"Unknown data integrity issue with resource: " + realCause.getMessage());
+	}
+	
+	
+	@Override
+	public CommandProcessingResult updateUpdateVoucherPins(Long voucherId, JsonCommand command) {
+		try {
+
+			this.context.authenticatedUser();
+			this.fromApiJsonDeserializer.validateForUpdate(command.json(), true);
+			
+			final String[] services = command.arrayValueOfParameterNamed("voucherIds");
+			final String status = command.stringValueOfParameterNamed("status");
+			
+			for (final String id : services) {
+				
+				final VoucherDetails voucherpinDetails = voucherDetailsRetrieveById(Long.valueOf(id));
+				if(voucherpinDetails.getStatus().equalsIgnoreCase("NEW")){
+					voucherpinDetails.setStatus(status);
+					this.randomGeneratorDetailsRepository.save(voucherpinDetails);
+				}
+			}
+			
+			return new CommandProcessingResult(voucherId);
+
+		} catch (DataIntegrityViolationException dve) {
+			handleCodeDataIntegrityIssues(command, dve);
+			return null;
+		}
+
+	}
+
+	private VoucherDetails voucherDetailsRetrieveById(final Long id) {
+
+		final VoucherDetails voucherDetails = this.randomGeneratorDetailsRepository.findOne(id);
+
+		if (voucherDetails == null) {
+			throw new VoucherDetailsNotFoundException(id);
+		}
+		return voucherDetails;
+	}
+
+	@Override
+	public CommandProcessingResult deleteUpdateVoucherPins(Long voucherId, JsonCommand command) {
+
+		try {
+			this.context.authenticatedUser();
+			this.fromApiJsonDeserializer.validateForUpdate(command.json(), false);
+			
+			final String[] services = command.arrayValueOfParameterNamed("voucherIds");
+			
+			for (final String id : services) {
+				final VoucherDetails voucherpinDetails = voucherDetailsRetrieveById(Long.valueOf(id));
+				if(voucherpinDetails.getStatus().equalsIgnoreCase("NEW")){
+					voucherpinDetails.setIsDeleted('Y');
+					this.randomGeneratorDetailsRepository.save(voucherpinDetails);
+				}
+			}
+			
+			return new CommandProcessingResult(voucherId);
+
+		} catch (Exception exception) {
+			return null;
+		}
 	}
 
 }
