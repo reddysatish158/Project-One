@@ -107,7 +107,7 @@ public class VoucherReadPlatformServiceImpl implements
 	}
 
 	@Override
-	public Page<VoucherData> getAllBatchWiseData(SearchSqlQuery searchVoucher, String statusType, String batchName, String pinType) {
+	public Page<VoucherData> getAllVoucherById(SearchSqlQuery searchVoucher, String statusType, Long id) {
 		try {
 
 			context.authenticatedUser();
@@ -116,15 +116,9 @@ public class VoucherReadPlatformServiceImpl implements
 			
 			sqlBuilder.append("SELECT ");
 			sqlBuilder.append(mapper.schema());
-			sqlBuilder.append(" where pm.id IS NOT NULL ");
+			sqlBuilder.append(" where pd.is_deleted='N' and pd.pin_id=?");
 			String sqlSearch = searchVoucher.getSqlSearch();
 	        String extraCriteria = "";
-	        if(batchName != null){
-	        	sqlBuilder.append(" and (pm.batch_name ='"+batchName+"') ");
-		    }
-	        if(pinType != null){
-	        	sqlBuilder.append(" and (pm.pin_type ='"+pinType+"') ");
-		    }
 	        if(statusType != null){
 	        	sqlBuilder.append(" and (pd.status ='"+statusType+"') ");
 		    }
@@ -146,7 +140,7 @@ public class VoucherReadPlatformServiceImpl implements
 		    }
 		    
 			return this.paginationHelper.fetchPage(this.jdbcTemplate, "SELECT FOUND_ROWS()", sqlBuilder.toString(),
-		            new Object[] {}, mapper);
+		            new Object[] {id}, mapper);
 		} catch (EmptyResultDataAccessException e) {
 			return null;
 		}
@@ -347,53 +341,6 @@ public class VoucherReadPlatformServiceImpl implements
 			return new VoucherData(pinType,pinValue,expiryDate);
 		}
 	}
-
-	@Override
-	public List<VoucherData> retriveBatchTemplateData(Boolean isProcessed) {
-		try {
-
-			context.authenticatedUser();
-			String sql="";
-			BatchTemplateMapper mapper = new BatchTemplateMapper();
-			if(isProcessed){
-				sql = "SELECT "+ mapper.schema()+ " where bpm.is_processed='Y'";
-			}else{
-				sql = "SELECT "+ mapper.schema()+ " where bpm.is_processed='N'";
-			}
-			return this.jdbcTemplate.query(sql, mapper, new Object[] {});
-		} catch (EmptyResultDataAccessException e) {
-			return null;
-		}
-	}
-	
-	private static final class BatchTemplateMapper implements RowMapper<VoucherData> {
-
-		public String schema() {
-			return " bpm.id as id, bpm.batch_name as batchName from b_pin_master bpm ";
-
-		}
-
-		@Override
-		public VoucherData mapRow(final ResultSet rs, final int rowNum)
-				throws SQLException {
-			Long id = rs.getLong("id");
-			String batchName = rs.getString("batchName");
-			return new VoucherData(id,batchName);
-		}
-	}
-
-	@Override
-	public List<VoucherData> retriveAllBatchTemplateData() {
-		try {
-			context.authenticatedUser();
-			BatchTemplateMapper mapper = new BatchTemplateMapper();
-			String sql="SELECT "+ mapper.schema();
-			return this.jdbcTemplate.query(sql, mapper, new Object[] {});
-		} catch (EmptyResultDataAccessException e) {
-			return null;
-		}
-	}
-	
 	
 	@Override
 	public List<VoucherData> getAllData() {

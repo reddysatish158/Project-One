@@ -2559,6 +2559,21 @@ public CommandWrapperBuilder linkUpAccount() {
 	
 }
 
+public CommandWrapperBuilder updateVoucherPin(Long id) {
+	this.actionName = "UPDATE";
+	this.entityName = "VOUCHER";
+	this.entityId = id;
+	this.href = "/vouchers";
+	return this;
+}
+public CommandWrapperBuilder deleteVoucherPin(Long id) {
+	this.actionName = "DELETE";
+	this.entityName = "VOUCHER";
+	this.entityId = id;
+	this.href = "/vouchers";
+	return this;
+}
+
 }
 
 

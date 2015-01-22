@@ -911,6 +911,12 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
 							handler = applicationContext.getBean("createVoucherGroupCommandHandler",NewCommandSourceHandler.class);
 						}else if(wrapper.isGenerateVoucherPin()){
 							handler = applicationContext.getBean("generateVoucherPinCommandHandler",NewCommandSourceHandler.class);
+						}else if(wrapper.isUpdateOperation()){
+							handler = applicationContext.getBean("updateVoucherPinCommandHandler",NewCommandSourceHandler.class);
+						}else if(wrapper.isDelete()){
+							handler = applicationContext.getBean("deleteVoucherPinCommandHandler",NewCommandSourceHandler.class);
+						}else{
+							throw new UnsupportedCommandException(wrapper.commandName());
 						}
 
 			}else if (wrapper.isSchedulerResource()) {

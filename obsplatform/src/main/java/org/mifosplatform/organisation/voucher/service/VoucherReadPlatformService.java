@@ -18,7 +18,7 @@ public interface VoucherReadPlatformService {
 
 	String retrieveIndividualPin(String pinId);
 	
-	Page<VoucherData> getAllBatchWiseData(SearchSqlQuery searchTicketMaster, String statusType, String batchName, String pinType);
+	Page<VoucherData> getAllVoucherById(SearchSqlQuery searchTicketMaster, String statusType, Long id);
 
 	List<EnumOptionData> pinCategory();
 
@@ -29,10 +29,6 @@ public interface VoucherReadPlatformService {
 	StreamingOutput retrieveVocherDetailsCsv(Long batchId);
 
 	List<VoucherData> retrivePinDetails(String pinNumber);
-
-	List<VoucherData> retriveBatchTemplateData(Boolean isProcessed);
-	
-	List<VoucherData> retriveAllBatchTemplateData();
 
 	List<VoucherData> getAllData();
 
