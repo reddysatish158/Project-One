@@ -349,7 +349,7 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 			URL oURL = new URL("https://demo.globalpay.com.ng/GlobalpayWebService_demo/service.asmx");
 			HttpURLConnection soapConnection = (HttpURLConnection) oURL.openConnection();
 
-			System.out.println("connect to server...");
+			//System.out.println("connect to server...");
 			
 			// Send SOAP Message to SOAP Server
 			soapConnection.setRequestMethod("POST");
@@ -374,51 +374,72 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 
 			JSONObject xmlJSONObj = XML.toJSONObject(responseSB1);
 
-			JSONObject resultset = xmlJSONObj.getJSONObject("soap:Envelope")
+			JSONObject transactionResultset = xmlJSONObj.getJSONObject("soap:Envelope")
 					.getJSONObject("soap:Body")
 					.getJSONObject("getTransactionsResponse")
-					.getJSONObject("getTransactionsResult")
-					.getJSONObject("resultset").getJSONObject("record");
-
-			String paymentDesc = resultset.getString("payment_status_description");
-			System.out.println("paymentDesc From Globalpay: "+ paymentDesc);
-			Double amount = resultset.getDouble("amount");
-
-			String paymentDate = resultset.getString("payment_date");
-			Long txnref = resultset.getLong("txnref");
-			String channel = resultset.getString("channel");
-			String paymentStatus = resultset.getString("payment_status");
-
-			JSONArray fieldArray = resultset.getJSONObject("field_values").getJSONObject("field_values").getJSONArray("field");
-			String currency = fieldArray.getJSONObject(2).getString("currency");
-			String emailAddress = fieldArray.getJSONObject(3).getString("email_address");
-			String globalpayMerchanttxnref=null;
+					.getJSONObject("getTransactionsResult");
 			
-			if(fieldArray.getJSONObject(5).has("merch_txnref")){
-				globalpayMerchanttxnref = fieldArray.getJSONObject(5).getString("merch_txnref");
-			}else{
-				globalpayMerchanttxnref = fieldArray.getJSONObject(5).getString("merchant_txnref");
+			String resultsetString = (String)transactionResultset.get("resultset"); 
+			
+			if(resultsetString.equalsIgnoreCase("")){
+				
+				return "failure : Invalid Merchant TransactionId";
+			
+			}else {
+				JSONObject resultset = transactionResultset.getJSONObject("resultset").getJSONObject("record");
+
+				String paymentDesc = resultset.getString("payment_status_description");
+				/*System.out.println("paymentDesc From Globalpay: "+ paymentDesc);*/
+				Double amount = resultset.getDouble("amount");
+
+				String paymentDate = resultset.getString("payment_date");
+				Long txnref = resultset.getLong("txnref");
+				String channel = resultset.getString("channel");
+				String paymentStatus = resultset.getString("payment_status");
+
+				JSONArray fieldArray = resultset.getJSONObject("field_values").getJSONObject("field_values").getJSONArray("field");
+				String currency = fieldArray.getJSONObject(2).getString("currency");
+				String emailAddress = fieldArray.getJSONObject(3).getString("email_address");
+				
+				String globalpayMerchanttxnref=null;
+				
+				if(fieldArray.getJSONObject(5).has("merch_txnref")){
+					globalpayMerchanttxnref = fieldArray.getJSONObject(5).getString("merch_txnref");
+				}else{
+					globalpayMerchanttxnref = fieldArray.getJSONObject(5).getString("merchant_txnref");
+				}
+				String[] clientIdString = globalpayMerchanttxnref.split("-");
+			
+	            if(paymentStatus.equalsIgnoreCase(ConfigurationConstants.GLOBALPAY_SUCCESS)){
+	            	pgConfigJsonObj.put("status", "Success");
+	    			pgConfigJsonObj.put("error", paymentDesc);
+	            }else if (paymentStatus.equalsIgnoreCase(ConfigurationConstants.GLOBALPAY_PENDING)) {
+	            	pgConfigJsonObj.put("status", "Pending");
+	    			pgConfigJsonObj.put("error", paymentDesc);
+				}else{
+					pgConfigJsonObj.put("status", "Failure");
+					pgConfigJsonObj.put("error", paymentDesc);
+				}
+				
+				JSONObject otherDataObject = new JSONObject();
+				otherDataObject.put("currency", currency);
+				otherDataObject.put("paymentStatus", paymentStatus);
+				otherDataObject.put("channel", channel);
+				otherDataObject.put("paymentDate", paymentDate);
+				otherDataObject.put("paymentDesc", paymentDesc);
+				otherDataObject.put("globalpayMerchanttxnref", globalpayMerchanttxnref);
+
+				pgConfigJsonObj.put("clientId", clientIdString[0]);
+				pgConfigJsonObj.put("emailId", emailAddress);
+				pgConfigJsonObj.put("transactionId", txnref);
+				pgConfigJsonObj.put("total_amount", String.valueOf(amount));
+				pgConfigJsonObj.put("source", ConfigurationConstants.GLOBALPAY_PAYMENTGATEWAY);
+				pgConfigJsonObj.put("otherData", otherDataObject);
+				pgConfigJsonObj.put("device", "");
+				pgConfigJsonObj.put("currency", currency);
 			}
+					
 			
-			JSONObject otherDataObject = new JSONObject();
-			otherDataObject.put("currency", currency);
-			otherDataObject.put("paymentStatus", paymentStatus);
-			otherDataObject.put("channel", channel);
-			otherDataObject.put("paymentDate", paymentDate);
-			otherDataObject.put("paymentDesc", paymentDesc);
-			otherDataObject.put("globalpayMerchanttxnref", globalpayMerchanttxnref);
-
-			String[] clientIdString = globalpayMerchanttxnref.split("-");
-
-			pgConfigJsonObj.put("clientId", clientIdString[0]);
-			pgConfigJsonObj.put("emailId", emailAddress);
-			pgConfigJsonObj.put("transactionId", txnref);
-			pgConfigJsonObj.put("total_amount", String.valueOf(amount));
-			pgConfigJsonObj.put("source", ConfigurationConstants.GLOBALPAY_PAYMENTGATEWAY);
-			pgConfigJsonObj.put("otherData", otherDataObject);
-			pgConfigJsonObj.put("device", "");
-			pgConfigJsonObj.put("currency", currency);
-			pgConfigJsonObj.put("status", paymentStatus);		
 			
 			return pgConfigJsonObj.toString(); 
 	       
@@ -511,7 +532,8 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 						
 					} else{
 						if(!merchantRefId.equalsIgnoreCase(transactionId)){
-							return "failure : TransactionId=" + transactionId + "and Neteller Id=" + merchantRefId + " Should be equal.";
+							return "failure : TransactionId=" + transactionId + "and Neteller Id=" + merchantRefId + 
+									" Should be equal and Transaction Status="+status;
 						}else{
 							return "failure : Transaction Status="+status;
 						}	
@@ -547,8 +569,25 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 
 				PaymentGatewayConfiguration pgConfig = this.paymentGatewayConfigurationRepository.findOneByName(ConfigurationConstants.GLOBALPAY_PAYMENTGATEWAY);
 
-				if (pgConfig != null && pgConfig.getValue() != null && pgConfig.isEnabled()) {
+				if (null != pgConfig && null != pgConfig.getValue() && pgConfig.isEnabled()) {
+					
 					commandJson = globalPayProcessing(transactionId, pgConfig.getValue());
+					
+					if(commandJson.contains("failure :")){
+						String[] clientIdString = transactionId.split("-");
+						
+						//Map<String, Object> withChanges = new HashMap<>();
+						JSONObject withChanges = new JSONObject();
+						withChanges.put("status", "FAILURE");
+						withChanges.put("error", commandJson);
+						withChanges.put("clientId", clientIdString[0]);
+						withChanges.put("total_amount", 0);
+						withChanges.put("transactionId", transactionId);
+						withChanges.put("currency", "");
+						withChanges.put("source", source);
+						withChanges.put("otherData", command.json());
+						commandJson = withChanges.toString();
+					}
 				}
 
 			} else if (source.equalsIgnoreCase(ConfigurationConstants.NETELLER_PAYMENTGATEWAY)) {
@@ -569,7 +608,7 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 						withChanges.put("error", commandJson);
 						withChanges.put("clientId", clientId);
 						withChanges.put("amount", amount);
-						withChanges.put("transactionId", transactionId);
+						withChanges.put("txnId", transactionId);
 						withChanges.put("currency", currency);
 						
 						return new CommandProcessingResultBuilder().with(withChanges).build();
@@ -581,7 +620,7 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 				commandJson = command.json();
 			}
 
-			return processOnlinePayment(commandJson);
+			return processOnlinePayment(commandJson,command.json().toString());
 
 		} catch (DataIntegrityViolationException dve) {
 			handleDataIntegrityIssues(command, dve);
@@ -598,10 +637,9 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 		}
 	}
 
-	private CommandProcessingResult processOnlinePayment(String jsonData) throws JSONException {
+	private CommandProcessingResult processOnlinePayment(String jsonData, String requestJson ) throws JSONException {
 
-		String deviceId = "";
-		String status = "SUCCESS";
+		String deviceId = "", error = "", status = "SUCCESS";
 		
 		Map<String, Object> withChanges = new HashMap<String, Object>();
 
@@ -618,6 +656,9 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 		if(json.has("status")){
 			status = json.getString("status");
 		}
+		if(json.has("error")){
+			error = json.getString("error");
+		}
 		
 		final BigDecimal totalAmount = new BigDecimal(amount);
 		
@@ -627,12 +668,12 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 		
 		if(status.equalsIgnoreCase("pending")){
 			paymentGateway.setStatus("Pending");
-			paymentGateway.setRemarks("This Transaction was Pending in GlobalPay Payment Gateway");
+			paymentGateway.setRemarks(requestJson);
 		}else if(status.equalsIgnoreCase("SUCCESS")){
 			paymentGateway.setStatus(status);
 		}else{
 			paymentGateway.setStatus(status);
-			paymentGateway.setRemarks("Unknown Status Type");
+			paymentGateway.setRemarks(error);
 		}
 		
 		this.paymentGatewayRepository.save(paymentGateway);
@@ -643,6 +684,7 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 		withChanges.put("pgId", paymentGateway.getId());
 		withChanges.put("currency", currency);
 		withChanges.put("status", status);
+		withChanges.put("error", error);
 		
 		return new CommandProcessingResultBuilder().with(withChanges).build();
 	}

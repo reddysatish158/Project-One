@@ -106,15 +106,16 @@ public class PaymentGatewayCommandFromApiJsonDeserializer {
 		final JsonElement element = fromApiJsonHelper.parse(json);
 	
 		final String source = fromApiJsonHelper.extractStringNamed("source", element);
+		baseDataValidator.reset().parameter("source").value(source).notNull().notBlank();
 		
-		if(source.equalsIgnoreCase(ConfigurationConstants.GLOBALPAY_PAYMENTGATEWAY)){
+		if(null != source && source.equalsIgnoreCase(ConfigurationConstants.GLOBALPAY_PAYMENTGATEWAY)){
 			
 			final String transactionId = fromApiJsonHelper.extractStringNamed("transactionId", element);
 			baseDataValidator.reset().parameter("transactionId").value(transactionId).notBlank().notExceedingLengthOf(30);
 			
 		} else {
 			
-			if (source.equalsIgnoreCase(ConfigurationConstants.NETELLER_PAYMENTGATEWAY)) {		
+			if (null != source && source.equalsIgnoreCase(ConfigurationConstants.NETELLER_PAYMENTGATEWAY)) {		
 				final String verificationCode = fromApiJsonHelper.extractStringNamed("verificationCode", element);
 				baseDataValidator.reset().parameter("verificationCode").value(verificationCode).notNull();
 				

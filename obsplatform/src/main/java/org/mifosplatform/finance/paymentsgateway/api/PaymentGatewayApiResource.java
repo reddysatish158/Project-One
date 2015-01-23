@@ -388,31 +388,37 @@ public class PaymentGatewayApiResource {
 			String txnId = String.valueOf(output.get("txnId"));
 			String amount = String.valueOf(output.get("amount"));
 			String currency = String.valueOf(output.get("currency"));
-			Long clientId = Long.valueOf(client);
+
+			String error = String.valueOf(output.get("error"));
+			
+			if(currency.equalsIgnoreCase("ISK")){
+				amount = amount.replace('.', ',');
+			}
+			
 			String totalAmount =  amount + " " + currency;
 			
-			if(status.equalsIgnoreCase("FAILURE")){
+			Long clientId = Long.valueOf(client);
+			
+			if(status.equalsIgnoreCase("Success")){
 				
-				String error = String.valueOf(output.get("error"));
-				
-				JSONObject object = new JSONObject();
-				object.put("Result", "FAILURE");
-				object.put("Description", error);
-				object.put("Amount", totalAmount);
-				object.put("ObsPaymentId", "");
-				object.put("TransactionId", txnId);
-				
-				this.paymentGatewayWritePlatformService.emailSending(clientId, status, error, txnId, totalAmount);
-				
-				return object.toString();
-	
-			}else{
 				Long pgId = Long.valueOf(String.valueOf(output.get("pgId")));
 				String OutputData = this.paymentGatewayWritePlatformService.payment(clientId, pgId, txnId, amount);
 				
 				JSONObject object = new JSONObject(OutputData);
 				
 				this.paymentGatewayWritePlatformService.emailSending(clientId, object.getString("Result"), object.getString("Description"), txnId, totalAmount);
+				
+				return object.toString();
+			} else{
+				
+				JSONObject object = new JSONObject();
+				object.put("Result", status.toUpperCase());
+				object.put("Description", error);
+				object.put("Amount", totalAmount);
+				object.put("ObsPaymentId", "");
+				object.put("TransactionId", txnId);
+				
+				this.paymentGatewayWritePlatformService.emailSending(clientId, status, error, txnId, totalAmount);
 				
 				return object.toString();
 			}

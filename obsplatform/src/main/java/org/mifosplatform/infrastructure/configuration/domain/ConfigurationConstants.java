@@ -63,6 +63,11 @@ public class ConfigurationConstants {
 	public static final String NETELLER_ACCESS_TOKEN = "oauth2/token?grant_type=client_credentials";
 	public static final String NETELLER_BASIC = "Basic";
 	public static final String NETELLER_PAYMENT = "transferIn";
+	
+	//Globalpay Output 
+	public static final String GLOBALPAY_SUCCESS = "successful";
+	public static final String GLOBALPAY_FAILURE = "failed";
+	public static final String GLOBALPAY_PENDING = "pending";
 
 	//Constants
 	public static final char CONST_IS_Y = 'Y';

@@ -15,6 +15,6 @@ public class RadiusJobConstants {
 	 public static final String RADCHECK_OUTPUT = "User added to database with ID:";
 	 public static final String FAILURE = "failure : ";
 	 public static final String RADUSER_CREATE_OUTPUT = "User is created";
-	 public static final String RADUSER_DELETE_OUTPUT = "the record is deleted";
+	 public static final String RADIUS_DELETE_OUTPUT = "the record is deleted";
 	 
 }
