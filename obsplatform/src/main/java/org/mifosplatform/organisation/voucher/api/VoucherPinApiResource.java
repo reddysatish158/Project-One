@@ -288,8 +288,8 @@ public class VoucherPinApiResource {
 		return this.toApiJsonSerializer.serialize(result);
 	}
 
-	@DELETE
-	@Path("{id}")
+	@POST
+	@Path("delete/{id}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String deleteVoucherPins(@PathParam("id") final Long id, final String apiRequestBodyAsJson) {
