@@ -102,6 +102,7 @@ dependencies {
 	    tomcat "org.apache.tomcat:tomcat-dbcp:${tomcatVersion}"
 
     compile files('src/main/resources/addexternalbeesmart.jar')
+    compile files('src/main/resources/mikrotik-2.0.2.jar')
 	providedCompile(
 				[group: 'javax.servlet', name: 'servlet-api', version: '2.5'],
 			)

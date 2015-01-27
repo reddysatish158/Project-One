@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -287,7 +288,7 @@ public class VoucherPinApiResource {
 		return this.toApiJsonSerializer.serialize(result);
 	}
 
-	@POST
+	@DELETE
 	@Path("{id}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
