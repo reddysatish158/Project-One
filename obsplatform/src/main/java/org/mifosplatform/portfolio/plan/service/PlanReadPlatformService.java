@@ -17,8 +17,6 @@ public interface PlanReadPlatformService {
 	
 	List<EnumOptionData> retrieveNewStatus();
 	
-	List<BillRuleData> retrievebillRules();
-	
 	PlanData retrievePlanData(Long planCode);
 	
 	List<ServiceData> retrieveSelectedServices(Long planId);
