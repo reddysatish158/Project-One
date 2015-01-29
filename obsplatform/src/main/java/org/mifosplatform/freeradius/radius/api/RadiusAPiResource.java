@@ -136,6 +136,17 @@ public class RadiusAPiResource {
 		final String radServiceData = this.radiusReadPlatformService.deleteRadService(radServiceId);
 		return radServiceData;
 	}
+	
+	@GET
+	@Path("raduser2/template")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String retrieveRadserviceTemplateData() {
+
+		context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+		final String radServiceTemplateData = this.radiusReadPlatformService.retrieveRadServiceTemplateData();
+		return radServiceTemplateData;
+	}
 
 
 

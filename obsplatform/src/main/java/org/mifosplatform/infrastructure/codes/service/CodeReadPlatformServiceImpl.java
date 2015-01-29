@@ -7,6 +7,7 @@ package org.mifosplatform.infrastructure.codes.service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.mifosplatform.crm.clientprospect.service.SearchSqlQuery;
 import org.mifosplatform.infrastructure.codes.data.CodeData;
@@ -15,6 +16,7 @@ import org.mifosplatform.infrastructure.core.service.Page;
 import org.mifosplatform.infrastructure.core.service.PaginationHelper;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
+import org.mifosplatform.portfolio.plan.data.BillRuleData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -100,5 +102,41 @@ public class CodeReadPlatformServiceImpl implements CodeReadPlatformService {
             throw new CodeNotFoundException(codeName);
         }
     }
+    
+
+	/*
+	 *Retrieve billing Rules
+	 */
+	@Override
+	public List<BillRuleData> retrievebillRules(String enumName) {
+
+		context.authenticatedUser();
+
+		final BillRuleDataMapper mapper = new BillRuleDataMapper();
+
+		final String sql = "select " + mapper.schema(enumName);
+
+		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
+	}
+
+	private static final class BillRuleDataMapper implements RowMapper<BillRuleData> {
+
+		public String schema(String enumName) {
+			return " b.enum_id AS id,b.enum_message_property AS billingRule,b.enum_value AS value FROM r_enum_value b" +
+					" WHERE enum_name = '"+enumName+"'";
+
+		}
+
+		@Override
+		public BillRuleData mapRow(final ResultSet rs,final int rowNum) throws SQLException {
+
+			final Long id = rs.getLong("id");
+			final String billrules = rs.getString("billingRule");
+			final String value = rs.getString("value");
+			return new BillRuleData(id, billrules,value);
+			
+		}
+	}
+
     
 }

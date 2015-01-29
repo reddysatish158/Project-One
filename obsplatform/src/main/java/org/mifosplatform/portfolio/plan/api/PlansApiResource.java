@@ -23,6 +23,7 @@ import javax.ws.rs.core.UriInfo;
 import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
+import org.mifosplatform.infrastructure.codes.service.CodeReadPlatformService;
 import org.mifosplatform.infrastructure.core.api.ApiRequestParameterHelper;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
@@ -63,13 +64,14 @@ public class PlansApiResource  {
 	    private final PlanReadPlatformService planReadPlatformService;
 	    private final ServiceMasterReadPlatformService serviceMasterReadPlatformService;
 	    private final MCodeReadPlatformService mCodeReadPlatformService;
+	    private final CodeReadPlatformService codeReadPlatformService;
 	    
 	   
 	    @Autowired
 	    public PlansApiResource(final PlatformSecurityContext context,final DefaultToApiJsonSerializer<PlanData> toApiJsonSerializer,
 	    		final ApiRequestParameterHelper apiRequestParameterHelper,final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
 	    		final PlanReadPlatformService planReadPlatformService,final ServiceMasterReadPlatformService serviceMasterReadPlatformService,
-	    		final MCodeReadPlatformService mCodeReadPlatformService) {
+	    		final MCodeReadPlatformService mCodeReadPlatformService,final CodeReadPlatformService codeReadPlatformService) {
 	    	
 		        this.context = context;
 		        this.toApiJsonSerializer = toApiJsonSerializer;
@@ -78,6 +80,7 @@ public class PlansApiResource  {
 		        this.apiRequestParameterHelper = apiRequestParameterHelper;
 		        this.serviceMasterReadPlatformService=serviceMasterReadPlatformService;
 		        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+		        this.codeReadPlatformService = codeReadPlatformService;
 		    }	
 	    
 	/**
@@ -116,7 +119,7 @@ public class PlansApiResource  {
 	private PlanData handleTemplateData(PlanData planData) {
 		
 		 final List<ServiceData> data = this.serviceMasterReadPlatformService.retrieveAllServices();
-	     final List<BillRuleData> billData = this.planReadPlatformService.retrievebillRules();
+	     final List<BillRuleData> billData = this.codeReadPlatformService.retrievebillRules("billing_rules");
 		 final List<EnumOptionData> status = this.planReadPlatformService.retrieveNewStatus();
 		 final Collection<MCodeData> provisionSysData = this.mCodeReadPlatformService.getCodeValue("Provisioning");
 		 final List<EnumOptionData> volumeType = this.planReadPlatformService.retrieveVolumeTypes();
