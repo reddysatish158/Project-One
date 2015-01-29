@@ -10,17 +10,17 @@ public class ClientEntitlementData {
 	private String selfcareUsername;
 	private String selfcarePassword;
 	private boolean results;
+	private String firstName;
+	private String lastName;
 
-	public ClientEntitlementData(String emailId, String fullName, String login, 
-			String password, String selfcareUsername, String selfcarePassword) {
+	public ClientEntitlementData(String emailId, String firstName, 
+			String lastName, String selfcareUsername, String selfcarePassword) {
 	
 		this.emailId = emailId;
-		this.fullName = fullName;
-		this.login = login;
-		this.password = password;
 		this.selfcareUsername = selfcareUsername;
 		this.selfcarePassword = selfcarePassword;
-		
+		this.firstName = firstName;
+		this.lastName = lastName;
 	}
 
 	public ClientEntitlementData(String status, boolean results) {	
@@ -59,6 +59,14 @@ public class ClientEntitlementData {
 
 	public String getSelfcarePassword() {
 		return selfcarePassword;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
 	}
 	
 	

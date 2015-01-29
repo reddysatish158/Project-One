@@ -114,21 +114,24 @@ public class EntitlementReadPlatformServiceImpl implements
 		public ClientEntitlementData mapRow(final ResultSet rs, final int rowNum) throws SQLException {
 			
 			String emailId = rs.getString("EmailId");
-			String fullName = rs.getString("fullName");	
-			String login = rs.getString("login");
-			String password = rs.getString("password");
+			String firstName = rs.getString("firstName");
+			String lastName = rs.getString("lastName");
 			String selfcareUsername = rs.getString("selfcareUsername");
 		    String selfcarePassword = rs.getString("selfcarePassword");
 		    
-			return new ClientEntitlementData(emailId, fullName, login, password, selfcareUsername, selfcarePassword);
+			return new ClientEntitlementData(emailId, firstName, lastName, selfcareUsername, selfcarePassword);
 		
 		}
 		
 		public String schema() {
-			return " c.email as EmailId, c.display_name as fullName, ifnull(c.login,c.id) as login, " +
+			/*return " c.email as EmailId, c.display_name as fullName, ifnull(c.login,c.id) as login, " +
 					" ifnull(c.password,'0000') as password, " +
 					" sc.unique_reference as selfcareUsername, sc.password as selfcarePassword from m_client c " +
-					" LEFT JOIN b_clientuser sc ON sc.client_id = c.id where c.id=?";
+					" LEFT JOIN b_clientuser sc ON sc.client_id = c.id where c.id=?";*/
+			
+			return " c.email as EmailId, c.firstname as firstName,c.lastname as lastName," +
+					" sc.unique_reference as selfcareUsername, sc.password as selfcarePassword " +
+					" from m_client c LEFT JOIN b_clientuser sc ON sc.client_id = c.id where c.id=?";
 
 		}
 		
