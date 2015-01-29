@@ -335,7 +335,8 @@ public class VoucherWritePlatformServiceImpl implements
 			
 			return new CommandProcessingResult(voucherId);
 
-		} catch (Exception exception) {
+		} catch (DataIntegrityViolationException dve) {
+			handleCodeDataIntegrityIssues(command, dve);
 			return null;
 		}
 	}
