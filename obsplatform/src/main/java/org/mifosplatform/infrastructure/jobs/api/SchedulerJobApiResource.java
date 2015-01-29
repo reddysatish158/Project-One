@@ -22,6 +22,7 @@ import org.apache.commons.lang.StringUtils;
 import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
+import org.mifosplatform.infrastructure.codes.service.CodeReadPlatformService;
 import org.mifosplatform.infrastructure.core.api.ApiRequestParameterHelper;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.UnrecognizedQueryParamException;
@@ -43,6 +44,7 @@ import org.mifosplatform.organisation.mcodevalues.service.MCodeReadPlatformServi
 import org.mifosplatform.organisation.message.data.BillingMessageTemplateData;
 import org.mifosplatform.organisation.message.service.BillingMesssageReadPlatformService;
 import org.mifosplatform.portfolio.group.service.SearchParameters;
+import org.mifosplatform.portfolio.plan.data.BillRuleData;
 import org.mifosplatform.provisioning.processscheduledjobs.service.SheduleJobReadPlatformService;
 import org.mifosplatform.scheduledjobs.scheduledjobs.data.JobParameterData;
 import org.mifosplatform.scheduledjobs.scheduledjobs.data.ScheduleJobData;
@@ -65,14 +67,15 @@ public class SchedulerJobApiResource {
     private final MCodeReadPlatformService  mCodeReadPlatformService;
     private final ScheduledJobRunHistoryRepository scheduledJobRunHistoryRepository;
     private final PlatformSecurityContext context;
-
+    private final CodeReadPlatformService codeReadPlatformService;
     @Autowired
     public SchedulerJobApiResource(final SchedulerJobRunnerReadService schedulerJobRunnerReadService,final JobRegisterService jobRegisterService,
     		final ToApiJsonSerializer<JobDetailData> toApiJsonSerializer,final ApiRequestParameterHelper apiRequestParameterHelper,
     		final ToApiJsonSerializer<JobDetailHistoryData> jobHistoryToApiJsonSerializer,
     		final SheduleJobReadPlatformService sheduleJobReadPlatformService,final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
     		final BillingMesssageReadPlatformService billingMesssageReadPlatformService,final MCodeReadPlatformService mCodeReadPlatformService,
-    		final PlatformSecurityContext context,final ScheduledJobRunHistoryRepository scheduledJobRunHistoryRepository) {
+    		final PlatformSecurityContext context,final ScheduledJobRunHistoryRepository scheduledJobRunHistoryRepository,
+    		final CodeReadPlatformService codeReadPlatformService) {
     	
         this.schedulerJobRunnerReadService = schedulerJobRunnerReadService;
         this.jobRegisterService = jobRegisterService;
@@ -85,6 +88,7 @@ public class SchedulerJobApiResource {
         this.mCodeReadPlatformService=mCodeReadPlatformService;
         this.context = context;
         this.scheduledJobRunHistoryRepository=scheduledJobRunHistoryRepository;
+        this.codeReadPlatformService=codeReadPlatformService;
     }
     
 
@@ -165,7 +169,7 @@ public class SchedulerJobApiResource {
     	context.authenticatedUser().validateHasReadPermission(resourceNameForPermission);
     	JobDetailData jobDetailData = this.schedulerJobRunnerReadService.retrieveOne(jobId);
         JobParameterData data=this.sheduleJobReadPlatformService.getJobParameters(jobDetailData.getDisplayName());
-        Collection<MCodeData> provisionSysData = this.mCodeReadPlatformService.getCodeValue("Provisioning");
+        Collection<BillRuleData> provisionSysData = this.codeReadPlatformService.retrievebillRules("radius");
         jobDetailData=handleTemplateData(jobDetailData);
         
            jobDetailData.setJobParameters(data);

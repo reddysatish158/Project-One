@@ -180,7 +180,7 @@ public class JobParameters extends AbstractPersistable<Long>{
 	    	this.paramValue=ReportEmail;
 	      }
 	    
-	    final String ProvisioningParamName = "ProvSystem";
+	    final String ProvisioningParamName = "system";
 	    final String Provisioning = command.stringValueOfParameterNamed(ProvisioningParamName);
 	    if(this.paramName.equalsIgnoreCase(SchedulerJobApiConstants.JOB_ProvSystem) && Provisioning!=null){
 	    	this.paramValue=Provisioning;

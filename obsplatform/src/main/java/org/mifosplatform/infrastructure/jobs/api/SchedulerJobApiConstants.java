@@ -45,7 +45,7 @@ public class SchedulerJobApiConstants {
     public static final String JOB_REPORTEMAIL="Report Email";
     public static final String JOB_EmailId="emailId";
     public static final String JOB_MiddleWare="Middleware";
-    public static final String JOB_ProvSystem="ProvSystem";
+    public static final String JOB_ProvSystem="system";
     public static final String JOB_URL="URL";
     public static final String JOB_Username="Username";
     public static final String JOB_Password="Password";
