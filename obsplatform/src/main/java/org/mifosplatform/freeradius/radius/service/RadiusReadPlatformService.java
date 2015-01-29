@@ -23,6 +23,8 @@ public interface RadiusReadPlatformService {
 	
 	String deleteRadService(Long radServiceId);
 
+	String retrieveRadServiceTemplateData();
+
 
 
 }

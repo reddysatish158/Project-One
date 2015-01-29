@@ -362,5 +362,29 @@ public class RadiusReadPlatformServiceImp implements RadiusReadPlatformService {
 		 
 		}
 
+	@Override
+	public String retrieveRadServiceTemplateData() {
+		
+		try {
+			JobParameterData data = this.sheduleJobReadPlatformService.getJobParameters(JobName.RADIUS.toString());
+			if(data == null){
+				throw new RadiusDetailsNotFoundException();
+			}
+			String url ="";
+			url= data.getUrl() + "raduser2/template";
+			String credentials = data.getUsername().trim() + ":" + data.getPassword().trim();
+			byte[] encoded = Base64.encodeBase64(credentials.getBytes());
+			String encodedPassword = new String(encoded);
+			String radServiceTemplateData = this.processRadiusGet(url, encodedPassword);
+			return radServiceTemplateData;
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+			return e.getMessage();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return e.getMessage();
+		}
+	}
+
 }
 
