@@ -720,7 +720,7 @@ public void processNotify() {
 
 				HttpClient httpClient = new DefaultHttpClient();
 				List<EntitlementsData> entitlementDataForProcessings = this.entitlementReadPlatformService
-						.getProcessingData(new Long(100), data.getProvSystem(), null);
+						.getProcessingData(new Long(100), RadiusJobConstants.ProvisioningSystem, null);
 
 				if (!entitlementDataForProcessings.isEmpty()) {
 

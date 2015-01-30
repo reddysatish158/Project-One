@@ -1,6 +1,8 @@
 package org.mifosplatform.infrastructure.jobs.service;
 
 public class RadiusJobConstants {
+	
+	 public static final String ProvisioningSystem = "Radius";
 
 	 public static final String Activation = "ACTIVATION";
 	 public static final String ReConnection = "RECONNECTION";
