@@ -13,9 +13,17 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+<<<<<<< HEAD
 import org.mifosplatform.freeradius.radius.exception.RadiusDetailsNotFoundException;
 import org.mifosplatform.infrastructure.jobs.service.JobName;
 import org.mifosplatform.portfolio.order.exceptions.OrderNotFoundException;
+=======
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.mifosplatform.infrastructure.jobs.service.JobName;
+import org.mifosplatform.portfolio.order.exceptions.RadiusDetailsNotFoundException;
+>>>>>>> upstream/obsplatform-2.03
 import org.mifosplatform.provisioning.processscheduledjobs.service.SheduleJobReadPlatformService;
 import org.mifosplatform.scheduledjobs.scheduledjobs.data.JobParameterData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -153,15 +161,23 @@ public class RadiusReadPlatformServiceImp implements RadiusReadPlatformService {
 				throw new RadiusDetailsNotFoundException();
 			}
 			String url ="";
-			if(attribute!=null){
-				url= data.getUrl() + "radservice?attribute="+attribute;
-			}else{
-				url= data.getUrl() + "radservice";
+			if(data.getProvSystem().equalsIgnoreCase("version-1")){
+				if(attribute!=null){
+					url= data.getUrl() + "radservice?attribute="+attribute;
+				}else{
+					url= data.getUrl() + "radservice";
+				}
+			}else if(data.getProvSystem().equalsIgnoreCase("version-2")){
+				url= data.getUrl() + "service2";
 			}
 			String credentials = data.getUsername().trim() + ":" + data.getPassword().trim();
 			byte[] encoded = Base64.encodeBase64(credentials.getBytes());
 			String encodedPassword = new String(encoded);
 			String radServiceData = this.processRadiusGet(url, encodedPassword);
+			JSONObject jsonObj = new JSONObject();
+			jsonObj.put("radiusVersion", data.getProvSystem().toLowerCase());
+			jsonObj.put("radServiceData", new JSONArray(radServiceData));
+			radServiceData = jsonObj.toString();
 			return radServiceData;
 			
 
@@ -169,6 +185,9 @@ public class RadiusReadPlatformServiceImp implements RadiusReadPlatformService {
 			e.printStackTrace();
 			return e.getMessage();
 		} catch (IOException e) {
+			e.printStackTrace();
+			return e.getMessage();
+		} catch (JSONException e) {
 			e.printStackTrace();
 			return e.getMessage();
 		}
@@ -183,7 +202,13 @@ public class RadiusReadPlatformServiceImp implements RadiusReadPlatformService {
 			if(data == null){
 				throw new RadiusDetailsNotFoundException();
 			}
-			String url = data.getUrl() + "radservice";
+			String url = "";
+			if(data.getProvSystem().equalsIgnoreCase("version-1")){
+				 url = data.getUrl() + "radservice";
+			}
+			else if(data.getProvSystem().equalsIgnoreCase("version-2")){
+				 url = data.getUrl() + "service2";
+			}
 			String credentials = data.getUsername().trim() + ":" + data.getPassword().trim();
 			byte[] encoded = Base64.encodeBase64(credentials.getBytes());
 			String encodedPassword = new String(encoded);
@@ -232,7 +257,13 @@ public class RadiusReadPlatformServiceImp implements RadiusReadPlatformService {
 			if(data == null){
 				throw new RadiusDetailsNotFoundException();
 			}
-			String url = data.getUrl() + "radservice/"+radServiceId;
+			String url = "";
+			if(data.getProvSystem().equalsIgnoreCase("version-1")){
+			  url = data.getUrl() + "radservice/"+radServiceId;
+			}
+			/*else if(data.getProvSystem().equalsIgnoreCase("version-2")){
+				url = data.getUrl() + "radservice/"+radServiceId;
+			}*/
 			String credentials = data.getUsername().trim() + ":" + data.getPassword().trim();
 			byte[] encoded = Base64.encodeBase64(credentials.getBytes());
 			String encodedPassword = new String(encoded);
@@ -348,6 +379,30 @@ public class RadiusReadPlatformServiceImp implements RadiusReadPlatformService {
 			return output1;
 		 
 		}
+
+	@Override
+	public String retrieveRadServiceTemplateData() {
+		
+		try {
+			JobParameterData data = this.sheduleJobReadPlatformService.getJobParameters(JobName.RADIUS.toString());
+			if(data == null){
+				throw new RadiusDetailsNotFoundException();
+			}
+			String url ="";
+			url= data.getUrl() + "raduser2/template";
+			String credentials = data.getUsername().trim() + ":" + data.getPassword().trim();
+			byte[] encoded = Base64.encodeBase64(credentials.getBytes());
+			String encodedPassword = new String(encoded);
+			String radServiceTemplateData = this.processRadiusGet(url, encodedPassword);
+			return radServiceTemplateData;
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+			return e.getMessage();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return e.getMessage();
+		}
+	}
 
 }
 

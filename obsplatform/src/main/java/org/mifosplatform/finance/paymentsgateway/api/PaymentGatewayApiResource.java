@@ -390,9 +390,21 @@ public class PaymentGatewayApiResource {
 			String currency = String.valueOf(output.get("currency"));
 
 			String error = String.valueOf(output.get("error"));
+			String cardType = null;
+			String cardNumber = null;
 			
 			if(currency.equalsIgnoreCase("ISK")){
 				amount = amount.replace('.', ',');
+			}
+			
+			JSONObject apiObject = new JSONObject(apiRequestBodyAsJson);
+			
+			if(apiObject.has("cardType")){
+				cardType = apiObject.getString("cardType");
+			}
+			
+			if(apiObject.has("cardNumber")){
+				cardNumber = apiObject.getString("cardNumber");
 			}
 			
 			String totalAmount =  amount + " " + currency;
@@ -406,7 +418,8 @@ public class PaymentGatewayApiResource {
 				
 				JSONObject object = new JSONObject(OutputData);
 				
-				this.paymentGatewayWritePlatformService.emailSending(clientId, object.getString("Result"), object.getString("Description"), txnId, totalAmount);
+				this.paymentGatewayWritePlatformService.emailSending(clientId, object.getString("Result"), 
+						object.getString("Description"), txnId, totalAmount, cardType, cardNumber);
 				
 				return object.toString();
 			} else{
@@ -418,7 +431,7 @@ public class PaymentGatewayApiResource {
 				object.put("ObsPaymentId", "");
 				object.put("TransactionId", txnId);
 				
-				this.paymentGatewayWritePlatformService.emailSending(clientId, status, error, txnId, totalAmount);
+				this.paymentGatewayWritePlatformService.emailSending(clientId, status, error, txnId, totalAmount, cardType, cardNumber);
 				
 				return object.toString();
 			}

@@ -776,7 +776,7 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 	}
 	
 	@Override
-	public void emailSending(Long clientId, String Result, String Description, String orderId, String amount){
+	public void emailSending(Long clientId, String Result, String Description, String orderId, String amount, String cardType, String cardNumber){
 		
 		Client client = this.clientRepository.findOne(clientId);
 		if(client == null){
@@ -800,6 +800,13 @@ public class PaymentGatewayWritePlatformServiceImpl implements PaymentGatewayWri
 		body = body.replace("<PARAM4>", amount);
 		body = body.replace("<PARAM5>", orderId);
 		
+		if(body.contains("<PARAM6>")){
+			body = body.replace("<PARAM6>", cardType);
+		}
+		
+		if(body.contains("<PARAM7>")){
+			body = body.replace("<PARAM7>", cardNumber);
+		}
 		
 		BillingMessage billingMessage = new BillingMessage(header, body, footer, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_EMAIL_FROM, client.getEmail(),
 				subject, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_STATUS, messageDetails, BillingMessageTemplateConstants.MESSAGE_TEMPLATE_MESSAGE_TYPE, null);

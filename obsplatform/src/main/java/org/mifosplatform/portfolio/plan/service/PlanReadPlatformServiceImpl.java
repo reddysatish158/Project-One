@@ -48,41 +48,6 @@ public class PlanReadPlatformServiceImpl implements PlanReadPlatformService {
 		this.priceReadPlatformService=priceReadPlatformService;
 	}
 
-
-	/*
-	 *Retrieve billing Rules
-	 */
-	@Override
-	public List<BillRuleData> retrievebillRules() {
-
-		context.authenticatedUser();
-
-		final BillRuleDataMapper mapper = new BillRuleDataMapper();
-
-		final String sql = "select " + mapper.schema();
-
-		return this.jdbcTemplate.query(sql, mapper, new Object[] {});
-	}
-
-	private static final class BillRuleDataMapper implements RowMapper<BillRuleData> {
-
-		public String schema() {
-			return " b.enum_id AS id,b.enum_message_property AS billingRule,b.enum_value AS value FROM r_enum_value b" +
-					" WHERE enum_name = 'billing_rules'";
-
-		}
-
-		@Override
-		public BillRuleData mapRow(final ResultSet rs,final int rowNum) throws SQLException {
-
-			final Long id = rs.getLong("id");
-			final String billrules = rs.getString("billingRule");
-			final String value = rs.getString("value");
-			return new BillRuleData(id, billrules,value);
-			
-		}
-	}
-
 	@Override
 	public List<PlanData> retrievePlanData(final String planType) {
 
