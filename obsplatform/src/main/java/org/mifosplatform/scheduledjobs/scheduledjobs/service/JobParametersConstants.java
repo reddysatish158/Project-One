@@ -17,5 +17,6 @@ public class JobParametersConstants {
 	public static final String PARAM_EMAIL = "EmailId";
 	public static final String PARAM_TICKET = "Ticket";
 	public static final String PARAM_STATUS = "status";
+	public static final String PARAM_MIKROTIK_API="Mikrotik_api";
 	
 }
